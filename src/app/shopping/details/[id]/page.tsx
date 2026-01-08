@@ -9,6 +9,7 @@ import Sizes from "@/components/common/Sizes";
 import Counter from "@/components/sections/details/Counter";
 import { Reviews } from "@/components/sections/details/Reviews";
 import { AlsoLike } from "@/components/sections/details/AlsoLike";
+import { products } from "@/data/data";
 // 1.(SEO)
 export async function generateMetadata({
   params,
@@ -16,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const ProductType = data.find((e: Product) => e.id === Number(id));
+  const ProductType = products.find((e: Product) => e.id === Number(id));
   if (!ProductType) {
     return {
       title: "This Product Not Found",
@@ -35,7 +36,7 @@ export default async function DetailsProduct({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const productItem = data.find(
+  const productItem = products.find(
     (Product: Product) => Product.id === Number(id)
   );
   if (!productItem) {
