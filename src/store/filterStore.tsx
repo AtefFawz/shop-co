@@ -1,7 +1,7 @@
 import { create } from "zustand";
-import { data } from "@/lib/api";
+// import { data } from "@/lib/api";
 import { Product } from "@/types";
-
+import { products } from "@/data/data";
 interface FilterStore {
   products: Product[];
   filterBySection: (section: string) => void;
@@ -9,16 +9,16 @@ interface FilterStore {
   filterPrice?: (maxPrice: number) => void;
 }
 export const useFilterStore = create<FilterStore>()((set) => ({
-  products: data,
+  products: products,
   filterBySection: (section) => {
-    set({ products: data.filter((item) => item.section === section) });
+    set({ products: products.filter((item) => item.section === section) });
   },
   resetFilter: () => {
-    set({ products: data });
+    set({ products: products });
   },
   filterPrice: (newValue: number) => {
     set({
-      products: data.filter((item) => item.price <= newValue),
+      products: products.filter((item) => item.price <= newValue),
     });
   },
 }));

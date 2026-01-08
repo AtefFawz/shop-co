@@ -1,10 +1,11 @@
-import { data } from "@/lib/api";
+// import { data } from "@/lib/api";
+import { products } from "@/data/data";
 import { Product } from "@/types";
 import Card from "@/components//common/Card";
 import Heading from "@/components/ui/Heading";
 export const AlsoLike = ({ productItem }: { productItem: Product }) => {
   // && item.id !== productItem?.id عشان ميجيبش نفس المنتج اللي انا فاتحه
-  const filteredProducts = data.filter(
+  const filteredProducts = products.filter(
     (item) => item.section === productItem?.section
   );
   return (

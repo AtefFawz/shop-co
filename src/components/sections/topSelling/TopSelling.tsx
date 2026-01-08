@@ -2,10 +2,11 @@
 import { useRouter } from "next/navigation";
 import Card from "@/components/common/Card";
 import Heading from "@/components/ui/Heading";
-import { data } from "@/lib/api";
+// import { data } from "@/lib/api";
+import { products } from "@/data/data";
 import BUtton from "@/components/ui/BUtton";
 export default function TopSelling() {
-  const FILTERING = data.filter((e) => e.inSale === true);
+  const FILTERING = products.filter((e) => e.inSale === true);
   // console.log(FILTERING);
   const router = useRouter();
   function handelClick() {

@@ -75,7 +75,7 @@ export default async function DetailsProduct({
             </div>
           </div>
           <div className=" border-t border-gray-200 py-3 xl:py-6">
-            <h2 className="text-gray-500 pb-3 xl:pb-5">Quantity</h2>
+            <h2 className="text-gray-500 pb-3 xl:pb-5 ">Quantity</h2>
             <Counter product={productItem!} />
           </div>
         </div>
