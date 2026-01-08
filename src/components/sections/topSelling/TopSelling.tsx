@@ -7,7 +7,7 @@ import { products } from "@/data/data";
 import BUtton from "@/components/ui/BUtton";
 export default function TopSelling() {
   const FILTERING = products.filter((e) => e.inSale === true);
-  // console.log(FILTERING);
+
   const router = useRouter();
   function handelClick() {
     router.push("/selling");

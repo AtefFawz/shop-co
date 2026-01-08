@@ -4,8 +4,7 @@ import { AiOutlineRight } from "react-icons/ai";
 
 export const FilterButton = ({ content }: { content: string[] }) => {
   const set = useFilterStore((state) => state.filterBySection);
-  const pro = useFilterStore((e) => e.products);
-  console.log(pro);
+
   return (
     <div className="w-full border-b border-gray-300 pb-5">
       {content.map((e, id) => (
