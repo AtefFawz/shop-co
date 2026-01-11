@@ -3,6 +3,7 @@ import ProductsGrid from "./newArrIvals/ProductsGrid";
 import TopSelling from "./topSelling/TopSelling";
 import Browse from "./browse/Browse";
 import Rating from "./rating/RatingUi";
+import { Shop } from "./shop/shop";
 export default function Index() {
   return (
     <div>
@@ -13,6 +14,7 @@ export default function Index() {
         <Browse />
       </div>
       <Rating />
+      <Shop />
     </div>
   );
 }

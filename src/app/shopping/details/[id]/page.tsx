@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { data } from "../../../../lib/api";
+// import { data } from "../../../../lib/api";
 import { Product } from "../../../../types";
 import StarRating from "@/components/common/StarsRating";
 import Pricing from "@/components/common/Pricing";

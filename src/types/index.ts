@@ -12,7 +12,7 @@ export interface Product {
   colors: string[];
   sizes: string[];
   isChose: boolean;
-  type: "male" | "female";
+  type: "MEN" | "WOMEN" | "KIDS";
   section: string;
   count: number;
 }

@@ -1,17 +1,8 @@
-"use client";
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-
+import { Category as Cat } from "@/components/sections/category/Category";
 export default function Category() {
-  const router = useRouter();
-
-  useEffect(() => {
-    router.push("/shopping/");
-  }, [router]);
-
   return (
-    <div className="flex h-screen items-center text-2xl justify-center">
-      <p>Redirecting...</p>
-    </div>
+    <section>
+      <Cat />
+    </section>
   );
 }
