@@ -1,8 +1,8 @@
 import { Product } from "@/types";
-import T_Shirt from "../assets/card/T-Shirt.png";
-import Jeans from "../assets/card/Jeans.png";
-import T_Shirt2 from "../assets/card/T-Shirt2.png";
-import Shirt from "../assets/card/Shirt.png";
+import T_Shirt from "@/assets/card/T-Shirt.png";
+import Jeans from "@/assets/card/Jeans.png";
+import T_Shirt2 from "@/assets/card/T-Shirt2.png";
+import Shirt from "@/assets/card/Shirt.png";
 export const products: Product[] = [
   {
     id: 1,

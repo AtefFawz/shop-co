@@ -6,11 +6,10 @@ interface FilterStore {
   products: Product[];
   currentType: string | null;
 
-  filterByType: (type: string) => void; //
+  filterByType: (type: string) => void;
   filterBySection: (section: string) => void;
   resetFilter: () => void;
   filterPrice: (maxPrice: number) => void;
-  // sec: string | null;
 }
 
 export const useFilterStore = create<FilterStore>()((set, get) => ({

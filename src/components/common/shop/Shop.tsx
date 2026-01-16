@@ -3,9 +3,8 @@ import Card from "@/components/common/Card";
 import { Menu } from "@/components/common/shop/menu/Menu";
 import { ShopPaths } from "./Paths";
 import { MainMenu } from "./MenuPhone/MainMenue";
-import { fil } from "./menu/Menu";
 import { useFilterStore } from "@/store/filterStore";
-export const AllProduct = () => {
+export const Shop = () => {
   const product = useFilterStore((e) => e.products);
   const type = useFilterStore((e) => e.currentType);
 
