@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FilterButton } from "@/components/common/FilterButton";
 import { AiOutlineDown } from "react-icons/ai";
 export const Sections = () => {
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(false);
   const handelActive = () => {
     setActive((prev) => !prev);
   };

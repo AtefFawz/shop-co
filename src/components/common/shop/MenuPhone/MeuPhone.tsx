@@ -81,7 +81,10 @@ export default function AnchorTemporaryDrawer() {
           <div className="flex justify-between items-center bg-white max-w-full ">
             <h1 className="font-bold ">
               {`Shopping >`}{" "}
-              <span className="text-gray-500 text-sm">{find?.section}</span>{" "}
+              <span className="text-gray-500 text-sm">{find?.type}</span> {`>`}
+              <span className="text-gray-500 text-sm">
+                {find?.section}
+              </span>{" "}
             </h1>
 
             <Button onClick={toggleDrawer(anchor, true)}>

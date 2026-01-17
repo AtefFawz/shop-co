@@ -7,7 +7,7 @@ import { useFilterStore } from "@/store/filterStore";
 export const Shop = () => {
   const product = useFilterStore((e) => e.products);
   const type = useFilterStore((e) => e.currentType);
-
+  const Find = product.find((e) => e.id);
   return (
     <section className="container mx-auto  flex gap-6 justify-between  my-10 relative ">
       <div className="hidden md:block md:col-span-2 sticky top-30 h-fit w-[30%] xl:w-[25%] self-start ">
@@ -18,7 +18,7 @@ export const Shop = () => {
       <div className="xl:w-[75%] md:w-[70%] w-full ">
         <h1 className="pb-4 font-bold md:block hidden">{`Shop >${
           type || "All"
-        } > `}</h1>
+        } > ${Find?.section}`}</h1>
         <div className="md:hidden pb-6 px-4 ">
           <MainMenu />
         </div>

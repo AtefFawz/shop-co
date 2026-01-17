@@ -11,10 +11,11 @@ export const Brands = () => {
         {Brand_Item.map((brand) => {
           return (
             <motion.div
-              whileTap={{ rotateY: 90 }}
+              whileTap={{ rotateY: 10, y: -20 }}
+              whileHover={{ rotateY: 10, y: -20 }}
               transition={{ duration: 0.8 }}
               key={brand.id}
-              className="md:w-[31%] xl:w-[22%] w-[46%] bg-[#ffffff]  p-4 rounded-2xl h-46 shadow-[inset_0_0_0_3px_rgba(0,0,0,0.2)]"
+              className="md:w-[31%] xl:w-[22%] w-[46%] bg-[#ffffff]  p-4 rounded-2xl h-46 shadow-[inset_0_0_0_3px_rgba(0,0,0,0.2)] cursor-pointer"
             >
               <Image
                 src={brand.Icon}

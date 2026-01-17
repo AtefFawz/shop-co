@@ -23,12 +23,15 @@ export const Colors = () => {
   const handelActive = () => {
     setActive((prev) => !prev);
   };
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(false);
+
   return (
-    <div className="w-full  border-gray-200 pb-4">
+    <div className={`w-full  border-gray-200  ${active ? "pb-4" : ""}`}>
       {/* Header */}
       <div
-        className="flex items-center justify-between w-full gap-5 cursor-pointer py-4"
+        className={`flex items-center justify-between w-full gap-5 cursor-pointer  ${
+          active ? "py-4" : ""
+        } `}
         onClick={handelActive}
       >
         <h1 className="font-bold text-sm text-gray-600">COLORS</h1>

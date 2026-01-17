@@ -4,6 +4,7 @@ import { Product } from "@/types";
 interface Products {
   stack: Product[];
   toggle: (newState: Product) => void;
+  update: (newValue: Product) => void;
   up: (product: Product) => void;
   down: (product: Product) => void;
 }
@@ -27,7 +28,7 @@ export const useProduct = create<Products>()((set, get) => ({
         stack: stack.map((item) =>
           item.id === product.id
             ? { ...item, count: (item.count || 0) + 1 }
-            : item
+            : item,
         ),
       });
     } else {
@@ -41,7 +42,15 @@ export const useProduct = create<Products>()((set, get) => ({
       stack: stack.map((item) =>
         item.id === product.id && item.count > 0
           ? { ...item, count: item.count - 1 }
-          : item
+          : item,
+      ),
+    });
+  },
+  update: (newValue) => {
+    const { stack } = get();
+    set({
+      stack: stack.map((item) =>
+        item.id === newValue.id ? { ...item, isChose: true } : item,
       ),
     });
   },

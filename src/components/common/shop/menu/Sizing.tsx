@@ -14,7 +14,7 @@ export const Sizing = () => {
     "3X-Large",
     "4X-Large",
   ];
-  const [active, setActive] = useState(true);
+  const [active, setActive] = useState(false);
   const handelActive = () => {
     setActive((prev) => !prev);
   };

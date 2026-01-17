@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import { useProduct } from "@/store/cardStore";
 export default function Shopping() {
   const stack = useProduct((e) => e.stack);
+  console.log("stack" + stack);
   const fileting = stack.filter((e) => e.isChose == true);
-  console.log(fileting);
+  // console.log(fileting);
   const router = useRouter();
 
   const handleCardClick = (productId: number) => {
     console.log(`User clicked on therapist number: ${productId}`);
-    router.push(`/shopping/${productId}`);
+    router.push(`/shopping/details`);
   };
   return (
     <section className="flex items-center justify-center container mx-auto h-screen w-full">

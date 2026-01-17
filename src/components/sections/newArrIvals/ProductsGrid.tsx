@@ -10,7 +10,7 @@ import { Product } from "@/types/index";
 export default function NewArrivals() {
   const router = useRouter();
   function handelClick() {
-    router.push("/products");
+    router.push("/shopping");
   }
   return (
     <section className="px-2 md:px-4 lg:px-6 container mx-auto ">

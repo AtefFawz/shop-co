@@ -33,7 +33,7 @@ export default function MobileNavbar() {
       isFound: true,
       key: "cart",
       action: () => {
-        router.push("/shopping");
+        router.push("/shopping/details/cart/");
       },
     },
     {

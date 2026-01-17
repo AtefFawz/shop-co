@@ -11,86 +11,63 @@ import { useRouter } from "next/navigation";
 export default function Card({ product }: { product: Product }) {
   const toggleProduct = useProduct((e) => e.toggle);
   const router = useRouter();
-
   const handleNavigate = () => {
-    // تحديث الحالة وتوجيه المستخدم
-    product.isChose = !product.isChose; // لو السطر ده ضروري للوجيك بتاعك سيبه
     toggleProduct(product);
     router.push(`/shopping/details/${product.id}`);
   };
 
   return (
     <div className="group relative w-full space-y-3 py-4">
-      {/* --- Image Container --- */}
-      <div
+      <motion.div
         className="relative h-64 md:h-80 w-full overflow-hidden rounded-3xl bg-gray-100 cursor-pointer"
         onClick={handleNavigate}
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.97 }}
+        transition={{ duration: 0.2 }}
       >
-        {/* 1. الصورة بتعمل زووم خفيف */}
         <Image
           unoptimized
           src={product.image}
           alt={product.title}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-110"
+          className="object-cover transition-transform duration-700 md:group-hover:scale-110"
         />
 
-        {/* 2. طبقة سوداء تظهر بنعومة */}
-        <div className="absolute inset-0 bg-black/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+        {/* Overlay: ظاهر خفيف في الموبايل، وبيتقل في الهوفر */}
+        <div className="absolute inset-0 bg-black/10 md:bg-black/20 opacity-100 md:opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100" />
 
-        {/* 3. زرار التفاصيل يظهر من تحت لفوق */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+        {/* الزرار:
+           1. في الموبايل (block): ظاهر علطول.
+           2. في الكمبيوتر (md:opacity-0): مخفي ويظهر بالهوفر.
+        */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-100 md:opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100">
           <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-black shadow-xl"
+            // أنيميشن الزرار نفسه لما تدوس عليه
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={(e) => {
+              e.stopPropagation(); // عشان ميفعلش الكارت كله
+              handleNavigate();
+            }}
+            className="flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 md:px-6 md:py-3 text-sm font-bold text-black shadow-xl backdrop-blur-sm"
           >
             Show Details
             <GoArrowUpRight className="text-lg" />
           </motion.button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* --- Card Info --- */}
+      {/* باقي تفاصيل الكارت */}
       <div>
-        <div className="flex justify-between items-start">
-          <h4
-            className="font-bold text-base md:text-lg truncate w-3/4"
-            title={product.title}
-          >
-            {product.title}
-          </h4>
-          {/* زرار إضافة سريع (اختياري)
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              // هنا لو عايز تضيف للكارت علطول
-            }}
-            className="bg-black text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0"
-          >
-            <GoPlus size={20} />
-          </button> */}
-        </div>
-
+        <h4 className="font-bold text-base md:text-lg truncate">
+          {product.title}
+        </h4>
         <div className="flex items-center gap-2 mt-1">
           <StarRating rating={product.rating} />
           <span className="text-xs text-gray-500">{product.rating}/5</span>
         </div>
-
-        <div className="mt-2 flex items-center justify-between">
-          <Pricing product={product} />
-        </div>
+        <Pricing product={product} />
       </div>
     </div>
   );
 }
-// <button
-//   onClick={() => {
-//     product.isChose = !product.isChose;
-//     handel(product);
-
-//     router.push(`/shopping/details/${product.id}`);
-//   }}
-// >
-//   add me
-// </button>;
