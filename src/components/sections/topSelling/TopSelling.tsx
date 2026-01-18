@@ -4,7 +4,7 @@ import Card from "@/components/common/Card";
 import Heading from "@/components/ui/Heading";
 // import { data } from "@/lib/api";
 import { products } from "@/data/data";
-import BUtton from "@/components/ui/BUtton";
+import BUtton from "@/components/ui/Button";
 export default function TopSelling() {
   const FILTERING = products.filter((e) => e.inSale === true);
 

@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import Button from "@/components/ui/BUtton";
+import Button from "@/components/ui/Button";
 import { itemShop, items, brands } from "@/data/shop/Shop";
 import { useRouter } from "next/navigation";
 export default function ScreenShop() {

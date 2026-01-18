@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Card from "@/components/common/Card";
-import BUtton from "@/components/ui/BUtton";
+import BUtton from "@/components/ui/Button";
 import Heading from "@/components/ui/Heading";
 // import { data } from "@/lib/api";
 import { products } from "@/data/data";

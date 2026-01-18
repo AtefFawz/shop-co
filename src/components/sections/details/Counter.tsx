@@ -6,7 +6,7 @@ export default function Counter({ product }: { product: Product }) {
   const UPCounter = useProduct((state) => state.up);
   const DOWNCounter = useProduct((state) => state.down);
   const count = useProduct(
-    (state) => state.stack.find((item) => item.id === product.id)?.count || 0
+    (state) => state.stack.find((item) => item.id === product.id)?.count || 1,
   );
 
   if (!product) {

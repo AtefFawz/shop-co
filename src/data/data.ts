@@ -18,7 +18,7 @@ export const products: Product[] = [
     isChose: false,
     type: "KIDS",
     section: "JEANS",
-    count: 0,
+    count: 1,
   },
   {
     id: 2,
@@ -34,7 +34,7 @@ export const products: Product[] = [
     isChose: false,
     type: "MEN",
     section: "T-SHIRT",
-    count: 0,
+    count: 1,
   },
   {
     id: 3,
@@ -50,7 +50,7 @@ export const products: Product[] = [
     isChose: false,
     type: "MEN",
     section: "SHIRT",
-    count: 0,
+    count: 1,
   },
   {
     id: 4,
@@ -66,6 +66,6 @@ export const products: Product[] = [
     isChose: false,
     type: "MEN",
     section: "T-SHIRT",
-    count: 0,
+    count: 1,
   },
 ];

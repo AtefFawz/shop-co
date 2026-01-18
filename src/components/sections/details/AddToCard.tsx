@@ -1,21 +1,21 @@
 "use client";
 import { motion } from "motion/react";
+import toast from "react-hot-toast";
 import { useProduct } from "@/store/cardStore";
-import { products } from "@/data/data";
+
 export const ButtonCard = () => {
   const Choosing = useProduct((e) => e.stack);
   const update = useProduct((e) => e.update);
-  const result = Choosing.map((product) => product);
-  console.log(Choosing.forEach((product) => product));
+
   return (
     <div>
       <motion.button
         onClick={() => {
-          // console.log(result);
-          Choosing.map((product) => console.log(product));
-          Choosing.map((e) => {
-            console.log(Choosing);
+          Choosing.forEach((e) => {
             update(e);
+            toast.success(`${e.title} added to cart!`, {
+              id: "cart-toast",
+            });
           });
         }}
         whileTap={{ opacity: 0.7, scale: 0.98 }}

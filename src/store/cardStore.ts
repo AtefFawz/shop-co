@@ -5,6 +5,7 @@ interface Products {
   stack: Product[];
   toggle: (newState: Product) => void;
   update: (newValue: Product) => void;
+  delete: (newValue: Product) => void;
   up: (product: Product) => void;
   down: (product: Product) => void;
 }
@@ -51,6 +52,14 @@ export const useProduct = create<Products>()((set, get) => ({
     set({
       stack: stack.map((item) =>
         item.id === newValue.id ? { ...item, isChose: true } : item,
+      ),
+    });
+  },
+  delete: (newState) => {
+    const { stack } = get();
+    set({
+      stack: stack.map((item) =>
+        item.id === newState.id ? { ...item, isChose: false } : item,
       ),
     });
   },

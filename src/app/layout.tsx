@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import Navbar from "../components/layout/navbar/Navbar";
 import Footer from "../components/layout/footer/Footer";
@@ -31,6 +32,7 @@ export default function RootLayout({
       >
         <Navbar />
         {children}
+        <Toaster position="bottom-right" />
         <Footer />
       </body>
     </html>
