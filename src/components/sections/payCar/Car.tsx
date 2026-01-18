@@ -8,6 +8,7 @@ import { EmptyCart } from "./EmptyCart";
 export const Car = () => {
   const Stack = useProduct((e) => e.stack);
   const FILTER = Stack.filter((e) => e.isChose === true);
+  console.log("Stack", Stack);
   if (FILTER?.length > 0) {
     return (
       <section className=" w-full ">

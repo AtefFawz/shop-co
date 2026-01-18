@@ -3,9 +3,13 @@ export const calculateFinalPrice = (
   discount?: number,
   count?: number,
 ) => {
+  const qty = count ?? 1;
+
   if (discount) {
     const final = price - price * (discount / 100);
-    return Math.round(final);
+
+    return Math.round(final * qty);
   }
-  return price * (count ?? 1);
+
+  return price * qty;
 };

@@ -1,11 +1,9 @@
 "use client";
 import { useRouter } from "next/navigation";
 import Card from "@/components/common/Card";
-import BUtton from "@/components/ui/Button";
+import SecondButton from "@/components/ui/SecondButton";
 import Heading from "@/components/ui/Heading";
-// import { data } from "@/lib/api";
 import { products } from "@/data/data";
-
 import { Product } from "@/types/index";
 export default function NewArrivals() {
   const router = useRouter();
@@ -21,7 +19,7 @@ export default function NewArrivals() {
         ))}
       </div>
       <div className=" w-full flex justify-center items-center py-8">
-        <BUtton textBtn="View All" func={handelClick} />
+        <SecondButton textBtn="View All" func={handelClick} />
       </div>
       <hr className="w-full my-10 text-gray-300 " />
     </section>

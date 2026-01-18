@@ -10,6 +10,7 @@ import Counter from "@/components/sections/details/Counter";
 import { Reviews } from "@/components/sections/details/Reviews";
 import { AlsoLike } from "@/components/sections/details/AlsoLike";
 import { products } from "@/data/data";
+import Heading from "@/components/ui/Heading";
 // 1.(SEO)
 export async function generateMetadata({
   params,
@@ -37,13 +38,15 @@ export default async function DetailsProduct({
 }) {
   const { id } = await params;
   const productItem = products.find(
-    (Product: Product) => Product.id === Number(id)
+    (Product: Product) => Product.id === Number(id),
   );
   if (!productItem) {
     notFound();
   }
   return (
     <section className="container mx-auto h-full mt-32 px-4 md:px-2 lg:px-8 xl:px-10">
+      {/* <div> */} <Heading title="The Details" styling="text-start pb-16" />
+      {/* </div> */}
       <article className="grid md:grid-cols-3 grid-cols-1 gap-10 justify-between w-full">
         <figure className="md:col-span-1 w-full ">
           <Image

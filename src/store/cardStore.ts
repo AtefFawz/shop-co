@@ -59,7 +59,7 @@ export const useProduct = create<Products>()((set, get) => ({
     const { stack } = get();
     set({
       stack: stack.map((item) =>
-        item.id === newState.id ? { ...item, isChose: false } : item,
+        item.id === newState.id ? { ...item, isChose: false, count: 1 } : item,
       ),
     });
   },

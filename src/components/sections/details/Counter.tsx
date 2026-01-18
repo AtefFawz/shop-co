@@ -30,7 +30,7 @@ export default function Counter({ product }: { product: Product }) {
       </div>
       <div className="col-span-2 w-full">
         {" "}
-        <ButtonCard />
+        <ButtonCard item={product} />
       </div>
     </article>
   );

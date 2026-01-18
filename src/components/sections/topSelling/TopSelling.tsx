@@ -4,7 +4,7 @@ import Card from "@/components/common/Card";
 import Heading from "@/components/ui/Heading";
 // import { data } from "@/lib/api";
 import { products } from "@/data/data";
-import BUtton from "@/components/ui/Button";
+import SecondButton from "@/components/ui/SecondButton";
 export default function TopSelling() {
   const FILTERING = products.filter((e) => e.inSale === true);
 
@@ -24,7 +24,7 @@ export default function TopSelling() {
       </div>
       <div className="w-full flex justify-center items-center py-6">
         {" "}
-        <BUtton textBtn="View All" func={handelClick} />
+        <SecondButton textBtn="View All" func={handelClick} />
       </div>
     </section>
   );

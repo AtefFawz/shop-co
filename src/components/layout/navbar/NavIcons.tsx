@@ -23,7 +23,6 @@ export default function NavIcons({
   const Count = useProduct((state) => state.stack).filter(
     (e) => e.isChose === true,
   );
-
   return (
     <div className={containerClass}>
       {items.map((item) => (
