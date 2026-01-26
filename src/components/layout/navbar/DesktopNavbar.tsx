@@ -24,7 +24,7 @@ export default function DesktopNavbar() {
       Icon: AccountCircleOutlinedIcon,
       key: "profile",
       action: () => {
-        router.push("/userLogin");
+        router.push("/user/login/");
       },
     },
   ];
