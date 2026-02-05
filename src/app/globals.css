@@ -20,10 +20,13 @@ body {
 }
 
 .h1-main {
-  @apply text-xl  md:text-3xl lg:text-4xl xl:text-5xl font-extrabold;
+  @apply text-xl md:text-3xl lg:text-4xl xl:text-5xl font-extrabold;
 }
 .p-main {
   @apply text-sm text-gray-500 md:text-sm lg:text-lg;
+}
+.Responsive {
+  @apply px-4 lg:px-8 xl:px-12 container mx-auto;
 }
 
 section {
@@ -32,6 +35,6 @@ section {
 
 @media (min-width: 768px) {
   section {
-    padding-top: 6rem;
+    padding-top: 10rem;
   }
 }

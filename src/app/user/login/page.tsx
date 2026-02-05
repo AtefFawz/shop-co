@@ -1,4 +1,4 @@
-import { CheckLogin } from "@/components/auth/CheckLogin";
+import User_Login from "@/components/auth/User_Login";
 export default function Login() {
-  return <CheckLogin />;
+  return <User_Login />;
 }

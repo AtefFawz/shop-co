@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
-import Navbar from "../components/layout/navbar/Navbar";
-import Footer from "../components/layout/footer/Footer";
+import LayoutProvider from "../components/layout/LayoutProvider"; // استدعاء الكومبوننت الجديد
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +14,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+// ✅ كدا الميتا داتا هتشتغل 10/10 لأن الملف بقى Server Component
 export const metadata: Metadata = {
   title: "Shop-co",
   description: "Your one-stop shop for fashion and lifestyle products.",
@@ -30,10 +30,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar />
-        {children}
+        {/* حطينا الناف والفوتر واللوجيك كله جوه البروفايدر ده */}
+        <LayoutProvider>{children}</LayoutProvider>
+
         <Toaster position="bottom-right" />
-        <Footer />
       </body>
     </html>
   );

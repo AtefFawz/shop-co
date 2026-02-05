@@ -40,7 +40,7 @@ export default function MobileNavbar() {
       Icon: AccountCircleOutlinedIcon,
       key: "profile",
       action: () => {
-        router.push("/userLogin");
+        router.push("/user/login");
       },
     },
   ];
