@@ -13,7 +13,7 @@ export default function ScreenShop() {
     <>
       <div className=" bg-[#F2F0F1] w-full ">
         <div className=" container mx-auto flex md:flex-row flex-col justify-between gap-6 px-6 md:px-4 lg:px-6 pt-16 ">
-          <div className="md:w-1/2 w-full space-y-10">
+          <div className="md:w-1/2 w-full space-y-6 md:space-y-10">
             <h1 className="h1-main tracking-wider italic">{itemShop.title}</h1>
             <p className="p-main tracking-wider leading-6  xl:leading-9">
               {itemShop.description}
