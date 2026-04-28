@@ -46,7 +46,7 @@ export default async function DetailsProduct({
   return (
     <>
       <section className=" h-full">
-        <div className="  container mx-auto px-2 md:px-2 lg:px-8 xl:px-10 w-full">
+        <div className="  container mx-auto px-4 lg:px-8 xl:px-10 w-full">
           {/* ── Breadcrumb ── */}
           <div className="flex flex-col  w-full">
             <nav className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-gray-400 mb-8 px-8">
