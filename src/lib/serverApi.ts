@@ -3,7 +3,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL + "/",
+  baseURL:
+    process.env.NEXT_PUBLIC_API_URL || "https://shop-co-jfqp.vercel.app/api/",
 });
 const serverApi = async (url: string) => {
   const token = (await cookies()).get("token")?.value;
