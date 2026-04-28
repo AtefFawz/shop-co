@@ -2,7 +2,6 @@
 import { motion } from "motion/react";
 import toast from "react-hot-toast";
 import { Product } from "@/types";
-import { useProduct } from "@/store/cardStore";
 
 export const ButtonCard = ({ item }: { item: Product }) => {
   return (

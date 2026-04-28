@@ -44,7 +44,6 @@ export function ProfileClient({
   const [active, setActive] = useState("overview");
   const router = useRouter();
   const handleRefresh = () => router.refresh();
-  const Url = process.env.NEXT_PUBLIC_API_URL + "/uploads/";
 
   const goTo = (id: string) => {
     setActive(id);
@@ -92,7 +91,7 @@ export function ProfileClient({
               <div className="flex items-center gap-4">
                 <div className="relative w-14 h-14 rounded-2xl overflow-hidden ring-4 ring-black/5 shadow-inner">
                   <Image
-                    src={`${Url}${avatar}`}
+                    src={avatar}
                     alt={fullName}
                     fill
                     className="object-cover"
@@ -143,7 +142,7 @@ export function ProfileClient({
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-[32px] overflow-hidden border-4 border-white/10 shadow-2xl">
                     <Image
-                      src={`${Url}${avatar}`}
+                      src={avatar}
                       alt={fullName}
                       fill
                       className="object-cover"

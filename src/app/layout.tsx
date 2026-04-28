@@ -39,12 +39,7 @@ export default async function RootLayout({
         ) : null}
         <AuthWatcher />
         <LayoutProvider>{children}</LayoutProvider>
-        <Toaster
-          position="top-center"
-          // toastOptions={{
-          //   style: { width: "10000px", padding: "10px" },
-          // }}
-        />
+        <Toaster position="top-center" />
       </body>
     </html>
   );

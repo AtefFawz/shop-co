@@ -13,7 +13,7 @@ export default function ProductClientWrapper({ product }: { product: any }) {
   const [selectedColor, setSelectedColor] = useState(product.colors);
   const [selectedSize, setSelectedSize] = useState(product.size);
   const [quantity, setQuantity] = useState(1);
-  console.log("ProductClientWrapper =>", product);
+
   const handleAddToCart = () => {
     const finalProduct = {
       ...product,

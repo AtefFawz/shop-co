@@ -18,7 +18,6 @@ export const Card = ({ productItem }: { productItem: Product }) => {
     productItem.discount,
     productItem.count,
   );
-  console.log(productItem);
   return (
     <motion.div
       layout

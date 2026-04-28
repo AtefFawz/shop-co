@@ -43,10 +43,6 @@ export default async function DetailsProduct({
         reviews.length
       : 0;
 
-  const imgSrc =
-    productItem.image ||
-    `${process.env.NEXT_PUBLIC_API_URL}/uploads/${productItem.photo}`;
-  console.log("productItem =>", productItem);
   return (
     <>
       <section className=" h-full">

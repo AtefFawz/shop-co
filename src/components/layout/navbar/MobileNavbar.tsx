@@ -23,7 +23,6 @@ export default function MobileNavbar() {
     const res = await api.get("profile/me");
     setPhoto(res.data.data.user.avatar);
   };
-  console.log(photo);
   useEffect(() => {
     getPhoto();
   }, []);

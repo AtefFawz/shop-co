@@ -8,8 +8,6 @@ export default function selling() {
   const { product, loading } = useProduct();
   const FILTER = product.filter((e: Product) => e.isSale == true);
 
-  console.log(product.length);
-
   if (loading) {
     return (
       <div className="container mx-auto px-8 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
