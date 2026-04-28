@@ -1,17 +1,20 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { HiOutlineArrowSmallLeft } from "react-icons/hi2";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 export const ShopPaths = () => {
   const router = useRouter();
+
   return (
     <motion.button
-      whileTap={{ x: -500 }}
-      transition={{ duration: 0.6 }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
       onClick={() => router.back()}
-      className="fixed bottom-16  bg-gray-900 p-2 md:p-4 text-[#EEEEEE] rounded-[9999px] cursor-pointer left-5 lg:left-16 text-2xl hover:shadow-2xl shadow-blue-600  duration-300 "
+      className="fixed bottom-8 left-4 lg:left-10 z-40 flex items-center gap-2 bg-black text-white text-xs font-black uppercase tracking-widest px-4 py-3 rounded-full shadow-xl shadow-black/20 hover:bg-gray-800 transition-colors"
     >
-      <HiOutlineArrowSmallLeft />
+      <ArrowLeft size={15} />
+      <span className="hidden sm:inline">Back</span>
     </motion.button>
   );
 };

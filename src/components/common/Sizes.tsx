@@ -1,23 +1,22 @@
-"use client";
-import { useState } from "react";
-export default function Sizes({ sizes }: { sizes: string }) {
-  const [isSelected, setIsSelected] = useState(false);
-  const handleSelect = () => {
-    setIsSelected(!isSelected);
-  };
+export default function Sizes({ product, selectedSize, setSelectedSize }: any) {
+  const getSize = product.size.join(",");
+  const result = getSize.split(",");
 
   return (
-    <div className="flex justify-center items-center">
-      <button
-        style={{
-          backgroundColor: isSelected ? "black" : "#e5e7eb",
-          color: isSelected ? "white" : "gray",
-        }}
-        onClick={() => handleSelect()}
-        className="w-fit px-4 lg:px-4 xl:px-7 py-1 text-xs font-bold md:text-sm lg:text-lg text-nowrap rounded-full cursor-pointer"
-      >
-        {sizes}
-      </button>
+    <div className="flex gap-x-1 items-center justify-center">
+      {result.map((e: any, id: any) => (
+        <button
+          key={id}
+          style={{
+            backgroundColor: selectedSize === e ? "black" : "#e5e7eb",
+            color: selectedSize === e ? "white" : "gray",
+          }}
+          onClick={() => setSelectedSize(e)}
+          className=" min-w-fit px-8 py-1 text-sm font-bold md:text-sm lg:text-lg text-nowrap rounded-full cursor-pointer w-16"
+        >
+          {e}
+        </button>
+      ))}
     </div>
   );
 }

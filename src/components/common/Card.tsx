@@ -1,73 +1,87 @@
 "use client";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { GoArrowUpRight } from "react-icons/go";
+import { ArrowUpRight } from "lucide-react";
 import StarRating from "./StarsRating";
 import { Product } from "../../types/index";
 import Pricing from "./Pricing";
-import { useProduct } from "@/store/cardStore";
 import { useRouter } from "next/navigation";
 
 export default function Card({ product }: { product: Product }) {
-  const toggleProduct = useProduct((e) => e.toggle);
   const router = useRouter();
   const handleNavigate = () => {
-    toggleProduct(product);
-    router.push(`/shopping/details/${product.id}`);
+    router.push(`/shopping/details/${product._id}`);
   };
 
   return (
-    <div className="group relative w-full space-y-3 py-4">
+    <motion.div
+      className="group relative w-full flex flex-col gap-3"
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+    >
+      {/* ── Image container ── */}
       <motion.div
-        className="relative h-64 md:h-80 w-full overflow-hidden rounded-3xl bg-gray-100 cursor-pointer"
+        className="relative w-full overflow-hidden rounded-2xl bg-gray-100 cursor-pointer"
+        style={{ aspectRatio: "3/4" }}
         onClick={handleNavigate}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.97 }}
-        transition={{ duration: 0.2 }}
+        whileTap={{ scale: 0.98 }}
+        transition={{ duration: 0.18 }}
       >
+        {/* Product image */}
         <Image
-          unoptimized
-          src={product.image}
-          alt={product.title}
+          src={product.photo}
+          alt={product.name || "Product"}
           fill
-          className="object-cover transition-transform duration-700 md:group-hover:scale-110"
+          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* Overlay: ظاهر خفيف في الموبايل، وبيتقل في الهوفر */}
-        <div className="absolute inset-0 bg-black/10 md:bg-black/20 opacity-100 md:opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100" />
+        {/* Overlay — always subtle on mobile, stronger on hover desktop */}
+        <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* الزرار:
-           1. في الموبايل (block): ظاهر علطول.
-           2. في الكمبيوتر (md:opacity-0): مخفي ويظهر بالهوفر.
-        */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-100 md:opacity-0 md:transition-opacity md:duration-300 md:group-hover:opacity-100">
+        {/* Sale badge */}
+        {product.isSale && (
+          <span className="absolute top-3 left-3 bg-gray-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-md">
+            Sale
+          </span>
+        )}
+
+        {/* CTA button — bottom center */}
+        <div className="absolute bottom-3 inset-x-3 flex justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 md:translate-y-2 md:group-hover:translate-y-0 transition-all duration-300">
           <motion.button
-            // أنيميشن الزرار نفسه لما تدوس عليه
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.95 }}
             onClick={(e) => {
-              e.stopPropagation(); // عشان ميفعلش الكارت كله
+              e.stopPropagation();
               handleNavigate();
             }}
-            className="flex items-center gap-2 rounded-full bg-white/90 px-4 py-2 md:px-6 md:py-3 text-sm font-bold text-black shadow-xl backdrop-blur-sm"
+            className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-black text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full shadow-xl hover:bg-white transition-colors text-nowrap"
           >
-            Show Details
-            <GoArrowUpRight className="text-lg" />
+            View Details
+            <ArrowUpRight size={13} />
           </motion.button>
         </div>
       </motion.div>
 
-      {/* باقي تفاصيل الكارت */}
-      <div>
-        <h4 className="font-bold text-base md:text-lg truncate">
-          {product.title}
+      {/* ── Info ── */}
+      <div className="space-y-1.5 px-0.5">
+        {/* Name || Description*/}
+        <h4 className="font-black text-sm sm:text-base uppercase tracking-tight text-gray-900 truncate leading-tight">
+          {product.description || product.name}
         </h4>
-        <div className="flex items-center gap-2 mt-1">
+
+        {/* Stars + rating */}
+        <div className="flex items-center gap-1.5">
           <StarRating rating={product.rating} />
-          <span className="text-xs text-gray-500">{product.rating}/5</span>
+          <span className="text-[10px] font-bold text-gray-400">
+            {product.rating?.toFixed(1)}/5
+          </span>
         </div>
+
+        {/* Price */}
         <Pricing product={product} />
       </div>
-    </div>
+    </motion.div>
   );
 }

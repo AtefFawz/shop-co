@@ -4,41 +4,43 @@ import { useProduct } from "@/store/cardStore";
 
 interface NavIconItem {
   Icon: SvgIconComponent;
+  photo?: string;
   key: string;
   action?: () => void;
   isFound?: boolean;
 }
 
-interface NavIconsProps {
-  items: NavIconItem[];
-  containerClass?: string;
-  iconClass?: string;
-}
-
-export default function NavIcons({
-  items,
-  containerClass,
-  iconClass,
-}: NavIconsProps) {
-  const Count = useProduct((state) => state.stack).filter(
+export default function NavIcons({ items, containerClass, iconClass }: any) {
+  const cartItemsCount = useProduct((state) => state.stack).filter(
     (e) => e.isChose === true,
-  );
+  ).length;
+
   return (
     <div className={containerClass}>
-      {items.map((item) => (
+      {items.map((item: NavIconItem) => (
         <div
           key={item.key}
           onClick={item.action}
-          className={`bg-gray-100 rounded-full flex justify-center items-center cursor-pointer ${iconClass} relative transition-colors hover:bg-gray-200`}
+          className={`bg-gray-100 rounded-full flex justify-center items-center cursor-pointer ${iconClass} relative transition-all hover:bg-gray-200 duration-300 overflow-visible`}
         >
-          <item.Icon className="text-gray-700" />
-          {item.isFound && Count.length > 0 && (
+          {item.photo ? (
+            <img
+              src={item.photo}
+              alt="Profile"
+              className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-full border-2 border-blue-300"
+            />
+          ) : (
+            <item.Icon className="text-gray-700" />
+          )}
+
+          {item.isFound && cartItemsCount > 0 && (
             <span
               className="
-              absolute -top-1 -right-1 flex md:h-5 md:min-w-5 h-4 min-w-4 items-center justify-center rounded-full bg-red-500 px-1 font-extrabold text-[#FFDDAB]
-              md:text-[12px] text-[12px]  leading-none "
+              absolute -top-1 -right-1 flex md:h-5 md:min-w-5 h-4 min-w-4 items-center justify-center 
+              rounded-full bg-red-500 px-1 font-extrabold text-[#FFDDAB]
+              md:text-[11px] text-[10px] leading-none z-10 shadow-sm"
             >
-              {Count.length}
+              {cartItemsCount}
             </span>
           )}
         </div>

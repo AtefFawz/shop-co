@@ -1,28 +1,49 @@
-import ValueLabelComponent from "./Slider";
+"use client";
+import { SlidersHorizontal, RotateCcw } from "lucide-react";
 import { useFilterStore } from "@/store/filterStore";
-import { PiFadersHorizontalLight } from "react-icons/pi";
+import { FilterButton } from "@/components/common/FilterButton";
+import PriceSlider from "./Slider";
 import { Colors } from "./Colors";
 import { Sizing } from "./Sizing";
-import { FilterButton } from "@/components/common/FilterButton";
 import { Sections } from "./Sections";
-export const fil = ["T-SHIRT", "SHIRT", "PANTS", "JEANS"];
-export const Menu = () => {
-  const reset = useFilterStore((state) => state.resetFilter);
 
+export const fil = ["T-SHIRT", "SHIRT", "PANTS", "JEANS"];
+
+export const Menu = () => {
+  const reset = useFilterStore((s) => s.resetFilter);
   return (
-    <nav className="text-sm font-bold text-gray-600 flex flex-col items-center justify-start gap-y-8 py-2 hover:text-gray-800 cursor-pointer border border-gray-300 p-4 h-full bg-white rounded-lg shadow-sm w-full">
-      <h1 className="border-b border-gray-300 w-full flex justify-between items-center py-4 font-bold text-lg">
-        Filter
-        <PiFadersHorizontalLight
-          onClick={() => reset()}
-          className="bg-[#EEEEEE] cursor-pointer w-6 h-6 rounded-2xl "
-        />
-      </h1>
-      <FilterButton content={fil} />
-      <ValueLabelComponent />
-      <Colors />
-      <Sizing />
-      <Sections />
+    <nav className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+        <div className="flex items-center gap-2">
+          <SlidersHorizontal size={15} className="text-gray-700" />
+          <span className="text-sm font-black uppercase tracking-tight text-gray-900">
+            Filters
+          </span>
+        </div>
+        <button
+          onClick={reset}
+          className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:text-black transition-colors"
+        >
+          <RotateCcw size={11} />
+          Reset
+        </button>
+      </div>
+
+      {/* Filter sections */}
+      <div className="px-5 space-y-0">
+        <div className="border-b border-gray-100 py-4">
+          <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-3">
+            Category
+          </p>
+          <FilterButton content={fil} />
+        </div>
+
+        <PriceSlider />
+        <Colors />
+        <Sizing />
+        <Sections />
+      </div>
     </nav>
   );
 };

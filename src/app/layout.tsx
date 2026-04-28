@@ -3,6 +3,9 @@ import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import LayoutProvider from "../components/layout/LayoutProvider";
+import { cookies } from "next/headers";
+import Dialog from "@/components/common/dialog/Dialog";
+import { AuthWatcher } from "@/lib/AuthWatcher";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -17,19 +20,31 @@ export const metadata: Metadata = {
   description: "Your one-stop shop for fashion and lifestyle products.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const Cookie = (await cookies()).get("role")?.value;
+
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
+        {Cookie && Cookie !== "USER" ? (
+          <div className="fixed bottom-6 right-6 z-10">
+            <Dialog />
+          </div>
+        ) : null}
+        <AuthWatcher />
         <LayoutProvider>{children}</LayoutProvider>
-
-        <Toaster position="bottom-right" />
+        <Toaster
+          position="top-center"
+          // toastOptions={{
+          //   style: { width: "10000px", padding: "10px" },
+          // }}
+        />
       </body>
     </html>
   );

@@ -1,54 +1,72 @@
-import { create } from "zustand";
 import { Product } from "@/types";
-import { products as allProducts } from "@/data/data";
+import { create } from "zustand";
 
 interface FilterStore {
-  products: Product[];
+  allProducts: Product[];
+  filteredProducts: Product[];
   currentType: string | null;
 
+  // Actions
+  setInitialProducts: (data: Product[]) => void;
   filterByType: (type: string) => void;
   filterBySection: (section: string) => void;
-  resetFilter: () => void;
   filterPrice: (maxPrice: number) => void;
+  resetFilter: () => void;
 }
 
-export const useFilterStore = create<FilterStore>()((set, get) => ({
-  products: allProducts,
+export const useFilterStore = create<FilterStore>((set, get) => ({
+  allProducts: [],
+  filteredProducts: [],
   currentType: null,
+
+  setInitialProducts: (data) => {
+    const { currentType } = get();
+
+    let initialFiltered = data;
+
+    if (currentType) {
+      initialFiltered = data.filter((item) => item.type === currentType);
+    }
+    set({
+      allProducts: data,
+      filteredProducts: initialFiltered,
+    });
+  },
+
   filterByType: (type) => {
+    const { allProducts } = get();
     set({
       currentType: type,
-      products: allProducts.filter((item) => item.type === type),
+      filteredProducts: allProducts.filter(
+        (item) => item.type?.toUpperCase() === type.toUpperCase(),
+      ),
     });
   },
 
   filterBySection: (section) => {
-    const { currentType } = get();
-
+    const { allProducts, currentType } = get();
     let filtered = allProducts;
-
     if (currentType) {
       filtered = filtered.filter((item) => item.type === currentType);
     }
-
-    filtered = filtered.filter((item) => item.section === section);
-
-    set({ products: filtered });
+    set({
+      filteredProducts: filtered.filter((item) => item.section === section),
+    });
   },
 
   filterPrice: (maxPrice) => {
-    const { currentType } = get();
+    const { allProducts, currentType } = get();
     let filtered = allProducts;
     if (currentType) {
       filtered = filtered.filter((item) => item.type === currentType);
     }
-
-    filtered = filtered.filter((item) => item.price <= maxPrice);
-
-    set({ products: filtered });
+    set({
+      filteredProducts: filtered.filter((item) => item.price <= maxPrice),
+    });
   },
 
   resetFilter: () => {
-    set({ products: allProducts, currentType: null });
+    const { allProducts } = get();
+    set({ filteredProducts: allProducts, currentType: null });
   },
 }));

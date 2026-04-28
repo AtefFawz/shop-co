@@ -1,18 +1,29 @@
-import { StaticImageData } from "next/image";
+// import { StaticImageData } from "next/image";
 
 export interface Product {
-  id: number;
-  title: string;
-  image: StaticImageData;
+  _id: string;
+  name: string;
+  description: string;
+  photo: string;
   price: number;
-  discount?: number;
+  discount?: number & string;
   category: string;
-  inSale: boolean;
-  rating: number;
+  isSale: boolean;
   colors: string[];
-  sizes: string[];
-  isChose: boolean;
+  size: string[];
+  // type: string;
   type: "MEN" | "WOMEN" | "KIDS";
   section: string;
+  rating: number;
+  isChose: boolean;
   count: number;
+
+  reviews: Array<{
+    user: {
+      fullName: string;
+      avatar: string;
+    };
+    rating: number;
+    comment: string;
+  }>;
 }

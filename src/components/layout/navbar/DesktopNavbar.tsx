@@ -7,10 +7,22 @@ import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
 import { NAV_LINKS } from "./constants";
 import NavIcons from "./NavIcons";
+import api from "@/lib/api";
+import { useEffect, useState } from "react";
 
 export default function DesktopNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [photo, setPhoto] = useState("");
+  const getPhoto = async () => {
+    const res = await api.get("profile/me");
+    setPhoto(res.data.data.user.avatar);
+  };
+
+  useEffect(() => {
+    getPhoto();
+  }, []);
+
   const desktopIcons = [
     {
       Icon: AddShoppingCartIcon,
@@ -22,9 +34,10 @@ export default function DesktopNavbar() {
     },
     {
       Icon: AccountCircleOutlinedIcon,
+      photo: photo,
       key: "profile",
       action: () => {
-        router.push("/user/login/");
+        router.push("/user/profile/");
       },
     },
   ];
@@ -63,7 +76,7 @@ export default function DesktopNavbar() {
         <NavIcons
           items={desktopIcons}
           containerClass="flex gap-x-1 w-full col-span-1 items-center justify-evenly"
-          iconClass="p-2"
+          iconClass="p-1"
         />
       </header>
     </div>

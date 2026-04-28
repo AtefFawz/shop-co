@@ -1,4 +1,4 @@
-export const calculateFinalPrice = (
+const calculateFinalPrice = (
   price: number,
   discount?: number,
   count?: number,
@@ -13,3 +13,14 @@ export const calculateFinalPrice = (
 
   return price * qty;
 };
+
+const calculateTotalPrice = (items: any[]) => {
+  const subtotal = items.reduce(
+    (acc, item) => acc + item.price * item.count,
+    0,
+  );
+  const deliveryFee = 15;
+  return subtotal + deliveryFee;
+};
+
+export { calculateTotalPrice, calculateFinalPrice };

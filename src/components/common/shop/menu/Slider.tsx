@@ -2,83 +2,62 @@
 import { useState } from "react";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
-import Typography from "@mui/material/Typography";
 import Box from "@mui/material/Box";
 import { useFilterStore } from "@/store/filterStore";
 
-const PrettoSlider = styled(Slider)({
-  color: "#52af77",
-  height: 8,
-  "& .MuiSlider-track": {
-    border: "none",
-  },
+const BlackSlider = styled(Slider)({
+  color: "#000",
+  height: 4,
+  "& .MuiSlider-track": { border: "none" },
+  "& .MuiSlider-rail": { opacity: 0.15 },
   "& .MuiSlider-thumb": {
-    height: 24,
-    width: 24,
+    height: 20,
+    width: 20,
     backgroundColor: "#fff",
-    border: "2px solid currentColor",
+    border: "2.5px solid #000",
     "&:focus, &:hover, &.Mui-active, &.Mui-focusVisible": {
-      boxShadow: "inherit",
+      boxShadow: "0 0 0 6px rgba(0,0,0,0.08)",
     },
-    "&::before": {
-      display: "none",
-    },
+    "&::before": { display: "none" },
   },
   "& .MuiSlider-valueLabel": {
-    lineHeight: 1.2,
-    fontSize: 12,
-    background: "unset",
-    padding: 0,
-    width: 32,
-    height: 32,
-    borderRadius: "50% 50% 50% 0",
-    backgroundColor: "#52af77",
-    transformOrigin: "bottom left",
-    transform: "translate(50%, -100%) rotate(-45deg) scale(0)",
-    "&::before": { display: "none" },
-    "&.MuiSlider-valueLabelOpen": {
-      transform: "translate(50%, -100%) rotate(-45deg) scale(1)",
-    },
-    "& > *": {
-      transform: "rotate(45deg)",
-    },
+    fontSize: 11,
+    fontWeight: 800,
+    background: "#000",
+    borderRadius: 8,
+    padding: "3px 7px",
   },
 });
 
-export default function CustomizedSlider() {
-  const [price, setPrice] = useState<number>(100);
-
-  const filterStore = useFilterStore((state) => state.filterPrice);
-  const handleChange = (event: Event, newValue: number | number[]) => {
-    setPrice(newValue as number);
-  };
-  const handleChangeCommitted = (
-    event: React.SyntheticEvent | Event,
-    newValue: number | number[]
-  ) => {
-    console.log("Filtering now with:", newValue);
-
-    if (filterStore) {
-      filterStore(newValue as number);
-    }
-  };
+export default function PriceSlider() {
+  const [price, setPrice] = useState<number>(1000);
+  const filterPrice = useFilterStore((s) => s.filterPrice);
 
   return (
-    <Box sx={{ width: "100%" }}>
-      {" "}
-      <Box sx={{ m: 3 }} />
-      <Typography gutterBottom className="font-bold mb-2">
-        Max Price: ${price}
-      </Typography>
-      <PrettoSlider
-        valueLabelDisplay="auto"
-        aria-label="pretto slider"
-        value={price}
-        onChange={handleChange}
-        onChangeCommitted={handleChangeCommitted}
-        min={0}
-        max={500}
-      />
-    </Box>
+    <div className="w-full border-b border-gray-100 py-4">
+      <div className="flex items-center justify-between mb-3">
+        <span className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-700">
+          Price Range
+        </span>
+        <span className="text-xs font-black text-gray-900">
+          Up to ${price.toLocaleString()}
+        </span>
+      </div>
+      <Box sx={{ px: 0.5 }}>
+        <BlackSlider
+          valueLabelDisplay="auto"
+          value={price}
+          onChange={(_, v) => setPrice(v as number)}
+          onChangeCommitted={(_, v) => filterPrice?.(v as number)}
+          min={0}
+          max={5000}
+          valueLabelFormat={(v) => `$${v}`}
+        />
+      </Box>
+      <div className="flex justify-between mt-1">
+        <span className="text-[10px] text-gray-400 font-bold">$0</span>
+        <span className="text-[10px] text-gray-400 font-bold">$5,000</span>
+      </div>
+    </div>
   );
 }

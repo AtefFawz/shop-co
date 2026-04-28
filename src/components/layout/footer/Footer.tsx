@@ -30,8 +30,7 @@ export default function Footer() {
   ];
 
   return (
-    <section>
-      {" "}
+    <div className="  ">
       <Newsletter />
       <div className="bg-[#F0F0F0] ">
         <div className="container mx-auto w-full py-10 flex items-center justify-between flex-wrap ">
@@ -49,6 +48,6 @@ export default function Footer() {
           <CopyRight />
         </div>
       </div>
-    </section>
+    </div>
   );
 }

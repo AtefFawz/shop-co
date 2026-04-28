@@ -1,15 +1,15 @@
 import Heading from "@/components/ui/Heading";
 export default function Newsletter() {
   return (
-    <section className="flex md:flex-row flex-col container mx-auto px-4 lg:px-6 xl:px-8 2xl:px-10 bg-gray-950 justify-evenly rounded-2xl p-6 gap-8">
+    <div className="flex md:flex-row flex-col px-4 lg:px-6 xl:px-8 2xl:px-10 bg-gray-950 xl:py-16 justify-evenly rounded-2xl p-6 gap-8">
       <div className="text-white w-full ">
         {" "}
         <Heading
           title="STAY UPTO DATE ABOUT OUR LATEST OFFERS"
-          styling="text-[#ffffff] text-start"
+          styling="text-[#ffffff] text-center md:text-left"
         />{" "}
       </div>
-      <div className="flex flex-col gap-y-5 w-full ">
+      <div className="flex flex-col gap-y-5 w-full  ">
         <input
           type="text"
           placeholder="enter your email address"
@@ -19,6 +19,6 @@ export default function Newsletter() {
           Subscribe to Newsletter
         </button>
       </div>
-    </section>
+    </div>
   );
 }

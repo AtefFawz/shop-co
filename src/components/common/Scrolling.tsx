@@ -1,17 +1,46 @@
+"use client";
 import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
-import { scrollingType } from "@/data/rating";
 import StarRating from "./StarsRating";
-export default function Scrolling({ items }: { items: scrollingType }) {
+interface Review {
+  fullName: string;
+  rating: number;
+  comment: string;
+  avatar: string;
+}
+export default function Scrolling({ items }: { items: Review }) {
   return (
-    <div className="flex flex-col gap-4 w-full md:min-w-80 md:max-w-90 h-60 items-start rounded-2xl border border-gray-200 shadow-lg p-4">
-      <StarRating rating={items.rate} />
-      <h3 className="font-bold text-xl text-gray-950 flex justify-center items-center gap-1 tracking-wider">
-        {items.name}
-        <span className="text-green-500 text-sm">
-          <VerifiedRoundedIcon />
-        </span>
-      </h3>
-      <p className="text-sm text-gray-500 font-medium"> {items.description} </p>
+    <div className="group flex flex-col gap-4 w-full md:min-w-80 md:max-w-90 min-h-50 rounded-2xl border border-gray-200 shadow-md p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white">
+      {/* Rating */}
+      <StarRating rating={items.rating} />
+
+      {/* User Info */}
+      <div className="flex items-center gap-3">
+        <img
+          src={items.avatar}
+          alt={items.fullName}
+          loading="lazy"
+          onError={(e) => {
+            (e.currentTarget as HTMLImageElement).src =
+              "https://via.placeholder.com/40";
+          }}
+          className="w-10 h-10 rounded-full object-cover border"
+        />
+
+        <div className="flex flex-col">
+          <div className="flex items-center gap-1 font-semibold text-gray-900">
+            {items.fullName}
+
+            {true && <VerifiedRoundedIcon className="text-green-500 text-xs" />}
+          </div>
+
+          <span className="text-xs text-gray-400">Verified Customer</span>
+        </div>
+      </div>
+
+      {/* Comment */}
+      <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
+        {items.comment}
+      </p>
     </div>
   );
 }

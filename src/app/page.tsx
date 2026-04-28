@@ -1,7 +1,7 @@
-import Index from "@/components/sections/Index";
+import Index from "@/components/features/home/Index";
 export default function Home() {
   return (
-    <div className="pt-18 md:pt-27 ">
+    <div className="pt-18 md:pt-20 ">
       <Index />
     </div>
   );

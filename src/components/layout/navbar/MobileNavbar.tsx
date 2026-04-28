@@ -1,6 +1,6 @@
 // components/layout/navbar/MobileNavbar.tsx
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import DensityMediumIcon from "@mui/icons-material/DensityMedium";
@@ -11,12 +11,22 @@ import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined
 import MobileSearch from "./MobileSearch";
 import { NAV_LINKS } from "./constants";
 import NavIcons from "./NavIcons";
-
+import api from "@/lib/api";
 export default function MobileNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const mobileNavRef = useRef<HTMLDivElement | null>(null);
   const [activeSearch, setActiveSearch] = useState(false);
+  const [photo, setPhoto] = useState("");
+
+  const getPhoto = async () => {
+    const res = await api.get("profile/me");
+    setPhoto(res.data.data.user.avatar);
+  };
+  console.log(photo);
+  useEffect(() => {
+    getPhoto();
+  }, []);
 
   function toggleMobileNav() {
     mobileNavRef.current?.classList.toggle("showNav");
@@ -39,8 +49,9 @@ export default function MobileNavbar() {
     {
       Icon: AccountCircleOutlinedIcon,
       key: "profile",
+      photo: photo,
       action: () => {
-        router.push("/user/login");
+        router.push("/user/profile");
       },
     },
   ];
