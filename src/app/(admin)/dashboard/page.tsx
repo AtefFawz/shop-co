@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { StatCard } from "@/components/features/admin/StateCard";
 import { getDashboardStats } from "@/lib/apiServer";
 import { serverApi } from "@/lib/serverApi";
