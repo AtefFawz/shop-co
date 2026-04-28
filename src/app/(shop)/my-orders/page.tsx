@@ -1,10 +1,9 @@
 "use client";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import api from "@/lib/api";
 import OrderCard from "@/components/features/OrderCard/OrderCard";
 import Link from "next/link";
 import { Package, ShoppingBag, RefreshCw } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function MyOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -52,8 +51,8 @@ export default function MyOrdersPage() {
   }
 
   return (
-    <section className="min-h-screen  bg-[#F8F8F8] px-3 sm:px-6 pt-28 sm:pt-32 pb-16">
-      <div className="container mx-auto px-4 ">
+    <section className="min-h-screen  bg-[#F8F8F8] px-1 sm:px-6 pt-28 sm:pt-32 pb-16">
+      <div className="container mx-auto px-3 ">
         <div className="max-w-7xl space-y-6 sm:space-y-8 ">
           {/* ── Page Header ── */}
           <div className="flex items-end justify-between gap-4">

@@ -123,11 +123,10 @@ export default function OrderCard({
               deleteOrders(order._id);
               onReviewSuccess && onReviewSuccess();
             }}
-            className="w-fit p-2  flex items-center justify-center rounded-xl border-2 border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all active:scale-95 tracking-wide cursor-pointer"
+            className="w-fit p-1  flex items-center justify-center rounded-xl border-2 border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all active:scale-95 tracking-wide cursor-pointer "
             title="Delete"
           >
             <Trash2 size={18} />
-            delete
           </button>
           {order.status === "Delivered" && (
             <button

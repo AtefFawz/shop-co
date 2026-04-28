@@ -1,15 +1,30 @@
 "use client";
+import { useState, useEffect } from "react"; // 🎯 ضيف دول
 import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
 import StarRating from "./StarsRating";
+
 interface Review {
   fullName: string;
   rating: number;
   comment: string;
   avatar: string;
 }
+
 export default function Scrolling({ items }: { items: Review }) {
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) {
+    return (
+      <div className="md:min-w-80 md:max-w-90 min-h-40 bg-gray-50 animate-pulse rounded-2xl border" />
+    );
+  }
+
   return (
-    <div className="group flex flex-col gap-4 w-full md:min-w-80 md:max-w-90 min-h-50 rounded-2xl border border-gray-200 shadow-md p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white">
+    <div className="group flex flex-col gap-4 w-full md:min-w-80 md:max-w-90 min-h-40 rounded-2xl border border-gray-200 shadow-md p-5 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white">
       {/* Rating */}
       <StarRating rating={items.rating} />
 
@@ -30,14 +45,12 @@ export default function Scrolling({ items }: { items: Review }) {
           <div className="flex items-center gap-1 font-semibold text-gray-900">
             {items.fullName}
 
-            {true && <VerifiedRoundedIcon className="text-green-500 text-xs" />}
+            <VerifiedRoundedIcon className="text-green-500 text-xs" />
           </div>
-
           <span className="text-xs text-gray-400">Verified Customer</span>
         </div>
       </div>
 
-      {/* Comment */}
       <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">
         {items.comment}
       </p>

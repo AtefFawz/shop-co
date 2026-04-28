@@ -15,10 +15,14 @@ export default function DesktopNavbar() {
   const router = useRouter();
   const [photo, setPhoto] = useState("");
   const getPhoto = async () => {
-    const res = await api.get("profile/me");
-    setPhoto(res.data.data.user.avatar);
+    try {
+      const res = await api.get("profile/me");
+      setPhoto(res.data.data.user.avatar);
+    } catch (error) {
+      console.log("Error fetching profile:", error);
+    }
   };
-
+  console.log("photo", photo);
   useEffect(() => {
     getPhoto();
   }, []);

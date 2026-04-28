@@ -16,15 +16,14 @@ export default async function RatingUi() {
     rating: number;
     comment: string;
   }
+
   const res = await serverApi("/review");
   const products = res.data.reviews;
   const result = products.map((e: RawReview) => ({
     fullName: e.user?.fullName || "Anonymous",
     rating: e.rating,
     comment: e.comment,
-    avatar: e.user?.avatar
-      ? `${process.env.NEXT_PUBLIC_API_URL}/uploads/${e.user.avatar}`
-      : "/default-avatar.png",
+    avatar: e.user?.avatar,
   }));
 
   return (

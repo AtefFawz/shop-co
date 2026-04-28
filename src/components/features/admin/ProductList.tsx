@@ -31,8 +31,8 @@ export default function ProductList({
     <>
       {/* ── Confirm Modal ── */}
       {confirmId && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm px-4 pb-4 sm:pb-0">
-          <div className="bg-white rounded-3xl p-7 w-full max-w-sm shadow-2xl border border-gray-100 animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 backdrop-blur-sm px-2 pb-4 sm:pb-0">
+          <div className="bg-white rounded-3xl p-4 w-full max-w-sm shadow-2xl border border-gray-100 animate-in fade-in slide-in-from-bottom-4 sm:zoom-in-95 duration-200">
             <div className="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <AlertTriangle size={22} className="text-red-500" />
             </div>

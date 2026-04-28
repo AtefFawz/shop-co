@@ -11,6 +11,7 @@ import {
   LogOut,
   Store,
 } from "lucide-react";
+import { signOut } from "@/lib/signOut";
 
 export default function AdminLayout({
   children,
@@ -33,7 +34,7 @@ export default function AdminLayout({
 
   return (
     <section className=" bg-[#F8F8F8] ">
-      <div className="container mx-auto flex flex-col md:flex-row min-h-screen">
+      <div className="container mx-auto lg:px-4 flex flex-col md:flex-row min-h-screen">
         {/* ── 1. MOBILE: Bottom Navigation (Floating Style) ── */}
         <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] ">
           <nav className="bg-black/90 backdrop-blur-xl border border-white/10 p-2 rounded-[24px] flex items-center justify-around shadow-2xl">
@@ -113,14 +114,17 @@ export default function AdminLayout({
             >
               <Store size={18} /> Back to Store
             </Link>
-            <button className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all">
+            <button
+              onClick={() => signOut()}
+              className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all"
+            >
               <LogOut size={18} /> Log Out
             </button>
           </div>
         </aside>
 
         {/* ── 3. MAIN CONTENT ── */}
-        <main className="flex-1 min-w-0 p-4 sm:p-8 lg:p-12 pb-32 md:pb-12">
+        <main className="flex-1 min-w-0 p-1 sm:p-8 lg:p-12 pb-32 md:pb-12">
           <div className="max-w-7xl mx-auto">
             {/* Header للأدمن في الموبايل عشان يعرف هو فين */}
             <div className="md:hidden flex items-center justify-between mb-8">
