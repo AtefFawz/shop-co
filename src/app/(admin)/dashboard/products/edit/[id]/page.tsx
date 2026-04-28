@@ -1,6 +1,6 @@
 "use client";
 import { use, useEffect } from "react";
-import { usePatch } from "@/components/hooks/editProduct";
+import { usePatch } from "@/hooks/editProduct";
 import {
   Tag,
   AlignLeft,
