@@ -23,7 +23,7 @@ export default function NewArrivals() {
   }
 
   return (
-    <section className="px-2 md:px-4 lg:px-6 container mx-auto ">
+    <section className={`Responsive`}>
       <Heading title="NEW ARRIVALS" />
       <div className="flex flex-wrap justify-items-stretch justify-center w-full gap-2 md:gap-4  ">
         {product.map((item: Product) => (
@@ -35,7 +35,7 @@ export default function NewArrivals() {
       <div className=" w-full flex justify-center items-center py-8">
         <SecondButton textBtn="View All" func={handelClick} />
       </div>
-      <hr className="w-full my-10 text-gray-300 " />
+      <hr className="w-full text-gray-300 " />
     </section>
   );
 }

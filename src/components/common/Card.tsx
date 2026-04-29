@@ -15,7 +15,7 @@ export default function Card({ product }: { product: Product }) {
 
   return (
     <motion.div
-      className="group relative w-full flex flex-col gap-3"
+      className="group relative w-full flex flex-col gap-3 mb-4 cursor-pointer"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}

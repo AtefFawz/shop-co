@@ -6,7 +6,7 @@ import Rating from "./rating/RatingUi";
 // import { Shop } from "./shop/shop";
 export default function Index() {
   return (
-    <div>
+    <div className="w-full h-full ">
       <Hero />
       <ProductsGrid />
       <TopSelling />

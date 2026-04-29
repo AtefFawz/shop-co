@@ -27,13 +27,33 @@ export default async function RatingUi() {
   }));
 
   return (
-    <section className="container mx-auto px-4 md:px-6 lg:px-8 xl:px-10 overflow-hidden  ">
+    <section
+      className="Responsive overflow-hidden
+      "
+    >
       <Heading title="OUR HAPPY CUSTOMERS" />
-      <div className="flex flex-nowrap overflow-x-auto gap-4 w-full snap-x  snap-mandatory scroll-smooth pb-4 no-scrollbar py-5 lg:py-10">
+      <div
+        className="
+          flex flex-nowrap overflow-x-auto
+          w-full
+          pb-4 py-5
+          gap-2 snap-x snap-mandatory scroll-smooth no-scrollbar
+          lg:py-10
+        "
+      >
         {result.map((e: Review, id: number) => (
           <div
             key={id}
-            className=" snap-center shrink-0 max-w-full first:pl-4 last:pr-4"
+            className="
+              flex-shrink-0
+              w-full
+              px-4
+              snap-center first:pl-4 last:pr-4
+              md:w-1/2
+              lg:w-2/5
+              xl:w-2/6
+              2xl:w-1/4
+            "
           >
             <HorizontalScrolling items={e} />
           </div>

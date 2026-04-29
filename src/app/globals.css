@@ -26,7 +26,7 @@ body {
   @apply text-sm text-gray-500 md:text-sm lg:text-lg;
 }
 .Responsive {
-  @apply px-4 lg:px-8 xl:px-12 container mx-auto;
+  @apply px-2 lg:px-8 xl:px-12 container mx-auto;
 }
 .input-style {
   @apply w-full px-4 py-3 rounded-lg border border-gray-200 outline-none 
@@ -34,12 +34,14 @@ body {
            placeholder:text-gray-300 text-gray-700;
 }
 section {
-  padding: 7rem 0 4rem 0 !important;
+  padding-top: 7rem !important;
+  padding-bottom: 4rem !important;
 }
 
 @media (min-width: 768px) {
   section {
-    padding: 10rem 0 5rem 0 !important;
+    padding-top: 10rem !important;
+    padding-bottom: 5rem !important;
   }
 }
 #form > input {

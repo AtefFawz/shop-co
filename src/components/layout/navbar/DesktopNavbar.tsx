@@ -22,7 +22,7 @@ export default function DesktopNavbar() {
       console.log("Error fetching profile:", error);
     }
   };
-  console.log("photo", photo);
+
   useEffect(() => {
     getPhoto();
   }, []);
