@@ -13,7 +13,7 @@ const FormSignIn = () => {
       await submitAction();
       console.log("✅ Logged in successfully!");
     } catch (err) {
-      console.error("❌ Submission failed but page is stable.");
+      console.error("❌ Submission failed but page is stable.", err);
     }
   };
 

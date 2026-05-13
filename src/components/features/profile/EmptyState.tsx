@@ -1,4 +1,4 @@
-import { type LucideIcon, Package } from "lucide-react";
+import {  Package } from "lucide-react";
 function EmptyState({ message }: { message: string }) {
   return (
     <div className="bg-white rounded-4xl p-20 text-center border-2 border-dashed border-gray-100">

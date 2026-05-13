@@ -28,11 +28,11 @@ api.interceptors.response.use(
     if (status === 401) {
       if (
         typeof window !== "undefined" &&
-        window.location.pathname !== "/user/signin"
+        window.location.pathname !== "/auth/signin"
       ) {
         Cookies.remove("token", { path: "/" });
         Cookies.remove("role", { path: "/" });
-        window.location.href = "/user/signin";
+        window.location.href = "/auth/signin";
       }
     }
 

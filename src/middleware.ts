@@ -7,13 +7,13 @@ export function middleware(request: NextRequest) {
   // is not have a token
   if (request.nextUrl.pathname.startsWith("/dashboard") && !token) {
     // returned to sign in page
-    return NextResponse.redirect(new URL("/user/signin", request.url));
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
   // Check role
   const role = request.cookies.get("role")?.value;
 
   if (role !== "ADMIN" && role !== "MANGER") {
-    return NextResponse.redirect(new URL("/user/signin", request.url));
+    return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 
   return NextResponse.next(); //if done

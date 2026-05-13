@@ -24,7 +24,7 @@ const useSignup = () => {
     setLoading(true);
 
     try {
-      const res = await api.post("user/signup", user);
+      const res = await api.post("auth/signup", user);
       const token = res.data.data.token || res.data.token;
       if (token) {
         Cookies.set("token", token, { expires: 1, path: "/" });

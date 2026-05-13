@@ -18,7 +18,7 @@ const serverApi = async (url: string) => {
     return res.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
-      redirect("/user/signin/");
+      redirect("/auth/signin/");
     }
 
     if (error.response?.status === 403) {

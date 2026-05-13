@@ -4,12 +4,9 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import {
   Star,
-  User,
   Package,
   Settings,
   LogOut,
-  Heart,
-  MapPin,
   Activity,
   CreditCard,
   ShoppingBag,

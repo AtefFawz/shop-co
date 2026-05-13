@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   LogOut,
   Store,
+  Users,
 } from "lucide-react";
 import { signOut } from "@/lib/signOut";
 
@@ -29,12 +30,18 @@ export default function AdminLayout({
       title: "Orders",
       icon: ShoppingBag,
     },
-    { id: 4, path: "/dashboard/products/add", title: "New", icon: PlusCircle },
+    {
+      id: 4,
+      path: "/dashboard/admin/users",
+      title: "Users",
+      icon: Users,
+    },
+    { id: 5, path: "/dashboard/products/add", title: "New", icon: PlusCircle },
   ];
 
   return (
     <section className=" bg-[#F8F8F8] ">
-      <div className="container mx-auto lg:px-4 flex flex-col md:flex-row min-h-screen">
+      <div className="Responsive flex flex-col md:flex-row min-h-screen">
         {/* ── 1. MOBILE: Bottom Navigation (Floating Style) ── */}
         <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] ">
           <nav className="bg-black/90 backdrop-blur-xl border border-white/10 p-2 rounded-[24px] flex items-center justify-around shadow-2xl">

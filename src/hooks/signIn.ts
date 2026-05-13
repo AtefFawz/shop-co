@@ -21,7 +21,7 @@ const useLogin = () => {
       return;
     }
     try {
-      const response = await api.post("user/signin", user);
+      const response = await api.post("auth/signin", user);
       const { token, user: userData } = response.data.data;
 
       if (token) {
