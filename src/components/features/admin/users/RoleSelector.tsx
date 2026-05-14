@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import api from "@/lib/api"; // الـ axios instance بتاعك
+import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { ShieldCheck, ChevronDown, Loader2 } from "lucide-react";
-import toast from "react-hot-toast"; // يفضل تستخدمه للتنبيهات
+import toast from "react-hot-toast";
 
 export default function RoleSelector({
   userId,
@@ -28,7 +28,7 @@ export default function RoleSelector({
       setRole(newRole);
       setIsOpen(false);
       toast.success(`Role updated to ${newRole}`);
-      router.refresh(); // عشان يحدث البيانات في صفحة السيرفر
+      router.refresh();
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to update role");
     } finally {

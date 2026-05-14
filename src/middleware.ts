@@ -12,7 +12,7 @@ export function middleware(request: NextRequest) {
   // Check role
   const role = request.cookies.get("role")?.value;
 
-  if (role !== "ADMIN" && role !== "MANGER") {
+  if (role !== "ADMIN" && role !== "MANAGER") {
     return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 

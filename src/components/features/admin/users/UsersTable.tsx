@@ -1,6 +1,11 @@
 import { User } from "@/types/user";
+import { useRouter } from "next/navigation";
 
 export default function UsersTable({ users }: { users: User[] }) {
+  const router = useRouter();
+  const clickUser = (id: string) => {
+    router.push("/dashboard/admin/users/about/" + id);
+  };
   return (
     <div className="hidden md:block bg-white rounded-3xl border border-gray-100 overflow-hidden">
       <table className="w-full">
@@ -20,6 +25,7 @@ export default function UsersTable({ users }: { users: User[] }) {
         <tbody>
           {users.map((user) => (
             <tr
+              onClick={() => clickUser(user._id)}
               key={user._id}
               className="border-b border-gray-50 hover:bg-gray-50"
             >
