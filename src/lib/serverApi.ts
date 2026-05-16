@@ -6,8 +6,9 @@ export const api = axios.create({
   baseURL:
     process.env.NEXT_PUBLIC_API_URL || "https://shop-co-jfqp.vercel.app/api/",
 });
+
 const serverApi = async (url: string) => {
-  const token = (await cookies()).get("token")?.value;
+  let token = (await cookies()).get("token")?.value;
 
   try {
     const res = await api.get(url, {
@@ -18,7 +19,43 @@ const serverApi = async (url: string) => {
     return res.data;
   } catch (error: any) {
     if (error.response?.status === 401) {
-      redirect("/auth/signin/");
+      const refreshToken = (await cookies()).get("refreshToken")?.value;
+
+      if (!refreshToken) {
+        redirect("/auth/signin/");
+      }
+
+      try {
+        console.log("Server side: Access token expired, trying to refresh...");
+        const refreshRes = await axios.post(
+          `${api.defaults.baseURL}auth/refresh-token`,
+          {},
+          {
+            headers: {
+              Cookie: `refreshToken=${refreshToken}`,
+            },
+          },
+        );
+
+        const newAccessToken = refreshRes.data?.data?.token;
+
+        console.log(
+          "Server side: Token refreshed successfully! Retrying original request...",
+        );
+
+        const retryRes = await api.get(url, {
+          headers: {
+            Authorization: `Bearer ${newAccessToken}`,
+          },
+        });
+
+        return retryRes.data;
+      } catch (refreshError) {
+        console.error(
+          "Server side: Refresh token failed, redirecting to signin...",
+        );
+        redirect("/auth/signin/");
+      }
     }
 
     if (error.response?.status === 403) {
@@ -28,4 +65,5 @@ const serverApi = async (url: string) => {
     throw error;
   }
 };
+
 export { serverApi };

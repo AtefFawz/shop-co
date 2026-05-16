@@ -7,8 +7,6 @@ import {
   Star,
   DollarSign,
   ArrowLeft,
-  // Trash2,
-  // ShieldCheck,
 } from "lucide-react";
 import Link from "next/link";
 import RoleSelector from "@/components/features/admin/users/RoleSelector";
@@ -38,7 +36,7 @@ export default async function AboutUser({
   });
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8 font-sans">
+    <div className="max-w-6xl Responsive space-y-8 font-sans">
       {/* Header & Actions */}
       <div className="flex items-center  justify-between gap-4">
         <Link
