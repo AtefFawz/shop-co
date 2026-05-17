@@ -3,23 +3,25 @@ import type { NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
   const token = request.cookies.get("token")?.value;
+  const refreshToken = request.cookies.get("refreshToken")?.value;
+  const role = request.cookies.get("role")?.value;
 
-  // is not have a token
-  if (request.nextUrl.pathname.startsWith("/dashboard") && !token) {
-    // returned to sign in page
+  if (!token && refreshToken) {
+    return NextResponse.next();
+  }
+
+  if (!token && !refreshToken) {
+    console.log(request.url);
     return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
-  // Check role
-  const role = request.cookies.get("role")?.value;
 
   if (role !== "ADMIN" && role !== "MANAGER") {
     return NextResponse.redirect(new URL("/auth/signin", request.url));
   }
 
-  return NextResponse.next(); //if done
+  return NextResponse.next();
 }
 
-// 🎯 path middleware is run
 export const config = {
   matcher: ["/dashboard/:path*"],
 };

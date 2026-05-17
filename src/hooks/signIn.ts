@@ -37,7 +37,7 @@ const useLogin = () => {
     } catch (error: any) {
       const message =
         error.response?.data?.data ||
-        "An error occurred during signup. Please try again.";
+        "An error occurred during signin. Please try again.";
       setError(message);
       console.log(message);
       throw error;
