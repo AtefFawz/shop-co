@@ -28,7 +28,7 @@ const useLogin = () => {
         Cookies.set("token", token, { expires: 1 / 24, path: "/" });
         Cookies.set("role", userData.role, { expires: 1 / 24, path: "/" });
         toast.success("Login successful!");
-        if (userData.role === "ADMIN" || userData.role === "MANGER") {
+        if (userData.role === "ADMIN" || userData.role === "MANAGER") {
           router.push("/dashboard");
         } else {
           router.push("/");
