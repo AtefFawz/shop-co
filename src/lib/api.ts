@@ -26,7 +26,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = Cookies.get("token");
-    console.log("Token", token);
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -47,7 +47,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response?.status;
     const msg = error.response?.data?.message || "Something went wrong";
-    console.log(msg);
+
     if (status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
@@ -74,7 +74,7 @@ api.interceptors.response.use(
           {},
           { withCredentials: true },
         );
-        console.log("newAccessToken", res);
+
         const newAccessToken = res.data?.data?.token;
         Cookies.set("token", newAccessToken, { path: "/" });
 
