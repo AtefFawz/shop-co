@@ -7,9 +7,9 @@ export const AuthWatcher = () => {
   const clearCart = useProduct((state) => state.clearCart);
 
   useEffect(() => {
-    const token = Cookies.get("token");
+    const role = Cookies.get("role");
 
-    if (!token) {
+    if (!role) {
       clearCart();
     }
   }, [clearCart]);

@@ -26,6 +26,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = Cookies.get("token");
+    console.log("Token", token);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -42,19 +43,21 @@ api.interceptors.response.use(
     }
     return response;
   },
-
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
     const msg = error.response?.data?.message || "Something went wrong";
-
+    console.log(msg);
     if (status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject });
         })
           .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`;
+            if (originalRequest.headers) {
+              originalRequest.headers["Authorization"] = `Bearer ${token}`;
+              originalRequest.headers["authorization"] = `Bearer ${token}`;
+            }
             return api(originalRequest);
           })
           .catch((err) => Promise.reject(err));
@@ -71,12 +74,14 @@ api.interceptors.response.use(
           {},
           { withCredentials: true },
         );
-
+        console.log("newAccessToken", res);
         const newAccessToken = res.data?.data?.token;
-
         Cookies.set("token", newAccessToken, { path: "/" });
 
-        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        if (originalRequest.headers) {
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          originalRequest.headers["authorization"] = `Bearer ${newAccessToken}`;
+        }
 
         console.log(
           "🔓 Token refreshed successfully! Retrying original request...",
