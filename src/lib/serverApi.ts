@@ -18,19 +18,25 @@ const serverApi = async (url: string) => {
     });
     return res.data;
   } catch (error: any) {
+    if (error.digest?.startsWith("NEXT_REDIRECT")) {
+      throw error;
+    }
+
     if (error.response?.status === 401) {
       const refreshToken = (await cookies()).get("refreshToken")?.value;
 
       if (!refreshToken) {
-        redirect("/auth/signin/");
+        redirect("/auth/signin");
       }
 
       try {
         console.log("Server side: Access token expired, trying to refresh...");
+
         const refreshRes = await axios.post(
           `${api.defaults.baseURL}auth/refresh-token`,
           {},
           {
+            withCredentials: true,
             headers: {
               Cookie: `refreshToken=${refreshToken}`,
             },
@@ -44,17 +50,22 @@ const serverApi = async (url: string) => {
         );
 
         const retryRes = await api.get(url, {
+          withCredentials: true,
           headers: {
             Authorization: `Bearer ${newAccessToken}`,
           },
         });
 
         return retryRes.data;
-      } catch (refreshError) {
+      } catch (refreshError: any) {
+        if (refreshError.digest?.startsWith("NEXT_REDIRECT")) {
+          throw refreshError;
+        }
+
         console.error(
           "Server side: Refresh token failed, redirecting to signin...",
         );
-        redirect("/auth/signin/");
+        redirect("/auth/signin");
       }
     }
 
