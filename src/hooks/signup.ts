@@ -9,7 +9,7 @@ const useSignup = () => {
     email: "",
     password: "",
   });
-
+  // what is the purpose of this code?The purpose of this code is to create a custom React hook called `useSignup` that manages the state and logic for a user signup process in a web application.
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const handleChange = (name: string, value: string) => {
