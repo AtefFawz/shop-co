@@ -27,7 +27,7 @@ const useSignup = () => {
       const res = await api.post("auth/signup", user);
       const token = res.data.data.token || res.data.token;
       if (token) {
-        Cookies.set("token", token, { expires: 7, path: "/" });
+        Cookies.set("token", token, { path: "/" });
         router.push("/");
         router.refresh();
       }
