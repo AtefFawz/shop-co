@@ -68,14 +68,24 @@ api.interceptors.response.use(
       try {
         console.log("🔒 Access token expired. Fetching a new one...");
 
+        const cleanBaseURL = api.defaults.baseURL?.endsWith("/")
+          ? api.defaults.baseURL.slice(0, -1)
+          : api.defaults.baseURL;
+
         const res = await axios.post(
-          `${api.defaults.baseURL}auth/refresh-token`,
+          `${cleanBaseURL}/auth/refresh-token`,
           {},
           { withCredentials: true },
         );
 
         const newAccessToken = res.data?.data?.token;
-        Cookies.set("token", newAccessToken, { path: "/" });
+
+        const isProd = process.env.NODE_ENV === "production";
+        Cookies.set("token", newAccessToken, {
+          path: "/",
+          secure: isProd,
+          sameSite: isProd ? "none" : "lax",
+        });
 
         if (originalRequest.headers) {
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
@@ -100,10 +110,21 @@ api.interceptors.response.use(
           typeof window !== "undefined" &&
           window.location.pathname !== "/auth/signin"
         ) {
-          Cookies.remove("token", { path: "/" });
-          Cookies.remove("role", { path: "/" });
+          const isProd = process.env.NODE_ENV === "production";
+
+          Cookies.remove("token", {
+            path: "/",
+            secure: isProd,
+            sameSite: isProd ? "none" : "lax",
+          });
+          Cookies.remove("role", {
+            path: "/",
+            secure: isProd,
+            sameSite: isProd ? "none" : "lax",
+          });
           localStorage.clear();
-          window.location.href = "/auth/signin";
+
+          window.location.replace("/auth/signin");
         }
 
         toast.error("Your session has expired. Please sign in again.");
