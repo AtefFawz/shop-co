@@ -1,7 +1,9 @@
+"use client";
 export const dynamic = "force-dynamic";
 import { StatCard } from "@/components/features/admin/StateCard";
+import api from "@/lib/api";
 import { getDashboardStats } from "@/lib/apiServer";
-import { serverApi } from "@/lib/serverApi";
+
 import { Product } from "@/types";
 import {
   TrendingUp,
@@ -11,12 +13,29 @@ import {
   Tag,
   Activity,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 
-export default async function DashboardPage() {
-  const stats = await getDashboardStats();
+export default function DashboardPage() {
+  const [response, setResponse] = useState<any>([]);
+  const [stats, setStats] = useState<any>(null);
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.get("product");
+        setResponse(res);
+        const data = await getDashboardStats();
+        setStats(data);
+        data;
+      } catch (error) {
+        console.error("Failed to fetch stats:", error);
+      }
+    };
 
-  const response = await serverApi("product/");
-  const allProducts: Product[] = response.data.Products;
+    fetchStats();
+  }, []);
+  // const stats = await getDashboardStats()
+  // const response = api.get("product/");
+  const allProducts: Product[] = response.data?.data?.Products || [];
   const isSale = allProducts.filter((p) => p.isSale === true);
 
   const statCards = [

@@ -1,6 +1,6 @@
 import axios from "axios";
-import Cookies from "js-cookie";
-import toast from "react-hot-toast";
+
+const isServer = typeof window === "undefined";
 
 let isRefreshing = false;
 let failedQueue: any[] = [];
@@ -13,6 +13,7 @@ const processQueue = (error: any, token: string | null = null) => {
       prom.resolve(token);
     }
   });
+
   failedQueue = [];
 };
 
@@ -21,95 +22,161 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// Request Interceptor
+// ======================
+// REQUEST INTERCEPTOR
+// ======================
+
 api.interceptors.request.use(
-  (config) => {
-    const token = Cookies.get("token");
+  async (config) => {
+    // لو الريكوست جاية من Retry بعد Refresh
+    if ((config as any)._accessToken) {
+      config.headers = config.headers || {};
+
+      config.headers.Authorization = `Bearer ${(config as any)._accessToken}`;
+
+      return config;
+    }
+
+    let token = "";
+
+    if (isServer) {
+      try {
+        const { cookies } = await import("next/headers");
+
+        const cookieStore = await cookies();
+
+        token = cookieStore.get("token")?.value || "";
+      } catch (err) {}
+    } else {
+      const Cookies = (await import("js-cookie")).default;
+
+      token = Cookies.get("token") || "";
+    }
 
     if (token) {
+      config.headers = config.headers || {};
+
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error),
 );
 
-// Response Interceptor
+// ======================
+// RESPONSE INTERCEPTOR
+// ======================
+
 api.interceptors.response.use(
   (response) => {
-    if (response.config && (response.config as any)._retry) {
+    if ((response.config as any)?._retry) {
       delete (response.config as any)._retry;
     }
+
     return response;
   },
+
   async (error) => {
     const originalRequest = error.config;
+
     const status = error.response?.status;
+
     const msg = error.response?.data?.message || "Something went wrong";
 
     if (status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
+          failedQueue.push({
+            resolve,
+            reject,
+          });
         })
           .then((token) => {
-            if (originalRequest.headers) {
-              originalRequest.headers["Authorization"] = `Bearer ${token}`;
-              originalRequest.headers["authorization"] = `Bearer ${token}`;
-            }
+            originalRequest._accessToken = token;
+
             return api(originalRequest);
           })
           .catch((err) => Promise.reject(err));
       }
 
       originalRequest._retry = true;
+
       isRefreshing = true;
 
       try {
-        console.log("🔒 Access token expired. Fetching a new one...");
+        console.log(
+          `🔒 Access token expired [${isServer ? "Server" : "Browser"}]`,
+        );
 
         const cleanBaseURL = api.defaults.baseURL?.endsWith("/")
           ? api.defaults.baseURL.slice(0, -1)
           : api.defaults.baseURL;
 
+        const refreshHeaders: Record<string, string> = {};
+
+        if (isServer) {
+          try {
+            const { cookies } = await import("next/headers");
+
+            const cookieStore = await cookies();
+
+            const refreshToken = cookieStore.get("refreshToken")?.value;
+
+            if (refreshToken) {
+              refreshHeaders["Cookie"] = `refreshToken=${refreshToken}`;
+            }
+          } catch (err) {
+            console.error("Failed reading server cookies:", err);
+          }
+        }
+
         const res = await axios.post(
           `${cleanBaseURL}/auth/refresh-token`,
           {},
-          { withCredentials: true },
+          {
+            withCredentials: true,
+            headers: refreshHeaders,
+          },
         );
 
         const newAccessToken = res.data?.data?.token;
 
-        const isProd = process.env.NODE_ENV === "production";
-        Cookies.set("token", newAccessToken, {
-          path: "/",
-          secure: isProd,
-          sameSite: isProd ? "none" : "lax",
-        });
-
-        if (originalRequest.headers) {
-          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-          originalRequest.headers["authorization"] = `Bearer ${newAccessToken}`;
+        if (!newAccessToken) {
+          throw new Error("No access token returned");
         }
 
-        console.log(
-          "🔓 Token refreshed successfully! Retrying original request...",
-        );
+        // Browser
+        if (!isServer) {
+          const Cookies = (await import("js-cookie")).default;
+
+          const isProd = process.env.NODE_ENV === "production";
+
+          Cookies.set("token", newAccessToken, {
+            path: "/",
+            secure: isProd,
+            sameSite: isProd ? "none" : "lax",
+          });
+        }
 
         processQueue(null, newAccessToken);
+
         isRefreshing = false;
+
+        // أهم سطر في الحل كله
+        originalRequest._accessToken = newAccessToken;
 
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
+
         isRefreshing = false;
 
-        console.error("🚨 Refresh token failed. Redirecting to signin...");
+        console.error("🚨 Refresh token failed");
 
-        if (
-          typeof window !== "undefined" &&
-          window.location.pathname !== "/auth/signin"
-        ) {
+        if (!isServer) {
+          const Cookies = (await import("js-cookie")).default;
+
           const isProd = process.env.NODE_ENV === "production";
 
           Cookies.remove("token", {
@@ -117,29 +184,32 @@ api.interceptors.response.use(
             secure: isProd,
             sameSite: isProd ? "none" : "lax",
           });
+
           Cookies.remove("role", {
             path: "/",
             secure: isProd,
             sameSite: isProd ? "none" : "lax",
           });
+
           localStorage.clear();
 
           window.location.replace("/auth/signin");
         }
 
-        toast.error("Your session has expired. Please sign in again.");
         return Promise.reject(refreshError);
       }
     }
 
-    if (status !== 401) {
-      toast.error(msg);
-    }
+    if (!isServer) {
+      const toast = (await import("react-hot-toast")).default;
 
-    if (status === 500) {
-      if (typeof window !== "undefined") {
+      if (status === 500) {
         toast.error("Server is a bit tired, try again later!");
+      } else {
+        toast.error(msg);
       }
+    } else {
+      console.error(`🚨 Server API Error [${status}]: ${msg}`);
     }
 
     return Promise.reject(error);

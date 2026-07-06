@@ -87,11 +87,11 @@ export function ProfileClient({
             <div className="p-8 border-b border-gray-50">
               <div className="flex items-center gap-4">
                 <div className="relative w-14 h-14 rounded-2xl overflow-hidden ring-4 ring-black/5 shadow-inner">
-                  <Image
+                  <img
                     src={avatar}
-                    alt={fullName}
-                    fill
-                    className="object-cover"
+                    alt={fullName || "User Avatar"}
+                    // fill
+                    className="object-cover w-full h-full"
                   />
                 </div>
                 <div className="min-w-0 text-left">
@@ -137,12 +137,12 @@ export function ProfileClient({
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-[80px]" />
               <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
                 <div className="flex flex-col md:flex-row items-center gap-6">
-                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-[32px] overflow-hidden border-4 border-white/10 shadow-2xl">
-                    <Image
+                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-4xl overflow-hidden border-4 border-white/10 shadow-2xl">
+                    <img
                       src={avatar}
                       alt={fullName}
-                      fill
-                      className="object-cover"
+                      // fill
+                      className="object-cover w-full h-full"
                     />
                   </div>
                   <div className="text-center md:text-left">

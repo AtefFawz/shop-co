@@ -1,109 +1,102 @@
-import axios from "axios";
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+// import axios from "axios";
+// import { cookies } from "next/headers";
+// import { redirect } from "next/navigation";
+// import https from "https";
 
-export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-});
+// const httpsAgent = new https.Agent({
+//   rejectUnauthorized: false,
+//   keepAlive: true,
+// });
 
-const serverApi = async (url: string) => {
-  let token = (await cookies()).get("token")?.value;
+// export const api = axios.create({
+//   baseURL: process.env.NEXT_PUBLIC_API_URL,
+//   httpsAgent: httpsAgent,
+// });
 
-  try {
-    const res = await api.get(url, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return res.data;
-  } catch (error: any) {
-    // ١. تمرير توجيه نكست الداخلي فوراً دون اعتراضه
-    if (error.digest?.startsWith("NEXT_REDIRECT")) {
-      throw error;
-    }
+// const serverApi = async (url: string) => {
+//   let token = (await cookies()).get("token")?.value;
 
-    // ٢. التعامل مع انتهاء صلاحية الـ Access Token
-    if (error.response?.status === 401) {
-      const refreshToken = (await cookies()).get("refreshToken")?.value;
+//   try {
+//     const res = await api.get(url, {
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//       },
+//     });
+//     return res.data;
+//   } catch (error: any) {
+//     if (error.digest?.startsWith("NEXT_REDIRECT")) {
+//       throw error;
+//     }
 
-      if (!refreshToken) {
-        redirect("/auth/signin");
-      }
+//     if (
+//       error.response?.status === 401 ||
+//       error.code === "ECONNRESET" ||
+//       error.message.includes("socket disconnected")
+//     ) {
+//       const refreshToken = (await cookies()).get("refreshToken")?.value;
 
-      try {
-        console.log("Server side: Access token expired, trying to refresh...");
+//       if (!refreshToken) {
+//         console.error(
+//           "Server side: No refresh token found, redirecting to signin...",
+//           refreshToken,
+//         );
+//         redirect("/auth/signin");
+//       }
 
-        const refreshRes = await axios.post(
-          `${api.defaults.baseURL}/auth/refresh-token`, // تأمين الـ slash
-          {},
-          {
-            withCredentials: true,
-            headers: {
-              Cookie: `refreshToken=${refreshToken}`,
-            },
-          },
-        );
+//       try {
+//         console.log("Server side: Access token expired, trying to refresh...");
 
-        const newAccessToken = refreshRes.data?.data?.token;
+//         const cleanBaseURL = api.defaults.baseURL?.endsWith("/")
+//           ? api.defaults.baseURL.slice(0, -1)
+//           : api.defaults.baseURL;
 
-        console.log(
-          "Server side: Token refreshed successfully! Updating Server Cookies...",
-        );
+//         const refreshRes = await axios.post(
+//           `${cleanBaseURL}/auth/refresh-token`,
+//           {},
+//           {
+//             withCredentials: true,
+//             headers: { Cookie: `refreshToken=${refreshToken}` },
+//           },
+//         );
 
-        // 🎯 التعديل السحري: حفظ الـ Access Token الجديد في كوكيز نكست رسمياً
-        const cookieStore = await cookies();
-        cookieStore.set("token", newAccessToken, {
-          path: "/",
-          secure: process.env.NODE_ENV === "production",
-          sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-        });
+//         const newAccessToken = refreshRes.data?.data?.token;
 
-        // 🎯 إذا كان الباك إيند بيرجع كوكيز جديدة في الهيدرز، بنمررها لنكست عشان تسيفها
-        const setCookieHeader = refreshRes.headers["set-cookie"];
-        if (setCookieHeader) {
-          // استخراج الريفريش توكن الجديد لو الباك إيند بيبعته بالاسم ده
-          const match = setCookieHeader.find((c) =>
-            c.startsWith("refreshToken="),
-          );
-          if (match) {
-            const newValue = match.split(";")[0].split("=")[1];
-            cookieStore.set("refreshToken", newValue, {
-              httpOnly: true,
-              path: "/",
-              secure: process.env.NODE_ENV === "production",
-              sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-            });
-          }
-        }
+//         const cookieStore = await cookies();
+//         const isProd = process.env.NODE_ENV === "production";
+//         cookieStore.set("token", newAccessToken, {
+//           path: "/",
+//           secure: isProd,
+//           sameSite: isProd ? "none" : "lax",
+//         });
 
-        console.log("Server side: Retrying original request with new token...");
+//         console.log(
+//           "Server side: Token refreshed! Retrying original request directly...",
+//         );
 
-        const retryRes = await api.get(url, {
-          withCredentials: true,
-          headers: {
-            Authorization: `Bearer ${newAccessToken}`,
-          },
-        });
+//         const retryRes = await api.get(url, {
+//           headers: {
+//             Authorization: `Bearer ${newAccessToken}`,
+//           },
+//         });
 
-        return retryRes.data;
-      } catch (refreshError: any) {
-        if (refreshError.digest?.startsWith("NEXT_REDIRECT")) {
-          throw refreshError;
-        }
+//         return retryRes.data;
+//       } catch (refreshError: any) {
+//         if (refreshError.digest?.startsWith("NEXT_REDIRECT")) {
+//           throw refreshError;
+//         }
 
-        console.error(
-          "Server side: Refresh token failed, redirecting to signin...",
-        );
-        redirect("/auth/signin");
-      }
-    }
+//         console.error("Server side: Refresh truly failed, cleaning up...");
+//         const cookieStore = await cookies();
+//         cookieStore.delete("token");
+//         cookieStore.delete("role");
+//         cookieStore.delete("refreshToken");
 
-    if (error.response?.status === 403) {
-      console.log("unAuthorized");
-    }
+//         redirect("/auth/signin");
+//       }
+//     }
 
-    throw error;
-  }
-};
+//     throw error;
+//   }
+// };
 
-export { serverApi };
+// export { serverApi };

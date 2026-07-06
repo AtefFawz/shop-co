@@ -1,8 +1,8 @@
-import { serverApi } from "@/lib/serverApi";
 import Link from "next/link";
 import ProductList from "@/components/features/admin/ProductList";
+import { products } from "@/lib/Products";
 export default async function ManageProducts() {
-  const products = await serverApi("/product");
+  const productsData = await products();
 
   return (
     <div className="bg-[#ffffff] rounded-xl shadow-sm p-4 md:p-6 ">
@@ -25,7 +25,7 @@ export default async function ManageProducts() {
             <th>Actions</th>
           </tr>
         </thead>
-        <ProductList initialProducts={products.data.Products} />
+        <ProductList initialProducts={productsData.data.Products} />
       </table>
     </div>
   );

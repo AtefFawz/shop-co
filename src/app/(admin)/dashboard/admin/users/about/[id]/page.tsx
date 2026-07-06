@@ -1,4 +1,4 @@
-import { serverApi } from "@/lib/serverApi";
+// import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
 import {
   Mail,
@@ -11,6 +11,7 @@ import {
 import Link from "next/link";
 import RoleSelector from "@/components/features/admin/users/RoleSelector";
 import DeleteUserButton from "@/components/features/admin/users/DeleteUserButton";
+import api from "@/lib/api";
 
 export default async function AboutUser({
   params,
@@ -18,11 +19,11 @@ export default async function AboutUser({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const response = await serverApi(`/admin/users/${id}`);
+  const response = await api.get("/admin/users/" + id);
 
-  if (!response || response.status !== "Success") return notFound();
+  if (!response || response.status !== 200) return notFound();
 
-  const user = response.data.user;
+  const user = response.data?.data?.user;
 
   const totalSpent =
     user.orders?.reduce((acc: number, curr: any) => acc + curr.totalPrice, 0) ||

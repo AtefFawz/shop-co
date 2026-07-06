@@ -27,9 +27,7 @@ export function middleware(request: NextRequest) {
 
 function safeRedirect(urlPath: string, request: NextRequest) {
   const response = NextResponse.redirect(new URL(urlPath, request.url));
-
   response.headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
-
   return response;
 }
 

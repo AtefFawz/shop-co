@@ -1,6 +1,9 @@
+// "use client";
 import HorizontalScrolling from "@/components/common/Scrolling";
 import Heading from "@/components/ui/Heading";
-import { serverApi } from "@/lib/serverApi";
+// import { serverApi } from "@/lib/serverApi";
+import api from "@/lib/api";
+// import { useEffect, useState } from "react";
 export default async function RatingUi() {
   interface Review {
     fullName: string;
@@ -17,8 +20,9 @@ export default async function RatingUi() {
     comment: string;
   }
 
-  const res = await serverApi("/review");
-  const products = res.data.reviews;
+  const res = await api.get("/review");
+  const products = res.data?.data?.reviews;
+
   const result = products.map((e: RawReview) => ({
     fullName: e.user?.fullName || "Anonymous",
     rating: e.rating,
