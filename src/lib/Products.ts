@@ -1,8 +1,9 @@
-import api from "./api";
+import { serverApi } from "./serverApi";
 
 const products = async () => {
-  const response = await api.get("product");
-  return response.data;
+  const response = await serverApi("product");
+
+  return response.data.Products;
 };
 
 export { products };

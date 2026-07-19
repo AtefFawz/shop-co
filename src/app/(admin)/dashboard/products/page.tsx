@@ -25,7 +25,7 @@ export default async function ManageProducts() {
             <th>Actions</th>
           </tr>
         </thead>
-        <ProductList initialProducts={productsData.data.Products} />
+        <ProductList initialProducts={productsData} />
       </table>
     </div>
   );

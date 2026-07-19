@@ -2,12 +2,12 @@ import { ProfileClient } from "./ProfileClient";
 
 // ─── Server Component ─────────────────────────────────────
 
-import api from "@/lib/api";
-
+// import api from "@/lib/api";
+import { serverApi } from "@/lib/serverApi";
 const Profile = async () => {
-  const res = await api.get("profile/me/");
+  const res = await serverApi("profile/me/");
 
-  const user = res.data?.data?.user;
+  const user = res?.data?.user;
   const { fullName, email, avatar, orders, reviews } = user;
 
   return (
@@ -22,19 +22,3 @@ const Profile = async () => {
 };
 
 export { Profile };
-
-// const res = await serverApi("profile/me/");
-// const [user, setUser] = useState<any>([]);
-// useEffect(() => {
-//   const fetchData = async () => {
-//     try {
-//       const res = await api.get("profile/me/");
-//       const user = res.data.data.user;
-//       setUser(user);
-//     } catch (error) {
-//       console.error("Error fetching profile data:", error);
-//     }
-//   };
-
-//   fetchData();
-// }, []);

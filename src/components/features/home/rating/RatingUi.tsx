@@ -1,8 +1,8 @@
 // "use client";
 import HorizontalScrolling from "@/components/common/Scrolling";
 import Heading from "@/components/ui/Heading";
-// import { serverApi } from "@/lib/serverApi";
-import api from "@/lib/api";
+import { serverApi } from "@/lib/serverApi";
+// import api from "@/lib/api";
 // import { useEffect, useState } from "react";
 export default async function RatingUi() {
   interface Review {
@@ -20,16 +20,14 @@ export default async function RatingUi() {
     comment: string;
   }
 
-  const res = await api.get("/review");
-  const products = res.data?.data?.reviews;
-
+  const res = await serverApi("review");
+  const products = res.data?.reviews;
   const result = products.map((e: RawReview) => ({
     fullName: e.user?.fullName || "Anonymous",
     rating: e.rating,
     comment: e.comment,
     avatar: e.user?.avatar,
   }));
-
   return (
     <section
       className="Responsive overflow-hidden
@@ -49,7 +47,7 @@ export default async function RatingUi() {
           <div
             key={id}
             className="
-              flex-shrink-0
+              shrink-0
               w-full
               px-4
               snap-center first:pl-4 last:pr-4
