@@ -25,7 +25,12 @@ api.interceptors.response.use(
     const status = error.response?.status;
     const msg = error.response?.data?.message || "Something went wrong";
 
-    if (status === 401 && !originalRequest._retry) {
+    const isAuthEndpoint =
+      originalRequest?.url?.includes("/auth/signin") ||
+      originalRequest?.url?.includes("/auth/login") ||
+      originalRequest?.url?.includes("/auth/refresh-token");
+
+    if (status === 401 && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -36,22 +41,29 @@ api.interceptors.response.use(
         );
         const newAccessToken = res.data?.data?.token;
 
-        Cookies.set("token", newAccessToken, { path: "/" });
-
-        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-        return api(originalRequest);
-      } catch (refreshError) {
-        console.error("🚨  refresh Token is expired login...", refreshError);
-        if (error.response?.status === 401) {
-          if (typeof window !== "undefined") {
-            window.location.href = "/auth/signin";
-          }
+        if (newAccessToken) {
+          Cookies.set("token", newAccessToken, { path: "/" });
+          originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
+          return api(originalRequest);
         }
+      } catch (refreshError) {
+        console.error("🚨 Refresh Token Expired - Clearing session...");
+
+        Cookies.remove("token", { path: "/" });
+
+        if (
+          typeof window !== "undefined" &&
+          !window.location.pathname.startsWith("/auth")
+        ) {
+          window.location.href = "/auth/signin";
+        }
+
         return Promise.reject(refreshError);
       }
     }
 
-    if (status !== 401) {
+    //
+    if (status !== 401 && typeof window !== "undefined") {
       toast.error(msg);
     }
 

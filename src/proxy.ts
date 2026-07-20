@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export default async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const baseUrl = request.nextUrl.origin;
 
@@ -70,5 +70,5 @@ function safeRedirect(urlPath: string, request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|/auth).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|).*)"],
 };
