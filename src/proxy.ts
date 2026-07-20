@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
@@ -21,10 +20,14 @@ export default async function middleware(request: NextRequest) {
   let currentRole = role;
   let response = NextResponse.next();
 
+  if (pathname.startsWith("/auth")) {
+    return NextResponse.next();
+  }
+
   if (!token && refreshToken) {
     try {
       const refreshResponse = await fetch(
-        `${baseUrl}/api/backend/auth/refresh-token`,
+        `${baseUrl}api/backend/auth/refresh-token`,
         {
           method: "POST",
           headers: {
@@ -32,7 +35,7 @@ export default async function middleware(request: NextRequest) {
           },
         },
       );
-
+      console.log("refresh token => ", refreshResponse);
       if (refreshResponse.ok) {
         const jsonData = await refreshResponse.json();
         const newAccessToken = jsonData.data?.token;
@@ -57,10 +60,6 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  // if (!refreshToken) {
-  //   return safeRedirect("/auth/signin", request);
-  // }
-
   return response;
 }
 
@@ -71,5 +70,5 @@ function safeRedirect(urlPath: string, request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|/auth).*)"],
 };
