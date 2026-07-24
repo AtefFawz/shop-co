@@ -1,16 +1,9 @@
-"use client";
 import Image from "next/image";
-import Button from "@/components/ui/Button";
 import { itemShop, items, brands } from "@/data/shop/Shop";
-import { useRouter } from "next/navigation";
+import Screen from "@/assets/shop/screenShop.webp";
 import { ArrowUpRight } from "lucide-react";
-
+import Link from "next/link";
 export default function Hero() {
-  const router = useRouter();
-  function handleShopClick() {
-    router.push("/shopping");
-  }
-
   return (
     <>
       {/* ════════ HERO ════════ */}
@@ -38,9 +31,10 @@ export default function Hero() {
               </p>
 
               {/* CTA Row */}
+
               <div className="flex items-center gap-5">
-                <button
-                  onClick={handleShopClick}
+                <Link
+                  href="/shopping"
                   className="group flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-black transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)]"
                 >
                   {itemShop.btnText}
@@ -48,13 +42,13 @@ export default function Hero() {
                     size={16}
                     className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"
                   />
-                </button>
-                <button
-                  onClick={handleShopClick}
+                </Link>
+                <Link
+                  href="/shopping"
                   className="text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors underline underline-offset-4 decoration-gray-300 hover:decoration-gray-900"
                 >
                   Browse All
-                </button>
+                </Link>
               </div>
 
               {/* Stats */}
@@ -93,9 +87,12 @@ export default function Hero() {
               <div className="w-[calc(100%+1.5rem)] -mr-6 md:mr-0 md:w-full h-[420px] md:h-full relative">
                 <Image
                   priority
-                  src={itemShop.image}
+                  src={Screen}
                   alt="Shop Screen"
                   fill
+                  quality={70}
+                  preload
+                  sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover object-top"
                 />
                 {/* Fade left edge on desktop */}
@@ -109,7 +106,10 @@ export default function Hero() {
       {/* ════════ BRANDS TICKER ════════ */}
       <div className="bg-gray-950 overflow-hidden">
         <div className="flex items-center py-10 lg:py-16 h-16 bg-linear-to-r from-transparent via-white/10 to-transparent">
-          <div className="flex animate-[marquee_25s_linear_infinite] whitespace-nowrap">
+          <div
+            style={{ willChange: "transform" }}
+            className="flex animate-[marquee_25s_linear_infinite] whitespace-nowrap"
+          >
             {[...brands, ...brands].map((brand, id) => (
               <span
                 key={id}

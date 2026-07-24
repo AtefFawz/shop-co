@@ -1,8 +1,6 @@
-import screenShop from "@/assets/shop/screenShop.png";
-import { StaticImageData } from "next/image";
 interface shopDataType extends types {
   btnText: string;
-  image: StaticImageData;
+  // image: StaticImageData;
 }
 
 export const itemShop: shopDataType = {
@@ -10,7 +8,6 @@ export const itemShop: shopDataType = {
   description:
     "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality and cater to your sense of style.",
   btnText: "Shop Now",
-  image: screenShop,
 };
 interface types {
   title: string;

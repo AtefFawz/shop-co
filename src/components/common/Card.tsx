@@ -1,75 +1,66 @@
 "use client";
+
 import Image from "next/image";
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import StarRating from "./StarsRating";
 import { Product } from "../../types/index";
 import Pricing from "./Pricing";
-import { useRouter } from "next/navigation";
 
 export default function Card({ product }: { product: Product }) {
-  const router = useRouter();
-  const handleNavigate = () => {
-    router.push(`/shopping/details/${product._id}`);
-  };
+  const detailUrl = `/shopping/details/${product._id}`;
 
   return (
     <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
+      transition={{ duration: 0.25, ease: "easeOut" }}
       className="group relative w-full flex flex-col gap-3 mb-4 cursor-pointer"
-      initial={{ opacity: 0, y: 16 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
     >
       {/* ── Image container ── */}
-      <motion.div
-        className="relative w-full overflow-hidden rounded-2xl bg-gray-100 cursor-pointer"
+      <Link
+        href={detailUrl}
+        className="relative w-full overflow-hidden rounded-2xl bg-gray-100 block transition-all duration-300 active:scale-[0.98]"
         style={{ aspectRatio: "3/4" }}
-        onClick={handleNavigate}
-        whileTap={{ scale: 0.98 }}
-        transition={{ duration: 0.18 }}
       >
-        {/* Product image */}
+        {/* Product image with GPU-accelerated Zoom */}
         <Image
           src={product.photo}
           alt={product.name || "Product"}
           fill
-          className="object-cover transition-transform duration-700 group-hover:scale-105"
+          quality={60}
+          className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* Overlay — always subtle on mobile, stronger on hover desktop */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/30 via-transparent to-transparent opacity-60 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Overlay — Smooth gradient fade */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
 
         {/* Sale badge */}
         {product.isSale && (
-          <span className="absolute top-3 left-3 bg-gray-600 text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-md">
+          <span className="absolute top-3 left-3 bg-gray-900/90 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg z-10">
             Sale
           </span>
         )}
 
-        {/* CTA button — bottom center */}
-        <div className="absolute bottom-3 inset-x-3 flex justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 md:translate-y-2 md:group-hover:translate-y-0 transition-all duration-300">
-          <motion.button
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={(e) => {
-              e.stopPropagation();
-              handleNavigate();
-            }}
-            className="flex items-center gap-1.5 bg-white/95 backdrop-blur-sm text-black text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full shadow-xl hover:bg-white transition-colors text-nowrap"
-          >
+        {/* CTA Button with Smooth Slide Up */}
+        <div className="absolute bottom-3 inset-x-3 flex justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transform translate-y-0 md:translate-y-3 md:group-hover:translate-y-0 transition-all duration-300 ease-out z-10">
+          <span className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md text-black text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full shadow-2xl hover:bg-black hover:text-white active:scale-95 transition-all text-nowrap">
             View Details
             <ArrowUpRight size={13} />
-          </motion.button>
+          </span>
         </div>
-      </motion.div>
+      </Link>
 
       {/* ── Info ── */}
       <div className="space-y-1.5 px-0.5">
-        {/* Name || Description*/}
-        <h4 className="font-black text-sm sm:text-base uppercase tracking-tight text-gray-900 truncate leading-tight">
-          {product.description || product.name}
-        </h4>
+        <Link href={detailUrl}>
+          <h4 className="font-black text-sm sm:text-base uppercase tracking-tight text-gray-900 truncate leading-tight hover:text-gray-600 transition-colors">
+            {product.description || product.name}
+          </h4>
+        </Link>
 
         {/* Stars + rating */}
         <div className="flex items-center gap-1.5">

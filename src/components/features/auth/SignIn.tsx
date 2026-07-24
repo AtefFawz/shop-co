@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import Login from "@/assets/shop/screenShop.png";
+import Login from "@/assets/shop/screenShop.webp";
 import { FormSignIn } from "./FormSignIn";
 
 export default function SignInPage() {
