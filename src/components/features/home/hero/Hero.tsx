@@ -90,8 +90,7 @@ export default function Hero() {
                   src={Screen}
                   alt="Shop Screen"
                   fill
-                  quality={70}
-                  preload
+                  quality={90}
                   sizes="(max-width: 768px) 100vw, 50vw"
                   className="object-cover object-top"
                 />

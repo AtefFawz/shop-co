@@ -1,4 +1,4 @@
-// import { serverApi } from "@/lib/serverApi";
+import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
 import {
   Mail,
@@ -11,7 +11,7 @@ import {
 import Link from "next/link";
 import RoleSelector from "@/components/features/admin/users/RoleSelector";
 import DeleteUserButton from "@/components/features/admin/users/DeleteUserButton";
-import api from "@/lib/api";
+import StatCard from "@/components/features/admin/users/StateCard";
 
 export default async function AboutUser({
   params,
@@ -19,11 +19,16 @@ export default async function AboutUser({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const response = await api.get("/admin/users/" + id);
+  let user = null;
 
-  if (!response || response.status !== 200) return notFound();
+  try {
+    const response = await serverApi(`admin/users/${id}`);
+    user = response?.data?.user;
+  } catch (error: any) {
+    console.error("Error loading user in Server Component:", error);
+  }
 
-  const user = response.data?.data?.user;
+  if (!user) return notFound();
 
   const totalSpent =
     user.orders?.reduce((acc: number, curr: any) => acc + curr.totalPrice, 0) ||
@@ -37,7 +42,7 @@ export default async function AboutUser({
   });
 
   return (
-    <div className="max-w-6xl Responsive space-y-8 font-sans">
+    <div className=" Responsive space-y-8 font-sans">
       {/* Header & Actions */}
       <div className="flex items-center  justify-between gap-4">
         <Link
@@ -63,7 +68,7 @@ export default async function AboutUser({
       </div>
 
       {/* 1. Main Profile Card */}
-      <div className="bg-white rounded-[40px] border border-gray-100 p-6 md:p-10 shadow-sm flex flex-col md:flex-row gap-8 items-center relative ">
+      <div className="bg-white rounded-[30px] border border-gray-100 p-4 md:p-10 shadow-sm flex flex-row gap-8 items-center relative overflow-hidden ">
         <img
           src={user.avatar || "/placeholder-user.png"}
           alt={user.fullName}
@@ -72,14 +77,14 @@ export default async function AboutUser({
 
         <div className="flex-1 text-center md:text-left space-y-5">
           <div className="space-y-1">
-            <h1 className="text-3xl md:text-5xl font-black uppercase tracking-tighter text-gray-900 leading-tight">
+            <h1 className="text-xl md:text-2xl font-black uppercase tracking-tighter text-gray-900 leading-tight">
               {user.fullName}
             </h1>
             <div className="flex flex-wrap justify-center md:justify-start gap-x-6 gap-y-2 mt-2">
-              <span className="flex items-center gap-2 text-gray-500 text-sm font-bold tracking-tight">
+              <span className="flex items-center gap-2 text-gray-500 md:text-sm font-bold tracking-tight  text-xs">
                 <Mail size={14} className="text-gray-300" /> {user.email}
               </span>
-              <span className="flex items-center gap-2 text-gray-500 text-sm font-bold tracking-tight">
+              <span className="flex items-center gap-2 text-gray-500 text-xs md:text-sm font-bold tracking-tight">
                 <Calendar size={14} className="text-gray-300" /> Joined{" "}
                 {joinDate}
               </span>
@@ -123,7 +128,7 @@ export default async function AboutUser({
                 ({user.orders?.length})
               </span>
             </h2>
-            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-3 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
               {user.orders?.map((order: any) => (
                 <div
                   key={order._id}
@@ -157,7 +162,7 @@ export default async function AboutUser({
                 ({user.reviews?.length})
               </span>
             </h2>
-            <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            <div className="space-y-3 max-h-100 overflow-y-auto pr-2 custom-scrollbar">
               {user.reviews?.map((review: any) => (
                 <div
                   key={review._id}
@@ -189,33 +194,6 @@ export default async function AboutUser({
             </div>
           </section>
         ) : null}
-      </div>
-    </div>
-  );
-}
-
-// Reusable Stat Card (Maintained Design)
-function StatCard({
-  icon,
-  label,
-  value,
-}: {
-  icon: any;
-  label: string;
-  value: any;
-}) {
-  return (
-    <div className="bg-white p-7 rounded-[35px] border border-gray-100 shadow-sm flex items-center gap-5 hover:-translate-y-1 transition-transform">
-      <div className="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center shrink-0">
-        {icon}
-      </div>
-      <div className="min-w-0">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 mb-1 truncate">
-          {label}
-        </p>
-        <p className="text-2xl font-black text-gray-900 tracking-tight truncate">
-          {value}
-        </p>
       </div>
     </div>
   );
