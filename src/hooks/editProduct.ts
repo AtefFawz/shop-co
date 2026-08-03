@@ -29,8 +29,7 @@ export const usePatch = () => {
     setLoading(true);
     try {
       const res = await api.get(`product/${id}`);
-      const data = res.data.data.product;
-      console.log(res);
+      const data = res.data?.data?.product;
       setItem({
         name: data.name || "",
         description: data.description || "",
@@ -42,7 +41,7 @@ export const usePatch = () => {
         discount: data.discount || "",
         size: data.size || "",
         colors: data.colors || "",
-        photo: null, // بنسيبها null لأن الـ Input file مبيقبلش قيم قديمة
+        photo: null,
       });
     } catch (err) {
       setError("Failed to load product");
@@ -69,8 +68,6 @@ export const usePatch = () => {
 
     try {
       await api.patch(`product/${id}`, dataToSend);
-      console.log("item =>", item);
-
       router.refresh();
     } catch (error: any) {
       setError("Update failed");

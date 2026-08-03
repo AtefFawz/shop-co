@@ -1,23 +1,23 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
-// import Image from "next/image";
+
 import {
   Star,
   Package,
   Settings,
   LogOut,
   Activity,
-  CreditCard,
-  ShoppingBag,
+  UserCog,
 } from "lucide-react";
 import { signOut } from "@/lib/signOut";
-
 import { EmptyState } from "./EmptyState";
 import { SectionHeader } from "./SectionHeader";
 import { ReviewCard } from "./ReviewCard";
-import OrderCard from "../OrderCard/OrderCard";
 
+import OrdersContent from "./OrdersContent";
+import OverviewContent from "./OverviewContent";
 const NAV = [
   { id: "overview", label: "Home", icon: Activity },
   { id: "orders", label: "Orders", icon: Package },
@@ -30,41 +30,44 @@ interface Personal {
   avatar: string;
   orders: any[];
   reviews: any[];
+  role: string;
 }
-export function ProfileClient({
-  fullName,
-  email,
-  avatar,
-  orders,
-  reviews,
-}: Personal) {
+export function ProfileClient({ user }: { user: Personal }) {
+  const { fullName, email, avatar, orders, reviews, role } = user;
   const [active, setActive] = useState("overview");
   const router = useRouter();
   const handleRefresh = () => router.refresh();
+  const checkRole = role === "ADMIN" || role === "MANAGER ";
+  const NAV_LINKS = checkRole
+    ? [...NAV, { id: "dashboard", label: "DASHBOARD", icon: UserCog }]
+    : NAV;
 
   const goTo = (id: string) => {
+    if (id === "dashboard") {
+      router.push("/dashboard");
+      return;
+    }
     setActive(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
   return (
     <section className="min-h-screen bg-[#F8F8F8]   pb-24 lg:pb-0">
       <div className="container mx-auto ">
         {/* ── 1. MOBILE ONLY: Bottom Navigation Bar ── */}
-        <div className="lg:hidden block fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-full">
-          <nav className=" bg-[#f0f0f0f0] backdrop-blur-xl border border-white/10 p-2 rounded-[24px] flex items-center justify-around shadow-2xl">
-            {NAV.map(({ id, label, icon: Icon }) => (
+        <div className="lg:hidden block fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[98%] max-w-full">
+          <nav className=" bg-[#f0f0f0f0] backdrop-blur-xs border border-white/10 p-2 rounded-3xl flex items-center justify-around shadow-2xl">
+            {NAV_LINKS.map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
                 onClick={() => goTo(id)}
-                className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-300 ${
+                className={`flex flex-col items-center py-1 cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 ${
                   active === id
-                    ? "bg-black/90 text-[#f0f0f0f0] scale-105"
+                    ? "bg-black/90 text-[#f0f0f0f0] px-4 scale-105 space-y-0.75 overflow-hidden"
                     : "text-gray-400"
                 }`}
               >
-                <Icon size={18} />
-                <span className="text-[9px] font-black uppercase tracking-tight">
+                <Icon size={15} />
+                <span className="text-[7px] font-bold uppercase tracking-tight">
                   {label}
                 </span>
               </button>
@@ -73,7 +76,7 @@ export function ProfileClient({
               onClick={() => signOut()}
               className="flex flex-col items-center gap-1 px-4 py-2 text-red-400"
             >
-              <LogOut size={18} />
+              <LogOut size={15} />
               <span className="text-[9px] font-black uppercase tracking-tight">
                 Exit
               </span>
@@ -83,19 +86,20 @@ export function ProfileClient({
 
         <div className="max-w-6xl mx-auto flex">
           {/* ── 2. DESKTOP ONLY: Sidebar ── */}
-          <aside className="hidden lg:flex flex-col w-80 bg-white border-r border-gray-100 sticky top-0 h-screen rounded-xl shadow-sm">
+          <aside className="hidden lg:flex flex-col w-80 bg-reb-400 border-r border-gray-100 sticky top-0 h-screen rounded-xl shadow-sm">
             <div className="p-8 border-b border-gray-50">
               <div className="flex items-center gap-4">
-                <div className="relative w-14 h-14 rounded-2xl overflow-hidden ring-4 ring-black/5 shadow-inner">
-                  <img
+                <div className="relative w-14 h-14 rounded-[100%] overflow-hidden ring-4 ring-black/5 shadow-inner">
+                  <Image
                     src={avatar}
                     alt={fullName || "User Avatar"}
-                    // fill
-                    className="object-cover w-full h-full"
+                    fill
+                    quality={100}
+                    className="object-fill accent-auto "
                   />
                 </div>
                 <div className="min-w-0 text-left">
-                  <p className="font-black text-sm uppercase tracking-tighter truncate leading-none mb-1">
+                  <p className="font-black text-sm  tracking-tighter truncate leading-none mb-1">
                     {fullName}
                   </p>
                   <p className="text-[10px] font-bold text-gray-400 truncate">
@@ -105,11 +109,17 @@ export function ProfileClient({
               </div>
             </div>
             <nav className="flex-1 px-4 py-6 space-y-2 ">
-              {NAV.map(({ id, label, icon: Icon }) => (
+              {NAV_LINKS.map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
-                  onClick={() => setActive(id)}
-                  className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.1em] transition-all ${
+                  onClick={() => {
+                    if (id === "dashboard") {
+                      router.push("/dashboard");
+                    } else {
+                      setActive(id);
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
                     active === id
                       ? "bg-black text-white shadow-xl"
                       : "text-gray-400 hover:bg-gray-50 hover:text-black"
@@ -131,25 +141,27 @@ export function ProfileClient({
           </aside>
 
           {/* ── 3. MAIN CONTENT ── */}
-          <main className="flex-1 min-w-0 px-2 md:px-4 sm:px-10 py-8 lg:py-16">
-            {/* Hero Banner - بيبدأ فوراً تحت هيدر الموقع */}
-            <div className="relative bg-black rounded-4xl p-8 sm:p-14 mb-10 overflow-hidden shadow-2xl text-white">
+          <main className="flex-1 min-w-0 Responsive">
+            {/* Hero Banner */}
+            <div className="relative bg-black rounded-4xl p-4 sm:p-14 mb-10 overflow-hidden shadow-2xl text-white">
               <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -mr-32 -mt-32 blur-[80px]" />
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-                <div className="flex flex-col md:flex-row items-center gap-6">
-                  <div className="relative w-24 h-24 sm:w-32 sm:h-32 rounded-4xl overflow-hidden border-4 border-white/10 shadow-2xl">
-                    <img
+              {/* Container Top Profile */}
+              <div className="relative z-10 flex flex-col md:flex-row md:items-center items-start justify-between gap-8">
+                <div className="flex flex-row items-center justify-evenly gap-6">
+                  <div className="relative w-30 h-30 sm:w-32 sm:h-32 rounded-4xl overflow-hidden border-2 border-white/10 shadow-2xl">
+                    <Image
                       src={avatar}
                       alt={fullName}
-                      // fill
-                      className="object-cover w-full h-full"
+                      fill
+                      quality={100}
+                      className="object-fill w-full h-full"
                     />
                   </div>
-                  <div className="text-center md:text-left">
-                    <h1 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter leading-none mb-3">
+                  <div className="flex flex-col justify-center md:text-left">
+                    <h1 className="text-3xl md:text-4xl font-black   tracking-tighter leading-none mb-3">
                       {fullName}
                     </h1>
-                    <span className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] bg-white/10 px-4 py-2 rounded-full border border-white/10">
+                    <span className="inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] bg-white/10 px-2 py-2 rounded-full border border-white/10 text-nowrap">
                       <Star
                         size={10}
                         className="fill-yellow-400 text-yellow-400 "
@@ -158,7 +170,7 @@ export function ProfileClient({
                     </span>
                   </div>
                 </div>
-                <button className="bg-white text-black px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">
+                <button className="bg-white text-black px-10 py-2 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:scale-105 active:scale-95 transition-all text-nowrap md:w-fit w-full">
                   Edit Details
                 </button>
               </div>
@@ -188,75 +200,6 @@ export function ProfileClient({
   );
 }
 
-function OverviewContent({ orders, reviews, onRefresh, goTo }: any) {
-  return (
-    <div className="space-y-10 animate-in fade-in duration-700 ">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard
-          label="Expenses"
-          value={`$${orders?.reduce((a: any, o: any) => a + o.totalPrice, 0).toLocaleString()}`}
-          icon={CreditCard}
-          color="blue"
-        />
-        <StatCard
-          label="Orders"
-          value={orders?.length}
-          icon={Package}
-          color="orange"
-        />
-        <StatCard
-          label="Reviews"
-          value={reviews?.length}
-          icon={Star}
-          color="yellow"
-        />
-      </div>
-
-      <section>
-        <SectionHeader icon={ShoppingBag} title="Latest Activity" />
-        <div className="space-y-4 mt-6">
-          {orders?.slice(0, 2).map((order: any) => (
-            <OrderCard
-              key={order._id}
-              order={order}
-              onReviewSuccess={onRefresh}
-            />
-          ))}
-          <button
-            onClick={() => goTo("orders")}
-            className="w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-2 border-dashed border-gray-200 rounded-[24px]"
-          >
-            View All Activity →
-          </button>
-        </div>
-      </section>
-    </div>
-  );
-}
-
-function OrdersContent({ orders, onRefresh }: any) {
-  return (
-    <div className="space-y-6 ">
-      <SectionHeader
-        icon={Package}
-        title="Your Orders"
-        count={orders?.length}
-      />
-      {orders?.length > 0 ? (
-        orders.map((order: any) => (
-          <OrderCard
-            key={order._id}
-            order={order}
-            onReviewSuccess={onRefresh}
-          />
-        ))
-      ) : (
-        <EmptyState message="No orders yet." />
-      )}
-    </div>
-  );
-}
-
 function ReviewsContent({ reviews }: any) {
   return (
     <div className="space-y-6">
@@ -265,29 +208,6 @@ function ReviewsContent({ reviews }: any) {
         {reviews?.map((rev: any) => (
           <ReviewCard key={rev._id} rev={rev} />
         ))}
-      </div>
-    </div>
-  );
-}
-
-function StatCard({ label, value, icon: Icon, color }: any) {
-  const colors: any = {
-    blue: "bg-blue-50 text-blue-600",
-    orange: "bg-orange-50 text-orange-600",
-    yellow: "bg-yellow-50 text-yellow-600",
-  };
-  return (
-    <div className="bg-white rounded-[28px] p-6 border border-gray-50 flex items-center gap-4 shadow-sm ">
-      <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${colors[color]}`}
-      >
-        <Icon size={20} />
-      </div>
-      <div className="text-left">
-        <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest leading-none mb-1">
-          {label}
-        </p>
-        <p className="text-xl font-black leading-none">{value || 0}</p>
       </div>
     </div>
   );

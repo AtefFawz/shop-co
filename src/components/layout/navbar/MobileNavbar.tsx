@@ -8,22 +8,27 @@ import Button from "@mui/material/Button";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import MobileSearch from "./MobileSearch";
+// import MobileSearch from "./MobileSearch";
 import { NAV_LINKS } from "./constants";
 import NavIcons from "./NavIcons";
 import api from "@/lib/api";
+import SearchBar from "./SearchBar";
 export default function MobileNavbar() {
   const pathname = usePathname();
   const router = useRouter();
   const mobileNavRef = useRef<HTMLDivElement | null>(null);
   const [activeSearch, setActiveSearch] = useState(false);
   const [photo, setPhoto] = useState("");
-
-  const getPhoto = async () => {
-    const res = await api.get("profile/me");
-    setPhoto(res.data.data.user.avatar);
-  };
   useEffect(() => {
+    const getPhoto = async () => {
+      try {
+        const res = await api.get("profile/me");
+        const avatar = res?.data?.data?.user?.avatar || res?.data?.user?.avatar;
+        if (avatar) setPhoto(avatar);
+      } catch (error) {
+        console.error(error);
+      }
+    };
     getPhoto();
   }, []);
 
@@ -79,10 +84,10 @@ export default function MobileNavbar() {
       {/* Search Area */}
       <div
         className={`${
-          activeSearch ? "mt-6 duration-300" : "mt-0 duration-300"
+          activeSearch ? "mt-6 duration-300 px-2 md:px-0" : "mt-0 duration-300"
         }`}
       >
-        {activeSearch && <MobileSearch active={activeSearch} />}
+        {activeSearch && <SearchBar />}
       </div>
 
       {/* Collapsible Menu */}

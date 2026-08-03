@@ -16,10 +16,10 @@ export const Category = () => {
     { id: 3, title: "Women", img: Women, slug: "WOMEN" },
   ];
 
-  const setSection = useFilterStore((state) => state.filterByType);
+  const setType = useFilterStore((state) => state.filterByType);
 
   const handleClick = (slug: string) => {
-    setSection(slug);
+    setType(slug);
     router.push("/shopping");
   };
 
@@ -29,7 +29,6 @@ export const Category = () => {
         BROWSE BY DRESS STYLE
       </h2>
 
-      {/* ضفت gap-6 عشان يبقى فيه مسافات أشيك */}
       <div className="grid md:grid-cols-3 grid-cols-1 gap-6 group">
         {categories.map((cat) => (
           <div
@@ -38,25 +37,18 @@ export const Category = () => {
             className="
                 relative overflow-hidden rounded-3xl cursor-pointer h-80
                 transition-all duration-500 ease-in-out
-                
-                /* اللوجيك بتاعك: كله يبهت ويصغر */
                 group-hover:scale-95 group-hover:opacity-50
-                
-                /* ماعدا اللي واقف عليه: يرجع طبيعي ويكبر */
                 hover:scale-100! hover:opacity-100! hover:shadow-2xl
             "
           >
-            {/* الخلفية والصورة */}
             <Image
               src={cat.img}
               alt={cat.title}
               className="object-cover w-full h-full transition-transform duration-700 hover:scale-110"
             />
 
-            {/* طبقة سوداء خفيفة عشان الكلام يبان */}
             <div className="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent" />
 
-            {/* العنوان والأيقونة */}
             <div className="absolute bottom-6 left-6 flex items-center justify-between w-[calc(100%-3rem)]">
               <div>
                 <h3 className="text-white text-2xl font-bold tracking-wider">

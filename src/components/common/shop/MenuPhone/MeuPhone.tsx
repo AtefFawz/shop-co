@@ -15,6 +15,7 @@ const dress = ["Casual", "Formal", "Party", "Gym"];
 export default function MobileFilterDrawer() {
   const reset = useFilterStore((e) => e.resetFilter);
   const product = useFilterStore((e) => e.filteredProducts);
+  const { currentSection, currentType } = useFilterStore();
   const [open, setOpen] = React.useState(false);
 
   const find = product.find((e: any) => e._id);
@@ -27,13 +28,17 @@ export default function MobileFilterDrawer() {
         {find?.type && (
           <>
             {" "}
-            <span className="text-gray-300">/</span> {find.type}
+            {currentType ? <span className="text-gray-300">/</span> : null}{" "}
+            {currentType}
           </>
         )}
         {find?.section && (
           <>
             {" "}
-            <span className="text-gray-300">/</span> {find.section}
+            {currentSection ? (
+              <span className="text-gray-300">/</span>
+            ) : null}{" "}
+            {currentSection}
           </>
         )}
       </p>
@@ -41,7 +46,7 @@ export default function MobileFilterDrawer() {
       {/* Filter trigger */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-700 hover:border-gray-400 transition-colors shadow-sm flex-shrink-0"
+        className="flex items-center gap-1.5 px-3 py-2 bg-white border border-gray-200 rounded-xl text-[10px] font-black uppercase tracking-widest text-gray-700 hover:border-gray-400 transition-colors shadow-sm shrink-0"
       >
         <SlidersHorizontal size={13} />
         Filter
@@ -95,13 +100,13 @@ export default function MobileFilterDrawer() {
             <FilterButton content={fil} />
           </div>
 
-          <Divider sx={{ mb: 1 }} />
+          {/* <Divider sx={{ mb: 1 }} /> */}
 
           <PriceSlider />
           <Colors />
           <Sizing />
 
-          <Divider sx={{ my: 1 }} />
+          {/* <Divider sx={{ my: 1 }} /> */}
 
           <div className="pt-2">
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-3">

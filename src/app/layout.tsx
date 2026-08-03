@@ -4,8 +4,6 @@ import { Toaster } from "react-hot-toast";
 // @ts-ignore: CSS import side-effect type declarations missing
 import "./globals.css";
 import LayoutProvider from "../components/layout/LayoutProvider";
-import { cookies } from "next/headers";
-import Dialog from "@/components/common/dialog/Dialog";
 import { AuthWatcher } from "@/lib/AuthWatcher";
 
 const geistSans = Geist({
@@ -29,18 +27,11 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const Cookie = (await cookies()).get("role")?.value;
-
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
-        {Cookie && Cookie !== "USER" ? (
-          <div className="fixed bottom-6 right-6 z-10">
-            <Dialog />
-          </div>
-        ) : null}
         <AuthWatcher />
         <LayoutProvider>{children}</LayoutProvider>
         <Toaster position="top-center" />

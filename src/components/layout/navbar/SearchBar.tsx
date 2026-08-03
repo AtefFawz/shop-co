@@ -8,31 +8,44 @@ export default function SearchBar() {
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
-  const [query, setQuery] = useState(searchParams.get("search") || "");
+  const currentKeyword =
+    searchParams.get("keyword") || searchParams.get("search") || "";
+  const [query, setQuery] = useState(currentKeyword);
 
   useEffect(() => {
-    const currentSearch = searchParams.get("keyword") || "";
+    setQuery(currentKeyword);
+  }, [currentKeyword]);
 
-    if (query === currentSearch) return;
+  useEffect(() => {
+    if (query === currentKeyword) return;
 
     const delayDebounceFn = setTimeout(() => {
       const params = new URLSearchParams(searchParams.toString());
 
-      if (query) {
-        params.set("keyword", query);
+      if (query.trim()) {
+        params.set("keyword", query.trim());
       } else {
         params.delete("keyword");
       }
 
-      // const targetPath = pathname.includes("/shopping") ? pathname : "/";
       router.push(`${pathname}?${params.toString()}`, { scroll: false });
-    }, 500);
+    }, 400);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [query, router, pathname, searchParams]);
+  }, [query]);
+
+  const handleClear = () => {
+    setQuery("");
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("keyword");
+    params.delete("search");
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
   return (
-    <div className="relative w-full  group">
-      <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-black">
+    <div className="relative w-full group">
+      <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-gray-800">
         <Search size={18} />
       </div>
 
@@ -41,13 +54,14 @@ export default function SearchBar() {
         placeholder="Search for products..."
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="w-full bg-gray-100 border-none rounded-2xl py-3 pl-12 pr-10 text-sm focus:ring-2 focus:ring-black outline-none"
+        className="w-full bg-gray-100 border-none rounded-2xl py-3 pl-12 pr-10 text-sm focus:ring-2 focus:ring-gray-600 outline-none"
       />
 
       {query && (
         <button
-          onClick={() => setQuery("")}
-          className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-black"
+          type="button"
+          onClick={handleClear}
+          className="absolute inset-y-0 right-4 flex items-center text-gray-400 hover:text-black cursor-pointer"
         >
           <X size={16} />
         </button>

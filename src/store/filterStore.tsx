@@ -5,6 +5,7 @@ interface FilterStore {
   allProducts: Product[];
   filteredProducts: Product[];
   currentType: string | null;
+  currentSection: string | null;
 
   // Actions
   setInitialProducts: (data: Product[]) => void;
@@ -18,15 +19,22 @@ export const useFilterStore = create<FilterStore>((set, get) => ({
   allProducts: [],
   filteredProducts: [],
   currentType: null,
+  currentSection: null,
 
   setInitialProducts: (data) => {
-    const { currentType } = get();
-
+    const { currentType, currentSection } = get();
     let initialFiltered = data;
 
     if (currentType) {
       initialFiltered = data.filter((item) => item.type === currentType);
     }
+
+    if (currentSection) {
+      initialFiltered = initialFiltered.filter(
+        (item) => item.section === currentSection,
+      );
+    }
+
     set({
       allProducts: data,
       filteredProducts: initialFiltered,
@@ -46,20 +54,37 @@ export const useFilterStore = create<FilterStore>((set, get) => ({
   filterBySection: (section) => {
     const { allProducts, currentType } = get();
     let filtered = allProducts;
+
+    // If a type is selected, filter by that type first
     if (currentType) {
       filtered = filtered.filter((item) => item.type === currentType);
     }
+
+    // Then filter by section if provided
+    if (section) {
+      filtered = filtered.filter((item) => item.section === section);
+    }
+
     set({
-      filteredProducts: filtered.filter((item) => item.section === section),
+      filteredProducts: filtered,
+      currentSection: section,
     });
   },
 
   filterPrice: (maxPrice) => {
-    const { allProducts, currentType } = get();
+    const { allProducts, currentType, currentSection } = get();
     let filtered = allProducts;
+
+    // If a type is selected, filter by that type first
     if (currentType) {
       filtered = filtered.filter((item) => item.type === currentType);
     }
+
+    // If a section is selected, filter by that section
+    if (currentSection) {
+      filtered = filtered.filter((item) => item.section === currentSection);
+    }
+
     set({
       filteredProducts: filtered.filter((item) => item.price <= maxPrice),
     });

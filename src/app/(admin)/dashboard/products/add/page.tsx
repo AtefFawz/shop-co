@@ -161,7 +161,7 @@ export default function AddProduct() {
           <FormSection label="Description">
             <Field label="Product Description" icon={<AlignLeft size={13} />}>
               <textarea
-                className="form-input min-h-[100px] resize-none py-3 leading-relaxed"
+                className="form-input min-h-25 resize-none py-3 leading-relaxed"
                 placeholder="Describe your product in detail…"
                 value={item.description}
                 onChange={(e) => handleChange("description", e.target.value)}

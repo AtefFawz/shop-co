@@ -1,11 +1,11 @@
 "use client";
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
-
-export const ShippingForm = ({
-  onSubmit,
-}: {
+interface dataType {
   onSubmit: (data: any) => void;
-}) => {
+  state: boolean;
+}
+export const ShippingForm = ({ onSubmit, state }: dataType) => {
   const [formData, setFormData] = useState({
     address: "",
     city: "",
@@ -45,11 +45,23 @@ export const ShippingForm = ({
             }
           />
         </div>
+        {/* ── Submit ── */}
         <button
           type="submit"
-          className="w-full bg-black text-white py-4 rounded-full font-bold mt-4 hover:bg-gray-800"
+          disabled={state}
+          className="w-full flex items-center justify-center gap-2 bg-black text-white font-black text-sm uppercase tracking-widest py-4 rounded-2xl hover:bg-gray-800 transition-all active:scale-[0.99] disabled:bg-gray-300 disabled:cursor-not-allowed shadow-lg shadow-black/10 mt-2"
         >
-          Place Order
+          {state ? (
+            <>
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Place Order…
+            </>
+          ) : (
+            <>
+              Place Order
+              <ArrowRight size={15} />
+            </>
+          )}
         </button>
       </form>
     </div>

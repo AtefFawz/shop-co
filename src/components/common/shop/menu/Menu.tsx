@@ -32,7 +32,7 @@ export const Menu = () => {
 
       {/* Filter sections */}
       <div className="px-5 space-y-0">
-        <div className="border-b border-gray-100 py-4">
+        <div className=" py-4">
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-3">
             Category
           </p>

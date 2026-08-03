@@ -4,6 +4,9 @@ import type { NextRequest } from "next/server";
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const baseUrl = request.nextUrl.origin;
+  console.log("🚀 ~ file: proxy.ts:7 ~ proxy ~ pathname:", pathname);
+  console.log("🚀 ~ file: proxy.ts:8 ~ proxy ~ baseUrl:", baseUrl);
+  console.log("proxy ");
 
   if (
     pathname.startsWith("/_next") ||
@@ -35,7 +38,6 @@ export default async function proxy(request: NextRequest) {
           },
         },
       );
-      console.log("refresh token => ", refreshResponse);
       if (refreshResponse.ok) {
         const jsonData = await refreshResponse.json();
         const newAccessToken = jsonData.data?.token;
@@ -70,5 +72,5 @@ function safeRedirect(urlPath: string, request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };

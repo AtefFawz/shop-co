@@ -10,6 +10,7 @@ const useSignup = () => {
     fullName: "",
     email: "",
     password: "",
+    avatar: null as File | null,
   });
 
   const [error, setError] = useState("");
@@ -27,8 +28,13 @@ const useSignup = () => {
     setLoading(true);
     setError("");
 
+    const formData = new FormData();
+    Object.entries(user).forEach(([key, value]) => {
+      if (value !== null && value !== "") formData.append(key, value as any);
+    });
+
     try {
-      const res = await api.post("/auth/signup", user);
+      const res = await api.post("/auth/signup", formData);
 
       const token = res.data?.data?.token || res.data?.token;
       const userData = res.data?.data?.user || res.data?.user;

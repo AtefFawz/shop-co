@@ -15,6 +15,7 @@ export const Shop = () => {
   const setInitialProducts = useFilterStore((s) => s.setInitialProducts);
   const displayProducts = useFilterStore((s) => s.filteredProducts);
   const type = useFilterStore((s) => s.currentType);
+  const section = useFilterStore((s) => s.currentSection);
 
   useEffect(() => {
     if (product?.length > 0) setInitialProducts(product);
@@ -29,6 +30,8 @@ export const Shop = () => {
           <span>Shop</span>
           <span className="text-gray-200">/</span>
           <span className="text-gray-900">{type || "All Products"}</span>
+          <span className="text-gray-200">/</span>
+          <span className="text-gray-900">{section || "All Sections"}</span>
         </p>
 
         <div className="flex gap-6 items-start">

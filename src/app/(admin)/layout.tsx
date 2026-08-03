@@ -43,17 +43,17 @@ export default function AdminLayout({
     <section className=" bg-[#F8F8F8] ">
       <div className="Responsive flex flex-col md:flex-row min-h-screen">
         {/* ── 1. MOBILE: Bottom Navigation (Floating Style) ── */}
-        <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] ">
-          <nav className="bg-black/90 backdrop-blur-xl border border-white/10 p-2 rounded-[24px] flex items-center justify-around shadow-2xl">
+        <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[98%] ">
+          <nav className="bg-[#f0f0f0f0] backdrop-blur-xs border border-white/10 p-2 rounded-3xl flex items-center justify-around shadow-2xl">
             {collection.map((item) => {
               const isActive = path === item.path;
               return (
                 <Link
                   key={item.id}
                   href={item.path}
-                  className={`flex flex-col items-center gap-1 px-4 py-2 rounded-2xl transition-all duration-300 ${
+                  className={`flex flex-col items-center py-1 cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 ${
                     isActive
-                      ? "bg-white text-black scale-110 shadow-lg"
+                      ? "bg-black/90 text-[#f0f0f0f0] px-4 scale-105 space-y-0.75 overflow-hidden"
                       : "text-gray-400"
                   }`}
                 >
@@ -68,10 +68,10 @@ export default function AdminLayout({
         </div>
 
         {/* ── 2. DESKTOP: Sidebar ── */}
-        <aside className="hidden lg:flex flex-col w-80 bg-white border-r border-gray-100 sticky top-0 h-screen shrink-0 rounded-xl">
+        <aside className="hidden  lg:flex flex-col w-80 bg-white border-r border-gray-100 sticky top-0 h-screen shrink-0 rounded-xl">
           <div className="border-b border-gray-50">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/20">
+            <div className="flex items-center gap-4 p-5">
+              <div className="w-12 h-12  rounded-2xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/20">
                 <ShieldCheck size={24} />
               </div>
               <div>
@@ -131,9 +131,9 @@ export default function AdminLayout({
         </aside>
 
         {/* ── 3. MAIN CONTENT ── */}
-        <main className="flex-1 min-w-0 p-1 sm:p-8 lg:p-12 pb-32 md:pb-12">
-          <div className="max-w-7xl mx-auto">
-            {/* Header للأدمن في الموبايل عشان يعرف هو فين */}
+        <main className="flex-1 min-w-0 p-1 sm:p-4  ">
+          <div className="max-w-full mx-auto">
+            {/* Header FOR ADMIN */}
             <div className="md:hidden flex items-center justify-between mb-8">
               <h1 className="text-2xl font-black uppercase tracking-tighter italic">
                 {collection.find((i) => i.path === path)?.title || "Dashboard"}

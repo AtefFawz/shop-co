@@ -85,7 +85,7 @@ export default function OrderCard({
   };
 
   return (
-    <div className="border border-gray-100 rounded-[32px] px-3 py-4 lg:p-6 mb-6 hover:shadow-2xl hover:shadow-black/5 transition-all bg-white group relative overflow-hidden">
+    <div className="border border-gray-100 rounded-4xl px-3 py-4 lg:p-6 mb-6 hover:shadow-2xl hover:shadow-black/5 transition-all bg-white group relative overflow-hidden">
       {/* ─── Header ─── */}
       <div className="flex justify-between items-start mb-8">
         <div className="flex gap-4 md:gap-5">
@@ -112,9 +112,9 @@ export default function OrderCard({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-3">
+        <div className="flex flex-col items-end gap-2 w-fit  ">
           <span
-            className={`px-5 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.15em] shadow-sm ${getStatusColor(order.status)}`}
+            className={`px-5 w-full py-2 text-center rounded-full font-black uppercase tracking-[0.15em] text-[10px] shadow-sm ${getStatusColor(order.status)}`}
           >
             {order.status}
           </span>
@@ -123,10 +123,10 @@ export default function OrderCard({
               deleteOrders(order._id);
               onReviewSuccess && onReviewSuccess();
             }}
-            className="w-fit p-1  flex items-center justify-center rounded-xl border-2 border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all active:scale-95 tracking-wide cursor-pointer "
+            className="w-full font-black  flex items-center justify-center rounded-full border-2 border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all active:scale-95  cursor-pointer px-5 tracking-[0.15em] text-[10px] py-1 md:py-2 uppercase"
             title="Delete"
           >
-            <Trash2 size={18} />
+            Delete
           </button>
           {order.status === "Delivered" && (
             <button
@@ -153,7 +153,7 @@ export default function OrderCard({
             >
               <img
                 src={item.image}
-                alt=""
+                alt={item.name}
                 className="object-cover h-full w-full"
               />
             </div>
@@ -182,7 +182,7 @@ export default function OrderCard({
                   <img
                     src={item.image}
                     className="object-cover w-full h-full"
-                    alt=""
+                    alt={item.name}
                   />
                 </div>
                 <p className="font-black text-sm text-gray-800 uppercase tracking-tight truncate flex-1">

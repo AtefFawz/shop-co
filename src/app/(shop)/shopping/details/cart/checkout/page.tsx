@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 export default function Checkout() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-
   const { stack, clearCart } = useProduct();
   const cartItems = stack.filter((item: any) => item.isChose);
 
@@ -45,7 +44,7 @@ export default function Checkout() {
 
       await api.post("order", payload);
 
-      clearCart(); // فضي السلة
+      clearCart();
       router.push("/order-success");
     } catch (err) {
       alert("Order failed, please try again");
@@ -55,12 +54,12 @@ export default function Checkout() {
   };
 
   return (
-    <div className="container mx-auto py-10 px-4">
+    <section className="Responsive">
       <h2 className="text-3xl font-bold mb-10">Checkout</h2>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-        <ShippingForm onSubmit={handlePlaceOrder} />
+        <ShippingForm onSubmit={handlePlaceOrder} state={loading} />
         <OrderSummary items={cartItems} />
       </div>
-    </div>
+    </section>
   );
 }

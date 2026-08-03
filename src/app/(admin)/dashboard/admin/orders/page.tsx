@@ -11,7 +11,7 @@ export default function AdminOrdersPage() {
   const fetchAllOrders = async () => {
     try {
       setLoading(true);
-      const res = await api.get("/order/all");
+      const res = await api.get("order/all");
       setOrders(res.data.data.orders);
     } catch (err) {
       console.error("Error fetching orders", err);
@@ -41,10 +41,10 @@ export default function AdminOrdersPage() {
       </div>
     );
   }
-
+  // ;
   return (
-    <div className="min-h-screen bg-[#F8F8F8]  ">
-      <div className="max-w-6xl mx-auto space-y-6 ">
+    <div className="min-h-screen bg-[#F8F8F8]">
+      <div className="max-w-full  mx-auto space-y-6 ">
         {/* ── Header ── */}
         <div className="flex items-end justify-between gap-4 px-3 sm:px-6">
           <div>
@@ -61,7 +61,7 @@ export default function AdminOrdersPage() {
           </div>
           <button
             onClick={fetchAllOrders}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-gray-400 text-xs font-black uppercase tracking-widest text-gray-600 hover:text-black transition-all shadow-sm flex-shrink-0"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-gray-400 text-xs font-black uppercase tracking-widest text-gray-600 hover:text-black transition-all shadow-sm shrink-0"
           >
             <RefreshCw size={13} />
             <span className="hidden sm:inline">Refresh</span>
@@ -84,7 +84,7 @@ export default function AdminOrdersPage() {
             DESKTOP TABLE  (≥ md)
         ══════════════════════════════════ */}
         {orders.length > 0 && (
-          <div className="hidden md:block bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+          <div className="hidden md:block bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden w-full">
             <table className="w-full border-collapse">
               <thead>
                 <tr className="border-b border-gray-100 bg-gray-50/60">
@@ -92,7 +92,7 @@ export default function AdminOrdersPage() {
                     (h) => (
                       <th
                         key={h}
-                        className="px-5 py-4 text-left text-[10px] font-black uppercase tracking-[0.15em] text-gray-400"
+                        className="px-5 py-4 text-left text-[10px] text-nowrap font-black uppercase tracking-[0.15em] text-gray-400"
                       >
                         {h}
                       </th>
@@ -107,24 +107,24 @@ export default function AdminOrdersPage() {
                     className="border-b border-gray-50 hover:bg-gray-50/60 transition-colors group"
                   >
                     {/* Order ID */}
-                    <td className="px-5 py-4">
+                    <td className="px-2 xl:px-5 py-4">
                       <span className="font-mono text-xs font-bold text-gray-400 bg-gray-100 px-2.5 py-1 rounded-lg">
                         #{order._id.slice(-6).toUpperCase()}
                       </span>
                     </td>
 
                     {/* Customer */}
-                    <td className="px-5 py-4">
+                    <td className="px-2 xl:px-5 py-4">
                       <p className="font-black text-sm text-gray-900 leading-tight">
                         {order.user?.fullName}
                       </p>
-                      <p className="text-xs text-gray-400 mt-0.5 truncate max-w-[180px]">
+                      <p className="text-xs text-gray-400 mt-0.5 truncate max-w-45">
                         {order.user?.email}
                       </p>
                     </td>
 
                     {/* Product images */}
-                    <td className="px-5 py-4">
+                    <td className="px-2 xl:px-5 py-4">
                       <div className="flex -space-x-2">
                         {order.orderItems
                           .slice(0, 4)
@@ -134,7 +134,7 @@ export default function AdminOrdersPage() {
                               src={item.image}
                               alt={item.product?.name}
                               title={item.product?.name}
-                              className="w-9 h-9 rounded-xl border-2 border-white object-cover shadow-sm"
+                              className="w-7 h-7 xl:w-9 xl:h-9 rounded-xl border-2 border-white object-cover shadow-sm"
                             />
                           ))}
                         {order.orderItems.length > 4 && (
@@ -146,14 +146,14 @@ export default function AdminOrdersPage() {
                     </td>
 
                     {/* Total */}
-                    <td className="px-5 py-4">
+                    <td className="px-2 xl:px-5 py-4">
                       <span className="font-black text-base text-gray-900">
                         ${order.totalPrice.toLocaleString()}
                       </span>
                     </td>
 
                     {/* Status updater */}
-                    <td className="px-5 py-4">
+                    <td className="px-2 xl:px-5 py-4">
                       <OrderStatusUpdater
                         orderId={order._id}
                         currentStatus={order.status}
@@ -180,7 +180,7 @@ export default function AdminOrdersPage() {
                 <div className="px-4 pt-4 pb-3 flex items-start justify-between gap-3">
                   {/* Left — customer info */}
                   <div className="flex items-center gap-3 min-w-0">
-                    <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <div className="w-9 h-9 bg-gray-100 rounded-xl flex items-center justify-center shrink-0">
                       <Users size={15} className="text-gray-400" />
                     </div>
                     <div className="min-w-0">
