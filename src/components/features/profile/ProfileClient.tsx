@@ -7,20 +7,19 @@ import {
   Star,
   Package,
   Settings,
-  LogOut,
   Activity,
   UserCog,
-  User,
   Edit3,
+  Store,
 } from "lucide-react";
-import { signOut } from "@/lib/signOut";
 import { EmptyState } from "./EmptyState";
 import { SectionHeader } from "./SectionHeader";
 import { ReviewCard } from "./ReviewCard";
-
+import Link from "next/link";
 import OrdersContent from "./OrdersContent";
 import OverviewContent from "./OverviewContent";
-
+import { NavMobile } from "@/components/common/navbar/NavMobile";
+import { SidebarDesktop } from "@/components/common/navbar/SidebarDesktop";
 const NAV = [
   { id: "overview", label: "Home", icon: Activity },
   { id: "orders", label: "Orders", icon: Package },
@@ -64,71 +63,23 @@ export function ProfileClient({ user }: { user: Personal }) {
       <div className="container mx-auto">
         {/* ── 1. MOBILE ONLY: Bottom Navigation Bar ── */}
         <div className="lg:hidden block fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[98%] max-w-full">
-          <nav className="bg-gray-900 backdrop-blur-xs border border-white/10 p-2 rounded-3xl flex items-center justify-around shadow-2xl">
-            {NAV_LINKS.map(({ id, label, icon: Icon }) => {
-              const isActive = active === id;
-              return (
-                <button
-                  key={id}
-                  onClick={() => goTo(id)}
-                  className={`relative flex flex-col items-center justify-center py-1.5 px-2 transition-all duration-300 cursor-pointer select-none active:scale-90 ${
-                    isActive
-                      ? "text-black font-black "
-                      : "text-gray-500 font-medium hover:text-gray-800"
-                  }`}
-                >
-                  <div
-                    className={`transition-all duration-300 ${
-                      isActive
-                        ? "-translate-y-1 text-white scale-110"
-                        : "translate-y-0 text-gray-400"
-                    }`}
-                  >
-                    <Icon size={active == id ? 17 : 15} />
-                  </div>
-
-                  <span
-                    className={`text-[7px] uppercase tracking-wider mt-0.5 transition-colors duration-300 ${
-                      isActive
-                        ? "text-white font-black text-9"
-                        : "text-gray-500 font-bold"
-                    }`}
-                  >
-                    {label}
-                  </span>
-
-                  <span
-                    className={`absolute -bottom-0.5 w-5 h-1 bg-white rounded-full transition-all duration-300 ${
-                      isActive ? "scale-100 opacity-100" : "scale-0 opacity-0"
-                    }`}
-                  />
-                </button>
-              );
-            })}
-            <button
-              onClick={() => signOut()}
-              className="flex flex-col items-center gap-1 px-4 py-2 text-red-400"
-            >
-              <LogOut size={15} />
-              <span className="text-[9px] font-black uppercase tracking-tight">
-                Exit
-              </span>
-            </button>
-          </nav>
+          <NavMobile arrayOfData={NAV_LINKS} active={active} goTo={goTo} />
         </div>
 
-        <div className="max-w-6xl mx-auto flex">
-          {/* ── 2. DESKTOP ONLY: Sidebar ── */}
-          <aside className="hidden lg:flex flex-col w-80 bg-reb-400 border-r border-gray-100 sticky top-0 h-screen rounded-xl shadow-sm">
-            <div className="p-8 border-b border-gray-50">
-              <div className="flex items-center gap-4">
-                <div className="relative w-14 h-14 rounded-[100%] overflow-hidden ring-4 ring-black/5 shadow-inner">
+        {/* 2. DESKTOP ONLY */}
+        <div className="w-full mx-auto flex">
+          <SidebarDesktop
+            active={active}
+            arrayOfData={NAV_LINKS}
+            goTo={goTo}
+            headerContent={
+              <div className="p-2 flex items-center gap-4">
+                <div className="relative w-14 h-14 rounded-full overflow-hidden ring-4 ring-black/5 shadow-inner">
                   <Image
                     src={avatar}
-                    alt={fullName || "User Avatar"}
+                    alt={fullName}
                     fill
-                    quality={100}
-                    className="object-fill accent-auto"
+                    className="object-cover"
                   />
                 </div>
                 <div className="min-w-0 text-left">
@@ -140,40 +91,16 @@ export function ProfileClient({ user }: { user: Personal }) {
                   </p>
                 </div>
               </div>
-            </div>
-            <nav className="flex-1 px-4 py-6 space-y-2">
-              {NAV_LINKS.map(({ id, label, icon: Icon }) => (
-                <button
-                  key={id}
-                  onClick={() => {
-                    if (id === "dashboard") {
-                      router.push("/dashboard");
-                    } else {
-                      setActive(id);
-                    }
-                  }}
-                  className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all ${
-                    active === id
-                      ? "bg-black text-white shadow-xl"
-                      : "text-gray-400 hover:bg-gray-50 hover:text-black"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <Icon size={18} />
-                    <span>{label}</span>
-                  </div>
-                </button>
-              ))}
-            </nav>
-            <div className="p-4">
-              <button
-                onClick={() => signOut()}
-                className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all p-6 bottom-0"
+            }
+            extraFooterLinks={
+              <Link
+                href="/"
+                className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all"
               >
-                <LogOut size={18} /> Log Out
-              </button>
-            </div>
-          </aside>
+                <Store size={18} /> Back to Store
+              </Link>
+            }
+          />
 
           {/* ── 3. MAIN CONTENT ── */}
           <main className="flex-1 min-w-0 Responsive">

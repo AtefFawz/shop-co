@@ -6,14 +6,12 @@ import {
   Box,
   ShoppingBag,
   PlusCircle,
-  ChevronRight,
   ShieldCheck,
-  LogOut,
   Store,
   Users,
 } from "lucide-react";
-import { signOut } from "@/lib/signOut";
-
+import { NavMobile } from "@/components/common/navbar/NavMobile";
+import { SidebarDesktop } from "@/components/common/navbar/SidebarDesktop";
 export default function AdminLayout({
   children,
 }: {
@@ -22,79 +20,51 @@ export default function AdminLayout({
   const path = usePathname();
 
   const collection = [
-    { id: 1, path: "/dashboard", title: "Stats", icon: LayoutDashboard },
-    { id: 2, path: "/dashboard/products", title: "Products", icon: Box },
+    { id: "stats", href: "/dashboard", label: "Stats", icon: LayoutDashboard },
     {
-      id: 3,
-      path: "/dashboard/admin/orders",
-      title: "Orders",
+      id: "products",
+      href: "/dashboard/products",
+      label: "Products",
+      icon: Box,
+    },
+    {
+      id: "orders",
+      href: "/dashboard/admin/orders",
+      label: "Orders",
       icon: ShoppingBag,
     },
     {
-      id: 4,
-      path: "/dashboard/admin/users",
-      title: "Users",
+      id: "users",
+      href: "/dashboard/admin/users",
+      label: "Users",
       icon: Users,
     },
-    { id: 5, path: "/dashboard/products/add", title: "New", icon: PlusCircle },
+    {
+      id: "new",
+      href: "/dashboard/products/add",
+      label: "New",
+      icon: PlusCircle,
+    },
   ];
-
   return (
     <section className=" bg-[#F8F8F8] ">
       <div className="Responsive flex flex-col md:flex-row min-h-screen">
         {/* ── 1. MOBILE: Bottom Navigation (Floating Style) ── */}
-        <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[98%] ">
-          <nav className="bg-gray-900 backdrop-blur-xs border border-white/10 p-2 rounded-3xl flex items-center justify-around shadow-2xl">
-            {collection.map((item) => {
-              const isActive = path === item.path;
-              return (
-                <Link
-                  key={item.id}
-                  href={item.path}
-                  className={`relative flex flex-col items-center justify-center py-1.5 px-2 transition-all duration-300 cursor-pointer select-none active:scale-90 ${
-                    isActive
-                      ? "text-black font-black "
-                      : "text-gray-500 font-medium hover:text-gray-800"
-                  }`}
-                >
-                  <div
-                    className={`transition-all duration-300 ${
-                      isActive
-                        ? "-translate-y-1 text-white scale-110"
-                        : "translate-y-0 text-gray-400"
-                    }`}
-                  >
-                    <item.icon size={isActive ? 18 : 15} />
-                  </div>
-                  <span
-                    className={`text-[7px] uppercase tracking-wider mt-0.5 transition-colors duration-300 ${
-                      isActive
-                        ? "text-white text-[9px] font-black text-9"
-                        : "text-gray-500 font-bold"
-                    }`}
-                  >
-                    {item.title}
-                  </span>
-                  <span
-                    className={`absolute -bottom-0.5 w-5 h-1 bg-white rounded-full transition-all duration-300 ${
-                      isActive ? "scale-100 opacity-100" : "scale-0 opacity-0"
-                    }`}
-                  />
-                </Link>
-              );
-            })}
-          </nav>
+        <div className="lg:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[98%] ">
+          <NavMobile arrayOfData={collection} active={path} />
         </div>
-
         {/* ── 2. DESKTOP: Sidebar ── */}
-        <aside className="hidden  lg:flex flex-col w-80 bg-white border-r border-gray-100 sticky top-0 h-screen shrink-0 rounded-xl">
-          <div className="border-b border-gray-50">
-            <div className="flex items-center gap-4 p-5">
-              <div className="w-12 h-12  rounded-2xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/20">
+        <SidebarDesktop
+          active={path}
+          arrayOfData={collection}
+          navTitle="Management"
+          headerContent={
+            <div className="flex items-center gap-4 py-4">
+              <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/20">
                 <ShieldCheck size={24} />
               </div>
               <div>
-                <h2 className="text-sm font-black uppercase tracking-tighter leading-none">
+                <h2 className="text-sm  font-black uppercase tracking-tighter leading-none">
                   Admin Panel
                 </h2>
                 <p className="text-[10px] font-bold text-green-500 uppercase tracking-widest mt-1 flex items-center gap-1">
@@ -103,51 +73,16 @@ export default function AdminLayout({
                 </p>
               </div>
             </div>
-          </div>
-
-          <nav className="flex-1 p-6 space-y-2">
-            <p className="text-[10px] font-black uppercase text-gray-400 tracking-[0.2em] mb-4 px-4 text-left">
-              Management
-            </p>
-            {collection.map((item) => {
-              const isActive = path === item.path;
-              return (
-                <Link
-                  key={item.id}
-                  href={item.path}
-                  className={`w-full flex items-center justify-between px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-300 group ${
-                    isActive
-                      ? "bg-black text-white shadow-2xl shadow-black/20"
-                      : "text-gray-400 hover:bg-gray-50 hover:text-black"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <item.icon size={18} />
-                    <span>{item.title}</span>
-                  </div>
-                  {isActive && (
-                    <ChevronRight size={14} className="opacity-50" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="p-6 border-t border-gray-50 space-y-2">
+          }
+          extraFooterLinks={
             <Link
               href="/"
               className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all"
             >
               <Store size={18} /> Back to Store
             </Link>
-            <button
-              onClick={() => signOut()}
-              className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-red-500 hover:bg-red-50 transition-all"
-            >
-              <LogOut size={18} /> Log Out
-            </button>
-          </div>
-        </aside>
+          }
+        />
 
         {/* ── 3. MAIN CONTENT ── */}
         <main className="flex-1 min-w-0 p-1 sm:p-4  ">
@@ -155,7 +90,7 @@ export default function AdminLayout({
             {/* Header FOR ADMIN */}
             <div className="md:hidden flex items-center justify-between mb-8">
               <h1 className="text-2xl font-black uppercase tracking-tighter italic">
-                {collection.find((i) => i.path === path)?.title || "Dashboard"}
+                {collection.find((i) => i.href === path)?.label || "Dashboard"}
               </h1>
               <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white shadow-lg">
                 <ShieldCheck size={18} />
