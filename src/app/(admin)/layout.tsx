@@ -44,23 +44,42 @@ export default function AdminLayout({
       <div className="Responsive flex flex-col md:flex-row min-h-screen">
         {/* ── 1. MOBILE: Bottom Navigation (Floating Style) ── */}
         <div className="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[98%] ">
-          <nav className="bg-[#f0f0f0f0] backdrop-blur-xs border border-white/10 p-2 rounded-3xl flex items-center justify-around shadow-2xl">
+          <nav className="bg-gray-900 backdrop-blur-xs border border-white/10 p-2 rounded-3xl flex items-center justify-around shadow-2xl">
             {collection.map((item) => {
               const isActive = path === item.path;
               return (
                 <Link
                   key={item.id}
                   href={item.path}
-                  className={`flex flex-col items-center py-1 cursor-pointer overflow-hidden rounded-2xl transition-all duration-300 ${
+                  className={`relative flex flex-col items-center justify-center py-1.5 px-2 transition-all duration-300 cursor-pointer select-none active:scale-90 ${
                     isActive
-                      ? "bg-black/90 text-[#f0f0f0f0] px-4 scale-105 space-y-0.75 overflow-hidden"
-                      : "text-gray-400"
+                      ? "text-black font-black "
+                      : "text-gray-500 font-medium hover:text-gray-800"
                   }`}
                 >
-                  <item.icon size={18} />
-                  <span className="text-[9px] font-black uppercase tracking-tight">
+                  <div
+                    className={`transition-all duration-300 ${
+                      isActive
+                        ? "-translate-y-1 text-white scale-110"
+                        : "translate-y-0 text-gray-400"
+                    }`}
+                  >
+                    <item.icon size={isActive ? 18 : 15} />
+                  </div>
+                  <span
+                    className={`text-[7px] uppercase tracking-wider mt-0.5 transition-colors duration-300 ${
+                      isActive
+                        ? "text-white text-[9px] font-black text-9"
+                        : "text-gray-500 font-bold"
+                    }`}
+                  >
                     {item.title}
                   </span>
+                  <span
+                    className={`absolute -bottom-0.5 w-5 h-1 bg-white rounded-full transition-all duration-300 ${
+                      isActive ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                    }`}
+                  />
                 </Link>
               );
             })}
