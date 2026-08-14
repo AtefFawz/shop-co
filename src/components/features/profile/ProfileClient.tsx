@@ -57,9 +57,6 @@ export function ProfileClient({ user }: { user: Personal }) {
     setActive(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-  // const { stack } = useNotification();
-  // console.log(stack);
-  // toast.success(stack);
   return (
     <section className="min-h-screen bg-[#F8F8F8] pb-24 lg:pb-0">
       <div className="container mx-auto">
