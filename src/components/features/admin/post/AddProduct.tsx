@@ -27,7 +27,7 @@ export const AddProduct = () => {
     e.preventDefault();
     setLoading(true);
     const formData = new FormData();
-    // تجميع البيانات في FormData
+
     Object.entries(item).forEach(([key, value]) => {
       if (value !== null) formData.append(key, value);
     });

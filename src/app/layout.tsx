@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "react-hot-toast";
 // @ts-ignore: CSS import side-effect type declarations missing
 import "./globals.css";
 import LayoutProvider from "../components/layout/LayoutProvider";
 import { AuthWatcher } from "@/lib/AuthWatcher";
+import { Toaster } from "react-hot-toast";
 
+import NotificationListener from "@/components/notifications/NotificationListener";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default async function RootLayout({
         <AuthWatcher />
         <LayoutProvider>{children}</LayoutProvider>
         <Toaster position="top-center" />
+        <NotificationListener />
       </body>
     </html>
   );

@@ -20,6 +20,8 @@ import OrdersContent from "./OrdersContent";
 import OverviewContent from "./OverviewContent";
 import { NavMobile } from "@/components/common/navbar/NavMobile";
 import { SidebarDesktop } from "@/components/common/navbar/SidebarDesktop";
+import { useNotification } from "@/store/notificationStore";
+import toast from "react-hot-toast";
 const NAV = [
   { id: "overview", label: "Home", icon: Activity },
   { id: "orders", label: "Orders", icon: Package },
@@ -57,7 +59,9 @@ export function ProfileClient({ user }: { user: Personal }) {
     setActive(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
-
+  // const { stack } = useNotification();
+  // console.log(stack);
+  // toast.success(stack);  
   return (
     <section className="min-h-screen bg-[#F8F8F8] pb-24 lg:pb-0">
       <div className="container mx-auto">
@@ -66,7 +70,7 @@ export function ProfileClient({ user }: { user: Personal }) {
           <NavMobile arrayOfData={NAV_LINKS} active={active} goTo={goTo} />
         </div>
 
-        {/* 2. DESKTOP ONLY */}
+        {/* 2. DESKTOP ONLY  !*/}
         <div className="w-full mx-auto flex">
           <SidebarDesktop
             active={active}

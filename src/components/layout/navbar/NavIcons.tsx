@@ -27,7 +27,7 @@ export default function NavIcons({ items, containerClass, iconClass }: any) {
             <img
               src={item.photo}
               alt="Profile"
-              className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-full border-2 border-blue-300"
+              className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-full border-2 border-blue-500"
             />
           ) : (
             <item.Icon className="text-gray-700" />

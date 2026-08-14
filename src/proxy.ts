@@ -4,9 +4,6 @@ import type { NextRequest } from "next/server";
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const baseUrl = request.nextUrl.origin;
-  console.log("🚀 ~ file: proxy.ts:7 ~ proxy ~ pathname:", pathname);
-  console.log("🚀 ~ file: proxy.ts:8 ~ proxy ~ baseUrl:", baseUrl);
-  console.log("proxy ");
 
   if (
     pathname.startsWith("/_next") ||

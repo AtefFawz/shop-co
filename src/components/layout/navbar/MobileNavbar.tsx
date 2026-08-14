@@ -13,6 +13,7 @@ import { NAV_LINKS } from "./constants";
 import NavIcons from "./NavIcons";
 import api from "@/lib/api";
 import SearchBar from "./SearchBar";
+import NotificationDropdown from "@/components/notifications/NotificationDropdown";
 export default function MobileNavbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -58,6 +59,7 @@ export default function MobileNavbar() {
         router.push("/user/profile");
       },
     },
+    { Icon: NotificationDropdown, key: "notification" },
   ];
 
   return (

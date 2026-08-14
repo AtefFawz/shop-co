@@ -32,7 +32,7 @@ export default function OrderCard({
 
   const [loading, setLoading] = useState<string | null>(null);
 
-  const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL + "/uploads/";
+  // const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL + "/uploads/";
 
   const getStatusColor = (status: string) => {
     switch (status) {

@@ -1,5 +1,5 @@
-// components/layout/navbar/DesktopNavbar.tsx
 "use client";
+
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import SearchBar from "@/components/layout/navbar/SearchBar";
@@ -9,11 +9,14 @@ import { NAV_LINKS } from "./constants";
 import NavIcons from "./NavIcons";
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
+import NotificationDropdown from "@/components/notifications/NotificationDropdown";
 
 export default function DesktopNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+
   const [photo, setPhoto] = useState("");
+
   const getPhoto = async () => {
     try {
       const res = await api.get("profile/me");
@@ -51,9 +54,10 @@ export default function DesktopNavbar() {
       <header className="grid grid-cols-9 content-center md:gap-x-2 2xl:gap-x-6 w-full justify-items-stretch">
         {/* Logo & Links */}
         <nav className="flex md:gap-x-3 gap-7 lg:gap-x-4 xl:gap-10 items-center w-full 2xl:col-span-4 col-span-5 justify-evenly">
-          <h1 className=" font-[1000] tracking-wider italic text-lg md:text-xl xl:text-2xl">
+          <h1 className="font-[1000] tracking-wider italic text-lg md:text-xl xl:text-2xl">
             SHOP.CO
           </h1>
+
           {NAV_LINKS.map((item, ind) => (
             <ul key={ind}>
               <li
@@ -71,17 +75,21 @@ export default function DesktopNavbar() {
           ))}
         </nav>
 
-        {/* Search Bar */}
-        <div className="col-span-3 2xl:col-span-4">
+        {/* Search */}
+        <div className="col-span-2 2xl:col-span-4">
           <SearchBar />
         </div>
 
         {/* Icons */}
-        <NavIcons
-          items={desktopIcons}
-          containerClass="flex gap-x-1 w-full col-span-1 items-center justify-evenly"
-          iconClass="p-1"
-        />
+        <div className="flex gap-x-2 w-full col-span-2 xl:col-span-1 items-center justify-evenly">
+          <NavIcons
+            items={desktopIcons}
+            containerClass="flex gap-x-2 items-center"
+            iconClass="p-1"
+          />
+
+          <NotificationDropdown />
+        </div>
       </header>
     </div>
   );
