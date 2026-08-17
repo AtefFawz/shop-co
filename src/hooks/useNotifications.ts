@@ -32,7 +32,7 @@ export function useNotifications() {
       try {
         setLoading(true);
 
-        const res = await api.get(`/notifications?page=${page}&limit=10`);
+        const res = await api.get(`notifications?page=${page}&limit=10`);
 
         const newNotifications = res.data.data.notifications;
 
@@ -62,7 +62,7 @@ export function useNotifications() {
 
   const handleMarkAsRead = async (id: string) => {
     try {
-      await api.patch(`/notifications/${id}`);
+      await api.patch(`notifications/${id}`);
 
       markAsRead(id);
     } catch (error) {
@@ -72,7 +72,7 @@ export function useNotifications() {
 
   const handleMarkAllAsRead = async () => {
     try {
-      await api.patch("/notifications/readAll");
+      await api.patch("notifications/readAll");
 
       markAllAsRead();
     } catch (error) {

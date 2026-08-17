@@ -10,7 +10,8 @@ const createSocket = (): Socket | null => {
     return null;
   }
 
-  return io(process.env.SOCKET, {
+  return io(process.env.NEXT_PUBLIC_SOCKET_URL, {
+    // autoConnect: true,
     auth: {
       token,
     },

@@ -33,10 +33,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
       >
+        <NotificationListener />
         <AuthWatcher />
         <LayoutProvider>{children}</LayoutProvider>
         <Toaster position="top-center" />
-        <NotificationListener />
       </body>
     </html>
   );

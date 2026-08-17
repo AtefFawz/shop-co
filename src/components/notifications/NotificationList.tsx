@@ -7,7 +7,7 @@ type NotificationListProps = {
   notifications: Notification[];
   onNotificationClick: (notification: Notification) => void;
 };
-
+//
 export default function NotificationList({
   notifications,
   onNotificationClick,
@@ -16,45 +16,47 @@ export default function NotificationList({
     return (
       <div
         className="
-          flex
-          flex-col
-          items-center
-          justify-center
-          px-5
-          py-10
+          flex flex-col
+          items-center justify-center
+          px-5 py-10
           sm:py-12
-        "
+"
       >
         <div
           className="
-            mb-3
             flex
-            h-12
-            w-12
-            items-center
-            justify-center
+            items-center justify-center
+            w-12 h-12
+            mb-3
             rounded-full
             bg-gray-100
-            sm:h-14
-            sm:w-14
-          "
+            sm:w-14 sm:h-14
+"
         >
-          <Bell size={21} className="sm:h-6 sm:w-6" />
+          <Bell
+            size={21}
+            className="
+              sm:w-6 sm:h-6  "
+          />
         </div>
 
-        <p className="text-sm font-semibold text-gray-900 sm:text-base">
+        <p
+          className="
+            text-sm text-gray-900 font-semibold
+            sm:text-base
+"
+        >
           No notifications
         </p>
 
         <p
           className="
+            max-w-62.5
             mt-1
-            max-w-[250px]
+            text-xs text-gray-500
             text-center
-            text-xs
-            text-gray-500
             sm:text-sm
-          "
+"
         >
           We'll let you know when something happens.
         </p>
@@ -65,10 +67,10 @@ export default function NotificationList({
   return (
     <div
       className="
-        max-h-[65vh]
         overflow-y-auto
-        sm:max-h-[420px]
-      "
+        max-h-[65vh]
+        sm:max-h-105
+"
     >
       {notifications.map((notification) => (
         <NotificationItem

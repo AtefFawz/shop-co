@@ -22,8 +22,23 @@ export default function NotificationListener() {
       console.log("🔥 SOCKET CONNECTED:", socket.id);
     });
 
+    // For User
     socket.on("notification", (notification) => {
       // Add to Zustand
+      socket.connect();
+
+      addNotification(notification);
+      console.log("Notification -->", notification);
+      // Show toast
+      toast.success(notification.message, {
+        duration: 5000,
+      });
+    });
+
+    // For Admin
+    socket.on("new_notification", (notification) => {
+      socket.connect();
+      console.log("notification==>", notification);
       addNotification(notification);
 
       // Show toast
@@ -38,6 +53,7 @@ export default function NotificationListener() {
 
     socket.on("connect_error", async (error) => {
       console.log("❌ Socket Error:", error.message);
+      console.log("❌ Socket Error:", error);
 
       if (error.message === "ACCESS_TOKEN_EXPIRED") {
         try {
@@ -61,6 +77,7 @@ export default function NotificationListener() {
       socket.off("connect");
       socket.off("disconnect");
       socket.off("connect_error");
+      socket.off("new_notification");
 
       socket.disconnect();
     };

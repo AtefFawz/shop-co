@@ -71,8 +71,7 @@ export default function NotificationDropdown() {
         className="
           relative
           flex
-          h-9
-          w-9
+         w-8 h-8 lg:w-10 lg:h-10
           cursor-pointer
           items-center
           justify-center
@@ -81,11 +80,10 @@ export default function NotificationDropdown() {
           transition-all
           duration-300
           hover:bg-gray-200
-          sm:h-10
-          sm:w-10
+        
         "
       >
-        <Bell size={19} className="text-gray-700 sm:h-5.25 sm:w-5.25" />
+        <Bell size={21} className="text-gray-700 sm:h-5.25 sm:w-5.25" />
 
         {unreadCount > 0 && (
           <span
