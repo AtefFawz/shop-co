@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "shop-co-jfqp.vercel.app",
+        hostname: "https://shopco-production-330a.up.railway.app",
         pathname: "/**",
       },
       {

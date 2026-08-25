@@ -118,28 +118,11 @@ export default function NotificationDropdown() {
       {/* Dropdown */}
       {open && (
         <div
-          className="
-            fixed
-            left-1/2
-            top-23
-            z-200
-            w-[calc(100vw-24px)]
-            max-w-95
-            -translate-x-1/2
-            overflow-hidden
-            rounded-2xl
-            border
-            border-gray-200
-            bg-white
-            shadow-2xl
-
-            sm:absolute
-            sm:left-auto
-            sm:right-0
-            sm:top-20
-            sm:w-95
-            sm:translate-x-0
-          "
+          className="fixed left-1/2 top-23 z-200
+            w-[calc(100vw-24px)] max-w-95  -translate-x-1/2
+            overflow-hidden rounded-2xl border border-gray-200
+            bg-white shadow-2xl sm:absolute
+            sm:left-auto sm:right-0 sm:top-20 sm:w-95 sm:translate-x-0"
         >
           <NotificationHeader
             unreadCount={unreadCount}

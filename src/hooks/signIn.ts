@@ -4,13 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
-
+import { useSocketStore } from "@/store/socketStore";
 const useLogin = () => {
   const router = useRouter();
   const [user, setUser] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
   const handleChange = (name: string, value: string) => {
     setUser({ ...user, [name]: value });
   };
@@ -43,9 +42,10 @@ const useLogin = () => {
           secure: isProd,
           sameSite: isProd ? "none" : "lax",
         });
-
+        // stats
+        useSocketStore.getState().setSocketReady(true);
         toast.success("Login successful!");
-
+        router.refresh();
         if (userData.role === "ADMIN" || userData.role === "MANAGER") {
           router.push("/dashboard");
         } else {

@@ -68,7 +68,7 @@ export default async function AboutUser({
       </div>
 
       {/* 1. Main Profile Card */}
-      <div className="bg-white rounded-[30px] border border-gray-100 p-4 md:p-10 shadow-sm flex flex-row gap-8 items-center relative overflow-hidden ">
+      <div className="bg-white rounded-[30px] border border-gray-100 p-4 md:p-10 shadow-sm flex flex-row gap-8 items-center relative  ">
         <img
           src={user.avatar || "/placeholder-user.png"}
           alt={user.fullName}

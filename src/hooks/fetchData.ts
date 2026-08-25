@@ -17,7 +17,6 @@ const useProduct = () => {
     try {
       const response = await api.get(`product?keyword=${searchTerm}`);
       const products = response.data.data.Products;
-
       const readyData = products.map((item: Product) => {
         const productReviews = item.reviews || [];
         const totalScore = productReviews.reduce(

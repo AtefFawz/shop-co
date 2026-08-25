@@ -8,7 +8,7 @@ export default function SignInPage() {
   return (
     <div className="w-full min-h-screen flex bg-white">
       {/* ══ LEFT — Image Panel (desktop only) ══ */}
-      <div className="hidden md:flex md:w-1/2 h-screen relative bg-gray-950 overflow-hidden flex-shrink-0">
+      <div className="hidden md:flex md:w-1/2 h-screen relative bg-gray-950 overflow-hidden shrink-0">
         <Image
           src={Login}
           alt="Login Fashion"
@@ -17,7 +17,7 @@ export default function SignInPage() {
           priority
         />
         {/* Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-black/10" />
 
         {/* Top label */}
         <div className="absolute top-10 left-10 z-10">

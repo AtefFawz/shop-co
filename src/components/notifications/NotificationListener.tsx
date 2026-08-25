@@ -1,14 +1,16 @@
 "use client";
-
 import { useEffect } from "react";
 import { createSocket, refreshAccessToken } from "@/lib/sockets/socket";
 import toast from "react-hot-toast";
 import { useNotificationStore } from "@/store/notificationStore";
+import { useSocketStore } from "@/store/socketStore";
 
 export default function NotificationListener() {
   const addNotification = useNotificationStore(
     (state) => state.addNotification,
   );
+
+  const socketReady = useSocketStore((state) => state.socketReady);
 
   useEffect(() => {
     const socket = createSocket();
@@ -28,7 +30,6 @@ export default function NotificationListener() {
       socket.connect();
 
       addNotification(notification);
-      console.log("Notification -->", notification);
       // Show toast
       toast.success(notification.message, {
         duration: 5000,
@@ -38,7 +39,6 @@ export default function NotificationListener() {
     // For Admin
     socket.on("new_notification", (notification) => {
       socket.connect();
-      console.log("notification==>", notification);
       addNotification(notification);
 
       // Show toast
@@ -70,6 +70,7 @@ export default function NotificationListener() {
           console.log("❌ Refresh Failed:", error);
         }
       }
+      
     });
 
     return () => {
@@ -81,7 +82,7 @@ export default function NotificationListener() {
 
       socket.disconnect();
     };
-  }, [addNotification]);
+  }, [addNotification, socketReady]);
 
   return null;
 }

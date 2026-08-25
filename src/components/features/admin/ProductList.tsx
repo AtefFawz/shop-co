@@ -11,16 +11,16 @@ import {
   DollarSign,
   PackageX,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 
 export default function ProductList({
   initialProducts = [],
 }: {
-  initialProducts: Product[];
+  initialProducts?: Product[];
 }) {
   const router = useRouter();
-  const [productsList, setProductsList] = useState<Product[]>(initialProducts);
+  const [productsList, setProductsList] = useState<Product[]>([]);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
@@ -42,6 +42,11 @@ export default function ProductList({
     }
   };
 
+  useEffect(() => {
+    setProductsList(initialProducts);
+  }, [initialProducts]);
+
+  //   when not products
   if (!productsList || productsList.length === 0) {
     return (
       <tbody>

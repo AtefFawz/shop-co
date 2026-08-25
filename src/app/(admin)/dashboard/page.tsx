@@ -14,7 +14,8 @@ import { products } from "@/lib/Products";
 
 export default async function DashboardPage() {
   const stats = await getDashboardStats();
-  const allProducts: Product[] = (await products()) || [];
+  const Products = await products("product");
+  const allProducts: Product[] = Products.data.Products || [];
   const isSale = allProducts.filter((p) => p.isSale === true);
   const statCards = [
     {

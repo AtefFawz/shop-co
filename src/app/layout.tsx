@@ -7,6 +7,7 @@ import { AuthWatcher } from "@/lib/AuthWatcher";
 import { Toaster } from "react-hot-toast";
 
 import NotificationListener from "@/components/notifications/NotificationListener";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

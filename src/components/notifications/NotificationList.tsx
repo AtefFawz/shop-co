@@ -15,37 +15,17 @@ export default function NotificationList({
   if (notifications.length === 0) {
     return (
       <div
-        className="
-          flex flex-col
-          items-center justify-center
-          px-5 py-10
-          sm:py-12
-"
+        className="flex flex-col items-center justify-center
+          px-5 py-10 sm:py-12"
       >
         <div
-          className="
-            flex
-            items-center justify-center
-            w-12 h-12
-            mb-3
-            rounded-full
-            bg-gray-100
-            sm:w-14 sm:h-14
-"
+          className="flex items-center justify-center
+            w-12 h-12 mb-3 rounded-full bg-gray-100 sm:w-14 sm:h-14"
         >
-          <Bell
-            size={21}
-            className="
-              sm:w-6 sm:h-6  "
-          />
+          <Bell size={21} className="m:w-6 sm:h-6  " />
         </div>
 
-        <p
-          className="
-            text-sm text-gray-900 font-semibold
-            sm:text-base
-"
-        >
+        <p className="text-sm text-gray-900 font-semibold sm:text-base">
           No notifications
         </p>
 
@@ -66,11 +46,8 @@ export default function NotificationList({
 
   return (
     <div
-      className="
-        overflow-y-auto
-        max-h-[65vh]
-        sm:max-h-105
-"
+      className=" overflow-y-auto
+        max-h-[65vh] sm:max-h-105"
     >
       {notifications.map((notification) => (
         <NotificationItem
