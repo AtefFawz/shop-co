@@ -5,22 +5,31 @@ import { Menu } from "./menu/Menu";
 import { ShopPaths } from "./Paths";
 import MobileFilterDrawer from "./MenuPhone/MeuPhone";
 import { useFilterStore } from "@/store/filterStore";
-import { useProduct } from "@/hooks/fetchData";
 import { Product } from "@/types/index";
 import { ProductSkeleton } from "@/components/ui/ProductSkeleton";
 import { PackageSearch } from "lucide-react";
+import useData from "@/hooks/getData";
+import { Pagination } from "../Pagination.client";
+import { useSearchParams } from "next/navigation";
 
 export const Shop = () => {
-  const { product, loading } = useProduct();
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("keyword") || "";
+  const { data, loading, page, totalPages, goToPage } = useData("/product", {
+    params: {
+      keyword: keyword,
+    },
+  });
   const setInitialProducts = useFilterStore((s) => s.setInitialProducts);
   const displayProducts = useFilterStore((s) => s.filteredProducts);
   const type = useFilterStore((s) => s.currentType);
   const section = useFilterStore((s) => s.currentSection);
 
   useEffect(() => {
-    if (product?.length > 0) setInitialProducts(product);
-    else setInitialProducts([]);
-  }, [product]);
+    if (data?.data?.Products) {
+      setInitialProducts(data.data.Products);
+    }
+  }, [data, setInitialProducts]);
 
   return (
     <section className="min-h-screen bg-[#F8F8F8]">
@@ -36,7 +45,7 @@ export const Shop = () => {
 
         <div className="flex gap-6 items-start">
           {/* ── Desktop Sidebar ── */}
-          <aside className="hidden md:block sticky top-6 h-fit w-[260px] xl:w-[280px] flex-shrink-0 self-start">
+          <aside className="hidden md:block sticky top-6 h-fit w-[260px] xl:w-[280px] shrink-0 self-start">
             <Menu />
           </aside>
 
@@ -63,7 +72,7 @@ export const Shop = () => {
                 ))}
               </div>
             ) : displayProducts.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-5">
                 {displayProducts.map((e: Product) => (
                   <Card product={e} key={e._id} />
                 ))}
@@ -78,6 +87,11 @@ export const Shop = () => {
                 </p>
               </div>
             )}
+            <Pagination
+              page={page}
+              goToPage={goToPage}
+              totalPages={totalPages}
+            />
           </div>
         </div>
       </div>

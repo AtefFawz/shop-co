@@ -9,8 +9,8 @@ import { Product } from "../../types/index";
 import Pricing from "./Pricing";
 
 export default function Card({ product }: { product: Product }) {
+  //   const product = products ?? [];
   const detailUrl = `/shopping/details/${product._id}`;
-
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -25,9 +25,8 @@ export default function Card({ product }: { product: Product }) {
         className="relative w-full overflow-hidden rounded-2xl bg-gray-100 block transition-all duration-300 active:scale-[0.98]"
         style={{ aspectRatio: "3/4" }}
       >
-        {/* Product image with GPU-accelerated Zoom */}
         <Image
-          src={product.photo}
+          src={product.photo ?? ""}
           alt={product.name || "Product"}
           fill
           quality={60}
@@ -35,17 +34,14 @@ export default function Card({ product }: { product: Product }) {
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
         />
 
-        {/* Overlay — Smooth gradient fade */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-40 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-40 md:opacity-0 md:group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Sale badge */}
         {product.isSale && (
           <span className="absolute top-3 left-3 bg-gray-900/90 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full shadow-lg z-10">
             Sale
           </span>
         )}
 
-        {/* CTA Button with Smooth Slide Up */}
         <div className="absolute bottom-3 inset-x-3 flex justify-center opacity-100 md:opacity-0 md:group-hover:opacity-100 transform translate-y-0 md:translate-y-3 md:group-hover:translate-y-0 transition-all duration-300 ease-out z-10">
           <span className="flex items-center gap-1.5 bg-white/95 backdrop-blur-md text-black text-[11px] font-black uppercase tracking-widest px-5 py-2.5 rounded-full shadow-2xl hover:bg-black hover:text-white active:scale-95 transition-all text-nowrap">
             View Details
@@ -58,15 +54,15 @@ export default function Card({ product }: { product: Product }) {
       <div className="space-y-1.5 px-0.5">
         <Link href={detailUrl}>
           <h4 className="font-black text-sm sm:text-base uppercase tracking-tight text-gray-900 truncate leading-tight hover:text-gray-600 transition-colors">
-            {product.description || product.name}
+            {product.name || product.description}
           </h4>
         </Link>
 
         {/* Stars + rating */}
         <div className="flex items-center gap-1.5">
-          <StarRating rating={product.rating} />
+          <StarRating rating={product?.ratingsAverage || 0} />
           <span className="text-[10px] font-bold text-gray-400">
-            {product.rating?.toFixed(1)}/5
+            {product?.ratingsAverage}/5
           </span>
         </div>
 

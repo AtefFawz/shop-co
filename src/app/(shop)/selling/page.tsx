@@ -4,8 +4,12 @@ import { useProduct } from "@/hooks/fetchData";
 import Heading from "@/components/ui/Heading";
 import { Product } from "@/types";
 import { ProductSkeleton } from "@/components/ui/ProductSkeleton";
+import useData from "@/hooks/getData";
+import { Pagination } from "@/components/common/Pagination.client";
 export default function selling() {
-  const { product, loading } = useProduct();
+  //   const { product, loading } = useProduct();
+  const { data, loading, page, goToPage, totalPages } = useData("/product");
+  const product = data?.data?.Products ?? [];
   const FILTER = product.filter((e: Product) => e.isSale == true);
 
   if (loading) {
@@ -30,6 +34,7 @@ export default function selling() {
           </div>
         ))}
       </div>
+      <Pagination page={page} goToPage={goToPage} totalPages={totalPages} />
     </section>
   );
 }

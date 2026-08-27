@@ -3,6 +3,7 @@ import { SectionHeader } from "./SectionHeader";
 import { Package } from "lucide-react";
 import OrderCard from "../OrderCard/OrderCard";
 export default function OrdersContent({ orders, onRefresh }: any) {
+  console.log(orders);
   return (
     <div className="space-y-6 ">
       <SectionHeader

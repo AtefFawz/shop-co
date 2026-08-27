@@ -1,24 +1,8 @@
-import { Users, ChevronLeft, ChevronRight } from "lucide-react";
+import { Users } from "lucide-react";
 import OrderStatusUpdater from "../OrderStatusUpdater";
 import { DesktopOrderProps } from "./DesktopOrder";
 
-// دالة مساعدة لحساب الأرقام المعروضة لتكون الصفحة الحالية دائماً في المنتصف
-const getVisiblePages = (current: number, total: number) => {
-  if (total <= 5) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-
-  if (current <= 3) {
-    return [1, 2, 3, 4, "...", total];
-  }
-
-  if (current >= total - 2) {
-    return [1, "...", total - 3, total - 2, total - 1, total];
-  }
-
-  // الصفحة الحالية في المنتصف تماماً
-  return [1, "...", current - 1, current, current + 1, "...", total];
-};
+import { Pagination } from "../../../common/Pagination.client";
 
 const MobileOrders = ({
   orders = [],
@@ -26,8 +10,6 @@ const MobileOrders = ({
   totalPages = 1,
   goToPage,
 }: DesktopOrderProps) => {
-  const visiblePages = getVisiblePages(page, totalPages);
-
   return (
     <div className="md:hidden">
       {/* Orders List */}
@@ -108,59 +90,8 @@ const MobileOrders = ({
           ))}
         </div>
       )}
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-between gap-1.5 mt-5 py-3 px-3 bg-white rounded-2xl border border-gray-100 shadow-sm">
-          {/* Prev */}
-          <button
-            disabled={page <= 1}
-            onClick={() => goToPage(page - 1)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-600 active:scale-95 disabled:opacity-30 disabled:pointer-events-none shrink-0"
-          >
-            <ChevronLeft size={18} />
-          </button>
-
-          {/* Page Numbers */}
-          <div className="flex items-center justify-center gap-1.5">
-            {visiblePages.map((pageNum, idx) => {
-              if (pageNum === "...") {
-                return (
-                  <span
-                    key={`ellipsis-${idx}`}
-                    className="w-6 text-center text-xs font-bold text-gray-400"
-                  >
-                    ...
-                  </span>
-                );
-              }
-
-              const isCurrent = page === pageNum;
-              return (
-                <button
-                  key={pageNum}
-                  onClick={() => goToPage(Number(pageNum))}
-                  className={`w-8 h-8 rounded-xl text-xs font-bold transition-all active:scale-95 shrink-0 ${
-                    isCurrent
-                      ? "bg-black text-white shadow-sm"
-                      : "bg-transparent text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Next */}
-          <button
-            disabled={page >= totalPages}
-            onClick={() => goToPage(page + 1)}
-            className="w-9 h-9 flex items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-gray-600 active:scale-95 disabled:opacity-30 disabled:pointer-events-none shrink-0"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      )}
+      {/* Pagination Section */}
+      <Pagination page={page} totalPages={totalPages} goToPage={goToPage} />
     </div>
   );
 };

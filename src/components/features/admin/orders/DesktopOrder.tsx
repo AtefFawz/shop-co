@@ -1,28 +1,11 @@
 import OrderStatusUpdater from "../OrderStatusUpdater";
-
+import { Pagination } from "@/components/common/Pagination.client";
 export type DesktopOrderProps = {
   orders: any[];
   page: number;
   totalPages: number;
   goToPage: (page: number) => void;
 };
-
-const getVisiblePages = (current: number, total: number) => {
-  if (total <= 7) {
-    return Array.from({ length: total }, (_, i) => i + 1);
-  }
-
-  if (current <= 4) {
-    return [1, 2, 3, 4, 5, "...", total];
-  }
-
-  if (current >= total - 3) {
-    return [1, "...", total - 4, total - 3, total - 2, total - 1, total];
-  }
-
-  return [1, "...", current - 1, current, current + 1, "...", total];
-};
-
 //  DESKTOP TABLE  (≥ md)
 export const DeskTopOrder = ({
   orders,
@@ -30,8 +13,6 @@ export const DeskTopOrder = ({
   totalPages,
   goToPage,
 }: DesktopOrderProps) => {
-  const visiblePages = getVisiblePages(page, totalPages);
-
   return (
     <div>
       {orders.length > 0 && (
@@ -116,58 +97,7 @@ export const DeskTopOrder = ({
           </table>
 
           {/* Pagination Section */}
-          {totalPages > 1 && (
-            <div className="flex items-center justify-between gap-4 p-5 bg-white border-t border-gray-50 w-full">
-              {/* Previous */}
-              <button
-                disabled={page <= 1}
-                onClick={() => goToPage(page - 1)}
-                className="h-9 px-4 rounded-lg border border-gray-200 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none shrink-0"
-              >
-                Previous
-              </button>
-
-              {/* Page Numbers */}
-              <div className="flex items-center justify-center gap-1.5 flex-1">
-                {visiblePages.map((pageNum, idx) => {
-                  if (pageNum === "...") {
-                    return (
-                      <span
-                        key={`ellipsis-${idx}`}
-                        className="w-8 text-center text-sm font-bold text-gray-400"
-                      >
-                        ...
-                      </span>
-                    );
-                  }
-
-                  const isCurrent = page === pageNum;
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => goToPage(Number(pageNum))}
-                      className={`w-9 h-9 rounded-lg text-sm font-bold transition-all active:scale-95 shrink-0 ${
-                        isCurrent
-                          ? "bg-black text-white shadow-sm"
-                          : "bg-white border border-transparent hover:bg-gray-100 text-gray-600"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                })}
-              </div>
-
-              {/* Next */}
-              <button
-                disabled={page >= totalPages}
-                onClick={() => goToPage(page + 1)}
-                className="h-9 px-4 rounded-lg border border-gray-200 text-sm font-semibold text-gray-700 bg-white hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-40 disabled:pointer-events-none shrink-0"
-              >
-                Next
-              </button>
-            </div>
-          )}
+          <Pagination page={page} totalPages={totalPages} goToPage={goToPage} />
         </div>
       )}
     </div>

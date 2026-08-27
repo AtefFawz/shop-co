@@ -1,6 +1,5 @@
 "use client";
 import { User } from "@/types/user";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 interface Props {

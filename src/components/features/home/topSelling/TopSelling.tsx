@@ -1,14 +1,24 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Card from "@/components/common/Card";
 import Heading from "@/components/ui/Heading";
 import SecondButton from "@/components/ui/SecondButton";
-import { useProduct } from "@/hooks/fetchData";
 import { Product } from "@/types/index";
 import { ProductSkeleton } from "@/components/ui/ProductSkeleton";
+import useData from "@/hooks/getData";
 export default function TopSelling() {
-  const { product, loading } = useProduct();
-  const FILTERING = product.filter((e: Product) => e.isSale === true);
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("keyword") || "";
+  const { data, loading, page, totalPages } = useData("/product", {
+    params: {
+      keyword: keyword || undefined,
+    },
+    limit: 8,
+  });
+
+  const results = data?.data?.Products ?? [];
+  const FILTERING = results.filter((e: Product) => e.isSale === true);
+
   const router = useRouter();
   function handelClick() {
     router.push("/selling");

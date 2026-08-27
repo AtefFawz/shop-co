@@ -7,7 +7,6 @@ type Props = {
   totalPages: number;
 };
 
-// دالة حساب نطاق الصفحات الظاهرة مع النقاط
 const getVisiblePages = (current: number, total: number) => {
   if (total <= 5) {
     return Array.from({ length: total }, (_, i) => i + 1);
@@ -31,7 +30,6 @@ export default function Pagination({ currentPage, totalPages }: Props) {
 
   return (
     <div className="flex items-center justify-between sm:justify-center gap-2 pt-4 border-t border-gray-100">
-      {/* زرار السابق */}
       {currentPage > 1 ? (
         <Link
           href={`?page=${currentPage - 1}`}
@@ -47,7 +45,6 @@ export default function Pagination({ currentPage, totalPages }: Props) {
         </span>
       )}
 
-      {/* أرقام الصفحات */}
       <div className="flex items-center gap-1.5">
         {visiblePages.map((pageNum, idx) => {
           if (pageNum === "...") {
@@ -82,7 +79,6 @@ export default function Pagination({ currentPage, totalPages }: Props) {
         })}
       </div>
 
-      {/* زرار التالي */}
       {currentPage < totalPages ? (
         <Link
           href={`?page=${currentPage + 1}`}

@@ -1,13 +1,24 @@
 "use client";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Card from "@/components/common/Card";
 import SecondButton from "@/components/ui/SecondButton";
 import Heading from "@/components/ui/Heading";
 import { Product } from "@/types/index";
-import { useProduct } from "@/hooks/fetchData";
 import { ProductSkeleton } from "@/components/ui/ProductSkeleton";
+import useData from "@/hooks/getData";
 export default function NewArrivals() {
-  const { product, loading } = useProduct();
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get("keyword") || "";
+
+  const { data, loading } = useData("/product", {
+    params: {
+      keyword: keyword || undefined,
+    },
+    limit: 8,
+  });
+
+  const product = data?.data?.Products ?? [];
+
   const router = useRouter();
   function handelClick() {
     router.push("/shopping");

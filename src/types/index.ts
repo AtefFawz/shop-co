@@ -17,7 +17,7 @@ export interface Product {
   rating: number;
   isChose: boolean;
   count: number;
-
+  ratingsAverage: number;
   reviews: Array<{
     user: {
       fullName: string;

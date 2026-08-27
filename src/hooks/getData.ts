@@ -1,50 +1,78 @@
 "use client";
 
 import api from "@/lib/api";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
-const useData = (URL: string) => {
+interface UseDataOptions<T, R> {
+  params?: Record<string, any>;
+  limit?: number;
+  transform?: (data: T) => R;
+}
+
+const useData = <T = any, R = T>(
+  URL: string,
+  options?: UseDataOptions<T, R>,
+) => {
   const [loading, setLoading] = useState(true);
-  const [data, setData] = useState<any>(null);
-
+  const [data, setData] = useState<R | null>(null);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
   const [refreshKey, setRefreshKey] = useState(0);
+
+  const { params, limit = 10, transform } = options || {};
+
+  const serializedParams = JSON.stringify(params);
+
   useEffect(() => {
-    const controller = new AbortController();
-    const fetchData = async () => {
+    setPage(1);
+  }, [serializedParams]);
+
+  const fetchData = useCallback(
+    async (signal?: AbortSignal) => {
       try {
         setLoading(true);
 
-        const response = await api.get(`${URL}?page=${page}&limit=10`, {
-          signal: controller.signal,
+        const response = await api.get(URL, {
+          params: {
+            ...params,
+            page,
+            limit,
+          },
+          signal,
         });
 
-        setData(response.data);
+        const responseData = response.data;
+        const finalData = transform ? transform(responseData) : responseData;
 
-        setTotalPages(response.data.pagination.totalPages);
+        setData(finalData);
+        setTotalPages(responseData?.pagination?.totalPages || 1);
       } catch (error: any) {
-        if (error.name !== "CanceledError") {
-          console.error("ERROR:", error?.response?.data?.message);
+        if (error.name !== "CanceledError" && error.code !== "ERR_CANCELED") {
+          console.error(
+            "Fetch Error:",
+            error?.response?.data?.message || error.message,
+          );
         }
       } finally {
         setLoading(false);
       }
-    };
+    },
+    [URL, page, limit, serializedParams, refreshKey],
+  );
 
-    fetchData();
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchData(controller.signal);
     return () => controller.abort();
-  }, [URL, page, refreshKey]);
+  }, [fetchData]);
 
   const goToPage = (newPage: number) => {
     if (newPage < 1 || newPage > totalPages) return;
-
     setPage(newPage);
   };
-  const refetch = () => {
-    setRefreshKey((prev) => prev + 1);
-  };
+
+  const refetch = () => setRefreshKey((prev) => prev + 1);
+
   return {
     loading,
     data,
