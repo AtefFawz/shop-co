@@ -1,4 +1,8 @@
+"use client";
+import useData from "@/hooks/getData";
 import { Star } from "lucide-react";
+import { SectionHeader } from "./SectionHeader";
+import { Pagination } from "@/components/common/Pagination.client";
 function ReviewCard({
   rev,
 }: {
@@ -30,4 +34,21 @@ function ReviewCard({
   );
 }
 
-export { ReviewCard };
+function ReviewsContent() {
+  const { data, goToPage, page, totalPages } = useData("/profile/my-reviews");
+  const reviews = data?.data?.reviews ?? [];
+  const total = data?.pagination?.total;
+
+  return (
+    <div className="space-y-6">
+      <SectionHeader icon={Star} title="My Feedback" count={total} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {reviews?.map((rev: any) => (
+          <ReviewCard key={rev._id} rev={rev} />
+        ))}
+      </div>
+      <Pagination page={page} goToPage={goToPage} totalPages={totalPages} />
+    </div>
+  );
+}
+export { ReviewCard, ReviewsContent };

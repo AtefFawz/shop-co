@@ -16,7 +16,7 @@ const SectionHeader = ({ icon: Icon, title, count }: SectionHeaderProps) => (
       </div>
       <div>
         <h2 className="text-xl font-black uppercase tracking-tight">{title}</h2>
-        {count !== undefined && (
+        {count !== 0 && (
           <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">
             {count} Items Total
           </p>

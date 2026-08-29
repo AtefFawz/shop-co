@@ -57,6 +57,7 @@ export default function OrderCard({
         rating: ratings[productId],
         comment: comments[productId],
       });
+      
       toast.success("Review submitted successfully!");
       if (onReviewSuccess) onReviewSuccess();
       setRatings((prev) => {

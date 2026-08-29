@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 
 const api = axios.create({
   baseURL: "/api/backend/",
+  validateStatus: (status) => status >= 200 && status < 400,
 });
 
 api.interceptors.request.use(
@@ -24,7 +25,7 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response?.status;
     const msg = error.response?.data?.message || "Something went wrong";
-
+    console.log(error);
     const isAuthEndpoint =
       originalRequest?.url?.includes("/auth/signin") ||
       originalRequest?.url?.includes("/auth/login") ||
@@ -63,6 +64,13 @@ api.interceptors.response.use(
     }
 
     //
+    if (
+      axios.isCancel(error) ||
+      error.name === "CanceledError" ||
+      error.code === "ERR_CANCELED"
+    ) {
+      return Promise.reject(error);
+    }
     if (status !== 401 && typeof window !== "undefined") {
       toast.error(msg);
     }

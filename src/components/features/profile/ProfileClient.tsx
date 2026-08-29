@@ -13,8 +13,7 @@ import {
   Store,
 } from "lucide-react";
 import { EmptyState } from "./EmptyState";
-import { SectionHeader } from "./SectionHeader";
-import { ReviewCard } from "./ReviewCard";
+import { ReviewsContent } from "./ReviewCard";
 import Link from "next/link";
 import OrdersContent from "./OrdersContent";
 import OverviewContent from "./OverviewContent";
@@ -28,16 +27,28 @@ const NAV = [
 ];
 
 interface Personal {
-  fullName: string;
-  email: string;
-  avatar: string;
-  orders: any[];
-  reviews: any[];
-  role: string;
+  fullName?: string;
+  email?: string;
+  avatar?: string;
+  orders?: any[];
+  reviews?: any[];
+  role?: string;
+  user?: any;
+  review?: any;
+  order?: any;
 }
 
-export function ProfileClient({ user }: { user: Personal }) {
-  const { fullName, email, avatar, orders, reviews, role } = user;
+export function ProfileClient({ user, review, order }: Personal) {
+  const { fullName, email, avatar, role } = user?.data?.user;
+  const { reviews } = review?.data;
+  const { orders } = order?.data;
+
+  const paginationOrders = order.pagination;
+  const paginationReviews = review.pagination;
+  const pagination = {
+    paginationOrders: paginationOrders,
+    paginationReviews: paginationReviews,
+  };
   const [active, setActive] = useState("overview");
 
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -146,14 +157,15 @@ export function ProfileClient({ user }: { user: Personal }) {
                 <OverviewContent
                   orders={orders}
                   reviews={reviews}
+                  pagination={pagination}
                   onRefresh={handleRefresh}
                   goTo={goTo}
                 />
               )}
               {active === "orders" && (
-                <OrdersContent orders={orders} onRefresh={handleRefresh} />
+                <OrdersContent onRefresh={handleRefresh} />
               )}
-              {active === "reviews" && <ReviewsContent reviews={reviews} />}
+              {active === "reviews" && <ReviewsContent />}
               {active === "settings" && (
                 <EmptyState message="Settings under maintenance" />
               )}
@@ -171,18 +183,5 @@ export function ProfileClient({ user }: { user: Personal }) {
         />
       )}
     </section>
-  );
-}
-
-function ReviewsContent({ reviews }: any) {
-  return (
-    <div className="space-y-6">
-      <SectionHeader icon={Star} title="My Feedback" count={reviews?.length} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {reviews?.map((rev: any) => (
-          <ReviewCard key={rev._id} rev={rev} />
-        ))}
-      </div>
-    </div>
   );
 }

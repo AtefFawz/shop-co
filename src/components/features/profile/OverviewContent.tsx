@@ -1,30 +1,42 @@
 import OrderCard from "../OrderCard/OrderCard";
 import { Star, Package, CreditCard, ShoppingBag } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
+
+type dataType = {
+  orders: [];
+  reviews: [];
+  onRefresh: () => void;
+  goTo: (state: string) => void;
+  pagination: {
+    paginationOrders: { total: number; totalExpenses: number };
+    paginationReviews: { total: number };
+  };
+};
+
 export default function OverviewContent({
   orders,
-  reviews,
   onRefresh,
   goTo,
-}: any) {
+  pagination,
+}: dataType) {
   return (
     <div className="space-y-10 animate-in fade-in duration-700 ">
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <StatCard
           label="Expenses"
-          value={`$${orders?.reduce((a: any, o: any) => a + o.totalPrice, 0).toLocaleString()}`}
+          value={`$${pagination.paginationOrders.totalExpenses}`}
           icon={CreditCard}
           color="blue"
         />
         <StatCard
           label="Orders"
-          value={orders?.length}
+          value={pagination.paginationOrders.total}
           icon={Package}
           color="orange"
         />
         <StatCard
           label="Reviews"
-          value={reviews?.length}
+          value={pagination.paginationReviews.total}
           icon={Star}
           color="yellow"
         />

@@ -1,5 +1,6 @@
 import { serverApi } from "@/lib/serverApi";
 import { notFound } from "next/navigation";
+import Image from "next/image";
 import {
   Mail,
   Calendar,
@@ -68,11 +69,13 @@ export default async function AboutUser({
       </div>
 
       {/* 1. Main Profile Card */}
-      <div className="bg-white rounded-[30px] border border-gray-100 p-4 md:p-10 shadow-sm flex flex-row gap-8 items-center relative  ">
-        <img
+      <div className="bg-white rounded-[30px] border border-gray-100 py-4 px-3 md:p-10 shadow-sm flex flex-row gap-4 lg:gap-8 items-center relative  ">
+        <Image
           src={user.avatar || "/placeholder-user.png"}
           alt={user.fullName}
-          className="w-32 h-32 md:w-44 md:h-44 rounded-[35px] object-cover border-4 border-gray-50 shadow-inner"
+          width={50}
+          height={50}
+          className="w-42 h-32 md:w-44 md:h-44 rounded-[35px] object-cover border-4 border-gray-50 shadow-inner"
         />
 
         <div className="flex-1 text-center md:text-left space-y-5">

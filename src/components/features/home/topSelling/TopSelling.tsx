@@ -9,7 +9,7 @@ import useData from "@/hooks/getData";
 export default function TopSelling() {
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword") || "";
-  const { data, loading, page, totalPages } = useData("/product", {
+  const { data, loading } = useData("/product", {
     params: {
       keyword: keyword || undefined,
     },

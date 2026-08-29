@@ -1,15 +1,14 @@
+import { products } from "@/lib/Products";
 import { ProfileClient } from "./ProfileClient";
 
-// ─── Server Component ─────────────────────────────────────
-
-// import api from "@/lib/api";
 import { serverApi } from "@/lib/serverApi";
+
 const Profile = async () => {
-  const res = await serverApi("profile/me/");
+  const user = await serverApi("profile/me/");
+  const orders = await products("profile/my-orders");
+  const reviews = await serverApi("profile/my-reviews");
 
-  const user = res?.data?.user;
-
-  return <ProfileClient user={user} />;
+  return <ProfileClient user={user} order={orders} review={reviews} />;
 };
 
 export { Profile };

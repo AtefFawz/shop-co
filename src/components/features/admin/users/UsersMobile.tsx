@@ -1,5 +1,7 @@
 "use client";
+import type { SyntheticEvent } from "react";
 import { User } from "@/types/user";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 interface Props {
@@ -25,7 +27,7 @@ export default function UsersMobile({ users }: Props) {
             <div className="flex items-center gap-3 min-w-0">
               {/* Avatar */}
               <div className="relative shrink-0">
-                <img
+                <Image
                   src={user.avatar || "/placeholder-user.png"}
                   alt={user.fullName}
                   loading="lazy"
