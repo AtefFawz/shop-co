@@ -2,7 +2,7 @@
 import { Product } from "@/types";
 import Card from "@/components//common/Card";
 import Heading from "@/components/ui/Heading";
-import { useData } from "@/hooks/fetchData";
+import { useData } from "@/hooks/getData";
 import { ProductSkeleton } from "@/components/ui/ProductSkeleton";
 export const AlsoLike = ({ productItem }: { productItem: Product }) => {
   const { data, loading } = useData("/product");
