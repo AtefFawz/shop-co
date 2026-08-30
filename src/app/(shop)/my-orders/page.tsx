@@ -1,41 +1,25 @@
 "use client";
-import { useEffect, useState } from "react";
-import api from "@/lib/api";
 import OrderCard from "@/components/features/OrderCard/OrderCard";
 import Link from "next/link";
 import { Package, ShoppingBag, RefreshCw } from "lucide-react";
+import useData from "@/hooks/getData";
+import { Pagination } from "@/components/common/Pagination.client";
 
 export default function MyOrdersPage() {
-  const [orders, setOrders] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, refetch, page, totalPages, goToPage } =
+    useData("order/all");
 
-  const fetchOrders = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get("order/");
-      setOrders(res.data.data.orders);
-    } catch (err) {
-      console.error("Failed to fetch orders", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const orders = data?.data?.orders ?? [];
+  const total = data?.pagination?.total ?? 0;
 
-  useEffect(() => {
-    fetchOrders();
-  }, []);
-
-  // ── Loading skeleton
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className="min-h-screen bg-[#F8F8F8] px-3 sm:px-6 pt-28 sm:pt-32 pb-16">
         <div className="max-w-4xl mx-auto space-y-8">
-          {/* Header skeleton */}
           <div className="space-y-2">
             <div className="h-3 w-24 bg-gray-200 rounded-full animate-pulse" />
             <div className="h-8 w-48 bg-gray-200 rounded-xl animate-pulse" />
           </div>
-          {/* Card skeletons */}
           <div className="space-y-3">
             {[...Array(4)].map((_, i) => (
               <div
@@ -51,9 +35,9 @@ export default function MyOrdersPage() {
   }
 
   return (
-    <section className="min-h-screen  bg-[#F8F8F8] px-1 sm:px-6 pt-28 sm:pt-32 pb-16">
-      <div className="container mx-auto px-3 ">
-        <div className="max-w-7xl space-y-6 sm:space-y-8 ">
+    <section className="min-h-screen bg-[#F8F8F8] px-1 sm:px-6 pt-28 sm:pt-32 pb-16">
+      <div className="container mx-auto px-3">
+        <div className="max-w-7xl space-y-6 sm:space-y-8">
           {/* ── Page Header ── */}
           <div className="flex items-end justify-between gap-4">
             <div>
@@ -66,17 +50,21 @@ export default function MyOrdersPage() {
               </h1>
               {orders.length > 0 && (
                 <p className="text-xs text-gray-400 font-medium mt-1">
-                  {orders.length} order{orders.length !== 1 ? "s" : ""} placed
+                  {total} order{total !== 1 ? "s" : ""} placed
                 </p>
               )}
             </div>
 
             {orders.length > 0 && (
               <button
-                onClick={fetchOrders}
-                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-gray-400 text-xs font-black uppercase tracking-widest text-gray-600 hover:text-black transition-all shadow-sm shrink-0"
+                disabled={loading}
+                onClick={refetch}
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white border border-gray-200 hover:border-gray-400 text-xs font-black uppercase tracking-widest text-gray-600 hover:text-black transition-all shadow-xs shrink-0 disabled:opacity-50"
               >
-                <RefreshCw size={13} />
+                <RefreshCw
+                  size={13}
+                  className={loading ? "animate-spin text-black" : ""}
+                />
                 <span className="hidden sm:inline">Refresh</span>
               </button>
             )}
@@ -105,17 +93,22 @@ export default function MyOrdersPage() {
               </Link>
             </div>
           ) : (
-            /* ── Orders List ── */
-            <div className="space-y-3">
-              {orders.map((order) => (
+            <div
+              className={`space-y-3 transition-opacity duration-200 ${
+                loading ? "opacity-60 pointer-events-none" : "opacity-100"
+              }`}
+            >
+              {orders.map((order: any) => (
                 <OrderCard
                   key={order._id}
                   order={order}
-                  onReviewSuccess={fetchOrders}
+                  onReviewSuccess={refetch}
                 />
               ))}
             </div>
           )}
+
+          <Pagination page={page} totalPages={totalPages} goToPage={goToPage} />
         </div>
       </div>
     </section>

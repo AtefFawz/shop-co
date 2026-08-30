@@ -23,7 +23,6 @@ export default function ProductClientWrapper({ product }: { product: any }) {
       isChose: true,
     };
     update(finalProduct);
-    // 🚀 توست احترافي مع زرار "Go to Cart"
     toast.success(
       (t) => (
         <span className="flex items-center gap-3 ">
@@ -41,7 +40,7 @@ export default function ProductClientWrapper({ product }: { product: any }) {
       ),
       {
         duration: 4000,
-        position: "top-center", // شكلها أشيك في الموبايل والديسكتوب
+        position: "top-center",
       },
     );
   };
