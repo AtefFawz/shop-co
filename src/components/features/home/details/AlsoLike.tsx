@@ -2,11 +2,11 @@
 import { Product } from "@/types";
 import Card from "@/components//common/Card";
 import Heading from "@/components/ui/Heading";
-import { useData } from "@/hooks/getData";
+import useData from "@/hooks/getData";
 import { ProductSkeleton } from "@/components/ui/ProductSkeleton";
 export const AlsoLike = ({ productItem }: { productItem: Product }) => {
   const { data, loading } = useData("/product");
-const product = data?.data?.Products ?? []
+  const product = data?.data?.Products;
   const filteredProducts = product.filter(
     (item: Product) => item.section === productItem?.section,
   );

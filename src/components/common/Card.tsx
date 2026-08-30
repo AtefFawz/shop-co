@@ -9,7 +9,6 @@ import { Product } from "../../types/index";
 import Pricing from "./Pricing";
 
 export default function Card({ product }: { product: Product }) {
-  //   const product = products ?? [];
   const detailUrl = `/shopping/details/${product._id}`;
   return (
     <motion.div
