@@ -21,7 +21,7 @@ export default function NewArrivals() {
 
   const router = useRouter();
   function handelClick() {
-    router.push("/shopping");
+    router.push("/shop");
   }
   if (loading) {
     return (

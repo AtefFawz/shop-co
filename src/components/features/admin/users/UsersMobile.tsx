@@ -30,6 +30,8 @@ export default function UsersMobile({ users }: Props) {
                 <Image
                   src={user.avatar || "/placeholder-user.png"}
                   alt={user.fullName}
+                  width={44}
+                  height={44}
                   loading="lazy"
                   className="w-11 h-11 rounded-2xl object-cover border-2 border-gray-50"
                   onError={(e) => {

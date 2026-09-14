@@ -1,7 +1,7 @@
 "use client";
 import { SlidersHorizontal, RotateCcw } from "lucide-react";
 import { useFilterStore } from "@/store/filterStore";
-import { FilterButton } from "@/components/common/FilterButton";
+import { SectionButton } from "@/components/features/shop/buttons/SectionButton";
 import PriceSlider from "./Slider";
 import { Colors } from "./Colors";
 import { Sizing } from "./Sizing";
@@ -36,7 +36,7 @@ export const Menu = () => {
           <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-3">
             Category
           </p>
-          <FilterButton content={fil} />
+          <SectionButton content={fil} />
         </div>
 
         <PriceSlider />

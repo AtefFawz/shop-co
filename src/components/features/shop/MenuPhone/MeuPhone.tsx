@@ -3,7 +3,8 @@ import * as React from "react";
 import Drawer from "@mui/material/Drawer";
 import Divider from "@mui/material/Divider";
 import { SlidersHorizontal, X, RotateCcw } from "lucide-react";
-import { FilterButton } from "@/components/common/FilterButton";
+import { SectionButton } from "@/components/features/shop/buttons/SectionButton";
+import { StyleButton } from "@/components/features/shop/buttons/StyleButton";
 import PriceSlider from "../menu/Slider";
 import { Colors } from "../menu/Colors";
 import { Sizing } from "../menu/Sizing";
@@ -97,7 +98,7 @@ export default function MobileFilterDrawer() {
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-3">
               Category
             </p>
-            <FilterButton content={fil} />
+            <SectionButton content={fil} />
           </div>
 
           {/* <Divider sx={{ mb: 1 }} /> */}
@@ -112,7 +113,7 @@ export default function MobileFilterDrawer() {
             <p className="text-[10px] font-black uppercase tracking-[0.15em] text-gray-400 mb-3">
               Dress Style
             </p>
-            <FilterButton content={dress} />
+            <StyleButton content={dress} />
           </div>
 
           {/* Apply button */}

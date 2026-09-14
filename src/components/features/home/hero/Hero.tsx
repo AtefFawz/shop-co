@@ -34,7 +34,7 @@ export default function Hero() {
 
               <div className="flex items-center gap-5">
                 <Link
-                  href="/shopping"
+                  href="/shop"
                   className="group flex items-center gap-3 bg-gray-900 text-white px-8 py-4 rounded-2xl text-sm font-black uppercase tracking-widest hover:bg-black transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.2)]"
                 >
                   {itemShop.btnText}
@@ -44,7 +44,7 @@ export default function Hero() {
                   />
                 </Link>
                 <Link
-                  href="/shopping"
+                  href="/shop"
                   className="text-sm font-bold text-gray-500 hover:text-gray-900 transition-colors underline underline-offset-4 decoration-gray-300 hover:decoration-gray-900"
                 >
                   Browse All

@@ -48,7 +48,7 @@ export default function MobileNavbar() {
       isFound: true,
       key: "cart",
       action: () => {
-        router.push("/shopping/details/cart/");
+        router.push("/shop/details/cart/");
       },
     },
     {

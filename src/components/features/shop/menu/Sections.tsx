@@ -1,15 +1,14 @@
 "use client";
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { FilterButton } from "@/components/common/FilterButton";
+import { StyleButton } from "@/components/features/shop/buttons/StyleButton";
 
 const fil = ["Casual", "Formal", "Party", "Gym"];
 
 export const Sections = () => {
   const [active, setActive] = useState(false);
-
   return (
-    <div className="w-full border-b border-gray-100 pb-1">
+    <div className="w-full pb-1">
       <button
         onClick={() => setActive((p) => !p)}
         className="flex items-center justify-between w-full py-4 cursor-pointer"
@@ -29,7 +28,7 @@ export const Sections = () => {
         }`}
       >
         <div className="overflow-hidden pb-4 pt-1">
-          <FilterButton content={fil} />
+          <StyleButton content={fil} />
         </div>
       </div>
     </div>

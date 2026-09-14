@@ -19,6 +19,8 @@ import OrdersContent from "./OrdersContent";
 import OverviewContent from "./OverviewContent";
 import { NavMobile } from "@/components/common/navbar/NavMobile";
 import { SidebarDesktop } from "@/components/common/navbar/SidebarDesktop";
+import useData from "@/hooks/getData";
+
 const NAV = [
   { id: "overview", label: "Home", icon: Activity },
   { id: "orders", label: "Orders", icon: Package },
@@ -26,36 +28,65 @@ const NAV = [
   { id: "settings", label: "Settings", icon: Settings },
 ];
 
-interface Personal {
-  fullName?: string;
-  email?: string;
-  avatar?: string;
-  orders?: any[];
-  reviews?: any[];
-  role?: string;
-  user?: any;
-  review?: any;
-  order?: any;
-}
+export function ProfileClient() {
+  const {
+    data: userData,
+    loading: userLoading,
+    refetch: refetchUser,
+    totalPages: totalPagesUser,
+  } = useData("/profile/me");
+  const {
+    data: orderData,
 
-export function ProfileClient({ user, review, order }: Personal) {
-  const { fullName, email, avatar, role } = user?.data?.user;
-  const { reviews } = review?.data;
-  const { orders } = order?.data;
-
-  const paginationOrders = order.pagination;
-  const paginationReviews = review.pagination;
-  const pagination = {
-    paginationOrders: paginationOrders,
-    paginationReviews: paginationReviews,
-  };
+    refetch: refetchOrders,
+  } = useData("/profile/my-orders");
+  const { data: reviewData, refetch: refetchReviews } = useData(
+    "/profile/my-reviews",
+  );
   const [active, setActive] = useState("overview");
-
   const [isEditOpen, setIsEditOpen] = useState(false);
-
   const router = useRouter();
-  const handleRefresh = () => router.refresh();
-  const checkRole = role === "ADMIN" || role === "MANAGER ";
+
+  if (userLoading && !userData) {
+    return (
+      <div className="min-h-screen bg-[#F8F8F8] flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-black border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const user = userData?.data?.user || {};
+  const {
+    fullName = "",
+    email = "",
+    avatar = "/placeholder.png",
+    role = "USER",
+  } = user;
+
+  const orders = orderData?.data?.orders || [];
+  const reviews = reviewData?.data?.reviews || [];
+
+  const pagination = {
+    paginationOrders: orderData?.pagination || {
+      total: 0,
+      totalPages: 1,
+      page: 1,
+    },
+    paginationReviews: reviewData?.pagination || {
+      total: 0,
+      totalPages: 1,
+      page: 1,
+    },
+  };
+
+  const handleRefresh = () => {
+    refetchUser();
+    refetchOrders();
+    refetchReviews();
+    router.refresh();
+  };
+
+  const checkRole = role === "ADMIN" || role === "MANAGER";
   const NAV_LINKS = checkRole
     ? [...NAV, { id: "dashboard", label: "DASHBOARD", icon: UserCog }]
     : NAV;
@@ -68,6 +99,7 @@ export function ProfileClient({ user, review, order }: Personal) {
     setActive(id);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
   return (
     <section className="min-h-screen bg-[#F8F8F8] pb-24 lg:pb-0">
       <div className="container mx-auto">
@@ -76,7 +108,7 @@ export function ProfileClient({ user, review, order }: Personal) {
           <NavMobile arrayOfData={NAV_LINKS} active={active} goTo={goTo} />
         </div>
 
-        {/* 2. DESKTOP ONLY  !*/}
+        {/* ── 2. DESKTOP ONLY ── */}
         <div className="w-full mx-auto flex">
           <SidebarDesktop
             active={active}
@@ -85,12 +117,14 @@ export function ProfileClient({ user, review, order }: Personal) {
             headerContent={
               <div className="p-2 flex items-center gap-4">
                 <div className="relative w-14 h-14 rounded-full overflow-hidden ring-4 ring-black/5 shadow-inner">
-                  <Image
-                    src={avatar}
-                    alt={fullName}
-                    fill
-                    className="object-cover"
-                  />
+                  {avatar && (
+                    <Image
+                      src={avatar}
+                      alt={fullName}
+                      fill
+                      className="object-cover"
+                    />
+                  )}
                 </div>
                 <div className="min-w-0 text-left">
                   <p className="font-black text-sm tracking-tighter truncate leading-none mb-1">
@@ -115,29 +149,30 @@ export function ProfileClient({ user, review, order }: Personal) {
           {/* ── 3. MAIN CONTENT ── */}
           <main className="flex-1 min-w-0 Responsive">
             {/* Hero Banner */}
-            <div className="relative bg-black rounded-4xl p-4  sm:p-14 mb-10 overflow-hidden shadow-2xl text-white">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-white/9 rounded-full -mr-32 -mt-32 blur-[80px]" />
-              {/* Container Top Profile */}
+            <div className="relative bg-black rounded-4xl p-4 sm:p-14 mb-10 overflow-hidden shadow-2xl text-white">
+              <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-32 -mt-32 blur-[80px]" />
               <div className="relative z-10 flex flex-col md:flex-row md:items-center items-start justify-between gap-8">
                 <div className="flex flex-row items-center justify-around gap-4">
-                  <div className="relative w-30 h-30 sm:w-32 sm:h-32 rounded-4xl overflow-hidden border-2 border-white/10 shadow-2xl">
-                    <Image
-                      src={avatar}
-                      alt={fullName}
-                      fill
-                      quality={100}
-                      className="object-fill w-full h-full"
-                    />
+                  <div className="relative w-28 h-28 sm:w-32 sm:h-32 rounded-4xl overflow-hidden border-2 border-white/10 shadow-2xl">
+                    {avatar && (
+                      <Image
+                        src={avatar}
+                        alt={fullName}
+                        fill
+                        quality={100}
+                        className="object-cover w-full h-full"
+                      />
+                    )}
                   </div>
                   <div className="flex flex-col justify-center md:text-left">
                     <h1 className="text-2xl lg:text-nowrap xl:text-4xl font-black tracking-tighter leading-none mb-3">
                       {fullName}
                     </h1>
-                    <span className="inline-flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] bg-white/10 px-4 py-2 rounded-full border border-white/10 text-nowrap ">
+                    <span className="inline-flex items-center justify-center gap-2 text-[9px] font-black uppercase tracking-[0.2em] bg-white/10 px-4 py-2 rounded-full border border-white/10 text-nowrap">
                       <Star
                         size={10}
                         className="fill-yellow-400 text-yellow-400"
-                      />{" "}
+                      />
                       Premium Member
                     </span>
                   </div>
@@ -162,9 +197,7 @@ export function ProfileClient({ user, review, order }: Personal) {
                   goTo={goTo}
                 />
               )}
-              {active === "orders" && (
-                <OrdersContent onRefresh={handleRefresh} />
-              )}
+              {active === "orders" && <OrdersContent />}
               {active === "reviews" && <ReviewsContent />}
               {active === "settings" && (
                 <EmptyState message="Settings under maintenance" />

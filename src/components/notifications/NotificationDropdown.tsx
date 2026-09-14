@@ -38,7 +38,7 @@ export default function NotificationDropdown() {
     setOpen(false);
 
     if (notification.order) {
-      router.push(`/shopping/orders/${notification.order}`);
+      router.push(`/shop/orders/${notification.order}`);
     }
   };
 

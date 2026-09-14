@@ -28,7 +28,7 @@ export const PromoCode = () => {
 
       {/* Checkout */}
       <button
-        onClick={() => router.push("/shopping/details/cart/checkout")}
+        onClick={() => router.push("/shop/details/cart/checkout")}
         className="w-full flex items-center justify-center gap-2 bg-black text-white py-3.5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-800 transition-all shadow-lg shadow-black/10 hover:-translate-y-px active:translate-y-0"
       >
         Go to Checkout

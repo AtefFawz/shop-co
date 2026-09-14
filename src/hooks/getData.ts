@@ -40,7 +40,6 @@ const useData = <T = any, R = T>(
           },
           signal,
         });
-
         const responseData = response.data;
         const finalData = transform ? transform(responseData) : responseData;
 

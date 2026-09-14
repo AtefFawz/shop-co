@@ -29,7 +29,7 @@ export default function ProductClientWrapper({ product }: { product: any }) {
           <b>Awesome! {product.name} added to your cart.</b>
           <button
             onClick={() => {
-              router.push("/shopping/details/cart");
+              router.push("/shop/details/cart");
               toast.dismiss(t.id);
             }}
             className="bg-black text-white text-[10px] px-3 py-3 rounded-lg font-bold uppercase tracking-wider hover:bg-gray-800 transition-colors text-nowrap"

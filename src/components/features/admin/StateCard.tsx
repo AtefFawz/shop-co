@@ -1,12 +1,13 @@
-import { LucideIcon, TrendingUp, TrendingDown } from "lucide-react";
-
-interface StatCardProps {
+// ── SubComponent: Unified Stat Card ──────────────────────────
+import { TrendingUp, TrendingDown, LucideIcon } from "lucide-react";
+export interface StatCardProps {
   title: string;
   value: number | string;
   icon: LucideIcon;
   trend?: string;
   trendUp?: boolean;
   prefix?: string;
+  subtitle?: string;
 }
 
 export function StatCard({
@@ -16,52 +17,47 @@ export function StatCard({
   trend,
   trendUp = true,
   prefix = "",
+  subtitle,
 }: StatCardProps) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4  flex flex-col gap-3 hover:shadow-md hover:-translate-y-px transition-all duration-200 group">
-      {/* Top row — icon + trend */}
-      <div className="flex items-start justify-between gap-2">
-        <div className="w-9 h-9 bg-gray-100 group-hover:bg-black rounded-xl flex items-center justify-center transition-colors duration-300 shrink-0">
+    <div className="bg-white rounded-3xl border border-gray-200/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
+      {/* Icon & Trend */}
+      <div className="flex items-center justify-between">
+        <div className="w-10 h-10 bg-gray-50 group-hover:bg-black rounded-2xl flex items-center justify-center transition-colors duration-300 shrink-0 border border-gray-100">
           <Icon
-            size={16}
+            size={18}
             className="text-gray-500 group-hover:text-white transition-colors"
           />
         </div>
         {trend && (
           <span
-            className={`inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded-full shrink-0 ${
+            className={`inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider px-2.5 py-1 rounded-full ${
               trendUp
-                ? "bg-green-50 text-green-600"
-                : "bg-orange-50 text-orange-500"
+                ? "bg-emerald-50 text-emerald-600 border border-emerald-200/60"
+                : "bg-amber-50 text-amber-600 border border-amber-200/60"
             }`}
           >
-            {trendUp ? <TrendingUp size={8} /> : <TrendingDown size={8} />}
-            <span className="hidden sm:inline">{trend}</span>
-            <span className="sm:hidden">{trendUp ? trend : "!"}</span>
+            {trendUp ? <TrendingUp size={10} /> : <TrendingDown size={10} />}
+            <span>{trend}</span>
           </span>
         )}
       </div>
 
-      {/* Value + title */}
-      <div className="min-w-0">
-        <p className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tighter text-gray-900 leading-none truncate">
+      {/* Main Metric */}
+      <div>
+        <p className="text-2xl sm:text-3xl font-black tracking-tight text-gray-950 leading-none">
           {prefix}
           {typeof value === "number" ? value.toLocaleString() : (value ?? "—")}
         </p>
-        <p className="text-[9px] sm:text-[10px] font-black uppercase tracking-[0.12em] text-gray-400 mt-1.5 truncate">
+        <p className="text-[10px] font-black uppercase tracking-[0.16em] text-gray-400 mt-2">
           {title}
         </p>
+        {subtitle && (
+          <p className="text-[11px] text-gray-400 font-medium mt-1">
+            {subtitle}
+          </p>
+        )}
       </div>
-
-      {/* Trend label — desktop only full text */}
-      {trend && (
-        <p className="hidden sm:block text-[10px] text-gray-400 font-bold">
-          <span className={trendUp ? "text-green-500" : "text-orange-400"}>
-            {trend}
-          </span>{" "}
-          vs last month
-        </p>
-      )}
     </div>
   );
 }

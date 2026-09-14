@@ -2,7 +2,7 @@
 import { useFilterStore } from "@/store/filterStore";
 import { AiOutlineRight } from "react-icons/ai";
 
-export const FilterButton = ({ content }: { content: string[] }) => {
+export const SectionButton = ({ content }: { content: string[] }) => {
   const set = useFilterStore((state) => state.filterBySection);
   const currentSection = useFilterStore((state) => state.currentSection);
   return (
@@ -10,7 +10,7 @@ export const FilterButton = ({ content }: { content: string[] }) => {
       {content.map((e, id) => (
         <button
           key={id}
-          className={`w-full text-left cursor-pointer flex items-center justify-between p-2 font-bold text-gray-500 hover:text-gray-800 ${currentSection === e ? "text-gray-800 rounded-xl bg-gray-100 duration-400 " : ""}`}
+          className={`w-full text-left cursor-pointer flex items-center justify-between p-2 font-bold text-gray-500 hover:text-gray-800 ${currentSection === e ? "text-gray-800 rounded-xl bg-gray-100 duration-500 " : ""}`}
           onClick={() => set(e)}
         >
           {e}

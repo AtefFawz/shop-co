@@ -2,5 +2,6 @@
   "editor.formatOnSave": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.wordWrap": "on",
-  "workbench.colorTheme": "OM Theme (Night Owl Italic)"
+  "workbench.colorTheme": "OM Theme (Night Owl Italic)",
+  "commentTranslate.source": "Google"
 }

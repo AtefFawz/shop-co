@@ -35,7 +35,7 @@ export default function DesktopNavbar() {
       Icon: AddShoppingCartIcon,
       key: "cart",
       action: () => {
-        router.push("/shopping/details/cart/");
+        router.push("/shop/details/cart/");
       },
       isFound: true,
     },

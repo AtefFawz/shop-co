@@ -20,7 +20,7 @@ export const Category = () => {
 
   const handleClick = (slug: string) => {
     setType(slug);
-    router.push("/shopping");
+    router.push("/shop");
   };
 
   return (

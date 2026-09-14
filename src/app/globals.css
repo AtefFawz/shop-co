@@ -48,3 +48,26 @@ section {
   padding: 6px;
   border: 1px solid gray;
 }
+
+@layer components {
+  .input-base {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    background-color: #ffffff;
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #111827;
+    outline: none;
+    transition: all 150ms ease;
+  }
+  .input-base:hover {
+    border-color: #d1d5db;
+  }
+  .input-base:focus {
+    border-color: #111827;
+    box-shadow: 0 0 0 3px rgba(17, 24, 39, 0.06);
+  }
+}

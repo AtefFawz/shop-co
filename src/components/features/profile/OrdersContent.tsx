@@ -7,11 +7,7 @@ import OrderCard from "../OrderCard/OrderCard";
 import { Pagination } from "@/components/common/Pagination.client";
 import useData from "@/hooks/getData";
 
-export default function OrdersContent({
-  onRefresh,
-}: {
-  onRefresh: () => void;
-}) {
+export default function OrdersContent() {
   const { data, page, totalPages, goToPage, refetch } =
     useData("profile/my-orders");
 

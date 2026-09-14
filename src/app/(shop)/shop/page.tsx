@@ -1,4 +1,4 @@
-import { Shop } from "@/components/common/shop/Shop";
+import { Shop } from "@/components/features/shop/Shop";
 export default function Shopping() {
   return (
     <div>
