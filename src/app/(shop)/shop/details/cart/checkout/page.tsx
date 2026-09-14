@@ -12,7 +12,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const { stack, clearCart } = useProduct();
   const cartItems = stack.filter((item: any) => item.isChose);
-
+  console.log(cartItems);
   const handlePlaceOrder = async (shippingData: any) => {
     setLoading(true);
     interface Typing {
@@ -24,7 +24,12 @@ export default function Checkout() {
     }
     const subtotal = cartItems.reduce(
       (acc, item) =>
-        acc + calculateFinalPrice(item.price, item.discount, item.count),
+        acc +
+        calculateFinalPrice(
+          Number(item.price),
+          item.discount !== undefined ? Number(item.discount) : undefined,
+          item.count,
+        ),
       0,
     );
 

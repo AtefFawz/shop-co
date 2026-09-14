@@ -2,7 +2,7 @@ import { Product } from "@/types";
 import { calculateFinalPrice } from "@/lib/logicPricing";
 
 export default function Pricing({ product }: { product: Product }) {
-  const result = calculateFinalPrice(product.price, product.discount);
+  const result = calculateFinalPrice(product.price, Number(product.discount));
   return (
     <div className="flex items-center gap-2 flex-nowrap text-nowrap">
       <span className="text-sm md:text-xl font-bold text-slate-900 ">

@@ -3,7 +3,12 @@ import { calculateFinalPrice } from "@/lib/logicPricing";
 export const OrderSummary = ({ items }: { items: Product[] }) => {
   const subtotal = items.reduce(
     (acc, item) =>
-      acc + calculateFinalPrice(item.price, item.discount, item.count),
+      acc +
+      calculateFinalPrice(
+        Number(item.price),
+        item.discount !== undefined ? Number(item.discount) : undefined,
+        item.count,
+      ),
     0,
   );
   const deliveryFee = 15;

@@ -15,7 +15,7 @@ export const Card = ({ productItem }: { productItem: Product }) => {
 
   const finalPrice = calculateFinalPrice(
     productItem.price,
-    productItem.discount,
+    Number(productItem.discount),
     productItem.count,
   );
   return (

@@ -8,7 +8,9 @@ export const Pricing = ({ product }: { product: Product[] }) => {
       const qty = item.count ?? 1;
       return {
         subtotal: acc.subtotal + item.price * qty,
-        total: acc.total + calculateFinalPrice(item.price, item.discount, qty),
+        total:
+          acc.total +
+          calculateFinalPrice(item.price, Number(item.discount), qty),
       };
     },
     { total: 0, subtotal: 0 },
