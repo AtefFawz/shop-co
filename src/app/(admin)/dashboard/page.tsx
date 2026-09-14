@@ -131,7 +131,7 @@ export default async function DashboardPage() {
   );
 
   return (
-    <div className="h-screen overflow-hidden bg-[#F8F8F8] py-6 sm:py-8">
+    <div className="h-screen  bg-[#F8F8F8] py-6 sm:py-8">
       <div className="w-full  lg:px-8 max-w-[1400px] mx-auto space-y-6">
         {/* ── Header ── */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200/60">
