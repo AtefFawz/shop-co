@@ -26,6 +26,7 @@ export default function MobileFilterDrawer() {
       {/* Breadcrumb */}
       <p className="text-xs font-bold text-gray-500 truncate">
         Shopping
+        {/* Gender */}
         {find?.gender && (
           <>
             {" "}
