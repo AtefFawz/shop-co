@@ -11,9 +11,9 @@ export default function Index() {
       <Hero />
       <ProductsGrid />
       <TopSelling />
-      <div className="px-2">
-        <Browse />
-      </div>
+      {/* <div className="px-2"> */}
+      <Browse />
+      {/* </div> */}
       <Rating />
     </div>
   );

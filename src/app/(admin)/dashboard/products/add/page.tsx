@@ -38,7 +38,7 @@ export default function AddProduct() {
     gender: "MEN",
     category: "CLOTHING",
     section: "T-SHIRT",
-    type: "T-SHIRT",
+    // type: "T-SHIRT",
     style: "Casual",
     price: "",
     discount: "",
@@ -85,7 +85,7 @@ export default function AddProduct() {
       gender: "MEN",
       category: "CLOTHING",
       section: "T-SHIRT",
-      type: "T-SHIRT",
+      //   type: "T-SHIRT",
       style: "Casual",
       price: "",
       discount: "",
@@ -193,9 +193,7 @@ export default function AddProduct() {
                   type="text"
                   placeholder="e.g. Graphic Relaxed T-Shirt"
                   value={item.name}
-                  onChange={(e) =>
-                    handleChange("name", e.target.value.toUpperCase())
-                  }
+                  onChange={(e) => handleChange("name", e.target.value)}
                   required
                 />
               </Field>

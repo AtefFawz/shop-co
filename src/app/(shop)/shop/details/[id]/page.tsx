@@ -105,7 +105,7 @@ export default function DetailsProduct({
     imageGallery[activeIdx] || productItem.photo,
   );
 
-  // حساب حالة المخزون الفعلية
+  // Calculate actual inventory status
   const stock = Number((productItem as any).countInStock ?? 0);
   const isOutOfStock = stock <= 0;
 

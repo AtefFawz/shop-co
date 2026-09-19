@@ -12,7 +12,7 @@ export default function Checkout() {
   const [loading, setLoading] = useState(false);
   const { stack, clearCart } = useProduct();
   const cartItems = stack.filter((item: any) => item.isChose);
-  console.log(cartItems);
+  //   console.log(cartItems);
   const handlePlaceOrder = async (shippingData: any) => {
     setLoading(true);
     interface Typing {

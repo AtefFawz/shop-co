@@ -10,7 +10,7 @@ export interface Product {
   isSale: boolean;
   colors: string[];
   size: string[];
-  type: "MEN" | "WOMEN" | "KIDS";
+  gender: "MEN" | "WOMEN" | "KIDS";
   section: string;
   rating: number;
   isChose: boolean;

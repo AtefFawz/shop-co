@@ -16,7 +16,7 @@ export const Category = () => {
     { id: 3, title: "Women", img: Women, slug: "WOMEN" },
   ];
 
-  const setType = useFilterStore((state) => state.filterByType);
+  const setType = useFilterStore((state) => state.filterByGender);
 
   const handleClick = (slug: string) => {
     setType(slug);

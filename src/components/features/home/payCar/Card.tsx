@@ -28,7 +28,7 @@ export const Card = ({ productItem }: { productItem: Product }) => {
       className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-white rounded-2xl border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
     >
       {/* Image */}
-      <div className="w-20 h-24 sm:w-24 sm:h-28 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100">
+      <div className="w-20 h-24 sm:w-24 sm:h-28 shrink-0 rounded-xl overflow-hidden bg-gray-100">
         <img
           src={productItem.photo}
           alt={productItem.name}

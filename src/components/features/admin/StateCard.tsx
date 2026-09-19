@@ -22,8 +22,8 @@ export function StatCard({
   return (
     <div className="bg-white rounded-3xl border border-gray-200/70 p-5 sm:p-6 shadow-xs flex flex-col justify-between gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group">
       {/* Icon & Trend */}
-      <div className="flex items-center justify-between">
-        <div className="w-10 h-10 bg-gray-50 group-hover:bg-black rounded-2xl flex items-center justify-center transition-colors duration-300 shrink-0 border border-gray-100">
+      <div className="flex items-center justify-between ">
+        <div className="w-10 h-10 bg-gray-50 group-hover:bg-black rounded-2xl flex items-center justify-center transition-colors duration-300 shrink-0 border border-gray-100 ">
           <Icon
             size={18}
             className="text-gray-500 group-hover:text-white transition-colors"

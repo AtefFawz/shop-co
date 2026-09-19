@@ -40,7 +40,6 @@ export default function EditProductPage({
 
   const { item, error, loading, handleChange, handleUpdate, fetchProduct } =
     usePatch();
-  console.log("item ==>", item);
 
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);
@@ -59,10 +58,13 @@ export default function EditProductPage({
           : item.photo
             ? [item.photo]
             : [];
-      setExistingImages(serverImgs && []);
+      setExistingImages(
+        serverImgs.filter(
+          (image): image is string => typeof image === "string",
+        ),
+      );
     }
   }, [item._id, item.photo, item.images]);
-
   useEffect(() => {
     return () => {
       newPreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -119,7 +121,6 @@ export default function EditProductPage({
       return;
     }
 
-    // بناء الـ FormData مع دمج الصور المتبقية والجديدة
     const formData = new FormData();
 
     Object.entries(item).forEach(([key, value]) => {
@@ -130,7 +131,6 @@ export default function EditProductPage({
         value !== undefined &&
         value !== ""
       ) {
-        // إذا كان الحقل مصفوفة (مثل sizes أو colors) نحوله لـ string
         if (Array.isArray(value)) {
           formData.append(key, value.join(", "));
         } else {
@@ -139,17 +139,14 @@ export default function EditProductPage({
       }
     });
 
-    // 1. إرسال روابط الصور القديمة التي لم يتم حذفها
     existingImages.forEach((imgUrl) => {
       formData.append("existingImages", imgUrl);
     });
 
-    // 2. إرسال ملفات الصور الجديدة المرفوعة
     newImages.forEach((file) => {
       formData.append("images", file);
     });
 
-    // تنفيذ التحديث
     handleUpdate(id, formData);
   };
 
@@ -176,7 +173,7 @@ export default function EditProductPage({
 
   return (
     <main className="min-h-screen bg-[#F8F8F8] py-8 sm:py-10">
-      <div className="mx-auto w-full max-w-6xl px-3 sm:px-6 lg:px-8">
+      <div className="mx-auto w-full  ">
         {/* Header */}
         <header className="mb-6 sm:mb-8 flex items-center gap-4">
           <button
@@ -392,7 +389,7 @@ export default function EditProductPage({
                 <button
                   type="button"
                   onClick={handleClearAllImages}
-                  className="flex items-center gap-1.5 text-[11px] font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-all cursor-pointer"
+                  className="flex items-center gap-1.5 text-[11px] font-bold text-red-500 hover:text-red-700 bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-xl transition-all cursor-pointer text-nowrap"
                 >
                   <Trash2 size={13} />
                   Clear All

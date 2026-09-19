@@ -13,6 +13,7 @@ export default function ProductClientWrapper({ product }: { product: any }) {
   const [selectedColor, setSelectedColor] = useState(product.colors);
   const [selectedSize, setSelectedSize] = useState(product.size);
   const [quantity, setQuantity] = useState(1);
+  let logicQuantity = quantity > product?.countInStock;
 
   const handleAddToCart = () => {
     const finalProduct = {
@@ -26,7 +27,7 @@ export default function ProductClientWrapper({ product }: { product: any }) {
     toast.success(
       (t) => (
         <span className="flex items-center gap-3 ">
-          <b>Awesome! {product.name} added to your cart.</b>
+          <b>Awesome! {product.section} added to your cart.</b>
           <button
             onClick={() => {
               router.push("/shop/details/cart");
@@ -79,11 +80,16 @@ export default function ProductClientWrapper({ product }: { product: any }) {
         </h3>
         <div className="grid grid-cols-3 content-center items-center gap-2 w-full">
           <div className="col-span-1 ">
-            <Counter quantity={quantity} setQuantity={setQuantity} />
+            <Counter
+              quantity={quantity}
+              setQuantity={setQuantity}
+              logicQuantity={logicQuantity}
+            />
           </div>
           <button
             onClick={handleAddToCart}
-            className="bg-black col-span-2 text-white py-2 rounded-full font-bold text-nowrap hover:bg-gray-800 transition-colors"
+            disabled={logicQuantity}
+            className={` ${logicQuantity ? "opacity-20 bg-gray-400" : "opacity-100 bg-black"} col-span-2 text-white py-2 rounded-full font-bold text-nowrap hover:bg-gray-800 transition-colors`}
           >
             Add To Cart
           </button>

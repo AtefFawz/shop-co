@@ -18,7 +18,7 @@ export default function OrderItems({
   totalPrice: number;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+    <div className="rounded-2xl Responsive bg-white p-5 shadow-sm sm:p-6">
       <div className="mb-5 flex items-center justify-between">
         <div>
           <h2 className="text-lg font-bold text-gray-900">Order Items</h2>
@@ -44,7 +44,7 @@ export default function OrderItems({
 
             <div className="flex min-w-0 flex-1 flex-col justify-between">
               <div>
-                <h3 className="truncate text-sm font-bold text-gray-900">
+                <h3 className="truncate text-wrap text-sm font-bold text-gray-900">
                   {item.name}
                 </h3>
 

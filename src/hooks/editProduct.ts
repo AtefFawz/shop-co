@@ -10,7 +10,7 @@ export interface ProductEditItem {
   description: string;
   price: string | number;
   category: string;
-  type: string;
+  //   type: string;
   section: string;
   gender: string;
   isSale: string | boolean;
@@ -34,7 +34,7 @@ export const usePatch = () => {
     description: "",
     price: "",
     category: "",
-    type: "",
+    // type: "",
     section: "",
     gender: "MEN",
     isSale: "false",
@@ -71,7 +71,7 @@ export const usePatch = () => {
         description: data.description || "",
         price: data.price !== undefined ? String(data.price) : "",
         category: data.category || "",
-        type: data.type || data.section || "",
+        // type: data.type || data.section || "",
         section: data.section || data.type || "T-SHIRT",
         gender: data.gender || "MEN",
         isSale: String(data.isSale ?? "false"),

@@ -5,6 +5,10 @@ import Login from "@/assets/shop/screenShop.webp";
 import { FormSignIn } from "./FormSignIn";
 
 export default function SignInPage() {
+  const handleGoogleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}auth/google`;
+  };
+
   return (
     <div className="w-full min-h-screen flex bg-white">
       {/* ══ LEFT — Image Panel (desktop only) ══ */}
@@ -82,7 +86,7 @@ export default function SignInPage() {
 
           {/* Social buttons */}
           <div className="grid grid-cols-2 gap-3">
-            <SocialButton label="Google">
+            <SocialButton label="Google" onClick={handleGoogleLogin}>
               {/* Google SVG */}
               <svg
                 width="16"
@@ -140,12 +144,18 @@ export default function SignInPage() {
 function SocialButton({
   label,
   children,
+  onClick,
 }: {
   label: string;
   children: React.ReactNode;
+  onClick?: () => void;
 }) {
   return (
-    <button className="flex items-center justify-center gap-2.5 py-3 border-2 border-gray-100 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all text-xs font-black uppercase tracking-widest text-gray-700">
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex items-center justify-center gap-2.5 py-3 border-2 border-gray-100 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all text-xs font-black uppercase tracking-widest text-gray-700 cursor-pointer"
+    >
       {children}
       {label}
     </button>

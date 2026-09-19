@@ -11,7 +11,7 @@ interface FilterStore {
 
   // Actions
   setInitialProducts: (data: Product[]) => void;
-  filterByType: (type: string) => void;
+  filterByGender: (gender: string) => void;
   filterBySection: (section: string) => void;
   filterByStyle: (style: string) => void;
   filterPrice: (maxPrice: number) => void;
@@ -21,14 +21,14 @@ interface FilterStore {
 // A pure function that applies all active filters together without conflict
 const applyAllFilters = (
   products: Product[],
-  type: string | null,
+  gender: string | null,
   section: string | null,
   style: string | null,
   maxPrice: number | null,
 ) => {
   return products.filter((item: any) => {
     // 1. Filter by Type (Gender)
-    if (type && item.type?.toUpperCase() !== type.toUpperCase()) {
+    if (gender && item.gender?.toUpperCase() !== gender.toUpperCase()) {
       return false;
     }
 
@@ -73,13 +73,13 @@ export const useFilterStore = create<FilterStore>((set, get) => ({
     });
   },
 
-  filterByType: (type) => {
+  filterByGender: (gender) => {
     const { allProducts, currentSection, currentStyle, currentPrice } = get();
     set({
-      currentType: type,
+      currentType: gender,
       filteredProducts: applyAllFilters(
         allProducts,
-        type,
+        gender,
         currentSection,
         currentStyle,
         currentPrice,
@@ -103,7 +103,6 @@ export const useFilterStore = create<FilterStore>((set, get) => ({
 
   filterByStyle: (style) => {
     const { allProducts, currentType, currentSection, currentPrice } = get();
-    console.log("Filtering by style:", currentSection, style);
     set({
       currentStyle: style,
       filteredProducts: applyAllFilters(
