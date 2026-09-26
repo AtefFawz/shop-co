@@ -3,12 +3,13 @@ import { itemShop, items, brands } from "@/data/shop/Shop";
 import Screen from "@/assets/shop/screenShop.webp";
 import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
+
 export default function Hero() {
   return (
     <>
       {/* ════════ HERO ════════ */}
-      <div className="bg-[#F2F0F1] w-full overflow-hidden">
-        <div className="container mx-auto px-4 lg:px-10">
+      <div className="bg-[#F2F0F1] w-full overflow-hidden Responsive">
+        <div className="Responsive">
           <div className="flex flex-col md:flex-row min-h-[92vh] md:min-h-[85vh]">
             {/* ── Left ── */}
             <div className="md:w-1/2 w-full flex flex-col justify-center py-12 md:py-24 pr-0 md:pr-16 space-y-10 order-1 md:order-1">
@@ -21,7 +22,7 @@ export default function Hero() {
               </div>
 
               {/* Headline */}
-              <h1 className="text-3xl md:text-4xl lg:text-6xl xl:text-7xl font-black uppercase -tracking-wide leading-[1.2 ] lg:leading-[0.9] text-gray-900">
+              <h1 className="text-3xl md:text-4xl lg:text-6xl 2xl:text-7xl font-black uppercase -tracking-wide leading-[1.2 ] lg:leading-[0.9] text-gray-900">
                 {itemShop.title}
               </h1>
 

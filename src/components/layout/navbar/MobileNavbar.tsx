@@ -14,6 +14,7 @@ import NavIcons from "./NavIcons";
 import api from "@/lib/api";
 import SearchBar from "./SearchBar";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import StrokeText from "@/components/reactbits/StrokeText";
 export default function MobileNavbar() {
   const pathname = usePathname();
   const router = useRouter();
@@ -63,17 +64,33 @@ export default function MobileNavbar() {
   ];
 
   return (
-    <header className="pb-5 block md:hidden container mx-auto">
+    <header className="pb-5 block md:hidden ">
       {/* Top Bar */}
-      <nav className="px-5 pt-5 flex justify-between items-center">
+      <nav className=" pt-5 flex justify-between items-center">
         <div className="flex items-center gap-x-5">
           <DensityMediumIcon
             sx={{ cursor: "pointer" }}
             onClick={toggleMobileNav}
           />
-          <h1 className="font-[1000] tracking-wider italic text-lg lg:text-4xl">
-            SHOP.CO
-          </h1>
+          {/* <h1 className="font-[1000] tracking-wider italic text-lg lg:text-4xl"> */}
+          {/* SHOP.CO */}
+          <StrokeText
+            text="SHOP.CO"
+            strokeColor="#27272A"
+            fillColor="#18181B"
+            strokeWidth={1.6}
+            drawDuration={1.5}
+            fillDelay={0.25}
+            stagger={0.05}
+            ease="power2.out"
+            trigger="loop"
+            fillMode="wipe"
+            fontSize={30}
+            fontWeight={900}
+            letterSpacing={-1.5}
+            reverse={false}
+          />
+          {/* </h1> */}
         </div>
 
         <NavIcons

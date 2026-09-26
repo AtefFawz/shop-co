@@ -7,7 +7,7 @@ import { Pagination } from "@/components/common/Pagination.client";
 
 export default function MyOrdersPage() {
   const { data, loading, refetch, page, totalPages, goToPage } =
-    useData("order/all");
+    useData("profile/my-orders");
 
   const orders = data?.data?.orders ?? [];
   const total = data?.pagination?.total ?? 0;
@@ -36,8 +36,8 @@ export default function MyOrdersPage() {
 
   return (
     <section className="min-h-screen bg-[#F8F8F8] px-1 sm:px-6 pt-28 sm:pt-32 pb-16">
-      <div className="container mx-auto px-3">
-        <div className="max-w-7xl space-y-6 sm:space-y-8">
+      <div className="Responsive">
+        <div className="Responsive space-y-6 sm:space-y-8">
           {/* ── Page Header ── */}
           <div className="flex items-end justify-between gap-4">
             <div>

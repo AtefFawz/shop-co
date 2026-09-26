@@ -1,8 +1,10 @@
 "use client";
 import { useState } from "react";
-import { Package, Star, Send, CheckCircle2, Trash2 } from "lucide-react";
+import { Package, Star, Send, CheckCircle2 } from "lucide-react";
 import api from "@/lib/api";
 import { toast } from "react-hot-toast";
+import HoldButton from "@/components/reactbits/HoldButton";
+
 interface Order {
   _id: string;
   createdAt: string;
@@ -24,27 +26,22 @@ export default function OrderCard({
   onReviewSuccess: () => void;
 }) {
   const [isReviewOpen, setIsReviewOpen] = useState(false);
-
   const [ratings, setRatings] = useState<{ [key: string]: number }>({});
-
   const [comments, setComments] = useState<{ [key: string]: string }>({});
-
   const [loading, setLoading] = useState<string | null>(null);
 
-  // const BACKEND_URL = process.env.NEXT_PUBLIC_API_URL + "/uploads/";
-
-  const getStatusColor = (status: string) => {
+  const getStatusBadge = (status: string) => {
     switch (status) {
       case "Delivered":
-        return "bg-green-100 text-green-700";
+        return "bg-emerald-50 text-emerald-700 border-emerald-200/60";
       case "Shipped":
-        return "bg-blue-100 text-blue-700";
+        return "bg-blue-50 text-blue-700 border-blue-200/60";
       case "Pending":
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-amber-50 text-amber-700 border-amber-200/60";
       case "Cancelled":
-        return "bg-red-100 text-red-700";
+        return "bg-rose-50 text-rose-700 border-rose-200/60";
       default:
-        return "bg-gray-100 text-gray-700";
+        return "bg-neutral-100 text-neutral-700 border-neutral-200";
     }
   };
 
@@ -57,13 +54,13 @@ export default function OrderCard({
         rating: ratings[productId],
         comment: comments[productId],
       });
-      
+
       toast.success("Review submitted successfully!");
       if (onReviewSuccess) onReviewSuccess();
       setRatings((prev) => {
-        const n = { ...prev };
-        delete n[productId];
-        return n;
+        const next = { ...prev };
+        delete next[productId];
+        return next;
       });
     } catch (error) {
       console.error(error);
@@ -76,147 +73,191 @@ export default function OrderCard({
   const deleteOrders = async (id: string) => {
     try {
       await api.delete(`order/${id}`);
-      toast.success("Deleted is successfully!");
+      toast.success("Order deleted successfully!");
     } catch (err: any) {
       if (err.response?.status === 404) {
-        return toast.error("Order not found or already deleted", err.message);
+        return toast.error("Order not found or already deleted");
       }
+      toast.error("Failed to delete order");
     }
   };
 
+  const visibleItems = order.orderItems.slice(0, 4);
+  const remainingCount = order.orderItems.length - 4;
+
   return (
-    <div className="border border-gray-100 rounded-4xl px-3 py-4 lg:p-6 mb-6 hover:shadow-2xl hover:shadow-black/5 transition-all bg-white group relative overflow-hidden">
-      {/* ─── Header ─── */}
-      <div className="flex justify-between items-start mb-8">
-        <div className="flex gap-4 md:gap-5">
-          <div className="bg-gray-50 p-4 rounded-2xl group-hover:bg-black group-hover:text-white transition-all duration-500 shadow-inner">
-            <Package className="w-6  h-6" />
+    <div className="relative mb-6 overflow-hidden rounded-[28px] border border-neutral-200/80 bg-white p-5 transition-all duration-300 hover:border-neutral-300 hover:shadow-[0_12px_36px_-10px_rgba(0,0,0,0.07)] sm:p-7">
+      {/* ─── 1. Header (Clean & Uncluttered) ─── */}
+      <div className="flex items-center justify-between gap-4 border-b border-neutral-100 pb-5">
+        <div className="flex items-center gap-3.5 sm:gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-neutral-100 text-neutral-900 transition-colors duration-300">
+            <Package className="h-5 w-5" />
           </div>
           <div>
-            <h3 className="font-black text-sm lg:text-xl tracking-tighter text-gray-900">
+            <h3 className="text-base font-black tracking-tight text-neutral-950 sm:text-lg">
               ORDER #{order._id.slice(-6).toUpperCase()}
             </h3>
-            <div className="flex items-center gap-2 mt-1">
-              <p className="text-[10px] text-gray-400 text-nowrap font-black uppercase tracking-widest">
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
                 {new Date(order.createdAt).toLocaleDateString("en-GB", {
                   day: "numeric",
                   month: "short",
                   year: "numeric",
                 })}
-              </p>
-              <span className="w-1 h-1 bg-gray-300 rounded-full" />
-              <p className="text-[10px] text-gray-400 text-nowrap font-black uppercase tracking-widest">
-                {order.orderItems.length} Items
-              </p>
+              </span>
+              <span className="h-1 w-1 rounded-full bg-neutral-300" />
+              <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                {order.orderItems.length}{" "}
+                {order.orderItems.length === 1 ? "Item" : "Items"}
+              </span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-2 w-fit  ">
-          <span
-            className={`px-5 w-full py-2 text-center rounded-full font-black uppercase tracking-[0.15em] text-[10px] shadow-sm ${getStatusColor(order.status)}`}
-          >
-            {order.status}
-          </span>
-          <button
-            onClick={() => {
-              deleteOrders(order._id);
-              onReviewSuccess && onReviewSuccess();
-            }}
-            className="w-full font-black  flex items-center justify-center rounded-full border-2 border-red-200 text-red-500 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all active:scale-95  cursor-pointer px-5 tracking-[0.15em] text-[10px] py-1 md:py-2 uppercase"
-            title="Delete"
-          >
-            Delete
-          </button>
-          {order.status === "Delivered" && (
-            <button
-              onClick={() => setIsReviewOpen(!isReviewOpen)}
-              className="flex items-center gap-2 text-[8px] md:text-[12px] font-black uppercase tracking-widest text-yellow-600 hover:bg-yellow-50 px-1 md:px-3 py-1.5 rounded-lg transition-all text-nowrap"
-            >
-              {isReviewOpen ? "Hide Reviews" : "Rate Experience"}
-              <Star
-                // size={14}
-                className={`${isReviewOpen ? "" : "fill-yellow-500 "} size-3 md:size-5`}
-              />
-            </button>
-          )}
-        </div>
+        {/* Status Badge Only */}
+        <span
+          className={`shrink-0 rounded-full border px-3.5 py-1.5 text-center text-[10px] font-black uppercase tracking-widest sm:px-4 sm:text-[11px] ${getStatusBadge(
+            order.status,
+          )}`}
+        >
+          {order.status}
+        </span>
       </div>
 
-      {/* ─── Item Images Stack ─── */}
-      <div className="flex items-center justify-between">
-        <div className="flex -space-x-4">
-          {order.orderItems.map((item: any, idx: number) => (
+      {/* ─── 2. Middle Row: Product Images & Total Price ─── */}
+      <div className="flex items-center justify-between py-6">
+        <div className="flex items-center -space-x-3 sm:-space-x-4">
+          {visibleItems.map((item, idx) => (
             <div
               key={idx}
-              className="relative h-14 w-14 rounded-2xl ring-4 ring-white overflow-hidden bg-gray-50 shadow-md transform hover:-translate-y-1 transition-transform"
+              className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl border-2 border-white bg-neutral-100 shadow-sm transition-transform duration-300 hover:z-10 hover:-translate-y-1 sm:h-16 sm:w-16"
             >
               <img
                 src={item.image}
                 alt={item.name}
-                className="object-cover h-full w-full"
+                className="h-full w-full object-cover"
               />
             </div>
           ))}
+          {remainingCount > 0 && (
+            <div className="relative flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-white bg-neutral-900 text-xs font-black text-white shadow-sm sm:h-16 sm:w-16">
+              +{remainingCount}
+            </div>
+          )}
         </div>
+
         <div className="text-right">
-          <p className="text-[10px] font-black uppercase text-gray-400 tracking-widest mb-1">
-            Final Amount
+          <p className="text-[10px] font-black uppercase tracking-widest text-neutral-400">
+            Total Amount
           </p>
-          <p className="font-black text-xl md:text-3xl text-gray-900 tracking-tighter">
+          <p className="mt-0.5 text-2xl font-black tracking-tight text-neutral-950 sm:text-3xl">
             ${order.totalPrice.toLocaleString()}
           </p>
         </div>
       </div>
 
-      {/* ─── Expandable Review Section ─── */}
+      {/* ─── 3. Action Footer (Responsive Action Center) ─── */}
+      <div className="flex flex-col-reverse gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* Delete Action (Adapts to 100% width on mobile without breaking) */}
+        <div className="w-full sm:w-auto [&>*]:w-full sm:[&>*]:w-auto">
+          <HoldButton
+            doneLabel="Deleted"
+            backgroundColor="#FFFFFF"
+            fillColor="#DC2626"
+            textColor="#DC2626"
+            fillTextColor="#FFFFFF"
+            size="sm"
+            radius={20}
+            fillDirection="right"
+            holdTime={1200}
+            releaseTime={200}
+            pressScale={0.96}
+            wave
+            waveAmplitude={5}
+            glow={false}
+            resetAfter={1200}
+            className="w-full border border-neutral-200 text-xs font-black uppercase tracking-wider shadow-none transition-all hover:border-red-300 hover:bg-red-50/30 sm:w-auto [&_*]:!font-black"
+            onHold={() => {
+              deleteOrders(order._id);
+              onReviewSuccess && onReviewSuccess();
+            }}
+          >
+            Hold to delete
+          </HoldButton>
+        </div>
+
+        {/* Review Action Button */}
+        {order.status === "Delivered" && (
+          <button
+            onClick={() => setIsReviewOpen(!isReviewOpen)}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-50 px-4 py-2.5 text-xs font-black uppercase tracking-wider text-neutral-800 transition-all hover:bg-neutral-100 sm:w-auto"
+          >
+            <Star
+              className={`h-4 w-4 ${
+                isReviewOpen
+                  ? "text-neutral-400"
+                  : "fill-amber-400 text-amber-400"
+              }`}
+            />
+            {isReviewOpen ? "Close Reviews" : "Rate Products"}
+          </button>
+        )}
+      </div>
+
+      {/* ─── 4. Expandable Review Drawer ─── */}
       {isReviewOpen && (
-        <div className="mt-8 pt-8 border-t border-gray-100 space-y-6 animate-in slide-in-from-top-4 duration-500">
-          {order.orderItems.map((item: any) => (
+        <div className="mt-5 space-y-4 border-t border-neutral-100 pt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+          {order.orderItems.map((item) => (
             <div
               key={item._id}
-              className="bg-[#FAFAFA] rounded-3xl p-6 border border-gray-50 hover:border-gray-200 transition-all"
+              className="rounded-2xl border border-neutral-100 bg-[#FAFAFA] p-4 sm:p-5"
             >
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-12 h-12 rounded-xl overflow-hidden bg-white shadow-sm">
-                  <img
-                    src={item.image}
-                    className="object-cover w-full h-full"
-                    alt={item.name}
-                  />
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 truncate">
+                  <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-neutral-200/60 bg-white">
+                    <img
+                      src={item.image}
+                      className="h-full w-full object-cover"
+                      alt={item.name}
+                    />
+                  </div>
+                  <p className="truncate text-xs font-black uppercase tracking-tight text-neutral-900 sm:text-sm">
+                    {item.name}
+                  </p>
                 </div>
-                <p className="font-black text-sm text-gray-800 uppercase tracking-tight truncate flex-1">
-                  {item.name}
-                </p>
 
-                <span className="flex items-center gap-1 text-[9px] font-black uppercase tracking-widest text-green-500 bg-green-50 px-2 py-1 rounded-md">
-                  <CheckCircle2 size={10} /> Verified
+                <span className="flex shrink-0 items-center gap-1 rounded-md bg-emerald-50 px-2 py-1 text-[9px] font-black uppercase tracking-wider text-emerald-600 border border-emerald-100">
+                  <CheckCircle2 size={11} /> Verified Purchase
                 </span>
               </div>
 
-              {/* Stars */}
-              <div className="flex items-center gap-1.5 mb-5 bg-white w-fit p-2 rounded-2xl shadow-sm border border-gray-50">
+              {/* Star Rating Select */}
+              <div className="mb-3 flex w-fit items-center gap-1 rounded-xl border border-neutral-200/60 bg-white p-1.5 shadow-sm">
                 {[1, 2, 3, 4, 5].map((num) => (
                   <button
                     key={num}
                     onClick={() =>
                       setRatings({ ...ratings, [item.product]: num })
                     }
-                    className="p-1 hover:scale-125 transition-transform"
+                    className="p-1 transition-transform hover:scale-110 active:scale-95"
                   >
                     <Star
-                      size={22}
-                      className={`${(ratings[item.product] || 0) >= num ? "fill-yellow-400 text-yellow-400" : "text-gray-200"}`}
+                      size={18}
+                      className={`${
+                        (ratings[item.product] || 0) >= num
+                          ? "fill-amber-400 text-amber-400"
+                          : "text-neutral-200"
+                      }`}
                     />
                   </button>
                 ))}
               </div>
 
-              {/* Input Area */}
-              <div className="relative group/input">
+              {/* Review Textarea & Submit */}
+              <div className="relative">
                 <textarea
-                  placeholder="Tell us what you liked or disliked..."
-                  className="w-full bg-white border border-gray-100 rounded-2xl p-5 text-sm focus:ring-2 focus:ring-black outline-none transition-all resize-none font-medium text-gray-600 shadow-sm"
+                  placeholder="Share your thoughts about this product..."
+                  className="w-full resize-none rounded-xl border border-neutral-200/80 bg-white p-3.5 pb-14 text-xs font-medium text-neutral-800 shadow-sm outline-none transition-all placeholder:text-neutral-400 focus:border-black focus:ring-1 focus:ring-black"
                   rows={2}
                   onChange={(e) =>
                     setComments({ ...comments, [item.product]: e.target.value })
@@ -229,13 +270,13 @@ export default function OrderCard({
                     loading === item.product ||
                     !comments[item.product]
                   }
-                  className="absolute bottom-4 right-4 bg-black text-white px-6 py-2.5 rounded-xl font-black text-[10px] uppercase tracking-widest hover:scale-105 disabled:opacity-20 transition-all shadow-xl shadow-black/10 flex items-center gap-2"
+                  className="absolute bottom-2.5 right-2.5 flex items-center gap-1.5 rounded-lg bg-black px-4 py-2 text-[10px] font-black uppercase tracking-widest text-white shadow-sm transition-all hover:bg-neutral-800 disabled:opacity-20"
                 >
                   {loading === item.product ? (
-                    "Sending..."
+                    "Submitting..."
                   ) : (
                     <>
-                      Post Review <Send size={12} />
+                      Post Review <Send size={11} />
                     </>
                   )}
                 </button>

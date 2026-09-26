@@ -5,9 +5,11 @@ import { MobileOrders } from "@/components/features/admin/orders/MobileOrder";
 import { DeskTopOrder } from "@/components/features/admin/orders/DesktopOrder";
 
 export default function AdminOrdersPage() {
-  const { loading, data, page, totalPages, goToPage, refetch } =
+  const { loading, data, page, totalPages, goToPage, refetch, total } =
     useData("/order/all");
-
+  const handleDeleteOrder = () => {
+    refetch();
+  };
   const orders =
     (data as unknown as { data?: { orders?: any[] } })?.data?.orders ?? [];
   return (
@@ -23,8 +25,8 @@ export default function AdminOrdersPage() {
               All Orders
             </h1>
             <p className="text-xs text-gray-400 font-medium mt-1">
-              {data?.pagination?.total ?? 0} order
-              {data?.pagination?.total !== 1 ? "s" : ""} total
+              {total ?? 0} order
+              {total !== 1 ? "s" : ""} total
             </p>
           </div>
 
@@ -53,7 +55,7 @@ export default function AdminOrdersPage() {
         ) : (
           <>
             {/* ── Empty state ── */}
-            {orders.length === 0 ? (
+            {total === 0 ? (
               <div className="bg-white rounded-3xl border border-gray-100 p-16 flex flex-col items-center justify-center text-center mx-3 sm:mx-6">
                 <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mb-4">
                   <Package size={24} className="text-gray-300" />
@@ -69,11 +71,15 @@ export default function AdminOrdersPage() {
                   goToPage={goToPage}
                   totalPages={totalPages}
                   page={page}
+                  total={total}
+                  onOrderDeleted={handleDeleteOrder}
                 />
                 <MobileOrders
                   orders={orders}
                   goToPage={goToPage}
                   page={page}
+                  total={total}
+                  onOrderDeleted={handleDeleteOrder}
                   totalPages={totalPages}
                 />
               </>

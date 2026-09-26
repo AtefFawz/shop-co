@@ -2,34 +2,60 @@
 import { useState } from "react";
 import api from "@/lib/api";
 import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 interface Props {
   orderId: string;
   currentStatus: string;
+  deletedOrderSuccess: any;
 }
 
-export default function OrderStatusUpdater({ orderId, currentStatus }: Props) {
+export default function OrderStatusUpdater({
+  orderId,
+  currentStatus,
+  deletedOrderSuccess,
+}: Props) {
   const [status, setStatus] = useState(currentStatus);
 
   const [loading, setLoading] = useState(false);
-
+  const router = useRouter();
   const handleStatusChange = async (newStatus: string) => {
     setLoading(true);
-    try {
-      await api.patch(`/order/${orderId}`, { status: newStatus });
 
-      setStatus(newStatus);
-      toast.success(`Order status updated to ${newStatus} 🎉`);
-    } catch (err: any) {
-      console.error("Update failed:", err);
-      toast.error(err.response?.data?.message || "Failed to update status");
+    if (newStatus === "Deleted") {
+      try {
+        setStatus(newStatus);
+        await api.delete(`/order/${orderId}`);
+        toast.success(`Order status  ${newStatus} done🎉`);
+        if (deletedOrderSuccess) deletedOrderSuccess();
+        // deletedOrderSuccess;
+        // window.location.reload();
+      } catch (err: any) {
+        console.error("deleted failed:", err);
+        toast.error(err.response?.data?.message || "Failed to update status");
+        setStatus(currentStatus);
+      } finally {
+        setLoading(false);
+      }
+    }
+    if (newStatus !== "Deleted") {
+      try {
+        await api.patch(`/order/${orderId}`, { status: newStatus });
+        setStatus(newStatus);
 
-      setStatus(currentStatus);
-    } finally {
-      setLoading(false);
+        toast.success(`Order status updated to ${newStatus} 🎉`);
+      } catch (err: any) {
+        console.error("Update failed:", err);
+        toast.error(err.response?.data?.message || "Failed to update status");
+
+        setStatus(currentStatus);
+      } finally {
+        setLoading(false);
+      }
     }
   };
 
+  //   console.log("status: " + status);
   const getBadgeStyles = (s: string) => {
     switch (s) {
       case "Pending":
@@ -39,6 +65,8 @@ export default function OrderStatusUpdater({ orderId, currentStatus }: Props) {
       case "Delivered":
         return "bg-green-100 text-green-700 border-green-200";
       case "Cancelled":
+        return "bg-red-100 text-red-700 border-red-200";
+      case "Deleted":
         return "bg-red-100 text-red-700 border-red-200";
       default:
         return "bg-gray-100 text-gray-700 border-gray-200";
@@ -59,6 +87,7 @@ export default function OrderStatusUpdater({ orderId, currentStatus }: Props) {
         <option value="Shipped">🚚 Shipped</option>
         <option value="Delivered">✅ Delivered</option>
         <option value="Cancelled">❌ Cancelled</option>
+        <option value="Deleted">🚫 Deleted</option>
       </select>
 
       {!loading && (

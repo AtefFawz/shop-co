@@ -16,6 +16,7 @@ const useData = <T = any, R = T>(
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<R | null>(null);
   const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -45,6 +46,7 @@ const useData = <T = any, R = T>(
 
         setData(finalData);
         setTotalPages(responseData?.pagination?.totalPages || 1);
+        setTotal(responseData?.pagination?.total || 1);
       } catch (error: any) {
         if (error.name !== "CanceledError" && error.code !== "ERR_CANCELED") {
           console.error(
@@ -79,6 +81,7 @@ const useData = <T = any, R = T>(
     totalPages,
     goToPage,
     refetch,
+    total,
   };
 };
 

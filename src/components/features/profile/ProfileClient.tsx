@@ -102,7 +102,7 @@ export function ProfileClient() {
 
   return (
     <section className="min-h-screen bg-[#F8F8F8] pb-24 lg:pb-0">
-      <div className="container mx-auto">
+      <div className="Responsive">
         {/* ── 1. MOBILE ONLY: Bottom Navigation Bar ── */}
         <div className="lg:hidden block fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[98%] max-w-full">
           <NavMobile arrayOfData={NAV_LINKS} active={active} goTo={goTo} />

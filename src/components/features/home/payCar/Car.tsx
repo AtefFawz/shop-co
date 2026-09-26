@@ -15,7 +15,7 @@ export const Car = () => {
   return (
     <section className="bg-[#F8F8F8]">
       <div className="min-h-screen px-3 sm:px-6 pb-16">
-        <div className="max-w-5xl container mx-auto space-y-6">
+        <div className="w-full Responsive space-y-6">
           {/* Header */}
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 mb-1.5 flex items-center gap-2">

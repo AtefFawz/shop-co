@@ -8,6 +8,7 @@ const MobileOrders = ({
   orders = [],
   page = 1,
   totalPages = 1,
+  onOrderDeleted,
   goToPage,
 }: DesktopOrderProps) => {
   return (
@@ -83,6 +84,7 @@ const MobileOrders = ({
                   <OrderStatusUpdater
                     orderId={order._id}
                     currentStatus={order.status}
+                    deletedOrderSuccess={onOrderDeleted}
                   />
                 </div>
               </div>

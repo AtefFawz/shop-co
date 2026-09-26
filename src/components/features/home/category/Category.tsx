@@ -24,7 +24,7 @@ export const Category = () => {
   };
 
   return (
-    <div className="content-center container mx-auto  px-4">
+    <div className="content-center Responsive">
       <h2 className="h1-main text-3xl font-bold mb-8 font-integral">
         BROWSE BY DRESS STYLE
       </h2>

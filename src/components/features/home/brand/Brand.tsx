@@ -7,7 +7,7 @@ import { ArrowUpRight } from "lucide-react";
 export const Brands = () => {
   return (
     <section className="bg-[#F8F8F8] py-16 sm:py-20 overflow-hidden">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-10">
+      <div className="Responsive">
         {/* ── Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-14">
           <div>

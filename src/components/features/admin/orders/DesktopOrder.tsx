@@ -4,7 +4,9 @@ export type DesktopOrderProps = {
   orders: any[];
   page: number;
   totalPages: number;
+  total: number;
   goToPage: (page: number) => void;
+  onOrderDeleted?: () => void;
 };
 //  DESKTOP TABLE  (≥ md)
 export const DeskTopOrder = ({
@@ -12,10 +14,12 @@ export const DeskTopOrder = ({
   page,
   totalPages,
   goToPage,
+  total,
+  onOrderDeleted,
 }: DesktopOrderProps) => {
   return (
     <div>
-      {orders.length > 0 && (
+      {total > 0 && (
         <div className="hidden md:block bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden w-full">
           <table className="w-full border-collapse">
             <thead>
@@ -89,6 +93,7 @@ export const DeskTopOrder = ({
                     <OrderStatusUpdater
                       orderId={order._id}
                       currentStatus={order.status}
+                      deletedOrderSuccess={onOrderDeleted}
                     />
                   </td>
                 </tr>

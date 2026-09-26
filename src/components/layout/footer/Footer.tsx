@@ -33,7 +33,7 @@ export default function Footer() {
     <div className="  ">
       <Newsletter />
       <div className="bg-[#F0F0F0] ">
-        <div className="container mx-auto w-full py-10 flex items-center justify-between flex-wrap ">
+        <div className="Responsive w-full py-10 flex items-center justify-between flex-wrap ">
           <div className="md:w-[20%] w-full px-4">
             <Media />
           </div>

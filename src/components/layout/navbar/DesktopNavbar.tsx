@@ -10,6 +10,9 @@ import NavIcons from "./NavIcons";
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import NotificationDropdown from "@/components/notifications/NotificationDropdown";
+import StrokeText from "@/components/reactbits/StrokeText";
+import { FontStyles } from "next/dist/next-devtools/dev-overlay/font/font-styles";
+import { italic } from "next/dist/lib/picocolors";
 
 export default function DesktopNavbar() {
   const pathname = usePathname();
@@ -54,10 +57,27 @@ export default function DesktopNavbar() {
       <header className="grid grid-cols-9 content-center md:gap-x-2 2xl:gap-x-6 w-full justify-items-stretch">
         {/* Logo & Links */}
         <nav className="flex md:gap-x-3 gap-7 lg:gap-x-4 xl:gap-10 items-center w-full 2xl:col-span-4 col-span-5 justify-evenly">
-          <h1 className="font-[1000] tracking-wider italic text-lg md:text-xl xl:text-2xl">
-            SHOP.CO
-          </h1>
+          {/* <h1 className="font-[1000] tracking-wider italic text-lg md:text-xl xl:text-2xl">
+            <StrokeText text="SHOP.CO" />
+          </h1> */}
 
+          <StrokeText
+            text="SHOP.CO"
+            strokeColor="#27272A"
+            fillColor="#18181B"
+            strokeWidth={1.6}
+            drawDuration={1.5}
+            fillDelay={0.25}
+            stagger={0.05}
+            ease="power2.out"
+            trigger="loop"
+            fillMode="wipe"
+            fontSize={28}
+            fontWeight={900}
+            letterSpacing={-1.5}
+            reverse={false}
+            style={{ width: "fit-content" }}
+          />
           {NAV_LINKS.map((item, ind) => (
             <ul key={ind}>
               <li

@@ -1,6 +1,6 @@
 export const ProductSkeleton = () => {
   return (
-    <section className="w-full container mx-auto px-4 space-y-4 animate-pulse">
+    <section className="w-full Responsive space-y-4 animate-pulse">
       <div className="aspect-square w-full bg-gray-200 rounded-2xl" />
 
       <div className="space-y-2">

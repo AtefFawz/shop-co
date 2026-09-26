@@ -2,7 +2,7 @@ import Image from "next/image";
 import { pay } from "@/data/payType";
 export const CopyRight = () => {
   return (
-    <div className=" text-gray-900 container mx-auto text-center flex justify-between md:flex-row flex-col items-center py-4 mt-10 border-t-2 w-full border-gray-300 ">
+    <div className=" text-gray-900 Responsive text-center flex justify-between md:flex-row flex-col items-center py-4 mt-10 border-t-2 w-full border-gray-300 ">
       <div className=" w-full text-center  md:text-start">
         <p className="md:text-lg text-sm text-gray-500 tracking-wide ">
           &copy; {new Date().getFullYear()} Shop.co. All rights reserved.
