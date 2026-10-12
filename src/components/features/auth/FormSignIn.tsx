@@ -68,7 +68,7 @@ const FormSignIn = () => {
       {/* ── Forgot password ── */}
       <div className="flex justify-end pt-1">
         <Link
-          href="/forgot-password"
+          href="/auth/forgot-password"
           className="text-xs font-bold text-gray-500 hover:text-black underline underline-offset-4 decoration-gray-300 hover:decoration-black transition-all"
         >
           Forgot password?

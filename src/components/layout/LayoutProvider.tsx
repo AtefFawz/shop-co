@@ -11,7 +11,13 @@ export default function LayoutProvider({
 }) {
   const pathname = usePathname();
 
-  const hideLayoutRoutes = ["/auth/signin", "/auth/signup"];
+  const hideLayoutRoutes = [
+    "/auth/signin",
+    "/auth/signup",
+    "/auth/forgot-password",
+    "/auth/reset-password",
+    "/user/profile",
+  ];
   const shouldHide = hideLayoutRoutes.includes(pathname);
 
   return (

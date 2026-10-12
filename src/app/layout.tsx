@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 // @ts-ignore: CSS import side-effect type declarations missing
 import "./globals.css";
-import LayoutProvider from "../components/layout/LayoutProvider";
 import { AuthWatcher } from "@/lib/AuthWatcher";
 import { Toaster } from "react-hot-toast";
 
@@ -36,7 +35,7 @@ export default async function RootLayout({
       >
         <NotificationListener />
         <AuthWatcher />
-        <LayoutProvider>{children}</LayoutProvider>
+        {children}
         <Toaster position="top-center" />
       </body>
     </html>

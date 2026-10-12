@@ -40,7 +40,7 @@ export const SidebarDesktop = ({
 
   return (
     <aside
-      className={`hidden lg:flex flex-col sticky top-20 h-[calc(100vh-6rem)] shrink-0 bg-white rounded-3xl border border-gray-200/80 shadow-xs transition-all duration-300 ease-in-out select-none ${
+      className={`hidden lg:flex flex-col h-screen shrink-0 bg-white border-r border-gray-200/80 shadow-sm transition-all duration-300 ease-in-out select-none z-40 ${
         open ? "w-68 xl:w-72 p-4" : "w-20 p-3"
       }`}
     >
@@ -182,7 +182,6 @@ export const SidebarDesktop = ({
         </button>
       </div>
 
-      {/* تنظيف السكرول بار للمتصفحات */}
       <style jsx global>{`
         .scrollbar-none {
           -ms-overflow-style: none;

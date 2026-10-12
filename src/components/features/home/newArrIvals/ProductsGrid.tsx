@@ -47,7 +47,7 @@ export default function NewArrivals() {
       </div>
       <div className=" w-full flex justify-center items-center py-8 ">
         <SpecularButton
-          size="md"
+          size="sm"
           radius={999}
           baseColor="#99a1af"
           lineColor="#000000"

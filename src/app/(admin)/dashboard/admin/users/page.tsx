@@ -14,7 +14,7 @@ export default function AdminUsers() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F8]">
-      <div className="max-w-6xl mx-auto space-y-6">
+      <div className="Responsive space-y-6">
         {/* Header */}
         <div className="flex items-end justify-between gap-4 px-3 sm:px-6 pt-6">
           <div>

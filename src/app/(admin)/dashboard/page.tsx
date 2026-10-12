@@ -17,7 +17,7 @@ import { StatCard, StatCardProps } from "@/components/features/admin/StateCard";
 import { getDashboardStats } from "@/lib/apiServer";
 import { products } from "@/lib/Products";
 import { Product } from "@/types";
-import { calculateTrend } from "@/app/utils/formatters";
+import { calculateTrend } from "@/utils/formatters";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { LowStackList } from "@/components/dashboard/LowStockList";
 
@@ -101,7 +101,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F8F8] py-6 sm:py-8">
-      <div className="w-full  lg:px-8 max-w-[1400px] mx-auto space-y-6">
+      <div className="Responsive space-y-6">
         {/* ── Header ── */}
         <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200/60">
           <div>
