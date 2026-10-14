@@ -195,8 +195,7 @@ export default function ForgotPasswordPage() {
       onMouseMove={handleMouseMove}
       className="min-h-screen w-full overflow-x-clip bg-[#F4F4F5] text-black antialiased selection:bg-black selection:text-white"
     >
-      {/* ================= الهيدر الأسود للموبايل والتابلت ================= */}
-      <header className="relative overflow-hidden bg-[#050505] px-4 pb-14 pt-5 text-white sm:px-8 sm:pb-16 sm:pt-6 lg:hidden">
+      <header className="relative overflow-hidden bg-[#050505] px-4 pb-4 pt-5 text-white sm:px-8 sm:pb-16 sm:pt-6 lg:hidden">
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 opacity-[0.06]"
@@ -229,7 +228,6 @@ export default function ForgotPasswordPage() {
         </div>
       </header>
 
-      {/* ================= التقسيم الرئيسي: 50% أسود | 50% فورم ================= */}
       <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-12">
         {/* ================= LEFT PANEL (6 Columns) ================= */}
         <aside className="relative hidden flex-col justify-between overflow-hidden bg-[#050505] p-10 text-white lg:col-span-6 lg:flex xl:p-14 2xl:p-18">
@@ -251,9 +249,8 @@ export default function ForgotPasswordPage() {
             }}
           />
 
-          <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-white/[0.04] blur-3xl" />
+          <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-white/4 blur-3xl" />
 
-          {/* الرقم المائي في الخلفية */}
           <AnimatePresence mode="wait">
             <motion.span
               key={`watermark-${visualStep}`}
@@ -276,7 +273,7 @@ export default function ForgotPasswordPage() {
               SHOP.CO
             </Link>
 
-            <span className="flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.06] px-3.5 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.16em] text-neutral-200 backdrop-blur-md">
+            <span className="flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-3.5 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.16em] text-neutral-200 backdrop-blur-md">
               <span
                 className={`h-1.5 w-1.5 animate-ping rounded-full ${
                   otpStatus === "error" ? "bg-red-500" : "bg-emerald-400"
@@ -505,7 +502,7 @@ export default function ForgotPasswordPage() {
         </aside>
 
         {/* ================= RIGHT PANEL (6 Columns - Form Area) ================= */}
-        <section className="relative -mt-8 flex min-w-0 items-center justify-center px-3.5 pb-8 sm:px-6 lg:col-span-6 lg:mt-0 lg:p-10 xl:p-14">
+        <div className="relative -mt-8 flex min-w-0 items-center justify-center px-3.5 pb-8 sm:px-6 lg:col-span-6 lg:mt-0 lg:p-10 xl:p-14">
           <div className="w-full max-w-[460px]">
             {/* Form Card */}
             <motion.div
@@ -1145,7 +1142,7 @@ export default function ForgotPasswordPage() {
               </div>
             </motion.div>
           </div>
-        </section>
+        </div>
       </div>
     </main>
   );

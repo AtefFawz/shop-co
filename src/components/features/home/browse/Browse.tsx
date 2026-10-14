@@ -12,9 +12,9 @@ export default function Browse() {
     router.push("/shop");
   };
   return (
-    <div className="Responsive p-4 md:p-16 bg-[#F0F0F0] rounded-2xl">
+    <div className=" p-4 md:p-16 bg-[#F0F0F0] rounded-2xl">
       <Heading title="BROWSE BY dress STYLE" />
-      <div className="grid md:grid-cols-3 grid-cols-1 gap-4 w-full auto-rows-[200px] md:auto-rows-[280px] pt-16 group">
+      <div className="grid md:grid-cols-3 grid-cols-1 gap-4 w-full auto-rows-[200px] md:auto-rows-[280px] pt-16 group Responsive ">
         {ItemsBrowse.map((e) => (
           <div
             key={e.name}

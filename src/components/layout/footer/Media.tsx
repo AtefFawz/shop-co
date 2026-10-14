@@ -1,22 +1,85 @@
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaFacebookF, FaGithub, FaInstagram, FaTwitter } from "react-icons/fa";
-import Heading from "@/components/ui/Heading";
+import { Globe } from "lucide-react";
+
+const SOCIALS = [
+  { Icon: FaTwitter, label: "Twitter", href: "#" },
+  { Icon: FaFacebookF, label: "Facebook", href: "#" },
+  { Icon: FaInstagram, label: "Instagram", href: "#" },
+  { Icon: FaGithub, label: "GitHub", href: "#" },
+];
+
 export const Media = () => {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   return (
-    <div>
-      <Heading title="Shop.co" styling="text-start" />
-      <p className="text-sm text-gray-500 mt-4">
-        We have clothes that suits your style and which you’re proud to wear.
+    <div className="flex flex-col items-start justify-between">
+      {/* اللوجو مع أنيميشن النقطة التفاعلية */}
+      <Link
+        href="/"
+        className="group inline-flex items-center gap-1.5 text-2xl font-black tracking-[-0.06em] text-black sm:text-3xl"
+      >
+        <span>SHOP.CO</span>
+        <span className="h-2 w-2 rounded-full bg-black transition-all duration-300 group-hover:scale-125 group-hover:bg-emerald-500" />
+      </Link>
+
+      {/* الوصف */}
+      <p className="mt-3.5 max-w-xs text-xs leading-relaxed text-neutral-600 sm:text-sm">
+        We have clothes that suit your style and which you’re proud to wear.
         From women to men.
       </p>
-      <div className="flex gap-4 mt-6">
-        {[FaFacebookF, FaTwitter, FaInstagram, FaGithub].map((Icon, index) => (
-          <span
-            key={index}
-            className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-700 hover:text-white cursor-pointer transition text-2xl p-1"
-          >
-            <Icon />
-          </span>
-        ))}
+
+      {/* بادج حالة الشحن العالمي */}
+      <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-neutral-300/80 bg-white/70 px-3 py-1 backdrop-blur-sm">
+        <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-500" />
+        <Globe size={11} className="text-neutral-500" />
+        <span className="font-mono text-[9.5px] font-bold uppercase tracking-wider text-neutral-600">
+          Worldwide Express Shipping
+        </span>
+      </div>
+
+      {/* أيقونات السوشيال ميديا مع Tooltip عائم */}
+      <div className="mt-6 flex items-center gap-3">
+        {SOCIALS.map(({ Icon, label, href }, index) => {
+          const isHovered = hoveredIndex === index;
+
+          return (
+            <div
+              key={index}
+              className="relative flex items-center justify-center"
+            >
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.span
+                    initial={{ opacity: 0, y: 6, scale: 0.85 }}
+                    animate={{ opacity: 1, y: -34, scale: 1 }}
+                    exit={{ opacity: 0, y: 4, scale: 0.85 }}
+                    transition={{ type: "spring", stiffness: 420, damping: 24 }}
+                    className="pointer-events-none absolute z-20 rounded-md bg-black px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-white shadow-md whitespace-nowrap"
+                  >
+                    {label}
+                  </motion.span>
+                )}
+              </AnimatePresence>
+
+              <motion.a
+                href={href}
+                aria-label={label}
+                onMouseEnter={() => setHoveredIndex(index)}
+                onMouseLeave={() => setHoveredIndex(null)}
+                whileHover={{ y: -3, scale: 1.06 }}
+                whileTap={{ scale: 0.92 }}
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-neutral-300/90 bg-white text-black shadow-xs transition-colors duration-200 hover:border-black hover:bg-black hover:text-white"
+              >
+                <Icon className="text-sm" />
+              </motion.a>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

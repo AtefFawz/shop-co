@@ -1,53 +1,113 @@
+"use client";
+
+import { motion, type Variants } from "framer-motion";
 import Newsletter from "./Newsletter";
 import { Feature } from "./Feature";
 import { Media } from "./Media";
 import { CopyRight } from "./CopyRight";
-export default function Footer() {
-  const all = [
-    { title: "COMPANY", items: ["About ", "Features ", "Works ", "Career "] },
-    {
-      title: "HELP",
-      items: [
-        "Customer Support",
-        "Delivery Details",
-        "Terms & Conditions",
-        "Privacy Policy",
-      ],
-    },
-    {
-      title: "FAQ",
-      items: ["Account", "Manage Deliveries", "Orders", "Payments"],
-    },
-    {
-      title: "RESOURCES",
-      items: [
-        "Free eBooks",
-        "Development Tutorial",
-        "How to - Blog",
-        "Youtube Playlist",
-      ],
-    },
-  ];
 
+const footerGroups = [
+  {
+    title: "COMPANY",
+    items: ["About", "Features", "Works", "Career"],
+  },
+  {
+    title: "HELP",
+    items: [
+      "Customer Support",
+      "Delivery Details",
+      "Terms & Conditions",
+      "Privacy Policy",
+    ],
+  },
+  {
+    title: "FAQ",
+    items: ["Account", "Manage Deliveries", "Orders", "Payments"],
+  },
+  {
+    title: "RESOURCES",
+    items: [
+      "Free eBooks",
+      "Development Tutorial",
+      "How to - Blog",
+      "Youtube Playlist",
+    ],
+  },
+];
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const columnVariants: Variants = {
+  hidden: { opacity: 0, y: 18 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { type: "spring", stiffness: 320, damping: 26 },
+  },
+};
+
+export default function Footer() {
   return (
-    <div className="  ">
-      <Newsletter />
-      <div className="bg-[#F0F0F0] ">
-        <div className="Responsive w-full py-10 flex items-center justify-between flex-wrap ">
-          <div className="md:w-[20%] w-full px-4">
-            <Media />
-          </div>
-          <div className="md:w-[77%] xl:w-[70%] w-full flex justify-evenly items-center mt-6 flex-wrap gap-6 px-2">
-            {" "}
-            {all.map((item, index) => (
-              <div key={index} className="md:w-[20%] w-[40%]">
+    <footer className="relative mt-16 w-full select-none overflow-hidden sm:mt-24">
+      <div className="relative w-full">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute  top-1/2 bottom-0 z-0 bg-[#F0F0F0]"
+        />
+
+        <div className="relative z-10 mx-auto w-full px-4 sm:px-6 lg:px-8">
+          <Newsletter />
+        </div>
+      </div>
+
+      <div className="relative z-10 w-full bg-[#F0F0F0] pt-12 pb-8 sm:pt-16 sm:pb-12">
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-x-0 bottom-4 flex justify-center overflow-hidden select-none"
+        >
+          <span className="text-[18vw] font-black leading-none tracking-[-0.08em] text-black/2.5">
+            SHOP.CO
+          </span>
+        </div>
+
+        <div className="relative z-10 mx-auto w-full  px-4 sm:px-6 lg:px-8">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-4 lg:grid-cols-12 lg:gap-8"
+          >
+            <motion.div
+              variants={columnVariants}
+              className="col-span-2 sm:col-span-4 lg:col-span-4 lg:pr-8"
+            >
+              <Media />
+            </motion.div>
+
+            {footerGroups.map((item, index) => (
+              <motion.div
+                key={index}
+                variants={columnVariants}
+                className="col-span-1 sm:col-span-1 lg:col-span-2"
+              >
                 <Feature title={item.title} feature={item.items} />
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
+
           <CopyRight />
         </div>
       </div>
-    </div>
+    </footer>
   );
 }

@@ -49,7 +49,7 @@ export default async function RatingUi() {
             className="
               shrink-0
               w-full
-              px-4
+              px-1
               snap-center first:pl-4 last:pr-4
               md:w-1/2
               lg:w-2/5
