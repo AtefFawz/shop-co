@@ -26,7 +26,7 @@ body {
   @apply text-sm text-gray-500 md:text-sm lg:text-lg;
 }
 .Responsive {
-  @apply mx-auto  w-full px-2 lg:px-6  xl:px-10;
+  @apply mx-auto  w-full px-3 lg:px-6  xl:px-10;
 }
 .input-style {
   @apply w-full px-4 py-3 rounded-lg border border-gray-200 outline-none 

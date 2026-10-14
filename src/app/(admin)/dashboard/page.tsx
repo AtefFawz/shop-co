@@ -1,16 +1,21 @@
+// app/dashboard/page.tsx
 export const dynamic = "force-dynamic";
+
+import type { Metadata } from "next";
 import {
+  Activity,
   AlertTriangle,
   ArrowUpRight,
-  Boxes,
   Calendar,
-  Edit3,
+  CheckCircle2,
+  PackagePlus,
   ShoppingBag,
+  Sparkles,
+  Store,
   Tag,
   TrendingUp,
   Users,
 } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 
 import { StatCard, StatCardProps } from "@/components/features/admin/StateCard";
@@ -21,36 +26,60 @@ import { calculateTrend } from "@/utils/formatters";
 import { RevenueChart } from "@/components/dashboard/RevenueChart";
 import { LowStackList } from "@/components/dashboard/LowStockList";
 
-export default async function DashboardPage() {
-  const stats = await getDashboardStats();
+export const metadata: Metadata = {
+  title: "Command Center · Dashboard",
+  description:
+    "SHOP.CO real-time executive telemetry on revenue, live orders, and catalog stock health.",
+};
 
-  const productsResponse = await products("product");
+export default async function DashboardPage() {
+  const [stats, productsResponse] = await Promise.all([
+    getDashboardStats(),
+    products("product"),
+  ]);
 
   const allProducts: Product[] = productsResponse?.data?.Products || [];
-
-  const totalCount = productsResponse?.pagination?.total;
+  const totalCount = productsResponse?.pagination?.total ?? allProducts.length;
 
   const lowStockProducts = allProducts.filter(
     (p: any) => (p.countInStock ?? 10) <= 5,
   );
 
   const {
-    onSaleCount: onSaleProducts,
-    lowStockCount,
-    outOfStockCount: outOfStockProducts,
-  } = productsResponse.stats;
+    onSaleCount: onSaleProducts = 0,
+    lowStockCount = 0,
+    outOfStockCount: outOfStockProducts = 0,
+  } = productsResponse?.stats || {};
+
+  const safeTotal = Math.max(totalCount, 1);
 
   const salePercentage = Math.min(
-    Math.round((onSaleProducts / Math.max(totalCount, 1)) * 100),
+    Math.round((onSaleProducts / safeTotal) * 100),
     100,
   );
 
   const lowStockPercentage = Math.min(
-    Math.round((lowStockCount / Math.max(totalCount, 1)) * 100),
+    Math.round((lowStockCount / safeTotal) * 100),
     100,
   );
 
-  // 1. Calculate trends for revenue, orders, and users using the calculateTrend function
+  const healthyCount = Math.max(
+    totalCount - lowStockCount - outOfStockProducts,
+    0,
+  );
+  const healthyPercentage = Math.max(
+    0,
+    Math.min(Math.round((healthyCount / safeTotal) * 100), 100),
+  );
+
+  // Executive derived metrics
+  const totalRevenue = stats?.totalRevenue ?? 0;
+  const totalOrders = stats?.totalOrders ?? 0;
+  const pendingOrders = stats?.pendingOrders ?? 0;
+  const avgOrderValue =
+    totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+
+  // Calculate dynamic trends
   const revenueTrend = calculateTrend(
     stats?.currentMonthRevenue,
     stats?.lastMonthRevenue,
@@ -63,23 +92,24 @@ export default async function DashboardPage() {
     stats?.currentMonthUsers,
     stats?.lastMonthUsers,
   );
+
   const statCards: StatCardProps[] = [
     {
       title: "Total Revenue",
-      value: stats?.totalRevenue ?? 0,
+      value: totalRevenue,
       icon: TrendingUp,
-      trend: revenueTrend.trend, // 👈 ديناميكي (مثال: "+12.4%" أو "-5.2%")
-      trendUp: revenueTrend.trendUp, // 👈 ديناميكي (true / false)
+      trend: revenueTrend.trend,
+      trendUp: revenueTrend.trendUp,
       prefix: "$",
       subtitle: "vs. last month",
     },
     {
       title: "Total Orders",
-      value: stats?.totalOrders ?? 0,
+      value: totalOrders,
       icon: ShoppingBag,
       trend: ordersTrend.trend,
       trendUp: ordersTrend.trendUp,
-      subtitle: `${stats?.pendingOrders ?? 0} pending`,
+      subtitle: `${pendingOrders} pending fulfillment`,
     },
     {
       title: "Total Customers",
@@ -87,41 +117,80 @@ export default async function DashboardPage() {
       icon: Users,
       trend: usersTrend.trend,
       trendUp: usersTrend.trendUp,
-      subtitle: `+${stats?.currentMonthUsers ?? 0} today`,
+      subtitle: `+${stats?.currentMonthUsers ?? 0} joined this month`,
     },
     {
       title: "Low Stock Items",
       value: lowStockCount,
       icon: AlertTriangle,
-      trend: lowStockCount > 0 ? "Action Needed" : "Healthy",
+      trend: lowStockCount > 0 ? "Action Needed" : "Optimal",
       trendUp: lowStockCount === 0,
-      subtitle: `${lowStockPercentage} depleted`,
+      subtitle: `${lowStockPercentage}% of catalog`,
     },
   ];
 
+  const circumference = 2 * Math.PI * 38;
+  const healthStrokeOffset =
+    circumference - (healthyPercentage / 100) * circumference;
+
   return (
-    <div className="min-h-screen bg-[#F8F8F8] py-6 sm:py-8">
-      <div className="Responsive space-y-6">
-        {/* ── Header ── */}
-        <header className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-gray-200/60">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="w-2.5 h-1 bg-black rounded-full" />
-              <p className="text-[9px] font-black uppercase tracking-[0.2em] text-gray-400">
-                Shop.co Command Center
-              </p>
+    <div className="relative isolate min-h-screen overflow-hidden bg-[#F4F3F4] py-6 text-[#111111] sm:py-8">
+      <style>{`
+        @keyframes dashFadeUp {
+          0% {
+            opacity: 0;
+            transform: translate3d(0, 20px, 0) scale(0.99);
+          }
+          100% {
+            opacity: 1;
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+        }
+
+        .dash-enter-1 { animation: dashFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both; }
+        .dash-enter-2 { animation: dashFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.10s both; }
+        .dash-enter-3 { animation: dashFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both; }
+        .dash-enter-4 { animation: dashFadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both; }
+      `}</style>
+
+      {/* Architectural Studio Grid */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_85%_70%_at_50%_25%,#000_55%,transparent_100%)]"
+      />
+
+      <div className="Responsive relative z-10 space-y-6">
+        {/* 1. EXECUTIVE COMMAND HEADER */}
+        <header className="dash-enter-1 flex flex-col justify-between gap-5 rounded-3xl border border-white/90 bg-white/90 p-5 shadow-[0_12px_36px_-12px_rgba(0,0,0,0.06)] backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-[#F4F3F4] px-3 py-1">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+              </span>
+              <span className="text-[9px] font-black uppercase tracking-[0.22em] text-neutral-700">
+                SHOP.CO COMMAND CENTER · LIVE TELEMETRY
+              </span>
             </div>
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-gray-900 leading-tight">
-              Dashboard Overview
-            </h1>
-            <p className="text-xs text-gray-400 font-medium mt-0.5">
-              Telemetry on revenue, live orders, and catalog stock.
+
+            <div className="flex flex-wrap items-baseline gap-3">
+              <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-[#111111] sm:text-3xl">
+                Dashboard Overview
+              </h1>
+              <span className="hidden font-mono text-[11px] font-bold text-neutral-400 sm:inline-block">
+                // STUDIO EDITION 2026
+              </span>
+            </div>
+
+            <p className="text-xs font-medium text-neutral-500">
+              Real-time financial trajectory, order fulfillment velocity, and
+              catalog stock health.
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-2 bg-white border border-gray-200/80 px-3 py-1.5 rounded-xl shadow-2xs text-xs font-bold text-gray-600 text-nowrap">
-              <Calendar size={13} className="text-gray-400" />
+          <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex items-center gap-2 rounded-2xl border border-neutral-200/90 bg-[#F8F8F8] px-3.5 py-2.5 text-xs font-bold text-neutral-700">
+              <Calendar size={14} className="text-neutral-900" />
               <span>
                 {new Date().toLocaleDateString("en-US", {
                   month: "short",
@@ -130,102 +199,285 @@ export default async function DashboardPage() {
                 })}
               </span>
             </div>
+
+            <Link
+              href="/"
+              className="group inline-flex items-center gap-2 rounded-2xl border border-neutral-200/90 bg-white px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-neutral-800 transition-all duration-200 hover:border-black hover:bg-neutral-50"
+            >
+              <Store size={14} />
+              <span className="hidden sm:inline">Storefront</span>
+              <ArrowUpRight
+                size={13}
+                className="text-neutral-400 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black"
+              />
+            </Link>
+
             <Link
               href="/admin/products/add"
-              className="inline-flex items-center gap-1.5 bg-black text-white px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider hover:bg-gray-800 transition-all shadow-xs text-nowrap"
+              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-[#111111] px-4 py-2.5 text-xs font-black uppercase tracking-wider text-white shadow-[0_10px_25px_-6px_rgba(0,0,0,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-neutral-800"
             >
-              + Add Product
+              <PackagePlus size={15} />
+              <span>+ Add Product</span>
             </Link>
           </div>
         </header>
 
-        {/* ── Stat Cards ── */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4">
+        {/* 2. EXECUTIVE INTELLIGENCE RIBBON */}
+        <div className="dash-enter-2 relative overflow-hidden rounded-2xl bg-[#111111] px-5 py-3.5 text-white shadow-[0_14px_34px_-10px_rgba(0,0,0,0.25)]">
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-white">
+                <Sparkles size={14} />
+              </span>
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50">
+                  Executive Pulse
+                </p>
+                <p className="text-xs font-extrabold tracking-wide text-white">
+                  System Operating at {healthyPercentage}% Inventory Readiness
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-6 sm:gap-8">
+              <div>
+                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/45">
+                  Avg. Order Value
+                </span>
+                <span className="font-mono text-sm font-black text-white">
+                  ${avgOrderValue.toLocaleString()}
+                </span>
+              </div>
+
+              <span className="hidden h-6 w-px bg-white/15 sm:block" />
+
+              <div>
+                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/45">
+                  Active Promos
+                </span>
+                <span className="font-mono text-sm font-black text-emerald-400">
+                  {onSaleProducts} Items ({salePercentage}%)
+                </span>
+              </div>
+
+              <span className="hidden h-6 w-px bg-white/15 sm:block" />
+
+              <div>
+                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-white/45">
+                  Critical Restock
+                </span>
+                <span
+                  className={`font-mono text-sm font-black ${
+                    lowStockCount > 0 ? "text-amber-400" : "text-emerald-400"
+                  }`}
+                >
+                  {lowStockCount} SKU{lowStockCount === 1 ? "" : "s"}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. 3D KPI STAT CARDS GRID */}
+        <div className="dash-enter-2 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {statCards.map((card) => (
             <StatCard key={card.title} {...card} />
           ))}
         </div>
 
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start">
-          {/* Revenue Chart */}
-          {/* Revenue Analytics Chart: 8 Cols */}
+        {/* 4. ANALYTICS CHART (8 COLS) + 3D INVENTORY HEALTH (4 COLS) */}
+        <div className="dash-enter-3 grid grid-cols-1 items-stretch gap-5 xl:grid-cols-12">
           <RevenueChart stats={stats} />
 
-          {/* Stock Breakdown */}
-          <div className="xl:col-span-4 bg-white rounded-2xl border border-gray-200/70 p-4 sm:p-6 shadow-xs space-y-5">
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-gray-400">
-                Inventory Health
-              </p>
-              <h3 className="text-sm sm:text-base font-black uppercase tracking-tight text-gray-900 mt-0.5">
-                Stock Breakdown
-              </h3>
+          {/* 3D Inventory Health Studio */}
+          <div className="xl:col-span-4 flex flex-col justify-between rounded-3xl border border-white/90 bg-white p-5 shadow-[0_14px_40px_-14px_rgba(0,0,0,0.07)] sm:p-6">
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <Activity size={12} className="text-neutral-900" />
+                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-neutral-400">
+                    Inventory Telemetry
+                  </p>
+                </div>
+                <h3 className="mt-1 text-base font-black uppercase tracking-tight text-[#111111] sm:text-lg">
+                  Stock Breakdown
+                </h3>
+              </div>
+
+              <span
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider ${
+                  outOfStockProducts === 0
+                    ? "bg-emerald-500/10 text-emerald-700"
+                    : "bg-amber-500/15 text-amber-800"
+                }`}
+              >
+                <span
+                  className={`h-1.5 w-1.5 rounded-full ${
+                    outOfStockProducts === 0 ? "bg-emerald-500" : "bg-amber-500"
+                  }`}
+                />
+                {outOfStockProducts === 0 ? "Optimal" : "Watch"}
+              </span>
             </div>
 
-            <div className="space-y-3">
-              {/* On Sale */}
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-[11px] font-bold">
-                  <span className="text-gray-500 flex items-center gap-1.5">
-                    <Tag size={12} className="text-black" /> On Promotion
+            {/* Radial Gauge */}
+            <div className="my-5 flex items-center gap-5 rounded-2xl border border-neutral-100 bg-[#F8F8F8] p-4">
+              <div className="relative flex h-24 w-24 shrink-0 items-center justify-center">
+                <svg
+                  className="h-full w-full -rotate-90 transform"
+                  viewBox="0 0 96 96"
+                >
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="38"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    fill="transparent"
+                    className="text-neutral-200"
+                  />
+                  <circle
+                    cx="48"
+                    cy="48"
+                    r="38"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    strokeDasharray={circumference}
+                    strokeDashoffset={healthStrokeOffset}
+                    strokeLinecap="round"
+                    fill="transparent"
+                    className="text-[#111111] transition-all duration-1000 ease-out"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+                  <span className="font-mono text-lg font-black leading-none text-[#111111]">
+                    {healthyPercentage}%
                   </span>
-                  <span className="text-gray-900">
+                  <span className="mt-0.5 text-[8px] font-extrabold uppercase tracking-widest text-neutral-400">
+                    Healthy
+                  </span>
+                </div>
+              </div>
+
+              <div className="min-w-0 flex-1 space-y-1">
+                <p className="text-xs font-extrabold uppercase tracking-wide text-[#111111]">
+                  Catalog Readiness
+                </p>
+                <p className="text-[11px] leading-relaxed text-neutral-500">
+                  <strong className="font-bold text-neutral-900">
+                    {healthyCount}
+                  </strong>{" "}
+                  of{" "}
+                  <strong className="font-bold text-neutral-900">
+                    {totalCount}
+                  </strong>{" "}
+                  listed garments have optimal stock levels ready for dispatch.
+                </p>
+              </div>
+            </div>
+
+            {/* Telemetry Bars */}
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] font-bold">
+                  <span className="flex items-center gap-1.5 text-neutral-600">
+                    <CheckCircle2 size={13} className="text-emerald-600" />
+                    Optimal Stock (&gt;5 units)
+                  </span>
+                  <span className="font-mono text-neutral-900">
+                    {healthyPercentage}% ({healthyCount})
+                  </span>
+                </div>
+                <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
+                  <div
+                    className="h-full rounded-full bg-emerald-500 transition-all duration-700"
+                    style={{ width: `${healthyPercentage}%` }}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between text-[11px] font-bold">
+                  <span className="flex items-center gap-1.5 text-neutral-600">
+                    <Tag size={13} className="text-[#111111]" />
+                    On Promotion
+                  </span>
+                  <span className="font-mono text-neutral-900">
                     {salePercentage}% ({onSaleProducts})
                   </span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
                   <div
-                    className="h-full bg-black rounded-full transition-all duration-700"
+                    className="h-full rounded-full bg-[#111111] transition-all duration-700"
                     style={{ width: `${salePercentage}%` }}
                   />
                 </div>
               </div>
 
-              {/* Low Stock */}
               <div className="space-y-1.5">
-                <div className="flex justify-between text-[11px] font-bold">
-                  <span className="text-gray-500 flex items-center gap-1.5">
-                    <AlertTriangle size={12} className="text-amber-500" /> Low &
-                    Depleted
+                <div className="flex items-center justify-between text-[11px] font-bold">
+                  <span className="flex items-center gap-1.5 text-neutral-600">
+                    <AlertTriangle size={13} className="text-amber-500" />
+                    Low &amp; Depleted (≤5 units)
                   </span>
-                  <span className="text-gray-900">
+                  <span className="font-mono text-neutral-900">
                     {lowStockPercentage}% ({lowStockProducts.length})
                   </span>
                 </div>
-                <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+                <div className="h-2 w-full overflow-hidden rounded-full bg-neutral-100">
                   <div
-                    className="h-full bg-amber-500 rounded-full transition-all duration-700"
+                    className="h-full rounded-full bg-amber-500 transition-all duration-700"
                     style={{ width: `${lowStockPercentage}%` }}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="pt-2 border-t border-gray-100 grid grid-cols-2 gap-2.5">
-              <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                <p className="text-[9px] font-bold text-gray-400 uppercase">
+            {/* Bottom Mini Metric Cards */}
+            <div className="mt-5 grid grid-cols-3 gap-2.5 border-t border-neutral-100 pt-4">
+              <div className="rounded-2xl border border-neutral-200/70 bg-[#F8F8F8] p-3 transition-transform duration-300 hover:-translate-y-1">
+                <p className="text-[8px] font-extrabold uppercase tracking-wider text-neutral-400">
                   Live Catalog
                 </p>
-                <p className="text-base font-black text-gray-900 mt-0.5">
+                <p className="mt-1 font-mono text-lg font-black leading-none text-[#111111]">
                   {totalCount}
                 </p>
-                <p className="text-[9px] text-gray-400">Total Listed</p>
+                <p className="mt-1 text-[9px] font-medium text-neutral-400">
+                  Total Listed
+                </p>
               </div>
-              <div className="bg-gray-50/80 p-3 rounded-xl border border-gray-100">
-                <p className="text-[9px] font-bold text-gray-400 uppercase">
+
+              <div className="rounded-2xl border border-neutral-200/70 bg-[#F8F8F8] p-3 transition-transform duration-300 hover:-translate-y-1">
+                <p className="text-[8px] font-extrabold uppercase tracking-wider text-neutral-400">
+                  Low Stock
+                </p>
+                <p className="mt-1 font-mono text-lg font-black leading-none text-amber-600">
+                  {lowStockCount}
+                </p>
+                <p className="mt-1 text-[9px] font-medium text-neutral-400">
+                  Needs Restock
+                </p>
+              </div>
+
+              <div className="rounded-2xl border border-rose-500/15 bg-rose-50/40 p-3 transition-transform duration-300 hover:-translate-y-1">
+                <p className="text-[8px] font-extrabold uppercase tracking-wider text-rose-400">
                   Zero Stock
                 </p>
-                <p className="text-base font-black text-rose-600 mt-0.5">
+                <p className="mt-1 font-mono text-lg font-black leading-none text-rose-600">
                   {outOfStockProducts}
                 </p>
-                <p className="text-[9px] text-gray-400">Depleted</p>
+                <p className="mt-1 text-[9px] font-medium text-rose-400">
+                  Depleted
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* ── Low Stock WatchList ── */}
-        <LowStackList lowStockProducts={lowStockProducts} />
+        {/* 5. CRITICAL LOW STOCK WATCHLIST */}
+        <div className="dash-enter-4">
+          <LowStackList lowStockProducts={lowStockProducts} />
+        </div>
       </div>
     </div>
   );

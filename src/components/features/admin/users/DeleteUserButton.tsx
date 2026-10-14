@@ -1,4 +1,5 @@
 "use client";
+
 import { useState } from "react";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
@@ -7,12 +8,12 @@ import toast from "react-hot-toast";
 
 interface DeleteUserProps {
   userId: string;
-  userName: string;
+  userName?: string;
 }
 
 export default function DeleteUserButton({
   userId,
-  userName,
+  userName = "this user",
 }: DeleteUserProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,13 +23,13 @@ export default function DeleteUserButton({
     try {
       setLoading(true);
       await api.delete(`/admin/users/${userId}`);
-      toast.success(`User "${userName}" has been deleted`);
+      toast.success(`User "${userName}" has been permanently removed`);
       setIsOpen(false);
 
-      // توجيه الأدمن لصفحة اليوزرز بعد المسح بنجاح
-      router.push("/dashboard/users");
+      router.push("/dashboard/admin/users");
       router.refresh();
     } catch (error: any) {
+      console.error("Delete user failed:", error);
       toast.error(error.response?.data?.message || "Failed to delete user");
     } finally {
       setLoading(false);
@@ -37,76 +38,75 @@ export default function DeleteUserButton({
 
   return (
     <>
-      {/* 1. زرار المسح الرئيسي */}
+      {/* Main Delete Action Trigger */}
       <button
+        type="button"
         onClick={() => setIsOpen(true)}
-        className="flex text-xs 2xl:text-sm text-nowrap items-center gap-2 px-4 py-2 rounded-xl border-2 border-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all active:scale-95 group"
-        title="Delete User"
+        className="group inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-rose-200/80 bg-rose-50/50 px-4 py-2.5 text-xs font-black uppercase tracking-widest text-rose-600 transition-all hover:bg-rose-600 hover:text-white hover:border-rose-600 active:scale-95"
+        title="Delete User Account"
       >
         <Trash2
-          size={16}
-          className="group-hover:rotate-12 transition-transform"
+          size={14}
+          className="transition-transform duration-300 group-hover:rotate-12"
         />
-        <span className="text-[10px] font-black uppercase tracking-widest">
-          Delete User
-        </span>
+        <span className="hidden sm:inline">Delete Profile</span>
       </button>
 
-      {/* 2. الـ Confirmation Modal */}
+      {/* Confirmation Modal */}
       {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-in fade-in duration-300"
-            onClick={() => !loading && setIsOpen(false)}
-          />
-
-          {/* Modal Content */}
-          <div className="relative bg-white w-full max-w-sm rounded-[40px] p-8 shadow-2xl border border-gray-100 animate-in zoom-in-95 duration-200">
-            {/* Close Button */}
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm rounded-[2.5rem] border border-white/20 bg-white p-7 shadow-2xl animate-in zoom-in-95 duration-200">
+            {/* Close X Button */}
             <button
-              onClick={() => setIsOpen(false)}
-              className="absolute top-6 right-6 text-gray-400 hover:text-black transition-colors"
+              type="button"
+              onClick={() => !loading && setIsOpen(false)}
+              className="absolute top-6 right-6 cursor-pointer text-neutral-400 transition-colors hover:text-black"
             >
-              <X size={20} />
+              <X size={18} />
             </button>
 
             {/* Warning Icon */}
-            <div className="w-16 h-16 bg-red-50 rounded-3xl flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle size={30} className="text-red-500" />
+            <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-600 ring-8 ring-rose-500/5">
+              <AlertTriangle size={26} />
             </div>
 
-            {/* Text */}
-            <div className="text-center space-y-2 mb-8">
-              <h3 className="text-xl font-black uppercase tracking-tight text-gray-900">
-                Are you sure?
+            {/* Modal Text */}
+            <div className="mb-7 text-center space-y-1.5">
+              <h3 className="text-lg font-black uppercase tracking-tight text-[#111111]">
+                Purge User Account?
               </h3>
-              <p className="text-xs text-gray-400 font-medium leading-relaxed px-4">
-                You are about to delete{" "}
-                <span className="text-black font-bold">"{userName}"</span>. This
-                action is permanent and cannot be undone.
+              <p className="text-xs leading-relaxed text-neutral-500 px-2">
+                You are about to permanently delete{" "}
+                <strong className="text-black">&ldquo;{userName}&rdquo;</strong>
+                . All associated credentials and telemetry records will be
+                erased.
               </p>
             </div>
 
-            {/* Actions */}
+            {/* Modal Actions */}
             <div className="flex gap-3">
               <button
-                onClick={() => setIsOpen(false)}
+                type="button"
                 disabled={loading}
-                className="flex-1 py-4 rounded-2xl border-2 border-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-400 hover:border-gray-300 hover:text-gray-600 transition-all disabled:opacity-50"
+                onClick={() => setIsOpen(false)}
+                className="flex-1 cursor-pointer rounded-2xl border border-neutral-200 bg-white py-3.5 text-xs font-black uppercase tracking-wider text-neutral-700 transition-colors hover:border-black hover:bg-neutral-50 disabled:opacity-50"
               >
                 Cancel
               </button>
 
               <button
-                onClick={handleDelete}
+                type="button"
                 disabled={loading}
-                className="flex-1 py-4 rounded-2xl bg-red-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-red-600 shadow-lg shadow-red-200 transition-all disabled:opacity-70 flex items-center justify-center gap-2"
+                onClick={handleDelete}
+                className="flex-1 cursor-pointer rounded-2xl bg-rose-600 py-3.5 text-xs font-black uppercase tracking-wider text-white shadow-[0_10px_24px_-6px_rgba(225,29,72,0.5)] transition-all hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {loading ? (
-                  <Loader2 size={14} className="animate-spin" />
+                  <>
+                    <Loader2 size={14} className="animate-spin" />
+                    <span>Purging...</span>
+                  </>
                 ) : (
-                  "Yes, Delete"
+                  "Confirm Delete"
                 )}
               </button>
             </div>

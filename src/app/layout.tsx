@@ -1,11 +1,15 @@
-import type { Metadata } from "next";
+// app/layout.tsx
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 // @ts-ignore: CSS import side-effect type declarations missing
 import "./globals.css";
 import { AuthWatcher } from "@/lib/AuthWatcher";
 import { Toaster } from "react-hot-toast";
-
 import NotificationListener from "@/components/notifications/NotificationListener";
+
+/* -------------------------------------------------------------------------- */
+/*                                FONTS SETUP                                 */
+/* -------------------------------------------------------------------------- */
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,25 +22,173 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
   display: "swap",
 });
-export const metadata: Metadata = {
-  title: "Shop-co",
-  description: "Your one-stop shop for fashion and lifestyle products.",
+
+/* -------------------------------------------------------------------------- */
+/*                         SITE URL & VIEWPORT CONFIG                         */
+/* -------------------------------------------------------------------------- */
+
+const SITE_URL =
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/";
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F2F0F1" },
+    { media: "(prefers-color-scheme: dark)", color: "#111111" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  colorScheme: "light",
 };
+
+/* -------------------------------------------------------------------------- */
+/*                     PREMIUM SEO & SOCIAL SHARE METADATA                    */
+/* -------------------------------------------------------------------------- */
+
+export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: "SHOP.CO™ | Find Clothes That Match Your Style",
+    template: "%s — SHOP.CO™ Studio",
+  },
+  description:
+    "Discover meticulously crafted garments from 200+ international luxury houses. Curated streetwear, minimalist tailoring, and contemporary essentials.",
+  applicationName: "SHOP.CO",
+  authors: [{ name: "SHOP.CO Atelier", url: SITE_URL }],
+  generator: "Next.js",
+  keywords: [
+    "SHOP.CO",
+    "Luxury Streetwear",
+    "Contemporary Fashion",
+    "Designer Clothing",
+    "Minimalist Apparel",
+    "Online Fashion Store",
+    "Lookbook 2026",
+  ],
+  referrer: "origin-when-cross-origin",
+  creator: "SHOP.CO Studio",
+  publisher: "SHOP.CO International",
+  category: "fashion",
+
+  alternates: {
+    canonical: "/",
+  },
+
+  // How the link looks on WhatsApp, Facebook, LinkedIn, Discord, Telegram
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: "SHOP.CO™ — Official Online Flagship",
+    title: "SHOP.CO™ | Find Clothes That Match Your Style",
+    description:
+      "Explore 2,000+ high-quality pieces from 200+ global luxury brands. Free express shipping & verified authenticity.",
+  },
+
+  // How the link looks on X (Twitter)
+  twitter: {
+    card: "summary_large_image",
+    title: "SHOP.CO™ | Contemporary Fashion & Street Luxe",
+    description:
+      "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality.",
+    creator: "@shopco",
+  },
+
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+};
+
+/* -------------------------------------------------------------------------- */
+/*                                ROOT LAYOUT                                 */
+/* -------------------------------------------------------------------------- */
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Structured Data (JSON-LD) for Google Rich Results
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ClothingStore",
+    name: "SHOP.CO",
+    url: SITE_URL,
+    description:
+      "Contemporary fashion destination featuring 200+ international brands and 2,000+ curated garments.",
+    priceRange: "$$",
+    sameAs: ["https://instagram.com", "https://twitter.com"],
+  };
+
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased relative`}
+        className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen bg-[#F2F0F1] font-sans text-[#111111] antialiased selection:bg-[#111111] selection:text-white overflow-x-hidden`}
       >
+        {/* Google Rich Snippet Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+
+        {/* Global App Listeners */}
         <NotificationListener />
         <AuthWatcher />
+
+        {/* Main Content */}
         {children}
-        <Toaster position="top-center" />
+
+        {/* Bespoke Luxury Toast Notifications */}
+        <Toaster
+          position="top-center"
+          gutter={10}
+          containerStyle={{
+            top: 24,
+          }}
+          toastOptions={{
+            duration: 3500,
+            style: {
+              background: "rgba(17, 17, 17, 0.94)",
+              color: "#FFFFFF",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1px solid rgba(255, 255, 255, 0.14)",
+              borderRadius: "9999px",
+              padding: "12px 22px",
+              fontSize: "12px",
+              fontWeight: 700,
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+              boxShadow: "0 20px 45px -10px rgba(0, 0, 0, 0.35)",
+            },
+            success: {
+              iconTheme: {
+                primary: "#10B981",
+                secondary: "#111111",
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: "#EF4444",
+                secondary: "#FFFFFF",
+              },
+            },
+          }}
+        />
       </body>
     </html>
   );
