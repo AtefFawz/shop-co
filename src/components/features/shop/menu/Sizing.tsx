@@ -1,57 +1,87 @@
 "use client";
-import { useState } from "react";
+
+import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 
-const array = [
-  "XX-Small",
-  "X-Small",
-  "Small",
-  "Medium",
-  "Large",
-  "X-Large",
-  "XX-Large",
-  "3X-Large",
-  "4X-Large",
+const SIZES = [
+  { label: "XX-Small", short: "XXS" },
+  { label: "X-Small", short: "XS" },
+  { label: "Small", short: "S" },
+  { label: "Medium", short: "M" },
+  { label: "Large", short: "L" },
+  { label: "X-Large", short: "XL" },
+  { label: "XX-Large", short: "2XL" },
+  { label: "3X-Large", short: "3XL" },
+  { label: "4X-Large", short: "4XL" },
 ];
 
 export const Sizing = () => {
-  const [active, setActive] = useState(false);
+  const [active, setActive] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+
   return (
-    <div className="w-full border-b border-gray-100 pb-1">
+    <div className="w-full py-1">
       <button
+        type="button"
         onClick={() => setActive((p) => !p)}
-        className="flex items-center justify-between w-full py-4 cursor-pointer"
+        className="flex w-full cursor-pointer items-center justify-between py-3.5"
       >
-        <span className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-700">
-          Size
-        </span>
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-black uppercase tracking-[0.16em] text-neutral-800">
+            Garment Size
+          </span>
+          {selectedSize && (
+            <span className="rounded-md bg-[#111111] px-2 py-0.5 font-mono text-[9px] font-black text-white">
+              {selectedSize}
+            </span>
+          )}
+        </div>
         <ChevronDown
-          size={16}
-          className={`text-gray-400 transition-transform duration-300 ${active ? "rotate-180" : ""}`}
+          size={15}
+          className={`text-neutral-400 transition-transform duration-300 ${
+            active ? "rotate-180" : ""
+          }`}
         />
       </button>
 
       <div
-        className={`grid transition-[grid-template-rows] duration-500 ease-in-out ${
+        className={`grid transition-[grid-template-rows,opacity] duration-300 ease-in-out ${
           active ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
       >
         <div className="overflow-hidden">
-          <div className="grid grid-cols-3 md:grid-cols-2 gap-4 items-center justify-center">
-            {array.map((e: any, id: any) => (
-              <button
-                key={id}
-                style={{
-                  backgroundColor: selectedSize === e ? "black" : "#e5e7eb",
-                  color: selectedSize === e ? "white" : "gray",
-                }}
-                onClick={() => setSelectedSize(e)}
-                className=" min-w-fit px-4 py-1 text-sm font-bold md:text-sm lg:text-lg text-nowrap rounded-full cursor-pointer w-16 col-span-1"
-              >
-                {e}
-              </button>
-            ))}
+          <div className="grid grid-cols-3 gap-2 pb-4 pt-1">
+            {SIZES.map((s) => {
+              const isSelected = selectedSize === s.label;
+              return (
+                <button
+                  key={s.label}
+                  type="button"
+                  onClick={() =>
+                    setSelectedSize((prev) =>
+                      prev === s.label ? null : s.label,
+                    )
+                  }
+                  title={s.label}
+                  className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border py-2 px-2 transition-all duration-200 active:scale-95 ${
+                    isSelected
+                      ? "border-black bg-[#111111] text-white shadow-sm"
+                      : "border-neutral-200/80 bg-[#F8F8F8] text-neutral-700 hover:border-black hover:bg-white"
+                  }`}
+                >
+                  <span className="font-mono text-xs font-black leading-none">
+                    {s.short}
+                  </span>
+                  <span
+                    className={`mt-1 text-[8px] font-bold uppercase tracking-wider ${
+                      isSelected ? "text-white/65" : "text-neutral-400"
+                    }`}
+                  >
+                    {s.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>

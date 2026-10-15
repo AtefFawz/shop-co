@@ -81,9 +81,9 @@ export default function AdminLayout({
       />
 
       <div className="flex flex-1 flex-col overflow-hidden relative">
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 scrollbar-none">
+        <main className="flex-1 overflow-y-auto  scrollbar-none">
           <div className="max-w-full mx-auto pb-24 lg:pb-0">
-            <div className="lg:hidden flex items-center justify-between mb-8">
+            <div className="lg:hidden flex items-center justify-between m-4">
               <h1 className="text-2xl font-black uppercase tracking-tighter italic">
                 {collection.find((i) => i.href === path)?.label || "Dashboard"}
               </h1>

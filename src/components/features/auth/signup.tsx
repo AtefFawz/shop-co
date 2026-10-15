@@ -1,88 +1,202 @@
 "use client";
+
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  ArrowLeft,
+  Sparkles,
+  Crown,
+  CheckCircle2,
+  ArrowUpRight,
+  ShieldCheck,
+} from "lucide-react";
 import Signup from "@/assets/shop/signup.png";
 import { FormSignUp } from "./FormSignUp";
 
 export default function SignUpPage() {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
+  const handleGoogleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}auth/google`;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
+    setTilt({ x, y });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
   return (
-    <div className="w-full min-h-screen flex bg-white">
-      {/* ══ LEFT — Image Panel (desktop only) ══ */}
-      <div className="hidden md:flex md:w-1/2 h-screen relative bg-gray-950 overflow-hidden flex-shrink-0">
+    <div className="relative flex min-h-screen w-full overflow-hidden bg-[#F4F3F4] text-[#111111] selection:bg-[#111111] selection:text-white">
+      {/* ================================================================== */}
+      {/* LEFT — 3D VIP CLUB SHOWCASE STAGE (DESKTOP ONLY)                   */}
+      {/* ================================================================== */}
+      <div
+        ref={stageRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ perspective: "1300px" }}
+        className="relative hidden h-screen w-1/2 shrink-0 flex-col justify-between overflow-hidden bg-[#0D0D0F] p-8 text-white md:flex lg:p-12"
+      >
+        {/* Background Editorial Image */}
         <Image
           src={Signup}
-          alt="Sign Up Fashion"
+          alt="SHOP.CO VIP Club"
           fill
-          className="object-cover opacity-80"
           priority
+          sizes="50vw"
+          className="object-cover opacity-55 transition-transform duration-1000 ease-out hover:scale-105"
         />
-        {/* Gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/10" />
 
-        {/* Top label */}
-        <div className="absolute top-10 left-10 z-10">
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/50 flex items-center gap-2">
-            <span className="w-4 h-px bg-white/40 inline-block" />
-            Shop.co
+        {/* Multi-Layer Studio Vignette */}
+        <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-[#0D0D0F] via-[#0D0D0F]/45 to-black/30" />
+        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_75%_65%_at_50%_50%,#000_40%,transparent_100%)]" />
+
+        {/* 1. Top Navigation */}
+        <div className="relative z-20 flex items-center justify-between">
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-white backdrop-blur-md transition-all hover:bg-white hover:text-black"
+          >
+            <ArrowLeft
+              size={13}
+              className="transition-transform duration-300 group-hover:-translate-x-1"
+            />
+            <span>Back to Flagship</span>
+          </Link>
+
+          <span className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-white/80 backdrop-blur-md">
+            VIP CLUB // 2026
           </span>
         </div>
 
-        {/* Bottom copy */}
-        <div className="absolute bottom-12 left-10 right-10 z-10">
-          <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-none mb-3">
-            Join the
-            <br />
-            Club.
-          </h2>
-          <p className="text-sm text-white/60 leading-relaxed max-w-xs font-medium">
-            Create your account today and get exclusive access to new drops and
-            member-only sales.
-          </p>
+        {/* 2. Center Interactive 3D Holographic VIP Membership Card */}
+        <div className="relative z-20 my-auto flex flex-col items-center justify-center">
+          <div
+            style={{
+              transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+              transformStyle: "preserve-3d",
+            }}
+            className="w-full max-w-[390px] rounded-3xl border border-white/20 bg-white/10 p-6 shadow-[0_35px_80px_rgba(0,0,0,0.65)] backdrop-blur-2xl transition-transform duration-200 ease-out"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-xs font-black text-black">
+                  S.
+                </span>
+                <span className="text-xs font-black tracking-[0.24em] text-white">
+                  SHOP.CO™ PASS
+                </span>
+              </div>
+
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 px-2.5 py-1 font-mono text-[9px] font-black uppercase tracking-widest text-amber-300">
+                <Crown size={11} /> Founder Tier
+              </span>
+            </div>
+
+            <div className="my-6 space-y-1">
+              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-white/50">
+                Member Privileges Unlocked
+              </p>
+              <p className="text-2xl font-black uppercase tracking-tight text-white">
+                All-Access Atelier Pass
+              </p>
+            </div>
+
+            <div className="space-y-2 border-t border-white/15 pt-4 text-xs font-semibold text-white/85">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-400" />
+                <span>Early access to limited season drops</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-400" />
+                <span>Complimentary priority express dispatch</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={14} className="text-emerald-400" />
+                <span>Private member-only archive pricing</span>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Decorative corner line */}
-        <div className="absolute bottom-0 right-0 w-32 h-32 border-l border-t border-white/10 rounded-tl-3xl" />
+        {/* 3. Bottom Editorial Headline */}
+        <div className="relative z-20 space-y-2">
+          <h2 className="text-4xl font-black uppercase leading-[0.92] tracking-[-0.05em] text-white lg:text-5xl">
+            Join The
+            <br />
+            <span className="text-white/50">Atelier Club.</span>
+          </h2>
+          <p className="max-w-sm text-xs font-medium leading-relaxed text-white/65">
+            Join 30,000+ style enthusiasts curating their wardrobe from over 200
+            international luxury houses.
+          </p>
+        </div>
       </div>
 
-      {/* ══ RIGHT — Form Panel ══ */}
-      <div className="w-full md:w-1/2 flex items-center justify-center min-h-screen px-5 sm:px-8 lg:px-16 py-12 overflow-y-auto">
-        <div className="w-full max-w-[420px] space-y-7">
-          {/* Mobile logo */}
-          <div className="md:hidden">
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 flex items-center gap-2">
-              <span className="w-4 h-px bg-gray-300 inline-block" />
-              Shop.co
-            </span>
-          </div>
+      {/* ================================================================== */}
+      {/* RIGHT — ARCHITECTURAL SIGN-UP FORM PANEL                           */}
+      {/* ================================================================== */}
+      <div className="relative flex min-h-screen w-full flex-col justify-center overflow-y-auto px-4 py-8 sm:px-8 md:w-1/2 lg:px-14">
+        {/* Mobile Header */}
+        <div className="mb-5 flex items-center justify-between md:hidden">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#111111] shadow-2xs"
+          >
+            <ArrowLeft size={13} />
+            <span>Store</span>
+          </Link>
+          <span className="text-xs font-black tracking-[-0.04em] text-[#111111]">
+            SHOP.CO™
+          </span>
+        </div>
 
+        {/* Form Card Container */}
+        <div className="mx-auto w-full max-w-[450px] rounded-[2.2rem] border border-white/90 bg-white p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] sm:p-8">
           {/* Header */}
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-gray-900 leading-none">
+          <div className="mb-6 space-y-1.5">
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-[#F4F3F4] px-3 py-1">
+              <Sparkles size={11} className="text-[#111111]" />
+              <span className="text-[9px] font-black uppercase tracking-[0.22em] text-neutral-700">
+                VIP ONBOARDING · FREE MEMBERSHIP
+              </span>
+            </div>
+
+            <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-[#111111] sm:text-3xl">
               Create Account
             </h1>
-            <p className="text-xs text-gray-400 font-medium mt-2">
-              Sign up for free to start your style journey.
+            <p className="text-xs font-medium text-neutral-500">
+              Complete your profile below to mint your personal SHOP.CO pass.
             </p>
           </div>
 
-          {/* Form */}
+          {/* Interactive Sign-Up Form */}
           <FormSignUp />
 
           {/* Divider */}
-          <div className="relative">
+          <div className="relative my-5">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100" />
+              <div className="w-full border-t border-neutral-100" />
             </div>
             <div className="relative flex justify-center">
-              <span className="px-4 bg-white text-[10px] font-black uppercase tracking-widest text-gray-400">
-                Or sign up with
+              <span className="bg-white px-4 text-[9px] font-black uppercase tracking-[0.22em] text-neutral-400">
+                Or Instant Registration With
               </span>
             </div>
           </div>
 
-          {/* Social buttons */}
+          {/* Social OAuth Buttons */}
           <div className="grid grid-cols-2 gap-3">
-            <SocialButton label="Google">
+            <SocialButton label="Google" onClick={handleGoogleLogin}>
               <svg
                 width="16"
                 height="16"
@@ -107,7 +221,8 @@ export default function SignUpPage() {
                 />
               </svg>
             </SocialButton>
-            <SocialButton label="Apple">
+
+            <SocialButton label="Apple" onClick={handleGoogleLogin}>
               <svg
                 width="16"
                 height="16"
@@ -120,16 +235,19 @@ export default function SignUpPage() {
             </SocialButton>
           </div>
 
-          {/* Switch */}
-          <p className="text-center text-xs text-gray-500 font-medium">
-            Already have an account?{" "}
-            <Link
-              href="/auth/signin"
-              className="font-black text-black hover:underline underline-offset-4"
-            >
-              Log In →
-            </Link>
-          </p>
+          {/* Switch to Sign In */}
+          <div className="mt-6 border-t border-neutral-100 pt-4 text-center">
+            <p className="text-xs font-medium text-neutral-500">
+              Already a registered member?{" "}
+              <Link
+                href="/auth/signin"
+                className="inline-flex items-center gap-1 font-black uppercase tracking-wider text-[#111111] underline decoration-neutral-300 underline-offset-4 transition-colors hover:decoration-black"
+              >
+                <span>Log In</span>
+                <ArrowUpRight size={13} />
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -139,14 +257,22 @@ export default function SignUpPage() {
 function SocialButton({
   label,
   children,
+  onClick,
 }: {
   label: string;
   children: React.ReactNode;
+  onClick?: () => void;
 }) {
   return (
-    <button className="flex items-center justify-center gap-2.5 py-3 border-2 border-gray-100 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all text-xs font-black uppercase tracking-widest text-gray-700">
-      {children}
-      {label}
+    <button
+      type="button"
+      onClick={onClick}
+      className="group flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-neutral-200/90 bg-[#F8F8F8] py-3 text-xs font-black uppercase tracking-widest text-neutral-800 transition-all duration-200 hover:-translate-y-0.5 hover:border-black hover:bg-white hover:shadow-sm active:scale-95"
+    >
+      <span className="transition-transform duration-200 group-hover:scale-110">
+        {children}
+      </span>
+      <span>{label}</span>
     </button>
   );
 }

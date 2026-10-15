@@ -1,22 +1,40 @@
-// "use client";
+"use client";
+
+import React from "react";
 import { useFilterStore } from "@/store/filterStore";
-import { AiOutlineRight } from "react-icons/ai";
+import { ChevronRight, Check } from "lucide-react";
 
 export const StyleButton = ({ content }: { content: string[] }) => {
   const set = useFilterStore((state) => state.filterByStyle);
-  const currentSection = useFilterStore((state) => state.currentStyle);
+  const currentStyle = useFilterStore((state) => state.currentStyle);
+
   return (
-    <div className="w-full  pb-5">
-      {content.map((e, id) => (
-        <button
-          key={id}
-          className={`w-full text-left cursor-pointer flex items-center justify-between p-2 font-bold text-gray-500 hover:text-gray-800 ${currentSection === e ? "text-gray-800 rounded-xl bg-gray-100 duration-500 " : ""}`}
-          onClick={() => set(e)}
-        >
-          {e}
-          <AiOutlineRight className="inline-block ml-2 text-xs" />
-        </button>
-      ))}
+    <div className="w-full space-y-1.5">
+      {content.map((item, id) => {
+        const isActive = currentStyle === item;
+        return (
+          <button
+            key={id}
+            type="button"
+            onClick={() => set(item)}
+            className={`group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-left text-xs font-black uppercase tracking-wider transition-all duration-200 ${
+              isActive
+                ? "bg-[#111111] text-white shadow-xs"
+                : "bg-[#F8F8F8] text-neutral-600 hover:bg-neutral-200/70 hover:text-[#111111]"
+            }`}
+          >
+            <span>{item}</span>
+            {isActive ? (
+              <Check size={13} strokeWidth={3} className="text-emerald-400" />
+            ) : (
+              <ChevronRight
+                size={14}
+                className="text-neutral-400 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-[#111111]"
+              />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 };

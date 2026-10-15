@@ -1,93 +1,224 @@
 "use client";
+
+import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import {
+  ArrowLeft,
+  Sparkles,
+  ShieldCheck,
+  Star,
+  Layers,
+  CheckCircle2,
+  ArrowUpRight,
+} from "lucide-react";
 import Login from "@/assets/shop/screenShop.webp";
 import { FormSignIn } from "./FormSignIn";
 
 export default function SignInPage() {
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [tilt, setTilt] = useState({ x: 0, y: 0 });
+
   const handleGoogleLogin = () => {
     window.location.href = `${process.env.NEXT_PUBLIC_API_URL}auth/google`;
   };
 
-  return (
-    <div className="w-full min-h-screen flex bg-white">
-      {/* ══ LEFT — Image Panel (desktop only) ══ */}
-      <div className="hidden md:flex md:w-1/2 h-screen relative bg-gray-950 overflow-hidden shrink-0">
-        <Image
-          src={Login}
-          alt="Login Fashion"
-          fill
-          className="object-cover opacity-80"
-          priority
-        />
-        {/* Gradient */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-black/10" />
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!stageRef.current) return;
+    const rect = stageRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width - 0.5) * 14;
+    const y = ((e.clientY - rect.top) / rect.height - 0.5) * -14;
+    setTilt({ x, y });
+  };
 
-        {/* Top label */}
-        <div className="absolute top-10 left-10 z-10">
-          <span className="text-[10px] font-black uppercase tracking-[0.25em] text-white/50 flex items-center gap-2">
-            <span className="w-4 h-px bg-white/40 inline-block" />
-            Shop.co
+  const handleMouseLeave = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
+  return (
+    <div className="relative flex min-h-screen w-full overflow-hidden bg-[#F4F3F4] text-[#111111] selection:bg-[#111111] selection:text-white">
+      {/* ================================================================== */}
+      {/* LEFT — 3D INTERACTIVE EDITORIAL SHOWCASE (DESKTOP ONLY)            */}
+      {/* ================================================================== */}
+      <div
+        ref={stageRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        style={{ perspective: "1300px" }}
+        className="relative hidden h-screen w-1/2 shrink-0 flex-col justify-between overflow-hidden border-r border-black/5 bg-[#EBE9EA] p-8 md:flex lg:p-12"
+      >
+        {/* Architectural Studio Grid */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-size-[3.2rem_3.2rem]"
+        />
+
+        {/* Soft Radial Studio Spotlight */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95 blur-[110px]"
+        />
+
+        {/* Giant Background Watermark */}
+        <div
+          aria-hidden="true"
+          style={{
+            transform: `translate3d(${tilt.x * -1.2}px, ${tilt.y * -1.2}px, 0)`,
+          }}
+          className="pointer-events-none absolute inset-x-0 top-20 z-0 flex justify-center select-none transition-transform duration-200 ease-out"
+        >
+          <span className="text-[clamp(4.5rem,8vw,7.5rem)] font-black uppercase leading-none tracking-[-0.07em] text-black/[0.05]">
+            SHOP.CO
           </span>
         </div>
 
-        {/* Bottom copy */}
-        <div className="absolute bottom-12 left-10 right-10 z-10">
-          <h2 className="text-4xl lg:text-5xl font-black uppercase tracking-tighter text-white leading-none mb-3">
-            Welcome
-            <br />
-            Back.
-          </h2>
-          <p className="text-sm text-white/60 leading-relaxed max-w-xs font-medium">
-            Log in to unlock exclusive offers and discover styles curated just
-            for you.
-          </p>
+        {/* 1. Top Bar: Brand Identity & Back to Store */}
+        <div className="relative z-30 flex items-center justify-between">
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-black/10 bg-white/90 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-[#111111] shadow-2xs backdrop-blur-md transition-all hover:bg-[#111111] hover:text-white"
+          >
+            <ArrowLeft
+              size={13}
+              className="transition-transform duration-300 group-hover:-translate-x-1"
+            />
+            <span>Back to Flagship</span>
+          </Link>
+
+          <span className="rounded-full border border-black/10 bg-white/80 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-neutral-700 backdrop-blur-md">
+            ARCHIVE // 2026
+          </span>
         </div>
 
-        {/* Decorative corner line */}
-        <div className="absolute bottom-0 right-0 w-32 h-32 border-l border-t border-white/10 rounded-tl-3xl" />
+        {/* 2. Center 3D Tilting Fashion Monolith */}
+        <div className="relative z-20 my-auto flex items-center justify-center py-4">
+          <div
+            style={{
+              transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
+              transformStyle: "preserve-3d",
+            }}
+            className="relative aspect-[4/4.5] w-full max-w-[420px] transition-transform duration-200 ease-out"
+          >
+            {/* Main Arch Pedestal */}
+            <div className="relative h-full w-full overflow-hidden rounded-[2.4rem] border-2 border-white bg-[#F2F0F1] shadow-[0_35px_80px_-20px_rgba(0,0,0,0.22)]">
+              <Image
+                src={Login}
+                alt="SHOP.CO Luxury Fashion"
+                fill
+                priority
+                sizes="50vw"
+                className="object-cover object-top mix-blend-multiply transition-transform duration-700 hover:scale-105"
+              />
+              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-black/65 via-black/20 to-transparent" />
+
+              {/* Bottom Editorial Copy Inside Frame */}
+              <div className="absolute inset-x-6 bottom-6 z-20 text-white">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-white backdrop-blur-md">
+                  <Sparkles size={10} /> Member Portal
+                </span>
+                <h2 className="mt-2 text-3xl font-black uppercase leading-[0.92] tracking-[-0.04em] lg:text-4xl">
+                  Welcome Back To The Studio.
+                </h2>
+              </div>
+            </div>
+
+            {/* Floating 3D Badge 1 (Top-Left) */}
+            <div
+              style={{ transform: "translateZ(55px)" }}
+              className="absolute -left-5 top-8 z-30 flex items-center gap-3 rounded-2xl border border-white bg-white/95 px-3.5 py-2.5 shadow-[0_18px_40px_rgba(0,0,0,0.14)] backdrop-blur-xl"
+            >
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#111111] text-white">
+                <Layers size={15} />
+              </div>
+              <div>
+                <p className="text-[9px] font-extrabold uppercase tracking-wider text-neutral-400">
+                  Curated Catalog
+                </p>
+                <p className="text-[11px] font-black text-[#111111]">
+                  200+ Luxury Houses
+                </p>
+              </div>
+            </div>
+
+            {/* Floating 3D Badge 2 (Bottom-Right) */}
+            <div
+              style={{ transform: "translateZ(70px)" }}
+              className="absolute -bottom-4 -right-4 z-30 flex items-center gap-2.5 rounded-2xl border border-white bg-[#111111] px-4 py-3 text-white shadow-[0_22px_45px_rgba(0,0,0,0.3)]"
+            >
+              <div className="flex text-amber-400">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} size={11} fill="currentColor" />
+                ))}
+              </div>
+              <span className="font-mono text-xs font-black">4.9/5</span>
+              <span className="text-[10px] text-white/60">VIP Rating</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 3. Bottom Telemetry Footer */}
+        <div className="relative z-30 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-neutral-500">
+          <span>OFFICIAL ONLINE FLAGSHIP</span>
+          <span>VERIFIED AUTHENTICITY</span>
+        </div>
       </div>
 
-      {/* ══ RIGHT — Form Panel ══ */}
-      <div className="w-full md:w-1/2 flex items-center justify-center min-h-screen px-5 sm:px-8 lg:px-16 py-12 overflow-y-auto">
-        <div className="w-full max-w-[420px] space-y-7">
-          {/* Mobile logo */}
-          <div className="md:hidden">
-            <span className="text-[10px] font-black uppercase tracking-[0.25em] text-gray-400 flex items-center gap-2">
-              <span className="w-4 h-px bg-gray-300 inline-block" />
-              Shop.co
-            </span>
-          </div>
+      {/* ================================================================== */}
+      {/* RIGHT — ARCHITECTURAL FORM PANEL                                   */}
+      {/* ================================================================== */}
+      <div className="relative flex min-h-screen w-full flex-col justify-center overflow-y-auto px-4 py-10 sm:px-8 md:w-1/2 lg:px-14">
+        {/* Mobile Top Navigation */}
+        <div className="mb-6 flex items-center justify-between md:hidden">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-[#111111] shadow-2xs"
+          >
+            <ArrowLeft size={13} />
+            <span>Store</span>
+          </Link>
+          <span className="text-xs font-black tracking-[-0.04em] text-[#111111]">
+            SHOP.CO™
+          </span>
+        </div>
 
-          {/* Header */}
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-black uppercase tracking-tighter text-gray-900 leading-none">
-              Log In
+        {/* Form Card Container */}
+        <div className="mx-auto w-full max-w-[440px] rounded-[2.2rem] border border-white/90 bg-white p-6 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.07)] sm:p-9">
+          {/* Top Pill & Headline */}
+          <div className="mb-7 space-y-2">
+            <div className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-[#F4F3F4] px-3 py-1">
+              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              <span className="text-[9px] font-black uppercase tracking-[0.22em] text-neutral-700">
+                CLIENT PORTAL · SIGN IN
+              </span>
+            </div>
+
+            <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-[#111111] sm:text-3xl">
+              Log In To Account
             </h1>
-            <p className="text-xs text-gray-400 font-medium mt-2">
-              Enter your details below to continue shopping.
+            <p className="text-xs font-medium leading-relaxed text-neutral-500">
+              Enter your credentials below to access your personal lookbook,
+              saved garments, and live order tracking.
             </p>
           </div>
 
-          {/* Form */}
+          {/* Interactive Sign-In Form */}
           <FormSignIn />
 
           {/* Divider */}
-          <div className="relative">
+          <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-100" />
+              <div className="w-full border-t border-neutral-100" />
             </div>
             <div className="relative flex justify-center">
-              <span className="px-4 bg-white text-[10px] font-black uppercase tracking-widest text-gray-400">
-                Or continue with
+              <span className="bg-white px-4 text-[9px] font-black uppercase tracking-[0.22em] text-neutral-400">
+                Or Instant Access With
               </span>
             </div>
           </div>
 
-          {/* Social buttons */}
+          {/* Social OAuth Buttons */}
           <div className="grid grid-cols-2 gap-3">
             <SocialButton label="Google" onClick={handleGoogleLogin}>
-              {/* Google SVG */}
               <svg
                 width="16"
                 height="16"
@@ -112,7 +243,8 @@ export default function SignInPage() {
                 />
               </svg>
             </SocialButton>
-            <SocialButton label="Apple">
+
+            <SocialButton label="Apple" onClick={handleGoogleLogin}>
               <svg
                 width="16"
                 height="16"
@@ -125,16 +257,19 @@ export default function SignInPage() {
             </SocialButton>
           </div>
 
-          {/* Switch */}
-          <p className="text-center text-xs text-gray-500 font-medium">
-            Don't have an account?{" "}
-            <Link
-              href="/auth/signup"
-              className="font-black text-black hover:underline underline-offset-4"
-            >
-              Create account →
-            </Link>
-          </p>
+          {/* Switch to Sign Up */}
+          <div className="mt-7 border-t border-neutral-100 pt-5 text-center">
+            <p className="text-xs font-medium text-neutral-500">
+              New to SHOP.CO Atelier?{" "}
+              <Link
+                href="/auth/signup"
+                className="inline-flex items-center gap-1 font-black uppercase tracking-wider text-[#111111] underline decoration-neutral-300 underline-offset-4 transition-colors hover:decoration-black"
+              >
+                <span>Create VIP Account</span>
+                <ArrowUpRight size={13} />
+              </Link>
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -154,10 +289,12 @@ function SocialButton({
     <button
       type="button"
       onClick={onClick}
-      className="flex items-center justify-center gap-2.5 py-3 border-2 border-gray-100 rounded-xl hover:border-gray-300 hover:bg-gray-50 transition-all text-xs font-black uppercase tracking-widest text-gray-700 cursor-pointer"
+      className="group flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-neutral-200/90 bg-[#F8F8F8] py-3 text-xs font-black uppercase tracking-widest text-neutral-800 transition-all duration-200 hover:-translate-y-0.5 hover:border-black hover:bg-white hover:shadow-sm active:scale-95"
     >
-      {children}
-      {label}
+      <span className="transition-transform duration-200 group-hover:scale-110">
+        {children}
+      </span>
+      <span>{label}</span>
     </button>
   );
 }

@@ -5,7 +5,7 @@ import MobileNavbar from "./MobileNavbar";
 export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50  bg-[#ffffff]  shadow-sm">
-      <div className="Responsive">
+      <div className="px-3 lg:px-6  xl:px-10">
         <DesktopNavbar />
         <MobileNavbar />
       </div>
