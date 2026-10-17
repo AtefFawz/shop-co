@@ -1,89 +1,199 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import {
+  Star,
+  Package,
+  CreditCard,
+  ShoppingBag,
+  ArrowUpRight,
+  Sparkles,
+  Store,
+} from "lucide-react";
 import OrderCard from "../OrderCard/OrderCard";
-import { Star, Package, CreditCard, ShoppingBag } from "lucide-react";
 import { SectionHeader } from "./SectionHeader";
 
-type dataType = {
-  orders: [];
-  reviews: [];
+type DataType = {
+  orders: any[];
+  reviews: any[];
   onRefresh: () => void;
   goTo: (state: string) => void;
   pagination: {
-    paginationOrders: { total: number; totalExpenses: number };
+    paginationOrders: { total: number; totalExpenses?: number };
     paginationReviews: { total: number };
   };
 };
 
 export default function OverviewContent({
-  orders,
+  orders = [],
   onRefresh,
   goTo,
   pagination,
-}: dataType) {
+}: DataType) {
+  // Safe calculation of total expenses so it never renders "$undefined"
+  const safeExpenses =
+    typeof pagination?.paginationOrders?.totalExpenses === "number"
+      ? pagination.paginationOrders.totalExpenses
+      : orders.reduce((sum, o) => sum + (Number(o?.totalPrice) || 0), 0);
+
+  const totalOrders = pagination?.paginationOrders?.total ?? orders.length;
+  const totalReviews = pagination?.paginationReviews?.total ?? 0;
+
   return (
-    <div className="space-y-10 animate-in fade-in duration-700 ">
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <style>{`
+        .overview-3d-card {
+          transform-style: preserve-3d;
+          transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @media (hover: hover) {
+          .overview-3d-card:hover {
+            transform: translateY(-5px) rotateX(3.5deg) rotateY(-3.5deg);
+            box-shadow: 0 22px 44px -12px rgba(17, 17, 17, 0.12);
+          }
+        }
+      `}</style>
+
+      {/* ── 1. 3D KPI Stat Cards ── */}
+      <div
+        style={{ perspective: "1100px" }}
+        className="grid grid-cols-1 gap-4 sm:grid-cols-3"
+      >
         <StatCard
-          label="Expenses"
-          value={`$${pagination.paginationOrders.totalExpenses}`}
+          label="Cumulative Spend"
+          value={`$${safeExpenses.toLocaleString()}`}
+          sub="Verified lifetime value"
           icon={CreditCard}
-          color="blue"
+          accent="emerald"
+          onClick={() => goTo("orders")}
         />
         <StatCard
-          label="Orders"
-          value={pagination.paginationOrders.total}
+          label="Total Orders"
+          value={totalOrders}
+          sub="Dispatched & queued"
           icon={Package}
-          color="orange"
+          accent="black"
+          onClick={() => goTo("orders")}
         />
         <StatCard
-          label="Reviews"
-          value={pagination.paginationReviews.total}
+          label="Published Reviews"
+          value={totalReviews}
+          sub="Verified patron feedback"
           icon={Star}
-          color="yellow"
+          accent="amber"
+          onClick={() => goTo("reviews")}
         />
       </div>
 
-      <section>
-        <SectionHeader icon={ShoppingBag} title="Latest Activity" />
-        <div className="space-y-4 mt-6">
-          {orders?.slice(0, 2).map((order: any) => (
-            <OrderCard
-              key={order._id}
-              order={order}
-              onReviewSuccess={onRefresh}
-            />
-          ))}
-          <button
-            onClick={() => goTo("orders")}
-            className="w-full py-4 text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 border-2 border-dashed border-gray-200 rounded-[24px]"
-          >
-            View All Activity →
-          </button>
-        </div>
+      {/* ── 2. Latest Activity Feed ── */}
+      <section className="space-y-5">
+        <SectionHeader
+          icon={ShoppingBag}
+          title="Recent Order Activity"
+          count={totalOrders}
+        />
+
+        {orders.length === 0 ? (
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-white/90 bg-white px-6 py-14 text-center shadow-[0_12px_34px_-14px_rgba(0,0,0,0.05)]">
+            <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F4F3F4] text-[#111111]">
+              <ShoppingBag size={24} />
+            </div>
+            <h3 className="text-sm font-black uppercase tracking-wider text-[#111111]">
+              No Recent Orders Recorded
+            </h3>
+            <p className="mt-1 max-w-xs text-xs text-neutral-400">
+              Your latest purchases and live shipment telemetry will appear here
+              automatically.
+            </p>
+            <Link
+              href="/shop"
+              className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-[#111111] px-6 py-3 text-[10px] font-black uppercase tracking-widest text-white shadow-md transition hover:-translate-y-0.5 hover:bg-neutral-800"
+            >
+              <Store size={13} />
+              <span>Explore Flagship Archive</span>
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {orders.slice(0, 2).map((order: any) => (
+              <OrderCard
+                key={order._id}
+                order={order}
+                onReviewSuccess={onRefresh}
+              />
+            ))}
+
+            {orders.length > 2 && (
+              <button
+                type="button"
+                onClick={() => goTo("orders")}
+                className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-neutral-300 bg-white/60 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-neutral-600 transition-all hover:border-[#111111] hover:bg-[#111111] hover:text-white"
+              >
+                <span>Inspect All {totalOrders} Orders</span>
+                <ArrowUpRight
+                  size={14}
+                  className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </button>
+            )}
+          </div>
+        )}
       </section>
     </div>
   );
 }
 
-// StatCard component
-function StatCard({ label, value, icon: Icon, color }: any) {
-  const colors: any = {
-    blue: "bg-blue-50 text-blue-600",
-    orange: "bg-orange-50 text-orange-600",
-    yellow: "bg-yellow-50 text-yellow-600",
+function StatCard({
+  label,
+  value,
+  sub,
+  icon: Icon,
+  accent,
+  onClick,
+}: {
+  label: string;
+  value: string | number;
+  sub: string;
+  icon: any;
+  accent: "emerald" | "black" | "amber";
+  onClick?: () => void;
+}) {
+  const iconStyles = {
+    emerald: "bg-emerald-500/10 text-emerald-600",
+    black: "bg-[#111111] text-white",
+    amber: "bg-amber-500/15 text-amber-600",
   };
+
   return (
-    <div className="bg-white rounded-[28px] p-6 border border-gray-50 flex items-center gap-4 shadow-sm ">
-      <div
-        className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${colors[color]}`}
-      >
-        <Icon size={20} />
+    <div
+      onClick={onClick}
+      className="overview-3d-card group relative flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-3xl border border-white/90 bg-white p-6 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.05)]"
+    >
+      <div className="flex items-center gap-4 min-w-0">
+        <div
+          className={`flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl transition-transform duration-300 group-hover:scale-110 ${iconStyles[accent]}`}
+        >
+          <Icon size={22} />
+        </div>
+
+        <div className="min-w-0 text-left">
+          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-neutral-400">
+            {label}
+          </p>
+          <p className="mt-1 font-mono text-2xl font-black leading-none tracking-tight text-[#111111] sm:text-3xl">
+            {value ?? 0}
+          </p>
+          <p className="mt-1.5 truncate text-[10px] font-semibold text-neutral-400">
+            {sub}
+          </p>
+        </div>
       </div>
-      <div className="text-left">
-        <p className="text-[10px] uppercase font-black text-gray-400 tracking-widest leading-none mb-1">
-          {label}
-        </p>
-        <p className="text-xl font-black leading-none">{value || 0}</p>
-      </div>
+
+      <ArrowUpRight
+        size={16}
+        className="shrink-0 text-neutral-300 transition-all duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-[#111111]"
+      />
     </div>
   );
 }

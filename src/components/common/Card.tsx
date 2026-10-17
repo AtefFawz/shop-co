@@ -1,54 +1,70 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Flame, Sparkles, Eye } from "lucide-react";
-import StarRating from "./StarsRating";
-import { Product } from "../../types/index";
-import Pricing from "./Pricing";
 
-const getImageUrl = (url: string) => {
+import StarRating from "./StarsRating";
+import Pricing from "./Pricing";
+import { Product } from "../../types/index";
+
+/* -------------------------------------------------------------------------- */
+/*                                HELPER UTILS                                */
+/* -------------------------------------------------------------------------- */
+
+const CLOUDINARY_BASE = "https://res.cloudinary.com/dudit0nty/image/upload/";
+
+const getImageUrl = (url?: string): string => {
   if (!url) return "";
-  if (url.startsWith("http")) return url;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${url}`;
+  return url.startsWith("http") ? url : `${CLOUDINARY_BASE}${url}`;
 };
+
+/* -------------------------------------------------------------------------- */
+/*                              MAIN CARD COMPONENT                           */
+/* -------------------------------------------------------------------------- */
 
 export default function Card({ product }: { product: Product }) {
   const detailUrl = `/shop/details/${product._id}`;
 
+  // 1. Stock Telemetry
   const stockCount = Number(product?.countInStock ?? 10);
   const isOutOfStock = stockCount <= 0;
   const isLowStock = stockCount > 0 && stockCount <= 5;
 
-  const images: string[] =
-    product.images && product.images.length > 0
-      ? product.images
-      : product.photo
-        ? [product.photo]
-        : [];
+  // 2. Normalized Image List
+  const images = useMemo<string[]>(() => {
+    if (Array.isArray(product.images) && product.images.length > 0) {
+      return product.images.filter(Boolean);
+    }
+    return product.photo ? [product.photo] : [];
+  }, [product.images, product.photo]);
 
+  // 3. Auto-Slideshow State
   const [activeIdx, setActiveIdx] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     if (isPaused || images.length <= 1) return;
 
-    const interval = setInterval(() => {
+    const timer = window.setInterval(() => {
       setActiveIdx((prev) => (prev + 1) % images.length);
-    }, 3200);
+    }, 3400);
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(timer);
   }, [isPaused, images.length]);
 
+  const categoryLabel =
+    (product as any).category || (product as any).section || "Atelier Edit";
+  const ratingValue = Number(product?.ratingsAverage || 0);
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 14 }}
+    <motion.article
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
+      viewport={{ once: true, margin: "-30px" }}
       transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative mb-3 flex h-full w-full cursor-pointer flex-col justify-between rounded-[1.75rem] border border-neutral-200/70 bg-white p-2.5 shadow-[0_8px_28px_-12px_rgba(0,0,0,0.06)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5 hover:border-black/20 hover:shadow-[0_24px_48px_-14px_rgba(0,0,0,0.14)] sm:p-3"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => {
         setIsPaused(false);
@@ -56,21 +72,24 @@ export default function Card({ product }: { product: Product }) {
       }}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
+      className="group relative flex h-full w-full flex-col justify-between rounded-2xl border border-neutral-200/75 bg-white p-1.5 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_20px_40px_-14px_rgba(0,0,0,0.12)] sm:rounded-[1.65rem] sm:p-2.5"
     >
-      {/* ── 1. Portrait Visual Stage ── */}
+      {/* ================================================================== */}
+      {/* 1. VISUAL STAGE (OPTIMIZED FOR MOBILE & DESKTOP)                   */}
+      {/* ================================================================== */}
       <Link
         href={detailUrl}
-        className={`relative block w-full overflow-hidden rounded-[1.35rem] bg-[#F4F3F4] transition-all duration-300 active:scale-[0.99] ${
-          isOutOfStock ? "grayscale opacity-85" : ""
+        className={`relative block aspect-[3/3.75] w-full overflow-hidden rounded-xl bg-[#F4F3F4] transition-transform duration-300 active:scale-[0.99] sm:aspect-[3/3.85] sm:rounded-[1.25rem] ${
+          isOutOfStock ? "grayscale opacity-80" : ""
         }`}
-        style={{ aspectRatio: "3/3.85" }}
       >
+        {/* Product Images */}
         {images.length > 0 ? (
           images.map((imgUrl, idx) => {
             const isActive = idx === activeIdx;
             return (
               <div
-                key={idx}
+                key={`${imgUrl}-${idx}`}
                 className={`absolute inset-0 h-full w-full transition-opacity duration-700 ease-out ${
                   isActive
                     ? "z-10 opacity-100"
@@ -79,31 +98,62 @@ export default function Card({ product }: { product: Product }) {
               >
                 <Image
                   src={getImageUrl(imgUrl)}
-                  alt={product.name || "Garment image"}
+                  alt={product.name || "Product"}
                   fill
                   quality={85}
                   priority={idx === 0}
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-108"
+                  sizes="(max-width: 640px) 48vw, (max-width: 1024px) 32vw, 24vw"
+                  className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                 />
               </div>
             );
           })
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center bg-[#EBE9EA] text-neutral-400">
-            <Sparkles size={22} />
-            <span className="mt-1 font-mono text-[9px] font-black uppercase tracking-widest">
-              SHOP.CO ARCHIVE
+          <div className="flex h-full w-full flex-col items-center justify-center bg-[#ECEAEB] text-neutral-400">
+            <Sparkles size={18} />
+            <span className="mt-1 font-mono text-[8px] font-black uppercase tracking-widest sm:text-[9px]">
+              SHOP.CO
             </span>
           </div>
         )}
 
-        {/* Subtle Bottom Vignette */}
-        <div className="pointer-events-none absolute inset-0 z-20 bg-linear-to-t from-black/50 via-transparent to-black/10 opacity-30 transition-opacity duration-300 md:opacity-0 md:group-hover:opacity-100" />
+        {/* Desktop Hover Gradient Vignette */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 z-20 bg-linear-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100"
+        />
 
-        {/* Top-Right Segmented Story Indicators */}
+        {/* Top-Left Status Badges (Compact on Mobile) */}
+        <div className="absolute left-2 top-2 z-30 flex flex-col items-start gap-1 sm:left-2.5 sm:top-2.5">
+          {isOutOfStock ? (
+            <span className="rounded-full bg-rose-600/95 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[9px]">
+              Sold Out
+            </span>
+          ) : (
+            <>
+              {product.isSale && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#111111]/90 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[9px]">
+                  <Sparkles
+                    size={8}
+                    className="text-amber-400 sm:h-2.5 sm:w-2.5"
+                  />
+                  <span>Sale</span>
+                </span>
+              )}
+
+              {isLowStock && (
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-white/95 px-2 py-0.5 text-[7px] font-black uppercase tracking-wider text-amber-700 shadow-xs backdrop-blur-md sm:text-[8px]">
+                  <Flame size={8} className="fill-amber-500 text-amber-500" />
+                  <span>{stockCount} Left</span>
+                </span>
+              )}
+            </>
+          )}
+        </div>
+
+        {/* Top-Right Image Switcher Dots */}
         {images.length > 1 && (
-          <div className="absolute right-2.5 top-2.5 z-30 flex items-center gap-1 rounded-full bg-black/45 px-2 py-1 backdrop-blur-md">
+          <div className="absolute right-2 top-2 z-30 flex items-center gap-1 rounded-full bg-black/40 px-1.5 py-1 backdrop-blur-md sm:right-2.5 sm:top-2.5 sm:px-2">
             {images.map((_, i) => (
               <button
                 key={i}
@@ -113,83 +163,63 @@ export default function Card({ product }: { product: Product }) {
                   setActiveIdx(i);
                 }}
                 onMouseEnter={() => setActiveIdx(i)}
+                aria-label={`Image ${i + 1}`}
                 className={`h-1 cursor-pointer rounded-full transition-all duration-300 ${
                   i === activeIdx
-                    ? "w-4 bg-white"
-                    : "w-1.5 bg-white/40 hover:bg-white/80"
+                    ? "w-3 bg-white sm:w-3.5"
+                    : "w-1 bg-white/45 hover:bg-white/80"
                 }`}
-                aria-label={`View angle ${i + 1}`}
               />
             ))}
           </div>
         )}
 
-        {/* Top-Left Status & Urgency Badges */}
-        <div className="absolute left-2.5 top-2.5 z-30 flex flex-col items-start gap-1.5">
-          {isOutOfStock ? (
-            <span className="rounded-full bg-rose-600/95 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-white shadow-md backdrop-blur-md">
-              Sold Out
-            </span>
-          ) : (
-            <>
-              {product.isSale && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-[#111111]/90 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-white shadow-md backdrop-blur-md">
-                  <Sparkles size={9} className="text-amber-400" />
-                  Sale
-                </span>
-              )}
-              {isLowStock && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/95 px-2.5 py-0.5 text-[8px] font-black uppercase tracking-wider text-amber-700 shadow-sm backdrop-blur-md">
-                  <Flame size={9} className="fill-amber-500 text-amber-500" />
-                  Only {stockCount} Left
-                </span>
-              )}
-            </>
-          )}
-        </div>
-
-        {/* Floating Quick-Inspect Bar on Hover */}
-        <div className="absolute inset-x-2.5 bottom-2.5 z-30 flex justify-center opacity-100 transition-all duration-300 ease-out md:translate-y-3 md:opacity-0 md:group-hover:translate-y-0 md:group-hover:opacity-100">
+        {/* Desktop-Only Hover Quick-Inspect Pill (Does not block mobile image) */}
+        <div className="pointer-events-none absolute inset-x-2.5 bottom-2.5 z-30 hidden translate-y-2 opacity-0 transition-all duration-300 ease-out md:flex md:group-hover:translate-y-0 md:group-hover:opacity-100">
           <span
-            className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.16em] shadow-xl backdrop-blur-xl transition-all ${
+            className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.14em] shadow-lg backdrop-blur-xl ${
               isOutOfStock
                 ? "bg-neutral-900/90 text-neutral-300"
-                : "bg-white/95 text-[#111111] hover:bg-[#111111] hover:text-white"
+                : "bg-white/95 text-[#111111]"
             }`}
           >
             <span className="inline-flex items-center gap-1.5">
               <Eye size={12} />
-              {isOutOfStock ? "Unavailable" : "Inspect Piece"}
+              <span>{isOutOfStock ? "Out of Stock" : "Quick View"}</span>
             </span>
             <ArrowUpRight size={13} />
           </span>
         </div>
       </Link>
 
-      {/* ── 2. Editorial Garment Metadata ── */}
-      <div className="mt-3 flex flex-1 flex-col justify-between space-y-2 px-1">
-        <div>
+      {/* ================================================================== */}
+      {/* 2. GARMENT METADATA & FOOTER (ERGONOMIC MOBILE SPACING)            */}
+      {/* ================================================================== */}
+      <div className="flex flex-1 flex-col justify-between px-1 pt-2.5 pb-0.5 sm:px-1.5 sm:pt-3">
+        <div className="space-y-1">
           {/* Category & Rating Row */}
-          <div className="flex items-center justify-between gap-2">
-            <span className="truncate font-mono text-[9px] font-extrabold uppercase tracking-[0.16em] text-neutral-400">
-              {(product as any).category ||
-                (product as any).section ||
-                "STUDIO EDIT"}
+          <div className="flex items-center justify-between gap-1">
+            <span className="truncate font-mono text-[8px] font-extrabold uppercase tracking-[0.14em] text-neutral-400 sm:text-[9px]">
+              {categoryLabel}
             </span>
 
-            <div className="flex items-center gap-1">
-              <StarRating rating={product?.ratingsAverage || 0} />
-              <span className="font-mono text-[10px] font-extrabold text-neutral-500">
-                {Number(product?.ratingsAverage || 0).toFixed(1)}
+            <div className="flex shrink-0 items-center gap-1">
+              {/* Full stars on tablet/desktop, compact single star on narrow phones */}
+              <div className="hidden sm:block">
+                <StarRating rating={ratingValue} />
+              </div>
+              <span className="text-[10px] text-amber-400 sm:hidden">★</span>
+              <span className="font-mono text-[9px] font-extrabold text-neutral-500 sm:text-[10px]">
+                {ratingValue > 0 ? ratingValue.toFixed(1) : "New"}
               </span>
             </div>
           </div>
 
           {/* Product Title */}
-          <Link href={detailUrl} className="mt-1 block">
+          <Link href={detailUrl} className="block">
             <h4
               title={product.name}
-              className={`truncate text-xs font-black uppercase tracking-tight transition-colors sm:text-sm ${
+              className={`line-clamp-1 text-xs font-black uppercase tracking-tight transition-colors sm:text-[13px] lg:text-sm ${
                 isOutOfStock
                   ? "text-neutral-400"
                   : "text-[#111111] group-hover:text-neutral-600"
@@ -200,15 +230,26 @@ export default function Card({ product }: { product: Product }) {
           </Link>
         </div>
 
-        {/* Price Footer */}
+        {/* Price & Action Footer */}
         <div
-          className={`border-t border-neutral-100 pt-2 ${
+          className={`mt-2 flex items-center justify-between gap-2 border-t border-neutral-100 pt-2 ${
             isOutOfStock ? "opacity-55" : ""
           }`}
         >
-          <Pricing product={product} />
+          <div className="min-w-0 flex-1">
+            <Pricing product={product} />
+          </div>
+
+          {/* Tactile Micro Action Button (Great for Mobile Tap & Desktop Hover) */}
+          <Link
+            href={detailUrl}
+            aria-label={`View ${product.name || "product"}`}
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#F4F3F4] text-[#111111] transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#111111] group-hover:text-white sm:h-8 sm:w-8"
+          >
+            <ArrowUpRight size={13} />
+          </Link>
         </div>
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
