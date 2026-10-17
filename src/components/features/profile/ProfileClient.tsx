@@ -438,9 +438,9 @@ export function ProfileClient() {
           {/* ── Scrollable Main Canvas ── */}
           <main
             ref={mainScrollRef}
-            className="relative z-10 flex-1 overflow-y-auto px-4 py-6 pb-32 sm:px-7 sm:py-8 lg:px-9 lg:pb-12"
+            className="relative z-10 flex-1  overflow-y-auto Responsive py-5"
           >
-            <div className="mx-auto max-w-[1400px] space-y-6">
+            <div className=" space-y-6">
               <div
                 style={{ perspective: "1300px" }}
                 className="grid grid-cols-1 gap-5 xl:grid-cols-12"

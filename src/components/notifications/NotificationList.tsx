@@ -1,61 +1,75 @@
 "use client";
 
-import { Bell } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { BellOff, CheckCircle2 } from "lucide-react";
 import type { Notification } from "@/store/notificationStore";
+// import type { FilterTab } from "./NotificationDropdown";
 import { NotificationItem } from "./NotificationItem";
+type FilterTab = "all" | "unread";
 type NotificationListProps = {
   notifications: Notification[];
+  activeTab?: FilterTab;
   onNotificationClick: (notification: Notification) => void;
+  onMarkAsRead?: (id: string) => void;
 };
-//
+
 export default function NotificationList({
   notifications,
+  activeTab = "all",
   onNotificationClick,
+  onMarkAsRead,
 }: NotificationListProps) {
   if (notifications.length === 0) {
+    const isUnreadTab = activeTab === "unread";
+
     return (
-      <div
-        className="flex flex-col items-center justify-center
-          px-5 py-10 sm:py-12"
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex flex-col items-center justify-center px-6 py-12 text-center"
       >
-        <div
-          className="flex items-center justify-center
-            w-12 h-12 mb-3 rounded-full bg-gray-100 sm:w-14 sm:h-14"
-        >
-          <Bell size={21} className="m:w-6 sm:h-6  " />
+        <div className="relative mb-3.5 flex h-14 w-14 items-center justify-center rounded-2xl border border-neutral-200/80 bg-neutral-50 text-neutral-700 shadow-2xs">
+          {isUnreadTab ? (
+            <CheckCircle2 size={24} className="text-emerald-500" />
+          ) : (
+            <BellOff size={22} className="text-neutral-400" />
+          )}
         </div>
 
-        <p className="text-sm text-gray-900 font-semibold sm:text-base">
-          No notifications
+        <p className="text-xs font-black uppercase tracking-[0.14em] text-black sm:text-sm">
+          {isUnreadTab ? "Zero Unread Alerts" : "No Notifications Yet"}
         </p>
 
-        <p
-          className="
-            max-w-62.5
-            mt-1
-            text-xs text-gray-500
-            text-center
-            sm:text-sm
-"
-        >
-          We'll let you know when something happens.
+        <p className="mt-1.5 max-w-[230px] text-xs leading-relaxed text-neutral-500">
+          {isUnreadTab
+            ? "You've reviewed all your recent updates and order statuses."
+            : "Order updates, delivery telemetry, and exclusive drops will appear here."}
         </p>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div
-      className=" overflow-y-auto
-        max-h-[65vh] sm:max-h-105"
-    >
-      {notifications.map((notification) => (
-        <NotificationItem
-          key={notification._id}
-          notification={notification}
-          onClick={() => onNotificationClick(notification)}
-        />
-      ))}
+    <div className="max-h-[60vh] overflow-y-auto overscroll-contain divide-y divide-neutral-100 sm:max-h-[380px] scrollbar-thin">
+      <AnimatePresence initial={false}>
+        {notifications.map((notification, index) => (
+          <motion.div
+            key={notification._id}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.15) }}
+          >
+            <NotificationItem
+              notification={notification}
+              onClick={() => onNotificationClick(notification)}
+              onMarkAsRead={
+                onMarkAsRead ? () => onMarkAsRead(notification._id) : undefined
+              }
+            />
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 }

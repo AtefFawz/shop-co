@@ -234,7 +234,7 @@ export default function OrderCard({
         {/* Right Actions: Rate Products + Track Dossier Link */}
         <div className="flex flex-wrap items-center gap-2.5">
           <Link
-            href={`/my-orders/${order._id}`}
+            href={`/shop/orders/${order._id}`}
             className="inline-flex flex-1 sm:flex-initial items-center justify-center gap-1.5 rounded-xl border border-neutral-200/90 bg-[#F8F8F8] px-4 py-2.5 text-[10px] font-black uppercase tracking-wider text-neutral-800 transition-all hover:border-black hover:bg-[#111111] hover:text-white"
           >
             <span>Track Dossier</span>

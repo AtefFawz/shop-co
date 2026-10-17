@@ -168,7 +168,7 @@ export default async function DashboardPage() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
               </span>
-              <span className="text-[9px] font-black uppercase tracking-[0.22em] text-neutral-700">
+              <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.22em] text-neutral-700 text-nowrap">
                 SHOP.CO COMMAND CENTER · LIVE TELEMETRY
               </span>
             </div>

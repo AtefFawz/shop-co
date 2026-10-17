@@ -223,7 +223,7 @@ export const RevenueChart = (props: any) => {
             transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
             transformStyle: "preserve-3d",
           }}
-          className="relative h-56 w-full rounded-2xl border border-neutral-100 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-size-[2.5rem_2.5rem] px-3 pt-8 pb-3 transition-transform duration-200 ease-out sm:px-6"
+          className="relative h-56 w-full rounded-2xl border border-neutral-100 bg-[linear-gradient(to_right,#00000005_1px,transparent_1px),linear-gradient(to_bottom,#00000005_1px,transparent_1px)] bg-size-[2.5rem_2.5rem] px-1 overflow-x-scroll pt-8 pb-3 transition-transform duration-200 ease-out sm:px-6"
         >
           {/* Optional Animated Daily Average Laser Line */}
           {showAvgLine && totalWeeklyRevenue > 0 && (
@@ -241,7 +241,7 @@ export const RevenueChart = (props: any) => {
             /* -------------------------------------------------------------- */
             /* MODE A: 3D VOLUMETRIC COLUMNS                                  */
             /* -------------------------------------------------------------- */
-            <div className="relative z-10 flex h-full w-full items-end justify-between gap-2 sm:gap-5">
+            <div className="relative z-10 flex h-full w-full items-end justify-between gap-1 sm:gap-5">
               {weeklySalesData.map((bar: any) => {
                 const rev = Number(bar.revenue) || 0;
                 const percentage = Math.round((rev / maxRevenue) * 100);
