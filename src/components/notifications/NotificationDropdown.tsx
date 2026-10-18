@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,9 +12,12 @@ import NotificationHeader from "./NotificationHeader";
 import NotificationList from "./NotificationList";
 import NotificationFooter from "./NotificationFooter";
 
+export type FilterTab = "all" | "unread" | "orders";
+
 export default function NotificationDropdown() {
   const [open, setOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<"all" | "unread">("all");
+  const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -30,10 +33,30 @@ export default function NotificationDropdown() {
     handleMarkAllAsRead,
   } = useNotifications();
 
-  const filteredNotifications =
-    activeTab === "unread"
-      ? notifications.filter((n) => !n.read)
-      : notifications;
+  // Filter by tab + search query
+  const filteredNotifications = useMemo(() => {
+    let list = [...notifications];
+
+    if (activeTab === "unread") {
+      list = list.filter((n) => !n.read);
+    } else if (activeTab === "orders") {
+      list = list.filter((n) => Boolean(n.order));
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      list = list.filter(
+        (n) =>
+          (n.title || "").toLowerCase().includes(q) ||
+          (n.message || "").toLowerCase().includes(q) ||
+          String(n.order || "")
+            .toLowerCase()
+            .includes(q),
+      );
+    }
+
+    return list;
+  }, [notifications, activeTab, searchQuery]);
 
   const handleNotificationClick = async (notification: Notification) => {
     if (!notification.read) {
@@ -76,19 +99,27 @@ export default function NotificationDropdown() {
 
   return (
     <div ref={dropdownRef} className="relative z-50">
-      {/* ── زر الجرس التفاعلي ── */}
+      {/* ================================================================== */}
+      {/* 1. 3D BELL TRIGGER BUTTON                                          */}
+      {/* ================================================================== */}
       <motion.button
         type="button"
         aria-label="Notifications"
         aria-expanded={open}
+        whileHover={{ y: -1.5 }}
         whileTap={{ scale: 0.92 }}
         onClick={() => setOpen((prev) => !prev)}
-        className={`relative flex h-9 w-9 lg:h-10 lg:w-10 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 outline-none ${
+        className={`group relative flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl border transition-all duration-300 outline-none ${
           open
-            ? "border-black bg-black text-white shadow-[0_6px_20px_rgba(0,0,0,0.18)]"
-            : "border-neutral-200/80 bg-neutral-100/90 text-neutral-700 hover:border-neutral-300 hover:bg-neutral-200/70 hover:text-black"
+            ? "border-[#111111] bg-[#111111] text-white shadow-[0_12px_28px_-6px_rgba(0,0,0,0.4)]"
+            : "border-neutral-200/90 bg-white text-neutral-800 shadow-2xs hover:border-black hover:bg-[#F8F8F8] hover:text-black"
         }`}
       >
+        {/* Ambient Ping Halo when Unread */}
+        {unreadCount > 0 && !open && (
+          <span className="pointer-events-none absolute inset-0 animate-ping rounded-2xl bg-rose-500/15 duration-1000" />
+        )}
+
         <motion.div
           animate={
             unreadCount > 0 && !open
@@ -96,14 +127,19 @@ export default function NotificationDropdown() {
               : { rotate: 0 }
           }
           transition={{
-            duration: 0.6,
+            duration: 0.65,
             repeat: unreadCount > 0 && !open ? Infinity : 0,
-            repeatDelay: 4,
+            repeatDelay: 4.5,
           }}
         >
-          <Bell size={18} strokeWidth={2.2} />
+          <Bell
+            size={18}
+            strokeWidth={2.2}
+            className="transition-transform duration-300 group-hover:scale-105"
+          />
         </motion.div>
 
+        {/* Unread Counter Pill */}
         <AnimatePresence>
           {unreadCount > 0 && (
             <motion.span
@@ -111,7 +147,7 @@ export default function NotificationDropdown() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0, opacity: 0 }}
               transition={{ type: "spring", stiffness: 450, damping: 22 }}
-              className="absolute -top-1 -right-1 z-10 flex h-4.5 min-w-4.5 items-center justify-center rounded-full bg-red-500 px-1 font-mono text-[9.5px] font-black leading-none text-white shadow-[0_2px_8px_rgba(239,68,68,0.5)] ring-2 ring-white sm:h-5 sm:min-w-5 sm:text-[10px]"
+              className="absolute -right-1.5 -top-1.5 z-10 flex h-5 min-w-5 items-center justify-center rounded-full bg-rose-600 px-1 font-mono text-[9.5px] font-black leading-none text-white shadow-[0_4px_12px_rgba(225,29,72,0.55)] ring-2 ring-white"
             >
               {unreadCount > 99 ? "99+" : unreadCount}
             </motion.span>
@@ -119,30 +155,36 @@ export default function NotificationDropdown() {
         </AnimatePresence>
       </motion.button>
 
-      {/* ── نافذة الإشعارات المنسدلة ── */}
+      {/* ================================================================== */}
+      {/* 2. 3D FLOATING INBOX POPOVER                                       */}
+      {/* ================================================================== */}
       <AnimatePresence>
         {open && (
           <>
+            {/* Mobile Backdrop Blur */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setOpen(false)}
-              className="fixed inset-0 top-15 z-40 bg-black/20 backdrop-blur-[2px] sm:hidden"
+              className="fixed inset-0 top-16 z-40 bg-black/35 backdrop-blur-xs sm:hidden"
             />
 
             <motion.div
-              initial={{ opacity: 0, y: 12, scale: 0.96 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 8, scale: 0.96 }}
+              initial={{ opacity: 0, y: 14, scale: 0.96, rotateX: -6 }}
+              animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+              exit={{ opacity: 0, y: 10, scale: 0.96, rotateX: -4 }}
               transition={{ type: "spring", stiffness: 400, damping: 28 }}
-              className="fixed inset-x-3 top-16 z-50 mx-auto flex w-auto max-w-[410px] flex-col overflow-hidden rounded-[24px] border border-neutral-200/90 bg-white shadow-[0_24px_60px_-12px_rgba(0,0,0,0.22)] ring-1 ring-black/[0.04] sm:absolute sm:inset-x-auto sm:top-13 sm:right-0 sm:mx-0 sm:w-[400px]"
+              style={{ transformOrigin: "top right", perspective: "1200px" }}
+              className="fixed inset-x-3 top-16 z-50 mx-auto flex w-auto max-w-[430px] flex-col overflow-hidden rounded-[2rem] border border-white/90 bg-[#F4F3F4] shadow-[0_30px_80px_-15px_rgba(0,0,0,0.28)] ring-1 ring-black/[0.06] sm:absolute sm:inset-x-auto sm:right-0 sm:top-13 sm:mx-0 sm:w-[420px]"
             >
               <NotificationHeader
                 unreadCount={unreadCount}
                 totalCount={notifications.length}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
                 onMarkAllAsRead={handleMarkAllAsRead}
                 onClose={() => setOpen(false)}
               />
@@ -150,6 +192,9 @@ export default function NotificationDropdown() {
               <NotificationList
                 notifications={filteredNotifications}
                 activeTab={activeTab}
+                loading={loading && notifications.length === 0}
+                searchQuery={searchQuery}
+                onClearSearch={() => setSearchQuery("")}
                 onNotificationClick={handleNotificationClick}
                 onMarkAsRead={handleMarkAsRead}
               />
@@ -159,7 +204,9 @@ export default function NotificationDropdown() {
                 loading={loading}
                 currentPage={page}
                 totalPages={totalPages}
+                totalCount={notifications.length}
                 onLoadMore={loadMore}
+                onClose={() => setOpen(false)}
               />
             </motion.div>
           </>

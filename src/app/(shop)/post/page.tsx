@@ -1,8 +1,3 @@
-import { AddProduct } from "@/components/features/admin/post/AddProduct";
-export default function Post() {
-  return (
-    <section>
-      <AddProduct />
-    </section>
-  );
-}
+import ProductSubmissionPage from "@/features/seller/pages/ProductSubmissionPage";
+
+export default ProductSubmissionPage;

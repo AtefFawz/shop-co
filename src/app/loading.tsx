@@ -96,7 +96,7 @@ export default function Loading() {
       aria-live="polite"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative isolate flex min-h-screen w-full flex-col justify-between overflow-hidden bg-[#F2F0F1] px-6 py-8 text-[#111111] select-none"
+      className="relative isolate flex min-h-screen w-full flex-col justify-between overflow-hidden bg-app px-6 py-8 text-primary select-none"
     >
       {/* ================================================================== */}
       {/* GPU 3D KEYFRAMES (LIGHT MODE ATELIER ENGINE)                       */}
@@ -123,8 +123,8 @@ export default function Loading() {
 
         .studio-floor {
           background-image: 
-            linear-gradient(to right, rgba(17,17,17,0.06) 1px, transparent 1px),
-            linear-gradient(to bottom, rgba(17,17,17,0.06) 1px, transparent 1px);
+            linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+            linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
           background-size: 56px 56px;
           transform: rotateX(75deg) translateZ(-170px);
           animation: studioRunway 1.6s linear infinite;
@@ -218,7 +218,7 @@ export default function Loading() {
       {/* Soft White Studio Lighting Blobs */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/95 blur-[110px]"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[520px] w-[520px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-surface/95 blur-[110px]"
       />
 
       {/* Giant Editorial Background Watermark */}
@@ -229,7 +229,7 @@ export default function Loading() {
         }}
         className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden transition-transform duration-200 ease-out"
       >
-        <span className="text-[clamp(6rem,20vw,18rem)] font-black uppercase leading-none tracking-[-0.07em] text-black/[0.035]">
+        <span className="text-[clamp(6rem,20vw,18rem)] font-black uppercase leading-none tracking-[-0.07em] text-primary/[0.035]">
           SHOP.CO
         </span>
       </div>
@@ -238,22 +238,22 @@ export default function Loading() {
       {/* 2. TOP EDITORIAL ATELIER BAR                                       */}
       {/* ================================================================== */}
       <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between">
-        <div className="flex items-center gap-3 rounded-full border border-black/10 bg-white/85 px-4 py-2 shadow-2xs">
+        <div className="flex items-center gap-3 rounded-full border border-border-subtle bg-surface/85 px-4 py-2 shadow-2xs">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-black opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#111111]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-action opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-action" />
           </span>
-          <span className="text-[10px] font-black uppercase tracking-[0.24em] text-[#111111]">
+          <span className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">
             SHOP.CO · ATELIER
           </span>
         </div>
 
-        <div className="hidden items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-neutral-400 sm:flex">
-          <Scissors size={12} className="text-neutral-700" />
+        <div className="hidden items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-muted sm:flex">
+          <Scissors size={12} className="text-secondary" />
           <span>3D INTERACTIVE LOOKBOOK</span>
         </div>
 
-        <span className="rounded-full border border-black/10 bg-white/85 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.18em] text-neutral-700 shadow-2xs">
+        <span className="rounded-full border border-border-subtle bg-surface/85 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.18em] text-secondary shadow-2xs">
           COLLECTION // 26
         </span>
       </div>
@@ -272,14 +272,14 @@ export default function Loading() {
           {/* -------------------------------------------------------------- */}
           {/* A. TAILOR MEASURING TAPE ORBIT RINGS                           */}
           {/* -------------------------------------------------------------- */}
-          <div className="tape-ring-1 preserve-3d pointer-events-none absolute h-76 w-76 rounded-full border-2 border-dashed border-black/15 sm:h-84 sm:w-84">
-            <span className="absolute -top-2 left-1/2 flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full bg-[#111111] text-[8px] font-bold text-white shadow-md">
+          <div className="tape-ring-1 preserve-3d pointer-events-none absolute h-76 w-76 rounded-full border-2 border-dashed border-border-subtle sm:h-84 sm:w-84">
+            <span className="absolute -top-2 left-1/2 flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full bg-action text-[8px] font-bold text-on-action shadow-md">
               ✦
             </span>
           </div>
 
-          <div className="tape-ring-2 preserve-3d pointer-events-none absolute h-64 w-64 rounded-full border border-black/10 sm:h-72 sm:w-72">
-            <span className="absolute left-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-[#111111]" />
+          <div className="tape-ring-2 preserve-3d pointer-events-none absolute h-64 w-64 rounded-full border border-border-subtle sm:h-72 sm:w-72">
+            <span className="absolute left-0 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-action" />
           </div>
 
           {/* -------------------------------------------------------------- */}
@@ -294,21 +294,21 @@ export default function Loading() {
                   style={{
                     transform: `rotateY(${item.angle}deg) translateZ(172px)`,
                   }}
-                  className="preserve-3d absolute flex items-center gap-2.5 rounded-2xl border border-black/10 bg-white px-3.5 py-2.5 shadow-[0_14px_34px_rgba(0,0,0,0.10)]"
+                  className="preserve-3d absolute flex items-center gap-2.5 rounded-2xl border border-border-subtle bg-surface px-3.5 py-2.5 shadow-[0_14px_34px_rgba(var(--shadow-rgb),0.10)]"
                 >
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#111111] text-white">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-action text-on-action">
                     <Icon size={14} />
                   </span>
                   <div className="pr-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-[8px] font-bold tracking-[0.16em] text-neutral-400">
+                      <span className="font-mono text-[8px] font-bold tracking-[0.16em] text-muted">
                         {item.tag}
                       </span>
-                      <span className="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-[9px] font-black text-[#111111]">
+                      <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[9px] font-black text-primary">
                         {item.price}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-[10px] font-black tracking-[0.08em] text-[#111111]">
+                    <p className="mt-0.5 text-[10px] font-black tracking-[0.08em] text-primary">
                       {item.name}
                     </p>
                   </div>
@@ -326,7 +326,7 @@ export default function Loading() {
               {/* Custom 3D Coat Hanger SVG */}
               <svg
                 viewBox="0 0 64 40"
-                className="h-11 w-16 stroke-[#111111] drop-shadow-md"
+                className="h-11 w-16 stroke-primary drop-shadow-md"
                 fill="none"
                 strokeWidth="3.5"
                 strokeLinecap="round"
@@ -335,7 +335,7 @@ export default function Loading() {
                 <path d="M32 10 C32 5, 39 5, 39 10 C39 14, 32 15, 32 19" />
                 <path d="M32 19 L6 34 C3 35.5, 4 38, 8 38 L56 38 C60 38, 61 35.5, 58 34 L32 19 Z" />
               </svg>
-              <span className=" -mt-2 rounded-full border border-black/15 bg-white px-2.5 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] text-[#111111] shadow-sm">
+              <span className=" -mt-2 rounded-full border border-border-subtle bg-surface px-2.5 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary shadow-sm">
                 NEW SEASON
               </span>
             </div>
@@ -343,59 +343,59 @@ export default function Loading() {
             {/* 2. 3D ARCHED BAG HANDLES (FRONT & BACK HANDLES) */}
             <div
               style={{ transform: "translateY(-68px) translateZ(18px)" }}
-              className="pointer-events-none absolute h-10 w-12 rounded-t-full border-4 border-b-0 border-[#111111]"
+              className="pointer-events-none absolute h-10 w-12 rounded-t-full border-4 border-b-0 border-border"
             />
             <div
               style={{ transform: "translateY(-68px) translateZ(-18px)" }}
-              className="pointer-events-none absolute h-10 w-12 rounded-t-full border-4 border-b-0 border-neutral-700"
+              className="pointer-events-none absolute h-10 w-12 rounded-t-full border-4 border-b-0 border-border-strong"
             />
 
             {/* 3. BAG FRONT FACE (104px wide x 126px high, translateZ 32px) */}
             <div
               style={{ transform: "rotateY(0deg) translateZ(32px)" }}
-              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-[#111111] p-3.5 text-white shadow-[0_20px_40px_rgba(0,0,0,0.25)]"
+              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-action p-3.5 text-on-action shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.25)]"
             >
               {/* Bag Rope Eyelets */}
               <div className="flex w-full justify-around px-3">
-                <span className="h-2 w-2 rounded-full border border-white/60 bg-neutral-800" />
-                <span className="h-2 w-2 rounded-full border border-white/60 bg-neutral-800" />
+                <span className="h-2 w-2 rounded-full border border-border-subtle bg-action-hover" />
+                <span className="h-2 w-2 rounded-full border border-border-subtle bg-action-hover" />
               </div>
 
               {/* Center Brand Print */}
               <div className="text-center">
-                <span className="block text-[15px] font-black tracking-[-0.04em] text-white">
+                <span className="block text-[15px] font-black tracking-[-0.04em] text-on-action">
                   SHOP.CO
                 </span>
-                <span className="mt-0.5 block text-[7px] font-bold uppercase tracking-[0.28em] text-white/50">
+                <span className="mt-0.5 block text-[7px] font-bold uppercase tracking-[0.28em] text-on-action/50">
                   LUXURY BAG
                 </span>
               </div>
 
               {/* Bottom Barcode Strip */}
-              <div className="flex w-full items-center justify-between border-t border-white/15 pt-1.5 text-[7px] font-mono text-white/50">
+              <div className="flex w-full items-center justify-between border-t border-white/15 pt-1.5 text-[7px] font-mono text-on-action/50">
                 <span>EST. 2026</span>
-                <Sparkles size={10} className="text-white" />
+                <Sparkles size={10} className="text-on-action" />
               </div>
             </div>
 
             {/* 4. BAG BACK FACE (translateZ -32px) */}
             <div
               style={{ transform: "rotateY(180deg) translateZ(32px)" }}
-              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-[#111111] p-3.5 text-white shadow-[0_20px_40px_rgba(0,0,0,0.25)]"
+              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-action p-3.5 text-on-action shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.25)]"
             >
               <div className="flex w-full justify-around px-3">
-                <span className="h-2 w-2 rounded-full border border-white/60 bg-neutral-800" />
-                <span className="h-2 w-2 rounded-full border border-white/60 bg-neutral-800" />
+                <span className="h-2 w-2 rounded-full border border-border-subtle bg-action-hover" />
+                <span className="h-2 w-2 rounded-full border border-border-subtle bg-action-hover" />
               </div>
 
               <div className="text-center">
-                <ShoppingBag size={22} className="mx-auto text-white" />
-                <span className="mt-1.5 block text-[8px] font-black uppercase tracking-[0.22em] text-white/80">
+                <ShoppingBag size={22} className="mx-auto text-on-action" />
+                <span className="mt-1.5 block text-[8px] font-black uppercase tracking-[0.22em] text-on-action/80">
                   FIND YOUR STYLE
                 </span>
               </div>
 
-              <span className="text-[7px] font-mono tracking-widest text-white/40">
+              <span className="text-[7px] font-mono tracking-widest text-on-action/40">
                 EDITION // 04
               </span>
             </div>
@@ -407,9 +407,9 @@ export default function Loading() {
                 left: "20px",
                 transform: "rotateY(90deg) translateZ(52px)",
               }}
-              className="absolute inset-y-0 flex flex-col items-center justify-center rounded-b-xl border border-black/15 bg-white text-[#111111] shadow-inner"
+              className="absolute inset-y-0 flex flex-col items-center justify-center rounded-b-xl border border-border-subtle bg-surface text-primary shadow-inner"
             >
-              <span className="[writing-mode:vertical-rl] text-[9px] font-black uppercase tracking-[0.28em] text-[#111111]">
+              <span className="[writing-mode:vertical-rl] text-[9px] font-black uppercase tracking-[0.28em] text-primary">
                 SHOP.CO
               </span>
             </div>
@@ -421,9 +421,9 @@ export default function Loading() {
                 left: "20px",
                 transform: "rotateY(-90deg) translateZ(52px)",
               }}
-              className="absolute inset-y-0 flex flex-col items-center justify-center rounded-b-xl border border-black/15 bg-white text-[#111111] shadow-inner"
+              className="absolute inset-y-0 flex flex-col items-center justify-center rounded-b-xl border border-border-subtle bg-surface text-primary shadow-inner"
             >
-              <span className="[writing-mode:vertical-rl] text-[9px] font-black uppercase tracking-[0.28em] text-[#111111]">
+              <span className="[writing-mode:vertical-rl] text-[9px] font-black uppercase tracking-[0.28em] text-primary">
                 2026 EDIT
               </span>
             </div>
@@ -435,14 +435,14 @@ export default function Loading() {
                 top: "31px",
                 transform: "rotateX(-90deg) translateZ(63px)",
               }}
-              className="absolute inset-x-0 rounded-lg bg-neutral-900"
+              className="absolute inset-x-0 rounded-lg bg-action"
             />
           </div>
 
           {/* -------------------------------------------------------------- */}
           {/* D. 3D FLOOR SHADOW UNDER THE BAG                               */}
           {/* -------------------------------------------------------------- */}
-          <div className="bag-floor-shadow pointer-events-none absolute h-28 w-28 rounded-full bg-black blur-xl" />
+          <div className="bag-floor-shadow pointer-events-none absolute h-28 w-28 rounded-full bg-action blur-xl" />
         </div>
 
         {/* ================================================================ */}
@@ -451,38 +451,38 @@ export default function Loading() {
         <div className="mt-4 flex w-full max-w-md flex-col items-center text-center">
           <div className="flex w-full items-end justify-between px-1">
             <div className="text-left">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.24em] text-neutral-400">
-                <Sparkles size={11} className="text-[#111111]" />
+              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.24em] text-muted">
+                <Sparkles size={11} className="text-primary" />
                 ATELIER STATUS
               </span>
-              <span className="mt-1 block text-xs font-black uppercase tracking-[0.16em] text-[#111111]">
+              <span className="mt-1 block text-xs font-black uppercase tracking-[0.16em] text-primary">
                 {FASHION_STEPS[stepIndex]}
               </span>
             </div>
 
             <div className="text-right font-mono">
-              <span className="text-3xl font-black leading-none tracking-tighter text-[#111111] sm:text-4xl">
+              <span className="text-3xl font-black leading-none tracking-tighter text-primary sm:text-4xl">
                 {String(progress).padStart(2, "0")}
               </span>
-              <span className="text-sm font-extrabold text-neutral-400">%</span>
+              <span className="text-sm font-extrabold text-muted">%</span>
             </div>
           </div>
 
           {/* Tailor Measuring Tape Progress Bar */}
-          <div className="relative mt-3 h-2.5 w-full overflow-hidden rounded-full border border-black/10 bg-white p-0.5 shadow-inner">
+          <div className="relative mt-3 h-2.5 w-full overflow-hidden rounded-full border border-border-subtle bg-surface p-0.5 shadow-inner">
             <div
               style={{ width: `${progress}%` }}
-              className="relative h-full rounded-full bg-[#111111] transition-all duration-75 ease-out"
+              className="relative h-full rounded-full bg-action transition-all duration-75 ease-out"
             />
           </div>
 
           {/* Ruler Ticks Under Progress Bar */}
-          <div className="mt-2 flex w-full justify-between px-1 font-mono text-[8px] font-bold tracking-[0.2em] text-neutral-400">
+          <div className="mt-2 flex w-full justify-between px-1 font-mono text-[8px] font-bold tracking-[0.2em] text-muted">
             <span>00 CM</span>
             <span>25 CM</span>
             <span>50 CM</span>
             <span>75 CM</span>
-            <span className="text-[#111111]">100 CM</span>
+            <span className="text-primary">100 CM</span>
           </div>
         </div>
       </div>
@@ -490,10 +490,10 @@ export default function Loading() {
       {/* ================================================================== */}
       {/* 5. BOTTOM EDITORIAL FOOTER                                         */}
       {/* ================================================================== */}
-      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between border-t border-black/10 pt-4 text-[10px] font-bold uppercase tracking-[0.22em] text-neutral-500">
+      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between border-t border-border-subtle pt-4 text-[10px] font-bold uppercase tracking-[0.22em] text-muted">
         <span>FIND CLOTHES THAT MATCH YOUR STYLE</span>
         <span className="hidden sm:inline">200+ INTERNATIONAL BRANDS</span>
-        <span className="text-[#111111]">SHOP.CO™</span>
+        <span className="text-primary">SHOP.CO™</span>
       </div>
     </div>
   );

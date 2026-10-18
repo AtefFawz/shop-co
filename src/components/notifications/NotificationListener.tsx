@@ -3,7 +3,14 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { Bell, ArrowUpRight, X } from "lucide-react";
+import {
+  Bell,
+  ArrowUpRight,
+  X,
+  Truck,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
 
 import { createSocket, refreshAccessToken } from "@/lib/sockets/socket";
 import {
@@ -11,6 +18,39 @@ import {
   type Notification,
 } from "@/store/notificationStore";
 import { useSocketStore } from "@/store/socketStore";
+
+// Subtle Web Audio API Luxury Chime (Zero external file dependencies)
+function playAtelierChime() {
+  try {
+    if (typeof window === "undefined") return;
+    if (localStorage.getItem("shopco_notif_sound") === "muted") return;
+
+    const AudioCtx =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext })
+        .webkitAudioContext;
+    if (!AudioCtx) return;
+
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(880, ctx.currentTime); // A5
+    osc.frequency.exponentialRampToValueAtTime(1318.5, ctx.currentTime + 0.14); // E6
+
+    gain.gain.setValueAtTime(0.06, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.45);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.45);
+  } catch {
+    // Audio autoplay blocked by browser until user interaction
+  }
+}
 
 export default function NotificationListener() {
   const router = useRouter();
@@ -26,51 +66,75 @@ export default function NotificationListener() {
       return;
     }
 
-    // دالة موحدة لعرض Toast فخم متناسق مع هوية SHOP.CO
     const handleIncomingNotification = (notification: Notification) => {
       addNotification(notification);
+      playAtelierChime();
+
+      const text = `${notification.title || ""} ${
+        notification.message || ""
+      }`.toLowerCase();
+      const ToastIcon =
+        text.includes("ship") || text.includes("deliver")
+          ? Truck
+          : text.includes("confirm") || text.includes("complete")
+            ? CheckCircle2
+            : Bell;
 
       toast.custom(
         (t) => (
           <div
             className={`${
               t.visible ? "animate-enter" : "animate-leave"
-            } pointer-events-auto flex w-full max-w-sm items-start gap-3.5 rounded-2xl border border-white/15 bg-[#080808]/95 p-4 text-white shadow-[0_20px_50px_rgba(0,0,0,0.35)] backdrop-blur-xl`}
+            } pointer-events-auto relative flex w-full max-w-sm flex-col overflow-hidden rounded-3xl border border-white/20 bg-[#111111]/95 p-4 text-white shadow-[0_28px_70px_rgba(0,0,0,0.5)] backdrop-blur-2xl`}
           >
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white text-black shadow-sm">
-              <Bell size={18} strokeWidth={2.3} />
+            <div className="flex items-start gap-3.5">
+              {/* 3D Icon Cube */}
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white text-[#111111] shadow-md">
+                <ToastIcon size={19} strokeWidth={2.3} />
+              </div>
+
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5">
+                  <Sparkles size={10} className="text-amber-400" />
+                  <span className="font-mono text-[8.5px] font-black uppercase tracking-[0.22em] text-white/50">
+                    LIVE TELEMETRY
+                  </span>
+                </div>
+
+                <p className="mt-0.5 truncate text-xs font-black uppercase tracking-wider text-white">
+                  {notification.title || "New Atelier Update"}
+                </p>
+
+                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-300">
+                  {notification.message}
+                </p>
+
+                {notification.order && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      toast.dismiss(t.id);
+                      router.push(`/shop/orders/${notification.order}`);
+                    }}
+                    className="mt-3 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-wider text-[#111111] shadow-xs transition hover:bg-emerald-400"
+                  >
+                    <span>
+                      Inspect Order #
+                      {String(notification.order).slice(-6).toUpperCase()}
+                    </span>
+                    <ArrowUpRight size={12} />
+                  </button>
+                )}
+              </div>
+
+              <button
+                type="button"
+                onClick={() => toast.dismiss(t.id)}
+                className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 transition hover:bg-white/20 hover:text-white"
+              >
+                <X size={13} />
+              </button>
             </div>
-
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-xs font-black uppercase tracking-wider text-white">
-                {notification.title || "New Update"}
-              </p>
-              <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-300">
-                {notification.message}
-              </p>
-
-              {notification.order && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    toast.dismiss(t.id);
-                    router.push(`/shop/orders/${notification.order}`);
-                  }}
-                  className="mt-2.5 inline-flex cursor-pointer items-center gap-1 rounded-lg bg-white/10 px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-wider text-white transition hover:bg-white hover:text-black"
-                >
-                  <span>View Order</span>
-                  <ArrowUpRight size={11} />
-                </button>
-              )}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => toast.dismiss(t.id)}
-              className="flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-full text-neutral-400 transition hover:bg-white/10 hover:text-white"
-            >
-              <X size={14} />
-            </button>
           </div>
         ),
         { duration: 5000, position: "bottom-right" },

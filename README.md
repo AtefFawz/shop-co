@@ -1,29 +1,94 @@
-# 🛒 Shop-co | Modern E-commerce Frontend
+# SHOP.CO — Fashion Storefront
 
-A high-performance, fully responsive e-commerce web application built with **Next.js 14** and **Tailwind CSS**. This project features a clean, modern design for a premium shopping experience.
+A responsive fashion e-commerce frontend built with **Next.js App Router**, **React**, **TypeScript**, and **Tailwind CSS v4**. The UI uses Framer Motion for restrained, accessible interaction animation.
 
-## 🚀 Live Demo
-[Check it out here](https://shop-co-1fqm.vercel.app/)
+## Highlights
 
-## ✨ Features
-- **Dynamic Product Listing:** Fetched directly from a custom REST API.
-- **Advanced Filtering:** Filter products by category, price, and color.
-- **Optimized Images:** Using Next.js Image component and Cloudinary.
-- **User Authentication:** Integrated login/signup flows with JWT.
-- **Responsive Design:** Mobile-first approach using Tailwind CSS.
-- **Custom Error Handling:** Elegant 404 and Error pages for better UX.
+- Responsive storefront, product browsing, shopping cart, authentication, orders, profile and admin dashboard routes.
+- Light and dark appearance modes with animated icon transitions, saved preference, and system-preference support.
+- Shared theme tokens and a compatibility layer for older utility-class surfaces.
+- Mobile navigation and search rendered through portals so they are not trapped by parent stacking contexts.
+- Responsive motion and support for `prefers-reduced-motion`.
+- Existing Axios clients, request flows, backend rewrite, and server transport settings were retained from the supplied project.
+- Existing image loading configuration is retained in `next.config.ts`.
 
-## 🛠️ Tech Stack
-- **Framework:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS
-- **State Management:** React Hooks (useState, useEffect)
-- **Icons & UI:** Material UI (MUI) & Lucide React
-- **Data Fetching:** Axios with custom Interceptors
-- **Deployment:** Vercel
+## Requirements
 
-## 📦 Getting Started
-1. Clone the repo: `git clone <your-repo-url>`
-2. Install dependencies: `npm install`
-3. Set up environment variables: Create a `.env.local` file with:
-   `NEXT_PUBLIC_API_URL=your_backend_api_url`
-4. Run development server: `npm run dev`
+- Node.js 20.9 or newer (recommended for the current Next.js version).
+- npm.
+- A running backend API for authenticated/product data features.
+
+## Getting started
+
+```bash
+cp .env.example .env.local
+npm ci
+npm run dev
+```
+
+Open `http://localhost:3000`.
+
+Set these environment variables in `.env.local` or your deployment environment:
+
+| Variable | Purpose |
+| --- | --- |
+| `NEXT_PUBLIC_SITE_URL` | Public storefront URL used for canonical and social metadata. |
+| `NEXT_PUBLIC_API_URL` | Backend API base URL used by the rewrite and server-side data client. |
+| `NEXT_PUBLIC_SOCKET_URL` | Socket.IO server origin used for authenticated live updates. |
+
+For local development, the backend URL defaults to `http://localhost:4000/api/` in the Next.js rewrite. Update `.env.local` when your API runs elsewhere. Point `NEXT_PUBLIC_SOCKET_URL` at the Socket.IO server origin (usually the same host without the `/api/` suffix).
+
+## Useful commands
+
+```bash
+npm run dev      # Start local development
+npm run lint     # Run ESLint
+npm run build    # Create a production build
+npm start        # Serve a production build
+```
+
+## Theme behavior
+
+The appearance toggle is available in the desktop storefront header, mobile navigation drawer, and admin navigation. The selected theme is saved under the `shopco-theme` local-storage key. When there is no saved selection, the app follows the operating-system appearance preference. The initial theme class is applied before hydration to reduce flash on page load.
+
+The shared theme implementation lives in `src/shared/theme/` and the design tokens plus legacy utility mappings are in `src/app/globals.css`.
+
+## Project structure
+
+```text
+src/
+  app/                    Next.js route adapters, layouts, metadata and boundaries
+  features/               Domain-first feature modules and named page implementations
+    account/              Profile and account views
+    admin/                Dashboard, catalog, orders and user administration
+    auth/                 Sign-in, sign-up and password recovery
+    cart/                 Cart state presentation and cart page
+    catalog/              Product discovery, details, filters and categories
+    checkout/             Checkout and shipping UI
+    home/                 Storefront landing page and hero
+    notifications/        Notification presentation
+    orders/               Customer order history, confirmation and details
+    reviews/              Review and testimonial presentation
+    seller/               Product submission UI
+  shared/
+    components/           Reusable navigation, feedback, motion, layout and UI primitives
+    styles/               Shared component overrides
+    theme/                Appearance provider and light/dark toggle
+  assets/                 Imported visual assets
+  features/*/data/        Feature-owned content/configuration
+  shared/config/           Cross-feature navigation configuration
+  shared/data/             Cross-feature static data
+  hooks/                  Existing hooks (including API-related hooks, unchanged)
+  lib/                    API clients, authentication infrastructure and sockets (unchanged)
+  store/                  Client state stores
+  types/                  Shared TypeScript types
+  utils/                  General-purpose helpers
+```
+
+See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the naming conventions and route-to-page ownership map. App Router files keep Next.js's required `page.tsx` name; their UI implementations use descriptive names under `src/features/**/pages/`.
+
+## Notes
+
+- Keep real secrets out of `NEXT_PUBLIC_*` variables: Next.js exposes them to the browser.
+- API configuration and API-related modules were preserved from the uploaded source project.
+- Product, auth, cart, order, and notification workflows still depend on the configured backend.

@@ -1,5 +1,5 @@
-import Signup from "@/components/features/auth/signup";
-function SignUp() {
-  return <Signup />;
+import SignUpPageContent from "@/features/auth/components/SignUpPageContent";
+
+export default function SignUpRoutePage() {
+  return <SignUpPageContent />;
 }
-export default SignUp;

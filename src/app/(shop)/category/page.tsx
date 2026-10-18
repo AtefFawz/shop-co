@@ -1,8 +1,3 @@
-import { Category as Cat } from "@/components/features/home/category/Category";
-export default function Category() {
-  return (
-    <section>
-      <Cat />
-    </section>
-  );
-}
+import CategoryLandingPage from "@/features/catalog/pages/CategoryLandingPage";
+
+export default CategoryLandingPage;

@@ -1,4 +1,5 @@
-import SignInPage from "@/components/features/auth/SignIn";
-export default async function SignIn() {
-  return <SignInPage />;
+import SignInPageContent from "@/features/auth/components/SignInPageContent";
+
+export default function SignInRoutePage() {
+  return <SignInPageContent />;
 }

@@ -1,8 +1,3 @@
-import { Shop } from "@/components/features/shop/Shop";
-export default function Shopping() {
-  return (
-    <div>
-      <Shop />
-    </div>
-  );
-}
+import ShopCatalogPage from "@/features/catalog/pages/ShopCatalogPage";
+
+export default ShopCatalogPage;

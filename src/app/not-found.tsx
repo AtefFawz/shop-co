@@ -54,7 +54,7 @@ export default function NotFound() {
     <main
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative isolate flex min-h-screen w-full flex-col items-center justify-between overflow-hidden bg-[#F4F3F4] px-4 py-8 text-center text-[#111111] select-none sm:px-8"
+      className="relative isolate flex min-h-screen w-full flex-col items-center justify-between overflow-hidden bg-surface-subtle px-4 py-8 text-center text-primary select-none sm:px-8"
     >
       {/* ================================================================== */}
       {/* GPU 3D ANIMATIONS                                                  */}
@@ -76,7 +76,7 @@ export default function NotFound() {
       {/* Architectural Studio Grid */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#00000006_1px,transparent_1px),linear-gradient(to_bottom,#00000006_1px,transparent_1px)] bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_75%_65%_at_50%_50%,#000_50%,transparent_100%)]"
+        className="pointer-events-none absolute inset-0 bg-grid-subtle bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_75%_65%_at_50%_50%,#000_50%,transparent_100%)]"
       />
 
       {/* Giant 3D Parallax Background "404" */}
@@ -87,7 +87,7 @@ export default function NotFound() {
         }}
         className="pointer-events-none absolute inset-0 flex items-center justify-center overflow-hidden transition-transform duration-200 ease-out"
       >
-        <span className="font-mono text-[clamp(11rem,34vw,28rem)] font-black uppercase leading-none tracking-[-0.08em] text-black/[0.035]">
+        <span className="font-mono text-[clamp(11rem,34vw,28rem)] font-black uppercase leading-none tracking-[-0.08em] text-primary/[0.035]">
           404
         </span>
       </div>
@@ -99,7 +99,7 @@ export default function NotFound() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-black/10 bg-white/90 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-[#111111] shadow-2xs backdrop-blur-md transition-all hover:bg-[#111111] hover:text-white"
+          className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-border-subtle bg-surface/90 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary shadow-2xs backdrop-blur-md transition-all hover:bg-action hover:text-on-action"
         >
           <ArrowLeft
             size={13}
@@ -108,7 +108,7 @@ export default function NotFound() {
           <span>Previous Page</span>
         </button>
 
-        <span className="rounded-full border border-black/10 bg-white/90 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-neutral-700 backdrop-blur-md">
+        <span className="rounded-full border border-border-subtle bg-surface/90 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-secondary backdrop-blur-md">
           STATUS // 404
         </span>
       </header>
@@ -126,18 +126,18 @@ export default function NotFound() {
             transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
             transformStyle: "preserve-3d",
           }}
-          className="relative rounded-[2.6rem] border-2 border-white bg-white/95 p-7 shadow-[0_35px_90px_-20px_rgba(0,0,0,0.15)] backdrop-blur-xl transition-transform duration-200 ease-out sm:p-10"
+          className="relative rounded-[2.6rem] border-2 border-surface bg-surface/95 p-7 shadow-[0_35px_90px_-20px_rgba(var(--shadow-rgb),0.15)] backdrop-blur-xl transition-transform duration-200 ease-out sm:p-10"
         >
           {/* 3D Floating Luxury Price Tag (translateZ +50px) */}
-          <div className="animate-tag-3d mx-auto mb-6 flex w-fit items-center gap-3 rounded-2xl border border-white/20 bg-[#111111] px-4 py-2.5 text-white shadow-[0_18px_36px_-6px_rgba(0,0,0,0.45)]">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-white text-[#111111]">
+          <div className="animate-tag-3d mx-auto mb-6 flex w-fit items-center gap-3 rounded-2xl border border-white/20 bg-action px-4 py-2.5 text-on-action shadow-[0_18px_36px_-6px_rgba(var(--shadow-rgb),0.45)]">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface text-primary">
               <Tag size={15} />
             </span>
             <div className="pr-1 text-left">
-              <span className="block font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-white/50">
+              <span className="block font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-on-action/50">
                 ARCHIVE CODE // 404
               </span>
-              <span className="block text-xs font-black uppercase tracking-wider text-amber-400">
+              <span className="block text-xs font-black uppercase tracking-wider text-rating">
                 Piece Relocated or Sold Out
               </span>
             </div>
@@ -145,13 +145,13 @@ export default function NotFound() {
 
           {/* Main Headline (translateZ +35px) */}
           <div style={{ transform: "translateZ(35px)" }} className="space-y-3">
-            <h1 className="text-3xl font-black uppercase leading-[0.95] tracking-[-0.04em] text-[#111111] sm:text-5xl">
+            <h1 className="text-3xl font-black uppercase leading-[0.95] tracking-[-0.04em] text-primary sm:text-5xl">
               Lost In The
               <br />
-              <span className="text-neutral-400">2026 Archive?</span>
+              <span className="text-muted">2026 Archive?</span>
             </h1>
 
-            <p className="mx-auto max-w-md text-xs font-medium leading-relaxed text-neutral-500 sm:text-sm">
+            <p className="mx-auto max-w-md text-xs font-medium leading-relaxed text-muted sm:text-sm">
               The garment or collection link you followed is either out of
               stock, archived, or moved to a new seasonal drop.
             </p>
@@ -161,24 +161,24 @@ export default function NotFound() {
           <form
             onSubmit={handleSearchSubmit}
             style={{ transform: "translateZ(40px)" }}
-            className="mt-7 flex gap-2 rounded-2xl border border-neutral-200/90 bg-[#F8F8F8] p-1.5 shadow-inner transition-colors focus-within:border-[#111111] focus-within:bg-white"
+            className="mt-7 flex gap-2 rounded-2xl border border-border/90 bg-surface-subtle p-1.5 shadow-inner transition-colors focus-within:border-border focus-within:bg-surface"
           >
             <div className="relative flex flex-1 items-center">
               <Search
                 size={15}
-                className="pointer-events-none absolute left-3.5 text-neutral-400"
+                className="pointer-events-none absolute left-3.5 text-muted"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search hoodies, jackets, jeans..."
-                className="w-full bg-transparent py-2.5 pl-10 pr-3 text-xs font-bold text-[#111111] placeholder:font-medium placeholder:text-neutral-400 focus:outline-none"
+                className="w-full bg-transparent py-2.5 pl-10 pr-3 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none"
               />
             </div>
             <button
               type="submit"
-              className="shrink-0 cursor-pointer rounded-xl bg-[#111111] px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-white transition-all hover:bg-neutral-800 active:scale-95"
+              className="shrink-0 cursor-pointer rounded-xl bg-action px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-on-action transition-all hover:bg-action-hover active:scale-95"
             >
               Search
             </button>
@@ -191,7 +191,7 @@ export default function NotFound() {
           >
             <Link
               href="/"
-              className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-[#111111] py-4 text-xs font-black uppercase tracking-[0.18em] text-white shadow-[0_14px_30px_-8px_rgba(0,0,0,0.4)] transition-all hover:-translate-y-0.5 hover:bg-neutral-800"
+              className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.4)] transition-all hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <Compass size={15} />
               <span>Flagship Home</span>
@@ -203,7 +203,7 @@ export default function NotFound() {
 
             <Link
               href="/shop"
-              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-neutral-200 bg-white py-4 text-xs font-black uppercase tracking-[0.18em] text-[#111111] shadow-2xs transition-all hover:-translate-y-0.5 hover:border-black hover:bg-neutral-50"
+              className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-surface py-4 text-xs font-black uppercase tracking-[0.18em] text-primary shadow-2xs transition-all hover:-translate-y-0.5 hover:border-border-strong hover:bg-surface-subtle"
             >
               <ShoppingBag size={15} />
               <span>Browse Catalog</span>
@@ -211,8 +211,8 @@ export default function NotFound() {
           </div>
 
           {/* Quick Destination Pills */}
-          <div className="mt-6 border-t border-neutral-100 pt-5">
-            <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-neutral-400">
+          <div className="mt-6 border-t border-border-subtle pt-5">
+            <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-muted">
               Direct Showroom Shortcuts
             </span>
             <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2">
@@ -220,7 +220,7 @@ export default function NotFound() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="rounded-full border border-neutral-200/80 bg-[#F8F8F8] px-3.5 py-1 text-[10px] font-bold text-neutral-700 transition-all hover:border-black hover:bg-[#111111] hover:text-white"
+                  className="rounded-full border border-border/80 bg-surface-subtle px-3.5 py-1 text-[10px] font-bold text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
                 >
                   {item.label}
                 </Link>
@@ -233,7 +233,7 @@ export default function NotFound() {
       {/* ================================================================== */}
       {/* 3. BOTTOM EDITORIAL FOOTER                                         */}
       {/* ================================================================== */}
-      <footer className="relative z-20 text-[10px] font-bold uppercase tracking-[0.24em] text-neutral-400">
+      <footer className="relative z-20 text-[10px] font-bold uppercase tracking-[0.24em] text-muted">
         SHOP.CO™ OFFICIAL ONLINE FLAGSHIP · EDITION 2026
       </footer>
     </main>

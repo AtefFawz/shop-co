@@ -10,8 +10,10 @@ import {
   Store,
   Users,
 } from "lucide-react";
-import { NavMobile } from "@/components/common/navbar/NavMobile";
-import { SidebarDesktop } from "@/components/common/navbar/SidebarDesktop";
+import { MobileAdminNavigation } from "@/shared/components/navigation/MobileAdminNavigation";
+import ThemeToggle from "@/shared/theme/ThemeToggle";
+import PageTransition from "@/shared/components/motion/RouteTransition";
+import { AdminDesktopSidebar } from "@/shared/components/navigation/AdminDesktopSidebar";
 
 export default function AdminLayout({
   children,
@@ -49,31 +51,33 @@ export default function AdminLayout({
   ];
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-[#F8F8F8]">
-      <SidebarDesktop
+    <div className="app-background flex h-dvh min-h-dvh w-full overflow-hidden">
+      <AdminDesktopSidebar
         active={path}
         arrayOfData={collection}
         navTitle="Management"
+        collapsedHeaderContent={<ThemeToggle compact />}
         headerContent={
-          <div className="flex items-center gap-4 py-4">
-            <div className="w-12 h-12 rounded-2xl bg-black flex items-center justify-center text-white shadow-xl shadow-black/20 shrink-0">
+          <div className="flex items-center gap-3 py-4">
+            <div className="w-12 h-12 rounded-2xl bg-action flex items-center justify-center text-on-action shadow-[0_18px_38px_-12px_rgba(var(--shadow-rgb),0.2)] shrink-0">
               <ShieldCheck size={24} />
             </div>
-            <div className="min-w-0">
-              <h2 className="text-sm font-black uppercase tracking-tighter leading-none truncate">
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-sm font-black uppercase leading-none tracking-tighter">
                 Admin Panel
               </h2>
-              <p className="text-[10px] font-bold text-green-500 uppercase tracking-widest mt-1 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse shrink-0" />
+              <p className="mt-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-success">
+                <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-success-bright" />
                 Live Mode
               </p>
             </div>
+            <ThemeToggle compact />
           </div>
         }
         extraFooterLinks={
           <Link
             href="/"
-            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-gray-500 hover:bg-gray-50 transition-all"
+            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest text-muted hover:bg-surface-subtle transition-all"
           >
             <Store size={18} /> Back to Store
           </Link>
@@ -87,8 +91,11 @@ export default function AdminLayout({
               <h1 className="text-2xl font-black uppercase tracking-tighter italic">
                 {collection.find((i) => i.href === path)?.label || "Dashboard"}
               </h1>
-              <div className="w-10 h-10 rounded-xl bg-black flex items-center justify-center text-white shadow-lg shrink-0">
-                <ShieldCheck size={18} />
+              <div className="flex items-center gap-2">
+                <ThemeToggle compact />
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-action text-on-action shadow-lg">
+                  <ShieldCheck size={18} />
+                </div>
               </div>
             </div>
 
@@ -99,7 +106,7 @@ export default function AdminLayout({
         {/* 4. MOBILE: Bottom Navigation (Floating Style) */}
         <div className="lg:hidden fixed bottom-2 left-1/2 -translate-x-1/2 z-50 w-[98%] pointer-events-none">
           <div className="pointer-events-auto">
-            <NavMobile arrayOfData={collection} active={path} />
+            <MobileAdminNavigation arrayOfData={collection} active={path} />
           </div>
         </div>
       </div>

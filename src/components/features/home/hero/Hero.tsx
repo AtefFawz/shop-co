@@ -14,112 +14,140 @@ import {
 } from "framer-motion";
 import {
   ArrowUpRight,
-  MoveUpRight,
   Sparkles,
   Star,
   ShieldCheck,
-  Flame,
-  Layers,
-  Plus,
   ShoppingBag,
-  CheckCircle2,
+  Layers,
+  Sun,
+  Moon,
+  Cpu,
+  RotateCcw,
+  Check,
+  Eye,
 } from "lucide-react";
 
 import { itemShop, items, brands } from "@/data/shop/Shop";
 import Screen from "@/assets/shop/screenShop.webp";
 
 /* -------------------------------------------------------------------------- */
-/*                               CONFIG & DATA                                */
+/*                                TYPES & CONFIG                              */
 /* -------------------------------------------------------------------------- */
 
+type StudioMode = "light" | "noir" | "blueprint";
+
 const EASE_OUT_EXPO = [0.16, 1, 0.3, 1] as const;
+const CURTAIN_EASE = [0.76, 0, 0.24, 1] as const;
 
-const DYNAMIC_WORDS = ["YOUR STYLE.", "YOUR VIBE.", "YOUR ERA."];
+const DYNAMIC_HEADLINES = ["YOUR STYLE.", "YOUR VISION.", "YOUR LEGACY."];
 
-const LOOKBOOK_EDITS = [
+const ARCHIVE_PIECES = [
   {
     id: "01",
-    tag: "Street Luxe Edit",
-    title: "Oversized Monochrome Set",
-    subtitle: "Heavyweight cotton · Tailored drop-shoulder",
-    price: "$185.00",
-    badge: "Trending #1",
-    hotspotPos: { top: "38%", left: "58%" },
-    fabric: "480GSM Organic Terry",
+    code: "ARC-01",
+    name: "Structured Noir Denim Jacket",
+    category: "Outerwear Atelier",
+    price: "$240",
+    stock: "In Stock • Milan",
+    spec: "14oz Japanese Selvedge",
+    pin: { x: "62%", y: "44%" },
+    glow: "rgba(59, 130, 246, 0.22)",
+    accentHex: "#3B82F6",
   },
   {
     id: "02",
-    tag: "Minimalist Studio",
-    title: "Structured Urban Outerwear",
-    subtitle: "Weather-resistant weave · Clean silhouette",
-    price: "$240.00",
-    badge: "Editor's Pick",
-    hotspotPos: { top: "48%", left: "36%" },
-    fabric: "Japanese Tech Twill",
+    code: "ARC-02",
+    name: "Heavyweight Studio Hoodie",
+    category: "Core Essentials",
+    price: "$165",
+    stock: "Limited • Tokyo",
+    spec: "480GSM Organic Cotton",
+    pin: { x: "48%", y: "34%" },
+    glow: "rgba(16, 185, 129, 0.22)",
+    accentHex: "#10B981",
   },
   {
     id: "03",
-    tag: "Season Essentials",
-    title: "Contemporary Everyday Layer",
-    subtitle: "Breathable luxury fabric · Relaxed fit",
-    price: "$145.00",
-    badge: "Limited Drop",
-    hotspotPos: { top: "34%", left: "48%" },
-    fabric: "Combed Supima Blend",
+    code: "ARC-03",
+    name: "Titanium Aviator Frames",
+    category: "Optical Archive",
+    price: "$190",
+    stock: "Few Left • Paris",
+    spec: " Hand-Polished Beta Titanium",
+    pin: { x: "52%", y: "18%" },
+    glow: "rgba(245, 158, 11, 0.24)",
+    accentHex: "#F59E0B",
   },
 ];
 
-const QUICK_TAGS = ["New Arrivals", "Streetwear", "Minimalist", "Winter '26"];
-
 /* -------------------------------------------------------------------------- */
-/*                            MAGNETIC 3D WRAPPER                             */
+/*                     ICONIC SHOP.CO 4-POINT VECTOR STAR                     */
 /* -------------------------------------------------------------------------- */
 
-function Magnetic({
-  children,
-  strength = 0.28,
-  reduceMotion,
-}: {
-  children: React.ReactNode;
-  strength?: number;
-  reduceMotion: boolean | null;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const springX = useSpring(x, { stiffness: 220, damping: 18, mass: 0.4 });
-  const springY = useSpring(y, { stiffness: 220, damping: 18, mass: 0.4 });
-
-  const handleMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduceMotion || !ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    x.set((e.clientX - centerX) * strength);
-    y.set((e.clientY - centerY) * strength);
-  };
-
-  const handleLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
+function FourPointStar({ className }: { className?: string }) {
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMove}
-      onMouseLeave={handleLeave}
-      style={{ x: springX, y: springY }}
-      className="inline-block"
+    <svg
+      viewBox="0 0 104 104"
+      fill="currentColor"
+      aria-hidden="true"
+      className={className}
     >
-      {children}
-    </motion.div>
+      <path d="M52 0C53.7654 27.955 76.0448 50.2347 104 52C76.0448 53.7654 53.7654 76.0448 52 104C50.2347 76.0448 27.955 53.7654 0 52C27.955 50.2347 50.2347 27.955 52 0Z" />
+    </svg>
   );
 }
 
 /* -------------------------------------------------------------------------- */
-/*                         ANIMATED NUMBER COUNTER                            */
+/*                  5-COLUMN ARCHITECTURAL CURTAIN INTRO                      */
+/* -------------------------------------------------------------------------- */
+
+function ArchitecturalCurtain({ onComplete }: { onComplete: () => void }) {
+  useEffect(() => {
+    const timer = window.setTimeout(onComplete, 1250);
+    return () => window.clearTimeout(timer);
+  }, [onComplete]);
+
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none fixed inset-0 z-[9999] grid grid-cols-5 overflow-hidden"
+    >
+      {[0, 1, 2, 3, 4].map((col) => (
+        <motion.div
+          key={col}
+          initial={{ y: "0%" }}
+          animate={{ y: "-100%" }}
+          transition={{
+            duration: 0.85,
+            delay: 0.25 + col * 0.065,
+            ease: CURTAIN_EASE,
+          }}
+          className="relative flex h-full flex-col justify-between border-r border-white/10 bg-[#08080A] p-4 text-white/30"
+        >
+          <span className="font-mono text-[9px] font-bold tracking-[0.2em]">
+            0{col + 1} // ATELIER
+          </span>
+          {col === 2 && (
+            <motion.div
+              initial={{ opacity: 1, scale: 1 }}
+              animate={{ opacity: 0, scale: 0.9 }}
+              transition={{ duration: 0.35, delay: 0.15 }}
+              className="self-center whitespace-nowrap font-mono text-xs font-black uppercase tracking-[0.35em] text-white"
+            >
+              SHOP.CO // 2026
+            </motion.div>
+          )}
+          <span className="font-mono text-[8px] tracking-widest">
+            SYS.READY
+          </span>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/* -------------------------------------------------------------------------- */
+/*                           ANIMATED NUMBER COUNTER                          */
 /* -------------------------------------------------------------------------- */
 
 function AnimatedStatValue({ rawValue }: { rawValue: string }) {
@@ -134,12 +162,11 @@ function AnimatedStatValue({ rawValue }: { rawValue: string }) {
   useEffect(() => {
     if (!targetNumber) return;
     let startTime: number | null = null;
-    const duration = 1800;
+    const duration = 1500;
 
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      // Ease out quart
       const eased = 1 - Math.pow(1 - progress, 4);
       setCount(Math.floor(eased * targetNumber));
       if (progress < 1) {
@@ -162,78 +189,7 @@ function AnimatedStatValue({ rawValue }: { rawValue: string }) {
 }
 
 /* -------------------------------------------------------------------------- */
-/*                         3D KINETIC HEADLINE LINE                           */
-/* -------------------------------------------------------------------------- */
-
-function Headline3DLine({
-  text,
-  delay = 0,
-  reduceMotion,
-}: {
-  text: string;
-  delay?: number;
-  reduceMotion: boolean | null;
-}) {
-  return (
-    <span className="block overflow-hidden whitespace-nowrap pb-[0.04em] [perspective:800px]">
-      <motion.span
-        initial={
-          reduceMotion
-            ? false
-            : { y: "115%", rotateX: -65, opacity: 0, filter: "blur(6px)" }
-        }
-        animate={{ y: "0%", rotateX: 0, opacity: 1, filter: "blur(0px)" }}
-        transition={{
-          duration: reduceMotion ? 0 : 0.95,
-          delay: reduceMotion ? 0 : delay,
-          ease: EASE_OUT_EXPO,
-        }}
-        className="block origin-bottom will-change-transform text-[#111111]"
-      >
-        {text}
-      </motion.span>
-    </span>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                       ROTATING 3D EDITORIAL STAMP                          */
-/* -------------------------------------------------------------------------- */
-
-function RotatingEditorialStamp({
-  reduceMotion,
-}: {
-  reduceMotion: boolean | null;
-}) {
-  return (
-    <div className="relative flex h-24 w-24 items-center justify-center rounded-full border border-white/80 bg-white/85 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl sm:h-28 sm:w-28">
-      <motion.svg
-        viewBox="0 0 100 100"
-        animate={reduceMotion ? undefined : { rotate: 360 }}
-        transition={{ duration: 16, repeat: Infinity, ease: "linear" }}
-        className="h-full w-full p-1.5"
-      >
-        <defs>
-          <path
-            id="circlePath"
-            d="M 50, 50 m -37, 0 a 37,37 0 1,1 74,0 a 37,37 0 1,1 -74,0"
-          />
-        </defs>
-        <text className="fill-[#111111] text-[9.2px] font-black uppercase tracking-[0.21em]">
-          <textPath href="#circlePath">
-            SHOP.CO STUDIO • EDITION 2026 •
-          </textPath>
-        </text>
-      </motion.svg>
-      <div className="absolute inset-0 m-auto flex h-9 w-9 items-center justify-center rounded-full bg-[#111111] text-white shadow-md">
-        <Sparkles size={15} />
-      </div>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------------------------- */
-/*                         LUXURY 3D BRAND TICKER                             */
+/*                          LUXURY 3D BRAND TICKER                            */
 /* -------------------------------------------------------------------------- */
 
 function BrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
@@ -243,26 +199,23 @@ function BrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
   return (
     <div
       aria-label="Featured luxury partners"
-      className="relative z-20 overflow-hidden border-y border-white/10 bg-[#0A0A0A] py-4 text-white"
+      className="relative z-20 overflow-hidden border-y border-white/10 bg-[#08080A] py-4 text-white sm:py-5"
     >
-      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-[#0A0A0A] via-[#0A0A0A]/85 to-transparent sm:w-32" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-[#0A0A0A] via-[#0A0A0A]/85 to-transparent sm:w-32" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-[#08080A] to-transparent sm:w-32" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-[#08080A] to-transparent sm:w-32" />
 
-      <div className="Responsive mx-auto flex items-center gap-6 px-4 py-3 sm:px-8 lg:gap-10">
-        <div className="relative z-20 hidden shrink-0 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 backdrop-blur-md lg:flex">
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-white/80">
-            Verified Houses
+      <div className="mx-auto flex w-full max-w-[1440px] items-center gap-6 px-4 sm:px-8">
+        <div className="relative z-20 hidden shrink-0 items-center gap-2.5 rounded-full border border-white/15 bg-white/[0.05] px-3.5 py-1.5 backdrop-blur-md lg:flex">
+          <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+          <span className="font-mono text-[9.5px] font-black uppercase tracking-[0.2em] text-white/80">
+            OFFICIAL HOUSES
           </span>
         </div>
 
         <div className="min-w-0 flex-1 overflow-hidden">
           <div
             className={`flex w-max items-center ${
-              reduceMotion ? "" : "animate-luxury-marquee"
+              reduceMotion ? "" : "animate-shopco-marquee"
             }`}
           >
             {[0, 1, 2].map((copy) => (
@@ -276,12 +229,10 @@ function BrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
                     key={`${copy}-${index}-${brand}`}
                     className="group flex shrink-0 items-center"
                   >
-                    <span className="cursor-default px-6 text-xl font-black uppercase tracking-[-0.03em] text-white/50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 group-hover:text-white sm:px-9 sm:text-2xl lg:text-[26px]">
+                    <span className="cursor-default px-6 text-lg font-black uppercase tracking-[-0.03em] text-white/55 transition-all duration-300 group-hover:scale-105 group-hover:text-white sm:px-10 sm:text-2xl lg:text-[26px]">
                       {brand}
                     </span>
-                    <span className="text-xs text-white/20 transition-all duration-500 group-hover:rotate-180 group-hover:scale-125 group-hover:text-white">
-                      ✦
-                    </span>
+                    <FourPointStar className="h-3 w-3 text-white/20 transition-transform duration-500 group-hover:rotate-90 group-hover:text-amber-400" />
                   </div>
                 ))}
               </div>
@@ -291,7 +242,7 @@ function BrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
       </div>
 
       <style jsx>{`
-        @keyframes luxury-marquee {
+        @keyframes shopco-marquee {
           from {
             transform: translate3d(0, 0, 0);
           }
@@ -299,17 +250,12 @@ function BrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
             transform: translate3d(-33.333%, 0, 0);
           }
         }
-        .animate-luxury-marquee {
-          animation: luxury-marquee 30s linear infinite;
+        .animate-shopco-marquee {
+          animation: shopco-marquee 28s linear infinite;
         }
         @media (hover: hover) {
-          .animate-luxury-marquee:hover {
+          .animate-shopco-marquee:hover {
             animation-play-state: paused;
-          }
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .animate-luxury-marquee {
-            animation: none;
           }
         }
       `}</style>
@@ -323,723 +269,672 @@ function BrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
 
 export default function Hero() {
   const reduceMotion = useReducedMotion();
-  const [activeSlide, setActiveSlide] = useState(0);
+
+  // Interactive Engineering States
+  const [studioMode, setStudioMode] = useState<StudioMode>("light");
+  const [activePieceIdx, setActivePieceIdx] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
-  const [hotspotOpen, setHotspotOpen] = useState(true);
+  const [selectedSize, setSelectedSize] = useState("L");
+  const [curtainActive, setCurtainActive] = useState(false);
+  const [isHoveringStage, setIsHoveringStage] = useState(false);
+  const [coords, setCoords] = useState({ x: 240, y: 180 });
 
   const stageRef = useRef<HTMLDivElement>(null);
 
-  /* ---------------- 3D Physics Tilt & Cursor Glare Values ----------------- */
+  // Trigger Curtain once per session
+  useEffect(() => {
+    if (reduceMotion) return;
+    const seen = sessionStorage.getItem("shopco_curtain_v2");
+    if (!seen) {
+      setCurtainActive(true);
+      sessionStorage.setItem("shopco_curtain_v2", "1");
+    }
+  }, [reduceMotion]);
+
+  // Auto-cycle dynamic headline word
+  useEffect(() => {
+    if (reduceMotion) return;
+    const timer = window.setInterval(() => {
+      setWordIndex((prev) => (prev + 1) % DYNAMIC_HEADLINES.length);
+    }, 3400);
+    return () => window.clearInterval(timer);
+  }, [reduceMotion]);
+
+  /* ---------------- Smooth Spring Physics & Mouse Tracking ---------------- */
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
-  const cursorXPx = useMotionValue(250);
-  const cursorYPx = useMotionValue(250);
+  const cursorX = useMotionValue(200);
+  const cursorY = useMotionValue(200);
 
-  const springConfig = { damping: 22, stiffness: 150, mass: 0.6 };
-  const smoothX = useSpring(mouseX, springConfig);
-  const smoothY = useSpring(mouseY, springConfig);
+  const smoothX = useSpring(mouseX, { stiffness: 140, damping: 22, mass: 0.5 });
+  const smoothY = useSpring(mouseY, { stiffness: 140, damping: 22, mass: 0.5 });
 
-  // True 3D perspective rotations (degrees)
-  const rotateX = useTransform(smoothY, [-0.5, 0.5], [11, -11]);
-  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-13, 13]);
+  const lensX = useSpring(cursorX, { stiffness: 300, damping: 28 });
+  const lensY = useSpring(cursorY, { stiffness: 300, damping: 28 });
 
-  // Multi-plane parallax translations
-  const modelShiftX = useTransform(smoothX, [-0.5, 0.5], [-14, 14]);
-  const modelShiftY = useTransform(smoothY, [-0.5, 0.5], [-10, 10]);
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-8, 8]);
+  const modelParallaxX = useTransform(smoothX, [-0.5, 0.5], [-10, 10]);
+  const modelParallaxY = useTransform(smoothY, [-0.5, 0.5], [-6, 6]);
 
-  const watermarkShiftX = useTransform(smoothX, [-0.5, 0.5], [22, -22]);
-  const watermarkShiftY = useTransform(smoothY, [-0.5, 0.5], [14, -14]);
+  const spotlightBg = useMotionTemplate`radial-gradient(380px circle at ${lensX}px ${lensY}px, rgba(255,255,255,0.45), transparent 80%)`;
 
-  const floatCardX = useTransform(smoothX, [-0.5, 0.5], [-22, 22]);
-  const floatCardY = useTransform(smoothY, [-0.5, 0.5], [-22, 22]);
-
-  const floatBadgeX = useTransform(smoothX, [-0.5, 0.5], [18, -18]);
-  const floatBadgeY = useTransform(smoothY, [-0.5, 0.5], [18, -18]);
-
-  // Dynamic studio spotlight following mouse
-  const glareBackground = useMotionTemplate`radial-gradient(420px circle at ${cursorXPx}px ${cursorYPx}px, rgba(255,255,255,0.65), transparent 80%)`;
-
-  const handleStageMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (reduceMotion || !stageRef.current) return;
+  const handleStageMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!stageRef.current) return;
     const rect = stageRef.current.getBoundingClientRect();
-    const xPct = (e.clientX - rect.left) / rect.width - 0.5;
-    const yPct = (e.clientY - rect.top) / rect.height - 0.5;
-    mouseX.set(xPct);
-    mouseY.set(yPct);
-    cursorXPx.set(e.clientX - rect.left);
-    cursorYPx.set(e.clientY - rect.top);
+    const xPx = Math.round(e.clientX - rect.left);
+    const yPx = Math.round(e.clientY - rect.top);
+
+    cursorX.set(xPx);
+    cursorY.set(yPx);
+    setCoords({ x: xPx, y: yPx });
+
+    if (!reduceMotion) {
+      mouseX.set(xPx / rect.width - 0.5);
+      mouseY.set(yPx / rect.height - 0.5);
+    }
   };
 
-  const handleStageMouseLeave = () => {
+  const handleStageLeave = () => {
+    setIsHoveringStage(false);
     mouseX.set(0);
     mouseY.set(0);
   };
 
-  /* ---------------- Auto-Cycling Lookbook & 3D Headline Word -------------- */
-  useEffect(() => {
-    if (reduceMotion) return;
-    const slideTimer = window.setInterval(() => {
-      setActiveSlide((prev) => (prev + 1) % LOOKBOOK_EDITS.length);
-    }, 4800);
-
-    const wordTimer = window.setInterval(() => {
-      setWordIndex((prev) => (prev + 1) % DYNAMIC_WORDS.length);
-    }, 3200);
-
-    return () => {
-      window.clearInterval(slideTimer);
-      window.clearInterval(wordTimer);
-    };
-  }, [reduceMotion]);
-
-  const currentEdit = LOOKBOOK_EDITS[activeSlide];
+  const activePiece = ARCHIVE_PIECES[activePieceIdx];
+  const isNoir = studioMode === "noir";
+  const isBlueprint = studioMode === "blueprint";
 
   return (
     <>
-      <div className="relative isolate overflow-hidden bg-[#F2F0F1] text-[#111111] selection:bg-[#111111] selection:text-white">
-        {/* Architectural Perspective Grid Backdrop */}
+      {/* ── الستارة السينمائية الافتتاحية (5-Column Curtain) ── */}
+      <AnimatePresence>
+        {curtainActive && (
+          <ArchitecturalCurtain onComplete={() => setCurtainActive(false)} />
+        )}
+      </AnimatePresence>
+
+      <section
+        className={`relative isolate overflow-hidden transition-colors duration-700 ${
+          isNoir
+            ? "bg-[#09090B] text-white selection:bg-white selection:text-black"
+            : isBlueprint
+              ? "bg-[#ECEFF4] text-[#0F172A] selection:bg-blue-600 selection:text-white"
+              : "bg-[#F2F0F1] text-[#111111] selection:bg-black selection:text-white"
+        }`}
+      >
+        {/* ================================================================ */}
+        {/* 1. ARCHITECTURAL GRID & DYNAMIC AMBIENT LIGHTING                 */}
+        {/* ================================================================ */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-size-[4rem_4rem] mask-[radial-gradient(ellipse_85%_75%_at_50%_45%,#000_55%,transparent_100%)]"
+          className={`pointer-events-none absolute inset-0 transition-opacity duration-500 ${
+            isBlueprint
+              ? "bg-[linear-gradient(to_right,#2563eb1a_1px,transparent_1px),linear-gradient(to_bottom,#2563eb1a_1px,transparent_1px)] bg-size-[2.5rem_2.5rem] opacity-100"
+              : isNoir
+                ? "bg-[linear-gradient(to_right,#ffffff0a_1px,transparent_1px),linear-gradient(to_bottom,#ffffff0a_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-100"
+                : "bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-size-[4rem_4rem] opacity-100"
+          }`}
         />
 
-        {/* Ambient Moving Studio Orbs */}
+        {/* Dynamic Studio Glow Behind Stage */}
         <motion.div
           aria-hidden="true"
-          animate={
-            reduceMotion
-              ? undefined
-              : { x: [0, 30, 0], y: [0, -25, 0], scale: [1, 1.08, 1] }
-          }
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="pointer-events-none absolute -left-24 top-10 h-96 w-96 rounded-full bg-white/95 blur-[115px]"
-        />
-        <motion.div
-          aria-hidden="true"
-          animate={
-            reduceMotion
-              ? undefined
-              : { x: [0, -35, 0], y: [0, 30, 0], scale: [1, 1.1, 1] }
-          }
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="pointer-events-none absolute right-[2%] top-[8%] h-[440px] w-[440px] rounded-full bg-white/85 blur-[130px]"
+          animate={{ background: activePiece.glow }}
+          transition={{ duration: 0.8 }}
+          className="pointer-events-none absolute right-[5%] top-[15%] h-[420px] w-[420px] rounded-full blur-[130px]"
         />
 
-        {/* Main Section with your Responsive class + balanced vertical spacing */}
-        <section className="Responsive relative  px-4 py-10! 2xl:pt-0! lg:pb-10! ">
-          <div className="grid grid-cols-1 items-center gap-x-12 lg:grid-cols-12 lg:gap-8 xl:gap-12">
-            {/* ================================================================ */}
-            {/* LEFT COLUMN: 3D KINETIC TYPOGRAPHY & CONVERSION (7 COLUMNS)      */}
-            {/* ================================================================ */}
-            <div className="relative z-20 flex flex-col items-start lg:col-span-7">
-              {/* Interactive Luxury Eyebrow Pill */}
-              <motion.div
-                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-                className="group mb-5 inline-flex items-center gap-3 rounded-full border border-black/10 bg-white/85 px-4 py-1.5 shadow-[0_4px_16px_rgba(0,0,0,0.04)] backdrop-blur-md transition-all duration-300 hover:border-black/25 hover:bg-white"
+        {/* Blueprint CAD Measurement Lines (Only visible in Blueprint Mode) */}
+        <AnimatePresence>
+          {isBlueprint && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="pointer-events-none absolute inset-x-0 top-12 z-20 mx-auto hidden max-w-[1400px] justify-between border-b border-dashed border-blue-500/40 px-8 pb-1 font-mono text-[9.5px] font-bold text-blue-600 lg:flex"
+            >
+              <span>├──── X-AXIS: 1440PX MAX CONTAINER</span>
+              <span>GOLDEN RATIO SPLIT // 7:5 COLUMNS</span>
+              <span>
+                CURSOR TELEMETRY: X:{coords.x} Y:{coords.y} ────┤
+              </span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <div className="mx-auto w-full max-w-[1400px] relative z-10 px-4 pt-5 pb-10 sm:px-6 sm:pt-8 lg:px-10 lg:pb-14">
+          {/* ================================================================ */}
+          {/* 2. TOP STUDIO ENGINEERING CONTROL BAR                            */}
+          {/* ================================================================ */}
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-current/10 pb-4 sm:mb-8">
+            {/* Left: Season Telemetry */}
+            <div className="flex items-center gap-2.5">
+              <span
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[9.5px] font-black uppercase tracking-[0.2em] ${
+                  isNoir ? "bg-white text-black" : "bg-[#111111] text-white"
+                }`}
               >
-                <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-black opacity-75" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-[#111111]" />
-                </span>
-                <span className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-neutral-900 sm:text-[11px]">
-                  New Collection · 2026
-                </span>
-                <span className="h-3 w-px bg-neutral-300" />
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-neutral-600">
-                  <Sparkles
-                    size={12}
-                    className="text-neutral-900 transition-transform duration-500 group-hover:rotate-180"
-                  />
-                  3D Lookbook
-                </span>
-              </motion.div>
+                <Sparkles size={10} className="text-amber-400" />
+                ARCHIVE // 2026
+              </span>
 
-              {/* 3D Kinetic Display Headline */}
-              <h1 className="w-full text-[clamp(2.4rem,5vw,4.85rem)] font-black uppercase leading-[0.94] tracking-[-0.055em]">
-                <Headline3DLine
-                  text="Find clothes"
-                  delay={0.05}
-                  reduceMotion={reduceMotion}
-                />
-                <Headline3DLine
-                  text="that match"
-                  delay={0.14}
-                  reduceMotion={reduceMotion}
-                />
+              <button
+                type="button"
+                onClick={() => setCurtainActive(true)}
+                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-full border px-3 py-1 font-mono text-[9.5px] font-bold uppercase tracking-wider transition ${
+                  isNoir
+                    ? "border-white/15 bg-white/5 text-white/80 hover:bg-white hover:text-black"
+                    : "border-black/10 bg-white/80 text-neutral-700 hover:bg-black hover:text-white"
+                }`}
+              >
+                <RotateCcw size={10} />
+                <span>Replay Reveal</span>
+              </button>
+            </div>
 
-                {/* 3D Flipping Dynamic Third Line */}
-                <div className="relative mt-1 inline-flex items-center">
-                  <div className="relative h-[1.08em] overflow-hidden [perspective:900px]">
-                    <AnimatePresence mode="wait">
+            {/* Right: Interactive Studio Lighting & CAD Mode Switcher */}
+            <div
+              role="group"
+              aria-label="Studio Lighting Mode"
+              className={`inline-flex items-center gap-1 rounded-full border p-1 backdrop-blur-xl ${
+                isNoir
+                  ? "border-white/15 bg-white/[0.06]"
+                  : "border-black/10 bg-white/90 shadow-xs"
+              }`}
+            >
+              {(
+                [
+                  { id: "light", label: "Studio", Icon: Sun },
+                  { id: "noir", label: "Noir", Icon: Moon },
+                  { id: "blueprint", label: "X-Ray CAD", Icon: Cpu },
+                ] as const
+              ).map(({ id, label, Icon }) => {
+                const active = studioMode === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setStudioMode(id)}
+                    className={`relative flex cursor-pointer items-center gap-1.5 rounded-full px-3 py-1 font-mono text-[10px] font-black uppercase tracking-wider transition-colors ${
+                      active
+                        ? isNoir
+                          ? "text-black"
+                          : "text-white"
+                        : isNoir
+                          ? "text-white/60 hover:text-white"
+                          : "text-neutral-500 hover:text-black"
+                    }`}
+                  >
+                    {active && (
                       <motion.span
-                        key={DYNAMIC_WORDS[wordIndex]}
-                        initial={
-                          reduceMotion
-                            ? false
-                            : {
-                                rotateX: -85,
-                                y: "60%",
-                                opacity: 0,
-                                filter: "blur(6px)",
-                              }
-                        }
-                        animate={{
-                          rotateX: 0,
-                          y: "0%",
-                          opacity: 1,
-                          filter: "blur(0px)",
-                        }}
-                        exit={{
-                          rotateX: 85,
-                          y: "-60%",
-                          opacity: 0,
-                          filter: "blur(6px)",
-                        }}
+                        layoutId="studioModeActivePill"
                         transition={{
-                          duration: 0.65,
-                          ease: EASE_OUT_EXPO,
+                          type: "spring",
+                          stiffness: 420,
+                          damping: 30,
                         }}
-                        className="block origin-center bg-linear-to-r from-neutral-900 via-neutral-500 to-neutral-400 bg-clip-text text-transparent will-change-transform"
-                      >
-                        {DYNAMIC_WORDS[wordIndex]}
-                      </motion.span>
-                    </AnimatePresence>
-                  </div>
+                        className={`absolute inset-0 rounded-full ${
+                          isNoir
+                            ? "bg-white"
+                            : id === "blueprint"
+                              ? "bg-blue-600"
+                              : "bg-[#111111]"
+                        }`}
+                      />
+                    )}
+                    <Icon size={11} className="relative z-10" />
+                    <span className="relative z-10">{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
 
-                  {/* Animated Laser Underline */}
-                  <motion.span
-                    initial={reduceMotion ? false : { scaleX: 0 }}
-                    animate={{ scaleX: 1 }}
-                    transition={{
-                      duration: 1,
-                      delay: 0.55,
-                      ease: EASE_OUT_EXPO,
-                    }}
-                    className="absolute -bottom-1 left-0 h-[3px] w-full origin-left rounded-full bg-linear-to-r from-[#111111] via-neutral-500 to-transparent sm:h-1"
-                  />
-                </div>
-              </h1>
+          {/* ================================================================ */}
+          {/* 3. MAIN 12-COLUMN ASYMMETRIC RUNWAY WORKSPACE                    */}
+          {/* ================================================================ */}
+          <div className="grid grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-10">
+            {/* ── LEFT 7 COLUMNS: KINETIC TYPOGRAPHY & LIVE SPEC CONSOLE ── */}
+            <div className="flex flex-col items-start lg:col-span-7">
+              {/* Masked Editorial Headline */}
+              <div className="w-full">
+                <h1 className="text-[clamp(2.35rem,5.3vw,4.9rem)] font-black uppercase leading-[0.94] tracking-[-0.05em]">
+                  <span className="block overflow-hidden pb-1">
+                    <motion.span
+                      initial={{ y: "100%", opacity: 0 }}
+                      animate={{ y: "0%", opacity: 1 }}
+                      transition={{ duration: 0.75, ease: EASE_OUT_EXPO }}
+                      className="block"
+                    >
+                      FIND CLOTHES
+                    </motion.span>
+                  </span>
 
-              {/* Editorial Description */}
+                  <span className="block overflow-hidden pb-1">
+                    <motion.span
+                      initial={{ y: "100%", opacity: 0 }}
+                      animate={{ y: "0%", opacity: 1 }}
+                      transition={{
+                        duration: 0.75,
+                        delay: 0.08,
+                        ease: EASE_OUT_EXPO,
+                      }}
+                      className="block"
+                    >
+                      THAT MATCHES
+                    </motion.span>
+                  </span>
+
+                  {/* Interactive Click-to-Cycle 3D Capsule */}
+                  <span className="mt-1.5 inline-flex flex-wrap items-center gap-3 sm:mt-2.5">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setWordIndex(
+                          (prev) => (prev + 1) % DYNAMIC_HEADLINES.length,
+                        )
+                      }
+                      title="Click to cycle headline"
+                      className={`group relative inline-flex cursor-pointer items-center overflow-hidden rounded-2xl px-4 py-1.5 shadow-xl transition-transform active:scale-95 sm:rounded-3xl sm:px-6 sm:py-2 ${
+                        isNoir
+                          ? "bg-white text-black"
+                          : isBlueprint
+                            ? "bg-blue-600 text-white"
+                            : "bg-[#111111] text-white"
+                      }`}
+                    >
+                      <AnimatePresence mode="wait">
+                        <motion.span
+                          key={DYNAMIC_HEADLINES[wordIndex]}
+                          initial={{ y: 24, opacity: 0, filter: "blur(4px)" }}
+                          animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                          exit={{ y: -24, opacity: 0, filter: "blur(4px)" }}
+                          transition={{ duration: 0.4, ease: EASE_OUT_EXPO }}
+                          className="block"
+                        >
+                          {DYNAMIC_HEADLINES[wordIndex]}
+                        </motion.span>
+                      </AnimatePresence>
+                    </button>
+                  </span>
+                </h1>
+              </div>
+
+              {/* Description */}
               <motion.p
-                initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
-                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                transition={{ duration: 0.8, delay: 0.25, ease: EASE_OUT_EXPO }}
-                className="mt-5 max-w-[52ch] text-pretty text-sm leading-[1.75] text-neutral-600 sm:text-[15px] sm:leading-[1.8]"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: EASE_OUT_EXPO }}
+                className={`mt-4 max-w-[54ch] text-xs font-medium leading-[1.75] sm:mt-5 sm:text-[15px] ${
+                  isNoir ? "text-neutral-400" : "text-neutral-600"
+                }`}
               >
                 {itemShop.description}
               </motion.p>
 
-              {/* Interactive Quick Filter Pills */}
+              {/* ── Interactive Garment Spec Console (Synced with Stage Pins) ── */}
               <motion.div
-                initial={{ opacity: 0, y: 18 }}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, delay: 0.32, ease: EASE_OUT_EXPO }}
-                className="mt-4 flex flex-wrap items-center gap-2"
+                transition={{
+                  duration: 0.75,
+                  delay: 0.28,
+                  ease: EASE_OUT_EXPO,
+                }}
+                className={`mt-6 w-full max-w-xl rounded-3xl border p-4 backdrop-blur-xl transition-colors sm:p-5 ${
+                  isNoir
+                    ? "border-white/15 bg-white/[0.04]"
+                    : isBlueprint
+                      ? "border-blue-500/30 bg-white/90 shadow-sm"
+                      : "border-black/10 bg-white/85 shadow-[0_14px_35px_rgba(0,0,0,0.04)]"
+                }`}
               >
-                <span className="mr-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-neutral-400">
-                  Curated:
-                </span>
-                {QUICK_TAGS.map((tag) => (
-                  <Link
-                    key={tag}
-                    href="/shop"
-                    className="group relative overflow-hidden rounded-full border border-neutral-300/90 bg-white/75 px-3.5 py-1 text-[11px] font-bold text-neutral-700 shadow-2xs backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-black hover:bg-[#111111] hover:text-white hover:shadow-md"
-                  >
-                    {tag}
-                  </Link>
-                ))}
-              </motion.div>
-
-              {/* Magnetic 3D CTAs */}
-              <motion.div
-                initial={{ opacity: 0, y: 22 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4, ease: EASE_OUT_EXPO }}
-                className="mt-7 flex flex-wrap items-center gap-4"
-              >
-                <Magnetic reduceMotion={reduceMotion} strength={0.25}>
-                  <Link
-                    href="/shop"
-                    className="group relative inline-flex min-h-[52px] items-center justify-center gap-4 overflow-hidden rounded-full bg-[#111111] px-8 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] text-white shadow-[0_18px_38px_-10px_rgba(0,0,0,0.45)] transition-all duration-300 hover:shadow-[0_24px_48px_-10px_rgba(0,0,0,0.6)] sm:min-h-[56px] sm:px-9"
-                  >
-                    {/* Animated light sweep */}
-                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
-                    <span className="relative z-10">{itemShop.btnText}</span>
-                    <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 transition-all duration-300 group-hover:rotate-45 group-hover:scale-110 group-hover:bg-white group-hover:text-black">
-                      <ArrowUpRight size={15} />
-                    </span>
-                  </Link>
-                </Magnetic>
-
-                <Magnetic reduceMotion={reduceMotion} strength={0.18}>
-                  <Link
-                    href="/shop"
-                    className="group inline-flex min-h-[52px] items-center gap-3 rounded-full border border-neutral-300/90 bg-white/80 px-6 py-3.5 text-xs font-extrabold uppercase tracking-[0.14em] text-neutral-900 shadow-xs backdrop-blur-md transition-all duration-300 hover:border-black hover:bg-white hover:shadow-md sm:min-h-[56px]"
-                  >
-                    <span>Explore Lookbook</span>
-                    <MoveUpRight
-                      size={15}
-                      className="text-neutral-500 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black"
-                    />
-                  </Link>
-                </Magnetic>
-              </motion.div>
-
-              {/* Live Social Proof & Avatar Stack */}
-              <motion.div
-                initial={{ opacity: 0, y: 18 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.48, ease: EASE_OUT_EXPO }}
-                className="mt-6 flex flex-wrap items-center gap-4 text-xs text-neutral-600"
-              >
-                <div className="flex items-center gap-2.5 rounded-full border border-black/5 bg-white/75 px-3.5 py-1.5 backdrop-blur-md">
-                  <div className="flex -space-x-2">
-                    {["S", "M", "A"].map((letter, idx) => (
-                      <span
-                        key={letter}
-                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-white text-[10px] font-black text-white ${
-                          idx === 0
-                            ? "bg-neutral-900"
-                            : idx === 1
-                              ? "bg-neutral-700"
-                              : "bg-neutral-500"
-                        }`}
-                      >
-                        {letter}
-                      </span>
-                    ))}
+                {/* Piece Selector Tabs */}
+                <div className="flex flex-wrap items-center justify-between gap-2 border-b border-current/10 pb-3">
+                  <div className="flex items-center gap-1.5">
+                    {ARCHIVE_PIECES.map((piece, idx) => {
+                      const active = activePieceIdx === idx;
+                      return (
+                        <button
+                          key={piece.id}
+                          type="button"
+                          onClick={() => setActivePieceIdx(idx)}
+                          className={`cursor-pointer rounded-xl px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-wider transition-all ${
+                            active
+                              ? isNoir
+                                ? "bg-white text-black shadow-sm"
+                                : "bg-[#111111] text-white shadow-sm"
+                              : "opacity-60 hover:opacity-100"
+                          }`}
+                        >
+                          {piece.code}
+                        </button>
+                      );
+                    })}
                   </div>
-                  <div className="flex text-amber-500">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={12} fill="currentColor" />
-                    ))}
-                  </div>
-                  <span className="font-extrabold text-neutral-900">4.9/5</span>
-                  <span className="text-[11px] text-neutral-500">
-                    (12.4k+ reviews)
+
+                  <span className="font-mono text-[10px] font-bold text-emerald-500">
+                    ● {activePiece.stock}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-1.5 font-semibold text-neutral-700">
-                  <ShieldCheck size={16} className="text-neutral-900" />
-                  <span>100% Authentic Luxury</span>
+                {/* Active Piece Details + Size Matrix */}
+                <div className="mt-3.5 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-[10px] font-bold uppercase tracking-widest opacity-55">
+                        {activePiece.category}
+                      </span>
+                      <span className="font-mono text-xs font-black text-amber-500">
+                        {activePiece.price}
+                      </span>
+                    </div>
+                    <h2 className="mt-0.5 truncate text-sm font-black uppercase tracking-tight sm:text-base">
+                      {activePiece.name}
+                    </h2>
+                    <p className="mt-0.5 font-mono text-[10.5px] opacity-65">
+                      Spec: {activePiece.spec}
+                    </p>
+                  </div>
+
+                  {/* Interactive Size Selector */}
+                  <div className="flex shrink-0 items-center gap-1.5">
+                    {["S", "M", "L", "XL"].map((sz) => {
+                      const isSelected = selectedSize === sz;
+                      return (
+                        <button
+                          key={sz}
+                          type="button"
+                          onClick={() => setSelectedSize(sz)}
+                          className={`flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border font-mono text-[10.5px] font-black transition-all ${
+                            isSelected
+                              ? isNoir
+                                ? "border-white bg-white text-black"
+                                : "border-black bg-black text-white"
+                              : "border-current/15 opacity-65 hover:opacity-100"
+                          }`}
+                        >
+                          {sz}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </motion.div>
 
-              {/* Interactive 3D Stat Cards with Animated Counters */}
+              {/* ── Primary CTAs ── */}
               <motion.div
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{
-                  duration: 0.85,
-                  delay: 0.56,
+                  duration: 0.75,
+                  delay: 0.36,
                   ease: EASE_OUT_EXPO,
                 }}
-                className="mt-7 grid w-full grid-cols-3 gap-3 sm:gap-4"
+                className="mt-6 flex w-full flex-col items-stretch gap-3 sm:w-auto sm:flex-row sm:items-center"
               >
-                {items.map((item, index) => (
-                  <div
-                    key={`${item.title}-${index}`}
-                    className="group relative overflow-hidden rounded-2xl border border-white/90 bg-white/70 p-3.5 shadow-[0_8px_24px_rgba(0,0,0,0.03)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-black/15 hover:bg-white hover:shadow-[0_16px_32px_rgba(0,0,0,0.07)] sm:p-4"
-                  >
-                    <span className="pointer-events-none absolute -right-4 -top-4 h-14 w-14 rounded-full bg-black/[0.03] transition-transform duration-500 group-hover:scale-150" />
-                    <p className="text-[clamp(1.35rem,2.6vw,2.15rem)] font-black leading-none tracking-[-0.05em] text-[#111111]">
-                      <AnimatedStatValue rawValue={item.title} />
-                    </p>
-                    <p className="mt-1.5 text-[9px] font-bold uppercase leading-snug tracking-[0.1em] text-neutral-500 sm:text-[11px]">
-                      {item.description}
-                    </p>
-                  </div>
-                ))}
+                <Link
+                  href="/shop"
+                  className={`group inline-flex min-h-[52px] items-center justify-center gap-3.5 rounded-full px-8 py-3.5 text-xs font-black uppercase tracking-[0.18em] shadow-lg transition-all duration-300 active:scale-95 ${
+                    isNoir
+                      ? "bg-white text-black hover:bg-neutral-200"
+                      : "bg-[#111111] text-white hover:bg-neutral-800"
+                  }`}
+                >
+                  <ShoppingBag size={15} />
+                  <span>{itemShop.btnText || "SHOP COLLECTION"}</span>
+                  <ArrowUpRight
+                    size={16}
+                    className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                  />
+                </Link>
+
+                <Link
+                  href="/category"
+                  className={`inline-flex min-h-[52px] items-center justify-center gap-2 rounded-full border px-7 py-3.5 text-xs font-black uppercase tracking-[0.15em] transition-all duration-200 ${
+                    isNoir
+                      ? "border-white/20 bg-white/5 text-white hover:bg-white/15"
+                      : "border-black/15 bg-white/80 text-black hover:border-black hover:bg-white"
+                  }`}
+                >
+                  <Eye size={15} />
+                  <span>Explore Lookbook</span>
+                </Link>
               </motion.div>
             </div>
 
             {/* ================================================================ */}
-            {/* RIGHT COLUMN: TRUE 3D HOLOGRAPHIC STAGE (5 COLUMNS)              */}
+            {/* RIGHT 5 COLUMNS: CLEAN INTERACTIVE STUDIO VIEWPORT               */}
             {/* ================================================================ */}
-            <div
-              ref={stageRef}
-              onMouseMove={handleStageMouseMove}
-              onMouseLeave={handleStageMouseLeave}
-              className="relative z-10 mx-auto w-full max-w-[500px] perspective-[1400px] lg:col-span-5 lg:max-w-none mt-20"
-            >
-              {/* 3D Tilt Container with preserve-3d */}
+            <div className="relative mx-auto w-full max-w-[460px] [perspective:1400px] lg:col-span-5 lg:max-w-none">
               <motion.div
+                ref={stageRef}
+                onMouseEnter={() => setIsHoveringStage(true)}
+                onMouseMove={handleStageMove}
+                onMouseLeave={handleStageLeave}
                 style={{
                   rotateX: reduceMotion ? 0 : rotateX,
                   rotateY: reduceMotion ? 0 : rotateY,
                   transformStyle: "preserve-3d",
                 }}
-                className="relative w-full"
+                className={`group relative aspect-[4/4.65] w-full overflow-hidden rounded-[2rem] border-[3px] transition-colors duration-500 sm:rounded-[2.4rem] ${
+                  isNoir
+                    ? "border-white/20 bg-[#141418] shadow-[0_30px_80px_rgba(0,0,0,0.65)]"
+                    : isBlueprint
+                      ? "border-blue-600/50 bg-[#E2E8F0] shadow-[0_25px_60px_rgba(37,99,235,0.12)]"
+                      : "border-white bg-[#EAE8E9] shadow-[0_30px_70px_-15px_rgba(0,0,0,0.2)]"
+                }`}
               >
-                {/* ------------------------------------------------------------ */}
-                {/* DEPTH LAYER -1 (translateZ -35px): 3D Gyroscopic Orbit Rings */}
-                {/* ------------------------------------------------------------ */}
+                {/* Specular Mouse Glare */}
                 <motion.div
                   aria-hidden="true"
-                  style={{ transform: "translateZ(-35px)" }}
-                  animate={reduceMotion ? undefined : { rotate: 360 }}
-                  transition={{
-                    duration: 42,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
-                  className="pointer-events-none absolute -inset-4 z-0 m-auto aspect-square w-[98%] rounded-full border border-dashed border-neutral-400/45 sm:-inset-6"
-                >
-                  <span className="absolute left-[14%] top-[14%] h-3 w-3 rounded-full bg-[#111111] ring-4 ring-black/10" />
-                  <span className="absolute bottom-[14%] right-[14%] h-2 w-2 rounded-full bg-neutral-500" />
-                </motion.div>
+                  style={{ background: spotlightBg }}
+                  className="pointer-events-none absolute inset-0 z-30 mix-blend-overlay"
+                />
 
-                {/* ------------------------------------------------------------ */}
-                {/* DEPTH LAYER 0 (Base): Main Architectural Monolith Frame      */}
-                {/* ------------------------------------------------------------ */}
-                <motion.div
-                  initial={
-                    reduceMotion
-                      ? false
-                      : { opacity: 0, scale: 0.92, rotateY: -12 }
-                  }
-                  animate={{ opacity: 1, scale: 1, rotateY: 0 }}
-                  transition={{ duration: 1.1, ease: EASE_OUT_EXPO }}
-                  style={{ transformStyle: "preserve-3d" }}
-                  className="relative z-10 aspect-[4/4.65] w-full overflow-hidden rounded-[2.2rem] border-2 border-white bg-[#F2F0F1] shadow-[0_35px_90px_-20px_rgba(0,0,0,0.22)] sm:rounded-[2.5rem]"
-                >
-                  {/* Dynamic Mouse-Following Studio Glare */}
-                  <motion.div
-                    aria-hidden="true"
-                    style={{ background: glareBackground }}
-                    className="pointer-events-none absolute inset-0 z-30 mix-blend-overlay transition-opacity duration-300"
-                  />
-
-                  {/* Architectural Grid Inside Frame */}
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-size-[2.25rem_2.25rem]"
-                  />
-
-                  {/* Giant 3D Parallax Watermark Behind Model */}
-                  <motion.div
-                    aria-hidden="true"
-                    style={{
-                      x: watermarkShiftX,
-                      y: watermarkShiftY,
-                    }}
-                    className="pointer-events-none absolute inset-x-0 top-12 z-10 flex flex-col items-center select-none"
-                  >
-                    <span className="text-[clamp(3.8rem,7vw,5.6rem)] font-black uppercase leading-none tracking-[-0.06em] text-black/[0.065]">
-                      SHOP.CO
-                    </span>
-                    <span className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.45em] text-black/20">
-                      ARCHIVE // 2026
-                    </span>
-                  </motion.div>
-
-                  {/* Top HUD Frame Bar */}
-                  <div className="relative z-30 flex items-center justify-between px-5 pt-4 sm:px-6 sm:pt-5">
-                    <AnimatePresence mode="wait">
-                      <motion.span
-                        key={currentEdit.badge}
-                        initial={{ opacity: 0, y: -8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/90 px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-neutral-900 shadow-xs backdrop-blur-md"
-                      >
-                        <Flame size={12} className="fill-black text-black" />
-                        {currentEdit.badge}
-                      </motion.span>
-                    </AnimatePresence>
-
-                    <span className="rounded-full border border-black/5 bg-white/80 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-neutral-700 backdrop-blur-md">
-                      LOOK / {currentEdit.id}
-                    </span>
-                  </div>
-
-                  {/* ---------------------------------------------------------- */}
-                  {/* THE HERO MODEL IMAGE - Full Bleed Seamless Integration     */}
-                  {/* ---------------------------------------------------------- */}
-                  <motion.div
-                    style={{
-                      x: modelShiftX,
-                      y: modelShiftY,
-                    }}
-                    className="absolute inset-0 top-6 z-20"
-                  >
-                    <Image
-                      src={Screen}
-                      alt="SHOP.CO 3D Fashion Lookbook"
-                      fill
-                      priority
-                      quality={95}
-                      sizes="(max-width: 768px) 95vw, (max-width: 1200px) 50vw, 600px"
-                      className="object-cover object-top mix-blend-multiply transition-transform duration-700 ease-out hover:scale-[1.04]"
+                {/* Top Camera HUD Bar Inside Frame (Does not block faces) */}
+                <div className="pointer-events-none absolute inset-x-4 top-4 z-30 flex items-center justify-between">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-black/75 px-3 py-1 font-mono text-[9px] font-black uppercase tracking-widest text-white backdrop-blur-md">
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: activePiece.accentHex }}
                     />
-                  </motion.div>
+                    {activePiece.code} // {selectedSize}
+                  </span>
 
-                  {/* ---------------------------------------------------------- */}
-                  {/* INTERACTIVE SHOPPABLE HOTSPOT ON THE MODEL                 */}
-                  {/* ---------------------------------------------------------- */}
-                  <motion.div
-                    animate={{
-                      top: currentEdit.hotspotPos.top,
-                      left: currentEdit.hotspotPos.left,
-                    }}
-                    transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-                    className="absolute z-30"
-                  >
-                    <div className="relative">
-                      <button
-                        type="button"
-                        onClick={() => setHotspotOpen((prev) => !prev)}
-                        aria-label="Toggle outfit hotspot details"
-                        className="group relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-[#111111] text-white shadow-[0_8px_20px_rgba(0,0,0,0.35)] transition-transform duration-300 hover:scale-110"
-                      >
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-black opacity-60" />
-                        <Plus
-                          size={14}
-                          className={`relative z-10 transition-transform duration-300 ${
-                            hotspotOpen ? "rotate-45" : "rotate-0"
-                          }`}
-                        />
-                      </button>
+                  <span className="rounded-full bg-white/85 px-2.5 py-1 font-mono text-[9px] font-black text-black backdrop-blur-md">
+                    {isBlueprint
+                      ? `X:${coords.x} Y:${coords.y}`
+                      : "60FPS // 3D"}
+                  </span>
+                </div>
 
-                      <AnimatePresence>
-                        {hotspotOpen && (
-                          <motion.div
-                            key={currentEdit.id}
-                            initial={{ opacity: 0, scale: 0.88, y: 8 }}
-                            animate={{ opacity: 1, scale: 1, y: 0 }}
-                            exit={{ opacity: 0, scale: 0.88, y: 8 }}
-                            transition={{ duration: 0.25 }}
-                            className=" absolute left-10 -top-3 w-48 rounded-2xl border border-white/90 bg-white/95 p-2.5 shadow-[0_16px_36px_rgba(0,0,0,0.18)] backdrop-blur-xl"
-                          >
-                            <div className="flex items-center justify-between">
-                              <span className="text-[9px] font-extrabold uppercase tracking-wider text-neutral-400">
-                                {currentEdit.fabric}
-                              </span>
-                              <span className="rounded-md bg-[#111111] px-1.5 py-0.5 text-[10px] font-black text-white">
-                                {currentEdit.price}
-                              </span>
-                            </div>
-                            <p className="mt-1 truncate text-[11px] font-extrabold text-neutral-900">
-                              {currentEdit.title}
-                            </p>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </motion.div>
+                {/* Iconic SHOP.CO 4-Point Stars */}
+                <FourPointStar
+                  className={`pointer-events-none absolute top-14 right-5 z-10 h-12 w-12 transition-colors duration-500 sm:h-16 sm:w-16 ${
+                    isNoir
+                      ? "text-white/20"
+                      : isBlueprint
+                        ? "text-blue-600/30"
+                        : "text-black"
+                  }`}
+                />
+                <FourPointStar
+                  className={`pointer-events-none absolute top-[44%] left-5 z-10 h-7 w-7 transition-colors duration-500 sm:h-9 sm:w-9 ${
+                    isNoir
+                      ? "text-white/20"
+                      : isBlueprint
+                        ? "text-blue-600/30"
+                        : "text-black"
+                  }`}
+                />
 
-                  {/* 3D Floating Sparkle Stars */}
-                  <motion.span
-                    aria-hidden="true"
-                    animate={
-                      reduceMotion
-                        ? undefined
-                        : { rotate: [0, 90, 180], scale: [1, 1.2, 1] }
-                    }
-                    transition={{
-                      duration: 8,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="pointer-events-none absolute right-6 top-[20%] z-20 select-none text-3xl text-[#111111] drop-shadow-sm sm:text-4xl"
-                  >
-                    ✦
-                  </motion.span>
-
-                  <motion.span
-                    aria-hidden="true"
-                    animate={
-                      reduceMotion
-                        ? undefined
-                        : { rotate: [180, 90, 0], scale: [1, 1.25, 1] }
-                    }
-                    transition={{
-                      duration: 6,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                    className="pointer-events-none absolute left-6 top-[48%] z-20 select-none text-xl text-neutral-800 sm:text-2xl"
-                  >
-                    ✦
-                  </motion.span>
-
-                  {/* Bottom Studio Vignette */}
-                  <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-28 bg-linear-to-t from-black/25 via-black/5 to-transparent"
+                {/* Hero Model Image */}
+                <motion.div
+                  style={{ x: modelParallaxX, y: modelParallaxY }}
+                  className="absolute inset-0 top-6 z-20"
+                >
+                  <Image
+                    src={Screen}
+                    alt="SHOP.CO Flagship Lookbook"
+                    fill
+                    priority
+                    sizes="(max-width: 768px) 95vw, (max-width: 1200px) 45vw, 560px"
+                    className={`object-cover object-top transition-all duration-500 ${
+                      isNoir
+                        ? "brightness-95 contrast-110"
+                        : isBlueprint
+                          ? "contrast-125 saturate-50"
+                          : "mix-blend-multiply"
+                    }`}
                   />
                 </motion.div>
 
-                {/* ------------------------------------------------------------ */}
-                {/* DEPTH LAYER +2 (translateZ +65px): Rotating 3D Stamp         */}
-                {/* ------------------------------------------------------------ */}
-                <motion.div
-                  style={{
-                    x: floatBadgeX,
-                    y: floatBadgeY,
-                    transform: "translateZ(65px)",
-                  }}
-                  className="pointer-events-none absolute -left-4 -top-6 z-30 hidden sm:block lg:-left-8"
-                >
-                  <RotatingEditorialStamp reduceMotion={reduceMotion} />
-                </motion.div>
+                {/* Minimal Numbered Hotspot Pins (No giant popups blocking the model) */}
+                {ARCHIVE_PIECES.map((piece, idx) => {
+                  const isSelected = activePieceIdx === idx;
+                  return (
+                    <button
+                      key={piece.id}
+                      type="button"
+                      onClick={() => setActivePieceIdx(idx)}
+                      style={{ left: piece.pin.x, top: piece.pin.y }}
+                      aria-label={`Select ${piece.name}`}
+                      className={`absolute z-30 -translate-x-1/2 -translate-y-1/2 flex h-7 w-7 cursor-pointer items-center justify-center rounded-full border-2 font-mono text-[10px] font-black transition-all duration-300 ${
+                        isSelected
+                          ? "scale-125 border-white bg-black text-white shadow-[0_0_20px_rgba(0,0,0,0.5)]"
+                          : "border-white/80 bg-white/85 text-black hover:scale-110"
+                      }`}
+                    >
+                      {isSelected && (
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                      )}
+                      <span className="relative z-10">{piece.id}</span>
+                    </button>
+                  );
+                })}
 
-                {/* ------------------------------------------------------------ */}
-                {/* DEPTH LAYER +3 (translateZ +75px): Live Fabric Pill          */}
-                {/* ------------------------------------------------------------ */}
-                <motion.div
-                  style={{
-                    x: floatBadgeX,
-                    y: floatBadgeY,
-                    transform: "translateZ(75px)",
-                  }}
-                  initial={reduceMotion ? false : { opacity: 0, x: -24 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{
-                    duration: 0.8,
-                    delay: 0.45,
-                    ease: EASE_OUT_EXPO,
-                  }}
-                  className="absolute -left-2 bottom-[24%] z-30 hidden sm:block lg:-left-7"
-                >
-                  <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/95 px-3.5 py-2.5 shadow-[0_20px_40px_rgba(0,0,0,0.12)] backdrop-blur-xl">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600">
-                      <CheckCircle2 size={16} />
-                    </div>
-                    <div>
-                      <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-neutral-400">
-                        Verified Quality
-                      </p>
-                      <p className="text-[11px] font-bold text-neutral-900">
-                        {currentEdit.fabric}
-                      </p>
-                    </div>
+                {/* Custom Spring Cursor Follower (Desktop Only) */}
+                <AnimatePresence>
+                  {isHoveringStage && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.6 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.6 }}
+                      style={{ left: lensX, top: lensY }}
+                      className="pointer-events-none absolute z-40 hidden -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-white/60 bg-black/65 px-3 py-1 font-mono text-[8.5px] font-black uppercase tracking-widest text-white backdrop-blur-md lg:flex"
+                    >
+                      {activePiece.price}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Clean Bottom Docked Bar Inside Stage */}
+                <div className="absolute inset-x-3 bottom-3 z-30 flex items-center justify-between rounded-2xl border border-white/40 bg-black/80 px-4 py-2.5 text-white backdrop-blur-xl">
+                  <div className="min-w-0">
+                    <p className="truncate text-[11px] font-black uppercase tracking-wider text-white">
+                      {activePiece.name}
+                    </p>
+                    <p className="font-mono text-[9.5px] text-white/65">
+                      {activePiece.spec} • Size {selectedSize}
+                    </p>
                   </div>
-                </motion.div>
-
-                {/* ------------------------------------------------------------ */}
-                {/* DEPTH LAYER +4 (translateZ +90px): 3D Floating Product Card  */}
-                {/* ------------------------------------------------------------ */}
-                <motion.div
-                  style={{
-                    x: floatCardX,
-                    y: floatCardY,
-                    transform: "translateZ(90px)",
-                  }}
-                  initial={reduceMotion ? false : { opacity: 0, y: 24, x: 16 }}
-                  animate={{ opacity: 1, y: 0, x: 0 }}
-                  transition={{
-                    duration: 0.85,
-                    delay: 0.6,
-                    ease: EASE_OUT_EXPO,
-                  }}
-                  className="absolute -bottom-5 right-2 z-30 w-[min(88%,315px)] sm:right-4 lg:-right-5"
-                >
                   <Link
                     href="/shop"
-                    className="group block rounded-2xl border border-white bg-white/95 p-3.5 shadow-[0_25px_60px_rgba(0,0,0,0.18)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-white"
+                    className="ml-3 flex h-8 shrink-0 items-center gap-1 rounded-xl bg-white px-3 font-mono text-[10px] font-black uppercase text-black transition hover:bg-emerald-400"
                   >
-                    <div className="flex items-center gap-3.5">
-                      <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#111111] text-white shadow-md transition-transform duration-300 group-hover:scale-105">
-                        <ShoppingBag size={17} />
-                        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500 text-[9px] font-black text-white">
-                          +
-                        </span>
-                      </div>
-
-                      <div className="min-w-0 flex-1">
-                        <AnimatePresence mode="wait">
-                          <motion.div
-                            key={currentEdit.id}
-                            initial={{ opacity: 0, y: 6 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -6 }}
-                            transition={{ duration: 0.22 }}
-                          >
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-neutral-400">
-                                {currentEdit.tag}
-                              </span>
-                              <span className="text-xs font-black text-[#111111]">
-                                {currentEdit.price}
-                              </span>
-                            </div>
-                            <span className="mt-0.5 block truncate text-xs font-extrabold text-neutral-900">
-                              {currentEdit.title}
-                            </span>
-                            <span className="mt-0.5 block truncate text-[10px] text-neutral-500">
-                              {currentEdit.subtitle}
-                            </span>
-                          </motion.div>
-                        </AnimatePresence>
-                      </div>
-
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-800 transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#111111] group-hover:text-white">
-                        <MoveUpRight size={14} />
-                      </span>
-                    </div>
+                    <span>{activePiece.price}</span>
+                    <ArrowUpRight size={12} />
                   </Link>
-                </motion.div>
+                </div>
               </motion.div>
-
-              {/* Bottom Interactive Lookbook Switcher & Animated Progress */}
-              <div className="mt-7 flex items-center justify-between px-1">
-                <div className="flex items-baseline gap-1.5">
-                  <AnimatePresence mode="wait">
-                    <motion.span
-                      key={currentEdit.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
-                      transition={{ duration: 0.2 }}
-                      className="text-xl font-black tracking-[-0.05em] text-[#111111] sm:text-2xl"
-                    >
-                      {currentEdit.id}
-                    </motion.span>
-                  </AnimatePresence>
-                  <span className="text-xs font-bold text-neutral-400">
-                    / 0{LOOKBOOK_EDITS.length}
-                  </span>
-                  <span className="ml-2 hidden text-[10px] font-bold uppercase tracking-widest text-neutral-400 sm:inline-block">
-                    · Interactive 3D Stage
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {LOOKBOOK_EDITS.map((edit, index) => {
-                    const isActive = activeSlide === index;
-                    return (
-                      <button
-                        key={edit.id}
-                        type="button"
-                        onClick={() => setActiveSlide(index)}
-                        aria-label={`Select lookbook ${edit.title}`}
-                        aria-current={isActive}
-                        className={`group relative h-2 overflow-hidden rounded-full transition-all duration-300 ${
-                          isActive
-                            ? "w-10 bg-neutral-300"
-                            : "w-2.5 bg-neutral-300 hover:bg-neutral-400"
-                        }`}
-                      >
-                        {isActive && (
-                          <motion.span
-                            layoutId="activeSlideProgress3D"
-                            className="absolute inset-0 rounded-full bg-[#111111]"
-                          />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
             </div>
           </div>
-        </section>
-      </div>
+
+          {/* ================================================================ */}
+          {/* 4. ARCHITECTURAL BENTO TELEMETRY DOCK WITH SVG SPARKLINES        */}
+          {/* ================================================================ */}
+          <div className="mt-10 grid grid-cols-1 gap-3 sm:mt-12 sm:grid-cols-2 lg:grid-cols-4">
+            {items.map((item, index) => (
+              <div
+                key={`${item.title}-${index}`}
+                className={`group relative flex items-center justify-between overflow-hidden rounded-2xl border px-5 py-4 transition-all duration-300 hover:-translate-y-0.5 ${
+                  isNoir
+                    ? "border-white/10 bg-white/[0.04] hover:border-white/25"
+                    : "border-black/10 bg-white/85 shadow-2xs hover:border-black/25 hover:bg-white"
+                }`}
+              >
+                <div>
+                  <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] opacity-45">
+                    0{index + 1} // VERIFIED METRIC
+                  </span>
+                  <p className="mt-1 font-mono text-2xl font-black tracking-tight sm:text-3xl">
+                    <AnimatedStatValue rawValue={item.title} />
+                  </p>
+                  <p className="mt-0.5 text-[10.5px] font-bold uppercase tracking-wider opacity-65">
+                    {item.description}
+                  </p>
+                </div>
+
+                {/* Mini Animated SVG Trend Sparkline */}
+                <div className="flex flex-col items-end gap-1">
+                  <svg
+                    width="54"
+                    height="24"
+                    viewBox="0 0 54 24"
+                    fill="none"
+                    className="text-emerald-500"
+                  >
+                    <path
+                      d="M2 20L14 14L25 17L38 7L52 3"
+                      stroke="currentColor"
+                      strokeWidth="2.2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="font-mono text-[9px] font-bold text-emerald-500">
+                    +18.4%
+                  </span>
+                </div>
+              </div>
+            ))}
+
+            {/* 4th Bento Cell: Flagship Authenticity Guarantee */}
+            <Link
+              href="/shop"
+              className={`group flex items-center justify-between rounded-2xl px-5 py-4 transition-all duration-300 hover:-translate-y-0.5 ${
+                isNoir
+                  ? "bg-white text-black"
+                  : "bg-[#111111] text-white shadow-md"
+              }`}
+            >
+              <div>
+                <div className="flex items-center gap-1 text-amber-400">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={12} fill="currentColor" />
+                  ))}
+                  <span className="ml-1 font-mono text-xs font-black">
+                    4.9/5
+                  </span>
+                </div>
+                <p className="mt-1 text-sm font-black uppercase tracking-tight">
+                  Flagship Guarantee
+                </p>
+                <p className="mt-0.5 inline-flex items-center gap-1 text-[10px] font-bold opacity-70">
+                  <ShieldCheck size={12} className="text-emerald-400" />
+                  100% Verified Authentic
+                </p>
+              </div>
+
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-current/10 transition-transform duration-300 group-hover:rotate-45">
+                <ArrowUpRight size={17} />
+              </span>
+            </Link>
+          </div>
+        </div>
+      </section>
 
       {/* Luxury Infinite Brand Ticker */}
       <BrandTicker reduceMotion={reduceMotion} />

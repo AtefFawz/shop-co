@@ -5,7 +5,8 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthWatcher } from "@/lib/AuthWatcher";
 import { Toaster } from "react-hot-toast";
-import NotificationListener from "@/components/notifications/NotificationListener";
+import NotificationListener from "@/features/notifications/components/NotificationListener";
+import { ThemeProvider } from "@/shared/theme/ThemeProvider";
 
 /* -------------------------------------------------------------------------- */
 /*                                FONTS SETUP                                 */
@@ -28,17 +29,13 @@ const geistMono = Geist_Mono({
 /* -------------------------------------------------------------------------- */
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api/";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://shop-co-1fqm.vercel.app";
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#F2F0F1" },
-    { media: "(prefers-color-scheme: dark)", color: "#111111" },
-  ],
+  themeColor: "#f5f3f0",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
-  colorScheme: "light",
 };
 
 /* -------------------------------------------------------------------------- */
@@ -136,59 +133,68 @@ export default async function RootLayout({
 
   return (
     <html lang="en" className="scroll-smooth" suppressHydrationWarning>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen bg-[#F2F0F1] font-sans text-[#111111] antialiased selection:bg-[#111111] selection:text-white overflow-x-hidden`}
-      >
-        {/* Google Rich Snippet Schema */}
+      <head>
+        {/* Apply the saved/system theme before the first paint to avoid a flash. */}
         <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-        />
-
-        {/* Global App Listeners */}
-        <NotificationListener />
-        <AuthWatcher />
-
-        {/* Main Content */}
-        {children}
-
-        {/* Bespoke Luxury Toast Notifications */}
-        <Toaster
-          position="top-center"
-          gutter={10}
-          containerStyle={{
-            top: 24,
-          }}
-          toastOptions={{
-            duration: 3500,
-            style: {
-              background: "rgba(17, 17, 17, 0.94)",
-              color: "#FFFFFF",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid rgba(255, 255, 255, 0.14)",
-              borderRadius: "9999px",
-              padding: "12px 22px",
-              fontSize: "12px",
-              fontWeight: 700,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              boxShadow: "0 20px 45px -10px rgba(0, 0, 0, 0.35)",
-            },
-            success: {
-              iconTheme: {
-                primary: "#10B981",
-                secondary: "#111111",
-              },
-            },
-            error: {
-              iconTheme: {
-                primary: "#EF4444",
-                secondary: "#FFFFFF",
-              },
-            },
+          dangerouslySetInnerHTML={{
+            __html: `var savedTheme = null; try { savedTheme = localStorage.getItem('shopco-theme'); } catch (_) {} var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; var initialTheme = savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark) ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', initialTheme === 'dark'); document.documentElement.dataset.theme = initialTheme; document.documentElement.style.colorScheme = initialTheme;`,
           }}
         />
+      </head>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen font-sans antialiased overflow-x-clip `}
+      >
+        <ThemeProvider>
+          {/* Google Rich Snippet Schema */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
+
+          {/* Global App Listeners */}
+          <NotificationListener />
+          <AuthWatcher />
+
+          {/* Main Content */}
+          {children}
+
+          {/* Application toast notifications */}
+          <Toaster
+            position="top-center"
+            gutter={10}
+            containerStyle={{ top: 24 }}
+            toastOptions={{
+              duration: 3500,
+              style: {
+                background:
+                  "color-mix(in srgb, var(--surface-raised) 94%, transparent)",
+                color: "var(--text-primary)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                border: "1px solid var(--border)",
+                borderRadius: "9999px",
+                padding: "12px 22px",
+                fontSize: "12px",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                boxShadow: "var(--shadow-floating)",
+              },
+              success: {
+                iconTheme: {
+                  primary: "var(--success)",
+                  secondary: "var(--surface)",
+                },
+              },
+              error: {
+                iconTheme: {
+                  primary: "var(--danger)",
+                  secondary: "var(--surface)",
+                },
+              },
+            }}
+          />
+        </ThemeProvider>
       </body>
     </html>
   );

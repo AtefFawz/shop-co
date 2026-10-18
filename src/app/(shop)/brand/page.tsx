@@ -1,4 +1,3 @@
-import { Brands } from "@/components/features/home/brand/Brand";
-export default function Brand() {
-  return <Brands />;
-}
+import BrandDirectoryPage from "@/features/catalog/pages/BrandDirectoryPage";
+
+export default BrandDirectoryPage;
