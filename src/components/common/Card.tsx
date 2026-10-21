@@ -22,7 +22,7 @@ const getImageUrl = (url?: string): string => {
 };
 
 /* -------------------------------------------------------------------------- */
-/*                              MAIN CARD COMPONENT                           */
+/*                             MAIN CARD COMPONENT                            */
 /* -------------------------------------------------------------------------- */
 
 export default function Card({ product }: { product: Product }) {
@@ -37,7 +37,8 @@ export default function Card({ product }: { product: Product }) {
   const images = useMemo<string[]>(() => {
     if (Array.isArray(product.images) && product.images.length > 0) {
       return product.images.filter(
-        (image): image is string => typeof image === "string" && image.trim().length > 0,
+        (image): image is string =>
+          typeof image === "string" && image.trim().length > 0,
       );
     }
     return product.photo ? [product.photo] : [];
@@ -74,14 +75,14 @@ export default function Card({ product }: { product: Product }) {
       }}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
-      className="group relative flex h-full w-full flex-col justify-between rounded-2xl border border-neutral-200/75 bg-white p-1.5 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-black/20 hover:shadow-[0_20px_40px_-14px_rgba(0,0,0,0.12)] sm:rounded-[1.65rem] sm:p-2.5"
+      className="group relative flex h-full w-full min-w-0 flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200/80 bg-white p-1.5 shadow-[0_4px_20px_-8px_rgba(0,0,0,0.05)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-black/25 hover:shadow-[0_22px_44px_-14px_rgba(0,0,0,0.13)] sm:rounded-[1.6rem] sm:p-2.5"
     >
       {/* ================================================================== */}
-      {/* 1. VISUAL STAGE (OPTIMIZED FOR MOBILE & DESKTOP)                   */}
+      {/* 1. VISUAL STAGE (IMAGE + FLOATING ACTION + STATUS BADGES)          */}
       {/* ================================================================== */}
       <Link
         href={detailUrl}
-        className={`relative block aspect-[3/3.75] w-full overflow-hidden rounded-xl bg-[#F4F3F4] transition-transform duration-300 active:scale-[0.99] sm:aspect-[3/3.85] sm:rounded-[1.25rem] ${
+        className={`relative block aspect-[3/3.75] w-full overflow-hidden rounded-xl bg-[#F4F3F4] transition-transform duration-300 active:scale-[0.99] sm:aspect-[3/3.85] sm:rounded-[1.2rem] ${
           isOutOfStock ? "grayscale opacity-80" : ""
         }`}
       >
@@ -119,13 +120,13 @@ export default function Card({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Desktop Hover Gradient Vignette */}
+        {/* Subtle Bottom Vignette for Contrast */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 z-20 bg-linear-to-t from-black/45 via-transparent to-transparent opacity-0 transition-opacity duration-300 md:group-hover:opacity-100"
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-16 bg-linear-to-t from-black/25 via-transparent to-transparent transition-opacity duration-300 md:h-24 md:from-black/45 md:opacity-0 md:group-hover:opacity-100"
         />
 
-        {/* Top-Left Status Badges (Compact on Mobile) */}
+        {/* Top-Left Status Badges */}
         <div className="absolute left-2 top-2 z-30 flex flex-col items-start gap-1 sm:left-2.5 sm:top-2.5">
           {isOutOfStock ? (
             <span className="rounded-full bg-rose-600/95 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-white shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[9px]">
@@ -144,7 +145,7 @@ export default function Card({ product }: { product: Product }) {
               )}
 
               {isLowStock && (
-                <span className="inline-flex items-center gap-0.5 rounded-full bg-white/95 px-2 py-0.5 text-[7px] font-black uppercase tracking-wider text-amber-700 shadow-xs backdrop-blur-md sm:text-[8px]">
+                <span className="inline-flex items-center gap-0.5 rounded-full bg-white/95 px-2 py-0.5 text-[7.5px] font-black uppercase tracking-wider text-amber-700 shadow-xs backdrop-blur-md sm:text-[8.5px]">
                   <Flame size={8} className="fill-amber-500 text-amber-500" />
                   <span>{stockCount} Left</span>
                 </span>
@@ -176,7 +177,15 @@ export default function Card({ product }: { product: Product }) {
           </div>
         )}
 
-        {/* Desktop-Only Hover Quick-Inspect Pill (Does not block mobile image) */}
+        {/* Mobile Floating Corner Action Button (Prevents Price/Discount Overlap!) */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute bottom-2 right-2 z-30 flex h-7 w-7 items-center justify-center rounded-full border border-white/60 bg-white/90 text-[#111111] shadow-[0_4px_12px_rgba(0,0,0,0.15)] backdrop-blur-md transition-transform duration-300 group-active:scale-90 md:hidden"
+        >
+          <ArrowUpRight size={13} strokeWidth={2.4} />
+        </span>
+
+        {/* Desktop Hover Quick-View Pill */}
         <div className="pointer-events-none absolute inset-x-2.5 bottom-2.5 z-30 hidden translate-y-2 opacity-0 transition-all duration-300 ease-out md:flex md:group-hover:translate-y-0 md:group-hover:opacity-100">
           <span
             className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.14em] shadow-lg backdrop-blur-xl ${
@@ -195,33 +204,37 @@ export default function Card({ product }: { product: Product }) {
       </Link>
 
       {/* ================================================================== */}
-      {/* 2. GARMENT METADATA & FOOTER (ERGONOMIC MOBILE SPACING)            */}
+      {/* 2. GARMENT METADATA & FULL-WIDTH UNOBSTRUCTED PRICING              */}
       {/* ================================================================== */}
-      <div className="flex flex-1 flex-col justify-between px-1 pt-2.5 pb-0.5 sm:px-1.5 sm:pt-3">
-        <div className="space-y-1">
+      <div className="flex min-w-0 flex-1 flex-col justify-between px-1 pt-2.5 pb-1 sm:px-1.5 sm:pt-3">
+        <div className="min-w-0 space-y-1">
           {/* Category & Rating Row */}
-          <div className="flex items-center justify-between gap-1">
-            <span className="truncate font-mono text-[8px] font-extrabold uppercase tracking-[0.14em] text-neutral-400 sm:text-[9px]">
+          <div className="flex items-center justify-between gap-1.5">
+            <span className="truncate font-mono text-[8.5px] font-extrabold uppercase tracking-[0.14em] text-neutral-400 sm:text-[9.5px]">
               {categoryLabel}
             </span>
 
-            <div className="flex shrink-0 items-center gap-1">
-              {/* Full stars on tablet/desktop, compact single star on narrow phones */}
+            <div className="flex shrink-0 items-center gap-1 rounded-full bg-neutral-100/80 px-1.5 py-0.5 sm:bg-transparent sm:p-0">
               <div className="hidden sm:block">
                 <StarRating rating={ratingValue} />
               </div>
-              <span className="text-[10px] text-amber-400 sm:hidden">★</span>
-              <span className="font-mono text-[9px] font-extrabold text-neutral-500 sm:text-[10px]">
+              <span className="text-[9.5px] leading-none text-amber-500 sm:hidden">
+                ★
+              </span>
+              <span className="font-mono text-[9px] font-black text-neutral-600 sm:text-[10px]">
                 {ratingValue > 0 ? ratingValue.toFixed(1) : "New"}
               </span>
             </div>
           </div>
 
           {/* Product Title */}
-          <Link href={detailUrl} className="block">
+          <Link
+            href={detailUrl}
+            className="group/title flex items-center justify-between gap-1"
+          >
             <h4
               title={product.name}
-              className={`line-clamp-1 text-xs font-black uppercase tracking-tight transition-colors sm:text-[13px] lg:text-sm ${
+              className={`line-clamp-1 min-w-0 flex-1 text-[11.5px] font-black uppercase tracking-tight transition-colors sm:text-[13px] lg:text-sm ${
                 isOutOfStock
                   ? "text-neutral-400"
                   : "text-[#111111] group-hover:text-neutral-600"
@@ -232,24 +245,15 @@ export default function Card({ product }: { product: Product }) {
           </Link>
         </div>
 
-        {/* Price & Action Footer */}
+        {/* Full-Width Pricing Container (Zero Overlap on Small Screens) */}
         <div
-          className={`mt-2 flex items-center justify-between gap-2 border-t border-neutral-100 pt-2 ${
+          className={`mt-2 w-full min-w-0 border-t border-neutral-100 pt-2 ${
             isOutOfStock ? "opacity-55" : ""
           }`}
         >
-          <div className="min-w-0 flex-1">
+          <div className="w-full min-w-0 overflow-hidden [&>*]:flex-wrap [&>*]:items-baseline [&>*]:gap-x-1.5 [&>*]:gap-y-1">
             <Pricing product={product} />
           </div>
-
-          {/* Tactile Micro Action Button (Great for Mobile Tap & Desktop Hover) */}
-          <Link
-            href={detailUrl}
-            aria-label={`View ${product.name || "product"}`}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#F4F3F4] text-[#111111] transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#111111] group-hover:text-white sm:h-8 sm:w-8"
-          >
-            <ArrowUpRight size={13} />
-          </Link>
         </div>
       </div>
     </motion.article>

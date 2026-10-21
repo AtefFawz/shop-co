@@ -1433,6 +1433,30 @@ const en = {
   dashboardNavProducts: "Products",
   dashboardNavUsers: "Users",
   dashboardNavOverview: "Overview",
+
+  brandTickerAria: "Featured fashion brands",
+  brandTickerVerified: "Verified brands",
+  catalogScrollToTop: "Scroll to top",
+  heroToggleHotspots: "Show or hide outfit details",
+  authSessionExpiredToast:
+    "Your session may have expired. Please sign in again.",
+  reviewVerifiedClient: "Verified customer",
+  reviewAnonymous: "Anonymous customer",
+  reviewSampleComment: "This customer has not provided a written review.",
+  reviewAuthenticatedBadge: "Verified customer reviews",
+  reviewOurHappyCustomers: "What our customers say",
+  reviewSyncing: "Customer reviews are loading. Please check back shortly.",
+  reviewSwipeToExplore: "Swipe to explore reviews",
+  reviewVerifiedPatronFeedback: "Verified customer feedback",
+  reviewTitle: "Customer reviews",
+  reviewVerifiedCount: "verified",
+  reviewFilterAll: "All reviews",
+  reviewFilterFiveOnly: "5 stars only",
+  reviewFilterFourPlus: "4 stars and above",
+  reviewShowLess: "Show less",
+  reviewReadMore: "Read more",
+  productQuantityDecrease: "Decrease quantity",
+  productQuantityIncrease: "Increase quantity",
   brandOfficialPartners: "Official flagship partners",
   brandBrowseLuxuryHouses: "Browse luxury houses",
   brandDescription:
@@ -1504,29 +1528,6 @@ const en = {
   sellerAddFailed: "Could not submit the product. Please try again.",
   sellerFormRequired: "Please complete the required fields.",
   sellerInvalidPrice: "Enter a valid price greater than or equal to zero.",
-  brandTickerAria: "Featured fashion brands",
-  brandTickerVerified: "Verified brands",
-  catalogScrollToTop: "Scroll to top",
-  heroToggleHotspots: "Show or hide outfit details",
-  authSessionExpiredToast:
-    "Your session may have expired. Please sign in again.",
-  reviewVerifiedClient: "Verified customer",
-  reviewAnonymous: "Anonymous customer",
-  reviewSampleComment: "This customer has not provided a written review.",
-  reviewAuthenticatedBadge: "Verified customer reviews",
-  reviewOurHappyCustomers: "What our customers say",
-  reviewSyncing: "Customer reviews are loading. Please check back shortly.",
-  reviewSwipeToExplore: "Swipe to explore reviews",
-  reviewVerifiedPatronFeedback: "Verified customer feedback",
-  reviewTitle: "Customer reviews",
-  reviewVerifiedCount: "verified",
-  reviewFilterAll: "All reviews",
-  reviewFilterFiveOnly: "5 stars only",
-  reviewFilterFourPlus: "4 stars and above",
-  reviewShowLess: "Show less",
-  reviewReadMore: "Read more",
-  productQuantityDecrease: "Decrease quantity",
-  productQuantityIncrease: "Increase quantity",
   sellerSizesLabel: "Sizes",
   sellerColorsLabel: "Colors",
   sellerImageTypeError: "Choose a PNG or JPG image.",
@@ -1587,6 +1588,14 @@ const en = {
   searchSearchingCatalog: "Searching catalog…",
   searchTopMatches: "Top matches",
   searchViewAllResults: "View all results for “{query}”",
+
+  // --- NEW KEYS ADDED FOR MOBILE NAVIGATION ---
+  uiNavigationClose: "Close navigation",
+  uiMoreOptions: "More Options",
+  uiMoreOptionsDescription: "Access additional workspace features.",
+  uiMorePages: "Additional Pages",
+  uiQuickPreferences: "Quick Preferences",
+  uiNavigationMore: "More", // <-- THIS IS THE MISSING KEY CAUSING THE ERROR
 } as const;
 
 const ar: Record<keyof typeof en, string> = {
@@ -2224,6 +2233,7 @@ const ar: Record<keyof typeof en, string> = {
   accountVerifiedTier: "عضو موثّق",
   accountEmailCopied: "تم نسخ البريد الإلكتروني",
   accountCopyFailed: "تعذر نسخ البريد الإلكتروني",
+  // Shared workspace, account and notification UI
   accountDefaultUser: "العميل",
   accountRoleAdmin: "مسؤول النظام",
   accountRoleManager: "مدير",
@@ -2759,8 +2769,8 @@ const ar: Record<keyof typeof en, string> = {
   usersPanelTitle: "لوحة الإدارة · دليل المستخدمين والصلاحيات",
   usersAccounts: "حساب",
   usersManageDescription: "إدارة حسابات العملاء وصلاحيات الوصول ونشاط العضوية.",
-  usersTotalDirectory: "الدليل بالكامل",
-  usersRegisteredProfiles: "الملفات المسجلة",
+  usersTotalDirectory: "الدليل الكامل",
+  usersRegisteredProfiles: "الملفات الشخصية المسجلة",
   authLoginPanelLabel: "بوابة الأعضاء · تسجيل الدخول",
   authLoginHeading: "سجّل الدخول إلى حسابك",
   authLoginDescription:
@@ -3003,6 +3013,8 @@ const ar: Record<keyof typeof en, string> = {
   dashboardNavProducts: "المنتجات",
   dashboardNavUsers: "المستخدمون",
   dashboardNavOverview: "نظرة عامة",
+
+  // Additional localized labels for product discovery, reviews and session feedback.
   brandTickerAria: "العلامات التجارية المميزة",
   brandTickerVerified: "علامات تجارية موثّقة",
   catalogScrollToTop: "الانتقال إلى أعلى الصفحة",
@@ -3025,6 +3037,7 @@ const ar: Record<keyof typeof en, string> = {
   reviewReadMore: "قراءة المزيد",
   productQuantityDecrease: "تقليل الكمية",
   productQuantityIncrease: "زيادة الكمية",
+  // ترجمات إضافية لأقسام المتجر والتقييمات ونموذج إضافة المنتجات.
   brandOfficialPartners: "شركاء العلامة التجارية المعتمدون",
   brandBrowseLuxuryHouses: "تسوّق من أبرز العلامات",
   brandDescription:
@@ -3093,10 +3106,14 @@ const ar: Record<keyof typeof en, string> = {
   sellerAddFailed: "تعذّر إرسال المنتج. حاول مرة أخرى.",
   sellerFormRequired: "أدخل اسم المنتج والقسم والسعر الصحيح وصورة للمنتج.",
   sellerInvalidPrice: "أدخل سعرًا صحيحًا يساوي صفرًا أو أكثر.",
+
+  // Product submission field labels and validation feedback.
   sellerSizesLabel: "المقاسات",
   sellerColorsLabel: "الألوان",
   sellerImageTypeError: "اختر صورة بصيغة PNG أو JPG.",
   sellerImageTooLarge: "يجب ألا يتجاوز حجم الصورة ٥ ميجابايت.",
+
+  // Customer reviews, image validation and order-confirmation feedback.
   reviewNoStoreReviews: "لا توجد تقييمات للعملاء حتى الآن.",
   reviewNoProductReviews: "لم تُرسل تقييمات لهذا المنتج حتى الآن.",
   reviewNoProductReviewsHint: "كن أول من يشارك تجربته مع هذا المنتج.",
@@ -3105,6 +3122,7 @@ const ar: Record<keyof typeof en, string> = {
   shippingAddressHint: "أدخل عنوانك ورقم هاتفك لترتيب التوصيل.",
   statusActive: "المرحلة الحالية",
   productImageAlt: "صورة المنتج",
+  //   searchGo: "بحث",
   genericMetricTitle: "مؤشر",
   genericMetricTelemetry: "مؤشرات مباشرة",
   notifCenter: "مركز الإشعارات",
@@ -3120,6 +3138,7 @@ const ar: Record<keyof typeof en, string> = {
   notifCategoryDrop: "إصدار حصري",
   notifCategoryOrder: "طلب",
   notifOrderNum: "طلب #{id}",
+  //   notifMarkRead: "تحديد كمقروء",
   notifMore: "المزيد",
   notifLess: "أقل",
   notifZeroUnread: "لا توجد تنبيهات جديدة",
@@ -3129,9 +3148,11 @@ const ar: Record<keyof typeof en, string> = {
     "ستظهر تحديثات الطلبات وتنبيهات الشحن والإصدارات الحصرية هنا.",
   notifNoMatching: "لا توجد نتائج مطابقة",
   notifNoMatchingDesc: "لم يتم العثور على إشعارات تطابق بحثك.",
+  //   notifClearSearch: "مسح البحث",
   notifTodaysTelemetry: "تحديثات اليوم",
   notifEarlierArchive: "الأرشيف السابق",
   notifSyncing: "جارٍ المزامنة...",
+  //   notifLoadOlder: "تحميل إشعارات أقدم",
   notifTotalSynced: "إشعار متزامن",
   notifOrderArchive: "أرشيف الطلبات",
   notifLiveTelemetry: "تحديث مباشر",
@@ -3143,12 +3164,20 @@ const ar: Record<keyof typeof en, string> = {
   adminProductGenderMen: "رجالي",
   adminProductGenderWomen: "نسائي",
   adminGenderKids: "أطفال",
-  adminProductGenderUnisex: "للجنسين",
+  adminProductGenderUnisex: "متنوع",
   authVerifiedSignedIn: "تم التحقق وتسجيل الدخول",
   authRedirectingMessage: "جارٍ توجيهك إلى سلة مشترياتك...",
   searchSearchingCatalog: "جارٍ البحث في الكتالوج…",
   searchTopMatches: "أفضل النتائج",
   searchViewAllResults: "عرض كل النتائج لـ «{query}»",
+
+  // --- NEW KEYS TRANSLATED FOR MOBILE NAVIGATION ---
+  uiNavigationClose: "إغلاق القائمة",
+  uiMoreOptions: "خيارات إضافية",
+  uiMoreOptionsDescription: "تصفح الميزات الإضافية لمساحة العمل.",
+  uiMorePages: "صفحات إضافية",
+  uiQuickPreferences: "تفضيلات سريعة",
+  uiNavigationMore: "المزيد", // <-- THIS WAS MISSING AND NOW IT IS FIXED
 };
 
 export const messages = { en, ar } as const;
