@@ -26,11 +26,11 @@
   --border: #e2dfdb;
   --border-subtle: #eeece8;
   --border-strong: #cfcbc5;
-  --focus: #69778d;
-  --accent: #64779b;
-  --focus-ring: rgba(92, 109, 136, 0.22);
-  --brand-soft: #e8f4f6;
-  --brand-soft-hover: #d8edf0;
+  --focus: #648176;
+  --accent: #748b80;
+  --focus-ring: rgba(100, 129, 118, 0.22);
+  --brand-soft: #edf3ef;
+  --brand-soft-hover: #dfe9e2;
   --success: #20764b;
   --text-on-success: #ffffff;
   --success-rgb: 32, 118, 75;
@@ -85,11 +85,11 @@ html.dark {
   --border: #38393f;
   --border-subtle: #2b2c31;
   --border-strong: #4a4b53;
-  --focus: #c0c7d4;
-  --accent: #9aaed4;
-  --focus-ring: rgba(179, 194, 219, 0.3);
-  --brand-soft: #213337;
-  --brand-soft-hover: #2b4146;
+  --focus: #a6c8b7;
+  --accent: #a6c8b7;
+  --focus-ring: rgba(166, 200, 183, 0.3);
+  --brand-soft: #22332c;
+  --brand-soft-hover: #2c4238;
   --success: #67d6a0;
   --text-on-success: #10261b;
   --success-rgb: 103, 214, 160;
@@ -392,13 +392,56 @@ html.theme-transition [class*="border-"] {
     transition-duration: 0.01ms !important;
   }
 }
+/* Locale-aware typography without requiring a remote font request. */
+html[lang="ar"] body {
+  font-family: Tahoma, Arial, var(--font-geist-sans), sans-serif;
+  letter-spacing: normal;
+}
+
+html[dir="rtl"] input,
+html[dir="rtl"] textarea,
+html[dir="rtl"] select {
+  text-align: start;
+}
+
+html[dir="rtl"] .rtl-mirror {
+  transform: scaleX(-1);
+}
+
+/* Keep global section styling neutral: individual sections own their spacing. */
+
+html[dir="rtl"] [class*="tracking-"] {
+  letter-spacing: normal !important;
+}
+
+html[dir="rtl"] .search-icon {
+  right: 1rem;
+  left: auto;
+}
+
+html[dir="rtl"] .search-field {
+  padding-right: 2.75rem;
+  padding-left: 5rem;
+}
+
+html[dir="rtl"] .search-actions {
+  left: 0.75rem;
+  right: auto;
+}
+
+html[dir="rtl"] .text-left {
+  text-align: right;
+}
+
+html[dir="rtl"] .text-right {
+  text-align: left;
+}
+
 section {
   padding-top: 6rem;
 }
-
-@media (min-width: 768px) {
+@media (min-width: 1280px) {
   section {
     padding-top: 8rem;
-    /* background-color: red; */
   }
 }

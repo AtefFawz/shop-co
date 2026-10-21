@@ -6,7 +6,10 @@ A responsive fashion e-commerce frontend built with **Next.js App Router**, **Re
 
 - Responsive storefront, product browsing, shopping cart, authentication, orders, profile and admin dashboard routes.
 - Light and dark appearance modes with animated icon transitions, saved preference, and system-preference support.
-- Shared theme tokens and a compatibility layer for older utility-class surfaces.
+- Shared, coordinated light/dark design tokens with accessible focus and semantic color states.
+- Arabic-first interface with a persistent Arabic/English language switch and automatic RTL/LTR direction.
+- Persistent cart with variant-aware line items, plus a saved wishlist accessible from the storefront navigation.
+- Standardized Egyptian pound (EGP) formatting across the main shopping, checkout, account, and order flows.
 - Mobile navigation and search rendered through portals so they are not trapped by parent stacking contexts.
 - Responsive motion and support for `prefers-reduced-motion`.
 - Existing Axios clients, request flows, backend rewrite, and server transport settings were retained from the supplied project.
@@ -46,6 +49,12 @@ npm run lint     # Run ESLint
 npm run build    # Create a production build
 npm start        # Serve a production build
 ```
+
+## Language and currency behavior
+
+Arabic is the default language and uses right-to-left layout. The storefront language toggle switches between Arabic and English and saves the choice in the `shopco-language` local-storage key. Translations live in `src/shared/i18n/messages.ts` and are accessed through `useLocale()`.
+
+Customer-facing price formatting uses `Intl.NumberFormat` through `src/lib/formatCurrency.ts` and displays EGP. Confirm that product prices returned by the configured API are stored in Egyptian pounds before deploying; change the central formatter if your catalog uses another currency. The wishlist saves to the browser under `shopco-wishlist`; cart data continues to use the `product` storage key and migrates older entries on read.
 
 ## Theme behavior
 

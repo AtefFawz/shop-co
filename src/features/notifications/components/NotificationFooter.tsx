@@ -8,6 +8,7 @@ import {
   Package,
   CheckCircle2,
 } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type NotificationFooterProps = {
   hasMore: boolean;
@@ -28,6 +29,7 @@ export default function NotificationFooter({
   onLoadMore,
   onClose,
 }: NotificationFooterProps) {
+  const { locale, t } = useLocale();
   return (
     <footer className="shrink-0 border-t border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900 sm:px-4">
       {hasMore ? (
@@ -57,11 +59,11 @@ export default function NotificationFooter({
                 size={14}
                 className="animate-spin text-emerald-600 dark:text-emerald-400"
               />
-              <span>Loading notifications…</span>
+              <span>{t("notifLoading")}</span>
             </>
           ) : (
             <>
-              <span>Load older notifications</span>
+              <span>{t("notifLoadOlder")}</span>
 
               {currentPage != null && totalPages != null && (
                 <span className="rounded-md bg-neutral-200/70 px-1.5 py-0.5 font-mono text-[9px] tracking-normal text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
@@ -83,7 +85,10 @@ export default function NotificationFooter({
               size={13}
               className="text-emerald-600 dark:text-emerald-400"
             />
-            {totalCount} notifications loaded
+            {t("notifLoadedCount").replace(
+              "{count}",
+              new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-US").format(totalCount),
+            )}
           </span>
 
           <Link
@@ -100,7 +105,7 @@ export default function NotificationFooter({
             "
           >
             <Package size={13} />
-            <span>Order history</span>
+            <span>{t("notifOrderHistory")}</span>
             <ArrowUpRight size={12} />
           </Link>
         </div>

@@ -8,6 +8,8 @@ import {
   useMotionValue,
   useMotionTemplate,
   useReducedMotion,
+  useTransform,
+  useSpring,
 } from "framer-motion";
 import {
   FaEnvelope,
@@ -23,17 +25,27 @@ import {
   FaFingerprint,
   FaClock,
 } from "react-icons/fa";
-import { useForgetPassword } from "@/hooks/useForgetPassword";
 
-const STEPS = [
-  { num: 1, label: "Identity", sub: "Your email" },
-  { num: 2, label: "Verify", sub: "6-digit code" },
-  { num: 3, label: "Security", sub: "New password" },
-];
+import { useForgetPassword } from "@/hooks/useForgetPassword";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
+import ThemeToggle from "@/shared/theme/ThemeToggle";
 
 type OtpStatus = "idle" | "success" | "error";
 
 export default function PasswordRecoveryPage() {
+  const { t, direction } = useLocale();
+
+  const steps = [
+    { num: 1, label: t("recoveryStepIdentity"), sub: t("recoveryStepEmail") },
+    { num: 2, label: t("recoveryStepVerify"), sub: t("recoveryStepCode") },
+    {
+      num: 3,
+      label: t("recoveryStepSecurity"),
+      sub: t("recoveryStepNewPassword"),
+    },
+  ];
+
   const {
     formData,
     step,
@@ -45,28 +57,48 @@ export default function PasswordRecoveryPage() {
     submitAction,
   } = useForgetPassword();
 
-  // visualStep بيسمحلنا نعرض أنيميشن النجاح في الخطوة 2 لمدة ثانية ونص قبل ما ننقل بصرياً للخطوة 3
   const [visualStep, setVisualStep] = useState<number>(step);
   const [otpStatus, setOtpStatus] = useState<OtpStatus>("idle");
   const [errorShakeKey, setErrorShakeKey] = useState<number>(0);
-
   const [showPassword, setShowPassword] = useState(false);
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [timeLeft, setTimeLeft] = useState(600);
 
+  // --- 3D Interactions ---
   const reduceMotion = useReducedMotion();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
+  const springConfig = { damping: 20, stiffness: 150, mass: 0.5 };
+  const smoothX = useSpring(mouseX, springConfig);
+  const smoothY = useSpring(mouseY, springConfig);
+
+  const rotateX = useTransform(smoothY, [-0.5, 0.5], [6, -6]);
+  const rotateY = useTransform(smoothX, [-0.5, 0.5], [-8, 8]);
+  const cardShiftX = useTransform(smoothX, [-0.5, 0.5], [-12, 12]);
+  const cardShiftY = useTransform(smoothY, [-0.5, 0.5], [-12, 12]);
+
   const spotlight = useMotionTemplate`
     radial-gradient(
-      520px circle at ${mouseX}px ${mouseY}px,
-      rgba(255,255,255,0.08),
+      600px circle at ${mouseX}px ${mouseY}px,
+      rgba(255,255,255,0.06),
       transparent 80%
     )
   `;
 
-  // 1. مراقبة انتقال المراحل وتشغيل أنيميشن النجاح لمدة 1.45 ثانية قبل النقل لصفحة الريست
+  const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
+    if (reduceMotion) return;
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const xPct = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const yPct = (event.clientY - bounds.top) / bounds.height - 0.5;
+    mouseX.set(event.clientX - bounds.left);
+    mouseY.set(event.clientY - bounds.top);
+    // for tilt logic
+    smoothX.set(xPct);
+    smoothY.set(yPct);
+  };
+
+  // Logic Observers
   useEffect(() => {
     if (step === 3 && visualStep === 2) {
       setOtpStatus("success");
@@ -81,12 +113,10 @@ export default function PasswordRecoveryPage() {
     }
   }, [step, visualStep]);
 
-  // 2. مراقبة حدوث خطأ في الخطوة التانية وتشغيل أنيميشن الرفض اللطيف
   useEffect(() => {
     if (visualStep === 2 && error && !isLoading) {
       setOtpStatus("error");
       setErrorShakeKey((prev) => prev + 1);
-
       const timer = window.setTimeout(() => {
         setOtpStatus("idle");
       }, 1100);
@@ -94,43 +124,31 @@ export default function PasswordRecoveryPage() {
     }
   }, [error, isLoading, visualStep]);
 
-  // 3. تشغيل عداد الـ 10 دقائق في الخطوة التانية والتالتة
   useEffect(() => {
     if (step === 1) {
       setTimeLeft(600);
       return;
     }
-
     const timer = window.setInterval(() => {
-      setTimeLeft((previous) => {
-        if (previous <= 1) {
+      setTimeLeft((prev) => {
+        if (prev <= 1) {
           window.clearInterval(timer);
-          setError("Session expired (10m limit). Please request a new code.");
+          setError(t("recoverySessionExpired"));
           setStep(1);
           return 0;
         }
-        return previous - 1;
+        return prev - 1;
       });
     }, 1000);
-
     return () => window.clearInterval(timer);
-  }, [step, setError, setStep]);
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLElement>) => {
-    if (reduceMotion) return;
-
-    const bounds = event.currentTarget.getBoundingClientRect();
-    mouseX.set(event.clientX - bounds.left);
-    mouseY.set(event.clientY - bounds.top);
-  };
+  }, [step, setError, setStep, t]);
 
   const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
+    const m = Math.floor(seconds / 60)
       .toString()
       .padStart(2, "0");
-    const remainingSeconds = (seconds % 60).toString().padStart(2, "0");
-
-    return `${minutes}:${remainingSeconds}`;
+    const s = (seconds % 60).toString().padStart(2, "0");
+    return `${m}:${s}`;
   };
 
   const hasMinLength = formData.newPassword.length >= 6;
@@ -138,7 +156,6 @@ export default function PasswordRecoveryPage() {
   const passwordsMatch =
     formData.newPassword.length > 0 &&
     formData.newPassword === formData.confirmPassword;
-
   const strengthScore = [hasMinLength, hasNumber, passwordsMatch].filter(
     Boolean,
   ).length;
@@ -155,23 +172,22 @@ export default function PasswordRecoveryPage() {
         : 66 + Math.round((strengthScore / 3) * 34);
 
   const currentStepTitle =
-    {
-      1: "Forgot Password?",
-      2:
-        otpStatus === "success"
-          ? "Code Verified!"
+    visualStep === 1
+      ? t("recoveryForgotTitle")
+      : visualStep === 2
+        ? otpStatus === "success"
+          ? t("recoveryCodeVerifiedTitle")
           : otpStatus === "error"
-            ? "Invalid Code"
-            : "Verify Your Email",
-      3: "Create New Password",
-    }[visualStep] ?? "Forgot Password?";
+            ? t("recoveryInvalidCodeTitle")
+            : t("recoveryVerifyEmailTitle")
+        : t("recoveryCreatePasswordTitle");
 
   const currentStepDescription =
-    {
-      1: "Enter your registered email address and we'll dispatch a 6-digit recovery code.",
-      2: "Enter the 6-digit cryptographic code sent to your inbox.",
-      3: "Choose a strong, unique password to lock and secure your account.",
-    }[visualStep] ?? "";
+    visualStep === 1
+      ? t("recoveryIntroIdentity")
+      : visualStep === 2
+        ? t("recoveryVerifyDescription")
+        : t("recoveryPasswordDescription");
 
   const inputVariants = {
     initial: (direction: number) => ({
@@ -193,6 +209,7 @@ export default function PasswordRecoveryPage() {
   return (
     <main
       onMouseMove={handleMouseMove}
+      dir={direction}
       className="min-h-screen w-full overflow-x-clip bg-surface-subtle text-primary antialiased selection:bg-action selection:text-on-action"
     >
       <header className="relative overflow-hidden bg-action px-4 pb-4 pt-5 text-on-action sm:px-8 sm:pb-16 sm:pt-6 lg:hidden">
@@ -212,7 +229,6 @@ export default function PasswordRecoveryPage() {
           >
             SHOP.CO
           </Link>
-
           <div className="flex items-center gap-1.5 rounded-full border border-white/15 bg-white/[0.08] px-3 py-1 backdrop-blur-md">
             <span
               className={`h-1.5 w-1.5 rounded-full ${
@@ -229,14 +245,16 @@ export default function PasswordRecoveryPage() {
       </header>
 
       <div className="grid min-h-screen w-full grid-cols-1 lg:grid-cols-12">
-        {/* ================= LEFT PANEL (6 Columns) ================= */}
-        <aside className="relative hidden flex-col justify-between overflow-hidden bg-action p-10 text-on-action lg:col-span-6 lg:flex xl:p-14 2xl:p-18">
+        {/* ================= LEFT PANEL (6 Columns - Dark Vault) ================= */}
+        <aside className="relative hidden flex-col justify-between overflow-hidden bg-[#111111] p-10 text-white lg:col-span-6 lg:flex xl:p-14 2xl:p-18">
+          {/* Mouse Spotlight */}
           <motion.div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 z-0"
+            className="pointer-events-none absolute inset-0 z-0 mix-blend-overlay"
             style={{ background: spotlight }}
           />
 
+          {/* Blueprint Grid */}
           <div
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 opacity-[0.05]"
@@ -249,8 +267,6 @@ export default function PasswordRecoveryPage() {
             }}
           />
 
-          <div className="pointer-events-none absolute -left-24 -top-24 h-80 w-80 rounded-full bg-white/4 blur-3xl" />
-
           <AnimatePresence mode="wait">
             <motion.span
               key={`watermark-${visualStep}`}
@@ -258,7 +274,7 @@ export default function PasswordRecoveryPage() {
               animate={{ opacity: 0.035, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -30, scale: 1.06 }}
               transition={{ duration: 0.4 }}
-              className="pointer-events-none absolute -right-4 top-1/2 -translate-y-1/2 select-none font-black leading-none tracking-tighter text-on-action text-[clamp(11rem,16vw,19rem)]"
+              className="pointer-events-none absolute -end-4 top-1/2 -translate-y-1/2 select-none font-black leading-none tracking-tighter text-white text-[clamp(11rem,16vw,19rem)]"
             >
               0{visualStep}
             </motion.span>
@@ -273,23 +289,23 @@ export default function PasswordRecoveryPage() {
               SHOP.CO
             </Link>
 
-            <span className="flex items-center gap-2 rounded-full border border-white/15 bg-white/6 px-3.5 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.16em] text-on-action-muted backdrop-blur-md">
+            <span className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.16em] text-neutral-300 backdrop-blur-md">
               <span
                 className={`h-1.5 w-1.5 animate-ping rounded-full ${
-                  otpStatus === "error" ? "bg-danger-bright" : "bg-success-bright"
+                  otpStatus === "error" ? "bg-rose-500" : "bg-emerald-500"
                 }`}
               />
               <FaShieldAlt
                 className={
-                  otpStatus === "error" ? "text-danger-bright" : "text-success-bright"
+                  otpStatus === "error" ? "text-rose-500" : "text-emerald-500"
                 }
                 size={11}
               />
               {otpStatus === "success"
-                ? "Access Granted"
+                ? t("recoveryAccessGranted")
                 : otpStatus === "error"
-                  ? "Access Denied"
-                  : "Encrypted Vault"}
+                  ? t("recoveryAccessDenied")
+                  : t("recoveryEncryptedVault")}
             </span>
           </div>
 
@@ -306,96 +322,94 @@ export default function PasswordRecoveryPage() {
                 <div
                   className={`mb-5 inline-flex items-center gap-2 rounded-md px-3 py-1 shadow-sm transition-colors ${
                     otpStatus === "success"
-                      ? "bg-success text-on-success"
+                      ? "bg-emerald-500 text-white"
                       : otpStatus === "error"
-                        ? "bg-danger text-on-danger"
-                        : "bg-surface text-primary"
+                        ? "bg-rose-600 text-white"
+                        : "bg-white text-black"
                   }`}
                 >
                   <FaFingerprint size={11} />
                   <span className="text-[9.5px] font-black uppercase tracking-[0.2em]">
                     {otpStatus === "success"
-                      ? "Identity Confirmed"
+                      ? t("recoveryIdentityConfirmed")
                       : otpStatus === "error"
-                        ? "Verification Failed"
-                        : `Security Protocol 0${visualStep}`}
+                        ? t("recoveryVerificationFailed")
+                        : `${t("recoverySecurityProtocol")} 0${visualStep}`}
                   </span>
                 </div>
 
-                <h2 className="text-[clamp(1.85rem,2.8vw,2.9rem)] font-black uppercase leading-[1.06] tracking-[-0.04em] text-on-action">
+                <h2 className="text-[clamp(1.85rem,2.8vw,2.9rem)] font-black uppercase leading-[1.06] tracking-[-0.04em] text-white">
                   {visualStep === 1 && (
                     <>
-                      Your Account.
+                      {t("recoveryYourAccount")}
                       <br />
-                      <span className="text-on-action-muted">Your Control.</span>
+                      <span className="text-neutral-500">
+                        {t("recoveryYourControl")}
+                      </span>
                     </>
                   )}
-
                   {visualStep === 2 && (
                     <>
                       {otpStatus === "success"
-                        ? "Access Granted."
+                        ? t("recoveryAccessGranted")
                         : otpStatus === "error"
-                          ? "Code Rejected."
+                          ? t("recoveryCodeRejected")
                           : formData.otp.length === 6
-                            ? "Code Ready."
-                            : `${6 - formData.otp.length} Digits Left.`}
+                            ? t("recoveryCodeReady")
+                            : `${6 - formData.otp.length} ${t("recoveryDigitsLeft")}`}
                       <br />
                       <span
                         className={
                           otpStatus === "success"
-                            ? "text-success-bright"
+                            ? "text-emerald-400"
                             : otpStatus === "error"
-                              ? "text-danger-bright"
-                              : "text-on-action-muted"
+                              ? "text-rose-500"
+                              : "text-neutral-500"
                         }
                       >
                         {otpStatus === "success"
-                          ? "Unlocking Vault..."
+                          ? t("recoveryUnlocking")
                           : otpStatus === "error"
-                            ? "Check & Try Again."
-                            : "Verify Identity."}
+                            ? t("recoveryCheckAgain")
+                            : t("recoveryVerifyIdentity")}
                       </span>
                     </>
                   )}
-
                   {visualStep === 3 && (
                     <>
-                      {passwordsMatch ? "Vault Locked." : "A Fresh Start."}
+                      {passwordsMatch
+                        ? t("recoveryVaultLocked")
+                        : t("recoveryFreshStart")}
                       <br />
-                      <span className="text-on-action-muted">A Stronger Key.</span>
+                      <span className="text-neutral-500">
+                        {t("recoveryStrongerKey")}
+                      </span>
                     </>
                   )}
                 </h2>
 
-                <p className="mt-4 max-w-md text-[13px] leading-relaxed text-on-action-muted xl:text-sm">
-                  {visualStep === 1 &&
-                    "Recover access to your Shop.co account through a time-locked, cryptographic verification flow."}
-                  {visualStep === 2 &&
-                    "Each digit you enter locks a security node below. Complete all 6 nodes before the timer expires."}
-                  {visualStep === 3 &&
-                    "Set your new password and fulfill all security checks to seal your credentials."}
+                <p className="mt-4 max-w-md text-[13px] leading-relaxed text-neutral-400 xl:text-sm">
+                  {currentStepDescription}
                 </p>
               </motion.div>
             </AnimatePresence>
 
             {/* Live Cryptographic Console Card */}
-            <div className="mt-8 rounded-2xl border border-white/15 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl xl:p-6">
+            <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl xl:p-6">
               <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div className="min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-on-action-muted">
-                    Target Identity
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-neutral-500">
+                    {t("recoveryTargetIdentity")}
                   </p>
-                  <p className="mt-1 truncate font-mono text-xs font-semibold text-on-action xl:text-[13px]">
-                    {formData.email || "awaiting_email_input..."}
+                  <p className="mt-1 truncate font-mono text-xs font-semibold text-white xl:text-[13px]">
+                    {formData.email || t("recoveryAwaitingEmail")}
                   </p>
                 </div>
-
-                <div className="shrink-0 rounded-xl border border-white/15 bg-action/60 px-3 py-1.5 text-right">
-                  <p className="text-[8.5px] font-bold uppercase tracking-widest text-on-action-muted">
-                    Completion
+                <div className="shrink-0 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-1.5 text-end">
+                  <p className="text-[8.5px] font-bold uppercase tracking-widest text-neutral-500">
+                    {t("recoveryCompletion")}
                   </p>
-                  <p className="mt-0.5 font-mono text-xs font-black text-on-action xl:text-sm">
+                  <p className="mt-0.5 font-mono text-xs font-black text-white xl:text-sm">
                     {completionPercentage}%
                   </p>
                 </div>
@@ -403,26 +417,26 @@ export default function PasswordRecoveryPage() {
 
               {/* 6-Node Live Key Matrix */}
               <div className="mt-4 space-y-2.5">
-                <div className="flex items-center justify-between text-[9.5px] font-bold uppercase tracking-[0.14em] text-on-action-muted">
-                  <span>6-Node Key Matrix</span>
+                <div className="flex items-center justify-between text-[9.5px] font-bold uppercase tracking-[0.14em] text-neutral-500">
+                  <span>{t("recoveryKeyMatrix")}</span>
                   <span
                     className={`font-mono ${
                       otpStatus === "success"
-                        ? "text-success-bright"
+                        ? "text-emerald-400"
                         : otpStatus === "error"
-                          ? "text-danger-bright"
-                          : "text-on-action"
+                          ? "text-rose-500"
+                          : "text-white"
                     }`}
                   >
                     {visualStep === 1
-                      ? "STANDBY"
+                      ? t("recoveryStandby")
                       : visualStep === 2
                         ? otpStatus === "success"
-                          ? "6 / 6 VERIFIED"
+                          ? `6 / 6 ${t("recoveryVerified")}`
                           : otpStatus === "error"
-                            ? "MISMATCH"
-                            : `${formData.otp.length} / 6 LOCKED`
-                        : "VERIFIED"}
+                            ? t("recoveryMismatch")
+                            : `${formData.otp.length} / 6 ${t("recoveryLockedDigits")}`
+                        : t("recoveryVerified")}
                   </span>
                 </div>
 
@@ -439,12 +453,12 @@ export default function PasswordRecoveryPage() {
                         animate={{
                           backgroundColor:
                             otpStatus === "success"
-                              ? "var(--success)"
+                              ? "#10B981"
                               : otpStatus === "error"
-                                ? "var(--danger)"
+                                ? "#E11D48"
                                 : isLit
-                                  ? "var(--action)"
-                                  : "color-mix(in srgb, var(--text-primary) 7%, transparent)",
+                                  ? "#FFFFFF"
+                                  : "rgba(255,255,255,0.05)",
                           scale:
                             otpStatus === "success" ? 1.06 : isLit ? 1.03 : 1,
                           y: otpStatus === "success" ? -3 : isLit ? -1.5 : 0,
@@ -456,19 +470,17 @@ export default function PasswordRecoveryPage() {
                           delay: otpStatus === "success" ? idx * 0.05 : 0,
                         }}
                         className={`flex h-8.5 items-center justify-center rounded-lg border border-white/15 font-mono text-xs font-black xl:h-9 ${
-                          otpStatus === "success"
-                            ? "text-on-success"
-                            : otpStatus === "error"
-                              ? "text-on-danger"
-                              : isLit
-                                ? "text-on-action"
-                                : "text-primary"
+                          otpStatus === "success" ||
+                          otpStatus === "error" ||
+                          isLit
+                            ? "text-black"
+                            : "text-white"
                         }`}
                       >
                         {otpStatus === "success" ? (
-                          <FaCheck size={10} />
+                          <FaCheck size={10} className="text-white" />
                         ) : otpStatus === "error" ? (
-                          <FaTimes size={10} />
+                          <FaTimes size={10} className="text-white" />
                         ) : isLit ? (
                           "•"
                         ) : (
@@ -485,12 +497,16 @@ export default function PasswordRecoveryPage() {
                 <motion.div
                   className={`h-full rounded-full transition-colors ${
                     otpStatus === "success"
-                      ? "bg-success-bright"
+                      ? "bg-emerald-500"
                       : otpStatus === "error"
-                        ? "bg-danger-bright"
-                        : "bg-surface"
+                        ? "bg-rose-500"
+                        : "bg-white"
                   }`}
-                  animate={{ width: `${completionPercentage}%` }}
+                  animate={{
+                    width: `${
+                      otpStatus === "success" ? 100 : (visualStep / 3) * 100
+                    }%`,
+                  }}
                   transition={{ duration: reduceMotion ? 0 : 0.35 }}
                 />
               </div>
@@ -498,33 +514,48 @@ export default function PasswordRecoveryPage() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="relative z-10 flex items-center justify-between gap-4 border-t border-white/10 pt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-on-action-muted">
+          <div className="relative z-10 flex items-center justify-between gap-4 border-t border-white/10 pt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-500">
             <span>© 2026 SHOP.CO</span>
-            <span className="flex items-center gap-1.5 text-on-action-muted">
-              <FaLock size={10} className="text-on-action" />
-              256-Bit Bcrypt Protected
+            <span className="flex items-center gap-1.5 text-neutral-500">
+              <FaLock size={10} className="text-white" />
+              {t("recoveryCryptoNote")}
             </span>
           </div>
         </aside>
 
-        {/* ================= RIGHT PANEL (6 Columns - Form Area) ================= */}
-        <div className="relative -mt-8 flex min-w-0 items-center justify-center px-3.5 pb-8 sm:px-6 lg:col-span-6 lg:mt-0 lg:p-10 xl:p-14">
+        {/* ================= RIGHT PANEL (6 Columns - Glass Form Area) ================= */}
+        <div className="relative -mt-8 flex min-w-0 items-center justify-center px-3.5 pb-8 sm:px-6 lg:col-span-6 lg:mt-0 lg:p-10 xl:p-14 perspective-[1400px]">
           <div className="w-full max-w-[460px]">
-            {/* Form Card */}
+            <div
+              className="mb-4 flex items-center justify-end gap-2"
+              aria-label={t("authLanguageAndTheme")}
+            >
+              <LocaleSwitcher compact />
+              <ThemeToggle compact />
+            </div>
+
+            {/* 3D Tilted Form Card */}
             <motion.div
               key={`card-shake-${errorShakeKey}`}
+              style={{
+                rotateX: reduceMotion ? 0 : rotateX,
+                rotateY: reduceMotion ? 0 : rotateY,
+                x: cardShiftX,
+                y: cardShiftY,
+                transformStyle: "preserve-3d",
+              }}
               animate={
                 error && !reduceMotion
                   ? { x: [0, -8, 8, -5, 5, -2, 2, 0] }
                   : { x: 0 }
               }
               transition={{ type: "tween", duration: 0.38 }}
-              className={`relative overflow-hidden rounded-[22px] border bg-surface p-5 shadow-[0_20px_60px_rgba(var(--shadow-rgb),0.07)] transition-colors duration-300 sm:rounded-[28px] sm:p-8 md:p-9 ${
+              className={`relative overflow-hidden rounded-[22px] border bg-surface p-5 shadow-[0_25px_65px_-12px_rgba(0,0,0,0.12)] transition-colors duration-300 sm:rounded-[28px] sm:p-8 md:p-9 ${
                 otpStatus === "success"
                   ? "border-success-border ring-4 ring-success/10"
                   : otpStatus === "error"
                     ? "border-danger-border ring-4 ring-danger/10"
-                    : "border-border/90"
+                    : "border-border/90 hover:shadow-[0_30px_75px_-12px_rgba(0,0,0,0.18)]"
               }`}
             >
               {/* Top Progress Line */}
@@ -535,7 +566,7 @@ export default function PasswordRecoveryPage() {
                       ? "bg-success"
                       : otpStatus === "error"
                         ? "bg-danger"
-                        : "bg-action"
+                        : "bg-[#111111]"
                   }`}
                   animate={{
                     width: `${
@@ -552,7 +583,7 @@ export default function PasswordRecoveryPage() {
 
               {/* Refined Stepper */}
               <div className="mb-6 grid grid-cols-3 gap-2 pt-1.5 sm:mb-7 sm:gap-2.5">
-                {STEPS.map((item) => {
+                {steps.map((item) => {
                   const active = visualStep === item.num;
                   const completed =
                     visualStep > item.num ||
@@ -568,7 +599,7 @@ export default function PasswordRecoveryPage() {
                           : item.num === 2 && otpStatus === "error"
                             ? "border-danger-border bg-danger text-on-danger shadow-[0_8px_20px_rgba(var(--danger-rgb),0.25)]"
                             : active
-                              ? "border-border-strong bg-action text-on-action shadow-[0_8px_20px_rgba(var(--shadow-rgb),0.14)]"
+                              ? "border-[#111111] bg-[#111111] text-white shadow-md"
                               : completed
                                 ? "border-border-subtle bg-surface-muted text-primary"
                                 : "border-border/70 bg-surface-subtle/60 text-muted"
@@ -578,7 +609,7 @@ export default function PasswordRecoveryPage() {
                         <span
                           className={`font-mono text-[9.5px] font-bold sm:text-[10px] ${
                             active && otpStatus === "idle"
-                              ? "text-muted"
+                              ? "text-neutral-400"
                               : ""
                           }`}
                         >
@@ -591,8 +622,8 @@ export default function PasswordRecoveryPage() {
                             animate={{ scale: 1 }}
                             className={`flex h-3.5 w-3.5 items-center justify-center rounded-full ${
                               item.num === 2 && otpStatus === "success"
-                                ? "bg-surface text-success"
-                                : "bg-action text-on-action"
+                                ? "bg-white text-success"
+                                : "bg-white text-black"
                             }`}
                           >
                             <FaCheck size={7} />
@@ -601,8 +632,8 @@ export default function PasswordRecoveryPage() {
                           <span
                             className={`h-1.5 w-1.5 rounded-full ${
                               otpStatus === "error"
-                                ? "bg-surface animate-ping"
-                                : "bg-success-bright"
+                                ? "bg-white animate-ping"
+                                : "bg-emerald-400"
                             }`}
                           />
                         ) : null}
@@ -611,13 +642,12 @@ export default function PasswordRecoveryPage() {
                       <p className="truncate text-[9.5px] font-black uppercase tracking-[0.06em] sm:text-[10.5px] sm:tracking-[0.08em]">
                         {item.label}
                       </p>
-
                       <p
                         className={`mt-0.5 hidden truncate text-[9px] sm:block ${
                           item.num === 2 && otpStatus !== "idle"
-                            ? "text-on-action/80"
+                            ? "text-white/80"
                             : active
-                              ? "text-muted"
+                              ? "text-neutral-400"
                               : "text-muted"
                         }`}
                       >
@@ -632,32 +662,26 @@ export default function PasswordRecoveryPage() {
               <AnimatePresence mode="wait">
                 <motion.div
                   key={`heading-${visualStep}-${otpStatus}`}
-                  initial={{
-                    opacity: 0,
-                    y: reduceMotion ? 0 : 6,
-                  }}
+                  initial={{ opacity: 0, y: reduceMotion ? 0 : 6 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{
-                    opacity: 0,
-                    y: reduceMotion ? 0 : -5,
-                  }}
+                  exit={{ opacity: 0, y: reduceMotion ? 0 : -5 }}
                   transition={{ duration: 0.18 }}
                   className="mb-6"
                 >
                   <div
-                    className={`mb-2 inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.16em] text-on-action transition-colors sm:text-[9.5px] ${
+                    className={`mb-2 inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.16em] transition-colors sm:text-[9.5px] ${
                       otpStatus === "success"
-                        ? "bg-success"
+                        ? "bg-success text-white"
                         : otpStatus === "error"
-                          ? "bg-danger"
-                          : "bg-action"
+                          ? "bg-danger text-white"
+                          : "bg-[#111111] text-white"
                     }`}
                   >
                     {otpStatus === "success"
-                      ? "Verified"
+                      ? t("recoveryVerifiedStatus")
                       : otpStatus === "error"
-                        ? "Try Again"
-                        : `Step 0${visualStep}`}
+                        ? t("recoveryTryAgain")
+                        : `${t("recoverySecurityProtocol")} 0${visualStep}`}
                   </div>
 
                   <h1
@@ -676,12 +700,11 @@ export default function PasswordRecoveryPage() {
                     {visualStep === 2 ? (
                       otpStatus === "success" ? (
                         <span className="font-semibold text-success">
-                          Cryptographic match confirmed. Redirecting to password
-                          setup...
+                          {t("recoveryUnlocking")}
                         </span>
                       ) : (
                         <>
-                          Verification code dispatched to{" "}
+                          {t("recoveryCodeSentTo")}{" "}
                           <span className="break-all font-semibold text-primary underline decoration-border-strong underline-offset-4">
                             {formData.email}
                           </span>
@@ -725,18 +748,18 @@ export default function PasswordRecoveryPage() {
                   >
                     {visualStep === 1 && (
                       <Field
-                        label="Email Address"
+                        label={t("recoveryEmailLabel")}
                         icon={<FaEnvelope size={11} />}
                       >
                         <div
                           className={`relative flex items-center rounded-xl border transition-all duration-200 sm:rounded-2xl ${
                             focusedField === "email"
-                              ? "border-border-strong bg-surface ring-4 ring-focus/[0.05]"
-                              : "border-border bg-surface-subtle/80 hover:border-border-strong"
+                              ? "border-black bg-surface ring-4 ring-black/5"
+                              : "border-border bg-surface-subtle/80 hover:border-black/50"
                           }`}
                         >
                           <span
-                            className={`pl-3.5 transition-colors sm:pl-4 ${
+                            className={`ps-3.5 transition-colors sm:ps-4 ${
                               focusedField === "email"
                                 ? "text-primary"
                                 : "text-muted"
@@ -763,7 +786,7 @@ export default function PasswordRecoveryPage() {
 
                     {visualStep === 2 && (
                       <Field
-                        label="6-Digit Verification Code"
+                        label={t("recoveryOtpLabel")}
                         icon={<FaKey size={11} />}
                         rightElement={
                           <motion.div
@@ -772,28 +795,25 @@ export default function PasswordRecoveryPage() {
                             animate={{ scale: 1, opacity: 1 }}
                             className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-bold sm:text-[11px] ${
                               otpStatus === "success"
-                                ? "bg-success text-on-success"
+                                ? "bg-success text-white"
                                 : otpStatus === "error"
-                                  ? "bg-danger text-on-danger"
+                                  ? "bg-danger text-white"
                                   : timeLeft < 60
-                                    ? "animate-pulse bg-danger text-on-danger"
-                                    : "bg-action text-on-action"
+                                    ? "animate-pulse bg-danger text-white"
+                                    : "bg-[#111111] text-white"
                             }`}
                           >
                             {otpStatus === "success" ? (
                               <>
-                                <FaCheck size={9} />
-                                MATCHED
+                                <FaCheck size={9} /> MATCHED
                               </>
                             ) : otpStatus === "error" ? (
                               <>
-                                <FaTimes size={9} />
-                                INVALID
+                                <FaTimes size={9} /> INVALID
                               </>
                             ) : (
                               <>
-                                <FaClock size={9} />
-                                {formatTime(timeLeft)}
+                                <FaClock size={9} /> {formatTime(timeLeft)}
                               </>
                             )}
                           </motion.div>
@@ -809,7 +829,6 @@ export default function PasswordRecoveryPage() {
                           transition={{ type: "tween", duration: 0.42 }}
                           className="relative overflow-hidden rounded-2xl p-0.5"
                         >
-                          {/* شعاع المسح الأخضر عند نجاح الـ OTP */}
                           <AnimatePresence>
                             {otpStatus === "success" && !reduceMotion && (
                               <motion.div
@@ -821,7 +840,7 @@ export default function PasswordRecoveryPage() {
                                   duration: 0.85,
                                   ease: "easeInOut",
                                 }}
-                                className="pointer-events-none absolute inset-y-0 z-20 w-1/2 bg-gradient-to-r from-transparent via-success/40 to-transparent skew-x-12"
+                                className="pointer-events-none absolute inset-y-0 z-20 w-1/2 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent skew-x-12"
                               />
                             )}
                           </AnimatePresence>
@@ -836,23 +855,17 @@ export default function PasswordRecoveryPage() {
                             disabled={otpStatus === "success" || isLoading}
                             maxLength={6}
                             pattern="[0-9]{6}"
-                            aria-label="Six-digit verification code"
+                            aria-label={t("recoveryOtpLabel")}
                             value={formData.otp}
                             onChange={(event) => {
                               if (otpStatus !== "idle") setOtpStatus("idle");
                               if (error) setError("");
-
                               const value = event.target.value
                                 .replace(/\D/g, "")
                                 .slice(0, 6);
-
                               handleChange({
                                 ...event,
-                                target: {
-                                  ...event.target,
-                                  name: "otp",
-                                  value,
-                                },
+                                target: { ...event.target, name: "otp", value },
                               } as React.ChangeEvent<HTMLInputElement>);
                             }}
                             onFocus={() => setFocusedField("otp")}
@@ -909,13 +922,13 @@ export default function PasswordRecoveryPage() {
                                   }}
                                   className={`flex h-11 min-w-0 items-center justify-center rounded-xl border-[1.5px] font-mono text-base font-black transition-colors duration-200 sm:h-13 sm:rounded-2xl sm:text-xl ${
                                     otpStatus === "success"
-                                      ? "border-success-border bg-success text-on-success shadow-[0_8px_20px_rgba(var(--success-rgb),0.32)]"
+                                      ? "border-emerald-500 bg-emerald-500 text-white shadow-md"
                                       : otpStatus === "error"
-                                        ? "border-danger-border bg-danger text-on-danger shadow-[0_8px_20px_rgba(var(--danger-rgb),0.28)]"
+                                        ? "border-rose-500 bg-rose-500 text-white shadow-md"
                                         : digit
-                                          ? "border-border-strong bg-action text-on-action shadow-[0_6px_16px_rgba(var(--shadow-rgb),0.14)]"
+                                          ? "border-black bg-[#111111] text-white shadow-sm"
                                           : isCurrent
-                                            ? "border-border-strong bg-surface text-primary ring-4 ring-focus/[0.05]"
+                                            ? "border-black bg-surface text-primary ring-4 ring-black/5"
                                             : "border-border bg-surface-subtle text-subtle"
                                   }`}
                                 >
@@ -932,7 +945,10 @@ export default function PasswordRecoveryPage() {
                                           delay: index * 0.06 + 0.1,
                                         }}
                                       >
-                                        <FaCheck size={14} />
+                                        <FaCheck
+                                          size={14}
+                                          className="text-white"
+                                        />
                                       </motion.span>
                                     ) : (
                                       <motion.span
@@ -943,9 +959,7 @@ export default function PasswordRecoveryPage() {
                                         transition={{ duration: 0.12 }}
                                       >
                                         {digit || (
-                                          <span className="text-subtle">
-                                            ·
-                                          </span>
+                                          <span className="text-subtle">·</span>
                                         )}
                                       </motion.span>
                                     )}
@@ -960,15 +974,16 @@ export default function PasswordRecoveryPage() {
 
                     {visualStep === 3 && (
                       <>
-                        <Field label="New Password" icon={<FaLock size={11} />}>
+                        <Field
+                          label={t("recoveryNewPasswordLabel")}
+                          icon={<FaLock size={11} />}
+                        >
                           <PasswordInput
                             name="newPassword"
                             value={formData.newPassword}
-                            placeholder="Enter new password"
+                            placeholder={t("recoveryNewPasswordPlaceholder")}
                             showPassword={showPassword}
-                            onToggle={() =>
-                              setShowPassword((previous) => !previous)
-                            }
+                            onToggle={() => setShowPassword((prev) => !prev)}
                             onChange={handleChange}
                             onFocus={() => setFocusedField("newPassword")}
                             onBlur={() => setFocusedField(null)}
@@ -977,17 +992,17 @@ export default function PasswordRecoveryPage() {
                         </Field>
 
                         <Field
-                          label="Confirm Password"
+                          label={t("recoveryConfirmPasswordLabel")}
                           icon={<FaLock size={11} />}
                         >
                           <PasswordInput
                             name="confirmPassword"
                             value={formData.confirmPassword}
-                            placeholder="Confirm new password"
+                            placeholder={t(
+                              "recoveryConfirmPasswordPlaceholder",
+                            )}
                             showPassword={showPassword}
-                            onToggle={() =>
-                              setShowPassword((previous) => !previous)
-                            }
+                            onToggle={() => setShowPassword((prev) => !prev)}
                             onChange={handleChange}
                             onFocus={() => setFocusedField("confirmPassword")}
                             onBlur={() => setFocusedField(null)}
@@ -999,9 +1014,9 @@ export default function PasswordRecoveryPage() {
                         <div className="rounded-xl border border-border bg-surface-subtle/90 p-3.5 sm:rounded-2xl">
                           <div className="mb-2.5 flex items-center justify-between gap-2">
                             <p className="text-[9.5px] font-black uppercase tracking-[0.12em] text-secondary sm:text-[10px]">
-                              Security Requirements
+                              {t("recoverySecurityRequirements")}
                             </p>
-                            <span className="rounded bg-action px-1.5 py-0.5 font-mono text-[9.5px] font-bold text-on-action">
+                            <span className="rounded bg-[#111111] px-1.5 py-0.5 font-mono text-[9.5px] font-bold text-white">
                               {strengthScore}/3
                             </span>
                           </div>
@@ -1013,7 +1028,7 @@ export default function PasswordRecoveryPage() {
                                 className="h-1 flex-1 overflow-hidden rounded-full bg-surface-hover"
                               >
                                 <motion.div
-                                  className="h-full rounded-full bg-action"
+                                  className={`h-full rounded-full ${strengthScore === 3 ? "bg-emerald-500" : "bg-[#111111]"}`}
                                   animate={{
                                     width:
                                       strengthScore >= level ? "100%" : "0%",
@@ -1026,15 +1041,24 @@ export default function PasswordRecoveryPage() {
 
                           <div className="flex flex-wrap gap-1.5">
                             {[
-                              { label: "6+ Chars", met: hasMinLength },
-                              { label: "1+ Number", met: hasNumber },
-                              { label: "Matched", met: passwordsMatch },
+                              {
+                                label: t("recoveryAtLeastSix"),
+                                met: hasMinLength,
+                              },
+                              {
+                                label: t("recoveryAtLeastOneNumber"),
+                                met: hasNumber,
+                              },
+                              {
+                                label: t("recoveryPasswordsMatch"),
+                                met: passwordsMatch,
+                              },
                             ].map((rule) => (
                               <span
                                 key={rule.label}
                                 className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider transition-all sm:text-[10px] ${
                                   rule.met
-                                    ? "bg-action text-on-action shadow-sm"
+                                    ? "bg-[#111111] text-white shadow-sm"
                                     : "border border-border bg-surface text-muted"
                                 }`}
                               >
@@ -1069,7 +1093,7 @@ export default function PasswordRecoveryPage() {
                         ? "bg-success text-on-success shadow-[0_10px_24px_rgba(var(--success-rgb),0.3)] focus:ring-success/20"
                         : otpStatus === "error"
                           ? "bg-danger text-on-danger shadow-[0_10px_24px_rgba(var(--danger-rgb),0.25)] focus:ring-danger/20"
-                          : "bg-action text-on-action shadow-[0_10px_24px_rgba(var(--shadow-rgb),0.18)] hover:bg-action-hover focus:ring-focus/15 disabled:cursor-not-allowed disabled:opacity-50"
+                          : "bg-[#111111] text-white shadow-[0_12px_28px_rgba(0,0,0,0.25)] hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-50"
                     }`}
                   >
                     <span className="absolute inset-0 h-full w-full -translate-x-full bg-gradient-to-r from-transparent via-white/15 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
@@ -1080,8 +1104,7 @@ export default function PasswordRecoveryPage() {
                         animate={{ scale: 1, opacity: 1 }}
                         className="flex items-center gap-2"
                       >
-                        <FaCheck size={12} />
-                        Identity Verified — Unlocking...
+                        <FaCheck size={12} /> {t("recoveryUnlocking")}
                       </motion.span>
                     ) : otpStatus === "error" ? (
                       <motion.span
@@ -1089,22 +1112,21 @@ export default function PasswordRecoveryPage() {
                         animate={{ scale: 1, opacity: 1 }}
                         className="flex items-center gap-2"
                       >
-                        <FaTimes size={12} />
-                        Invalid Code — Try Again
+                        <FaTimes size={12} /> {t("recoveryInvalidCodeTitle")}
                       </motion.span>
                     ) : isLoading ? (
                       <>
                         <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                        Processing...
+                        {t("recoveryVerifyingCode")}
                       </>
                     ) : (
                       <>
                         <span>
                           {visualStep === 1
-                            ? "Send Recovery Code"
+                            ? t("recoverySendCode")
                             : visualStep === 2
-                              ? "Verify 6-Digit Code"
-                              : "Save New Password"}
+                              ? t("recoveryVerifyCode")
+                              : t("recoveryResetPassword")}
                         </span>
                         <FaArrowRight
                           size={10}
@@ -1124,9 +1146,9 @@ export default function PasswordRecoveryPage() {
                       }}
                       className="w-full py-1 text-center text-[11px] font-semibold text-muted transition-colors hover:text-primary"
                     >
-                      Wrong email address?{" "}
+                      {t("recoveryEmailLabel")}{" "}
                       <span className="font-bold text-primary underline underline-offset-4">
-                        Edit email
+                        {t("recoveryEditEmail")}
                       </span>
                     </button>
                   )}
@@ -1143,7 +1165,7 @@ export default function PasswordRecoveryPage() {
                     size={9}
                     className="transition-transform group-hover:-translate-x-1"
                   />
-                  Back to Sign In
+                  {t("recoveryBackToLogin")}
                 </Link>
               </div>
             </motion.div>
@@ -1153,6 +1175,10 @@ export default function PasswordRecoveryPage() {
     </main>
   );
 }
+
+// ----------------------------------------------------------------------
+// SUB-COMPONENTS
+// ----------------------------------------------------------------------
 
 function Field({
   label,
@@ -1200,18 +1226,18 @@ function PasswordInput({
   onBlur: () => void;
   focused: boolean;
 }) {
+  const { t } = useLocale(); // تم الإصلاح هنا (استدعاء t)
+
   return (
     <div
       className={`flex h-11 items-center rounded-xl border transition-all duration-200 sm:h-12 sm:rounded-2xl ${
         focused
-          ? "border-border-strong bg-surface ring-4 ring-focus/[0.05]"
-          : "border-border bg-surface-subtle/80 hover:border-border-strong"
+          ? "border-black bg-surface ring-4 ring-black/5"
+          : "border-border bg-surface-subtle/80 hover:border-black/50"
       }`}
     >
       <span
-        className={`pl-3.5 transition-colors sm:pl-4 ${
-          focused ? "text-primary" : "text-muted"
-        }`}
+        className={`ps-3.5 transition-colors sm:ps-4 ${focused ? "text-primary" : "text-muted"}`}
       >
         <FaLock size={12} />
       </span>
@@ -1232,8 +1258,8 @@ function PasswordInput({
       <button
         type="button"
         onClick={onToggle}
-        aria-label={showPassword ? "Hide password" : "Show password"}
-        className="mr-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-muted hover:text-primary focus:outline-none"
+        aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+        className="me-1 flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-lg text-muted transition-colors hover:bg-surface-muted hover:text-primary focus:outline-none"
       >
         {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
       </button>

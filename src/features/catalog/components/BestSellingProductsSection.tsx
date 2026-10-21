@@ -10,8 +10,10 @@ import { Product } from "@/types";
 import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton";
 import useData from "@/hooks/getData";
 import SpecularButton from "@/shared/components/motion/SpecularButton";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function BestSellingProductsSection() {
+  const { t } = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword") || "";
@@ -57,18 +59,18 @@ export default function BestSellingProductsSection() {
   }
 
   return (
-    <div className="relative isolate overflow-hidden py-6 sm:py-10 lg:py-14">
+    <div className="relative isolate overflow-hidden pb-6 sm:pb-10 lg:pb-14">
       <div className="Responsive space-y-8">
         {/* ── Header & Mode Switcher ── */}
         <div className="flex flex-col items-center text-center">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-action px-3.5 py-1 text-on-action shadow-xs">
             <Crown size={12} className="text-rating" />
             <span className="text-[10px] font-black uppercase tracking-[0.22em]">
-              MOST COVETED · CLIENT FAVORITES
+              {t("topSellingMicro")}
             </span>
           </div>
 
-          <Heading title="TOP SELLING" />
+          <Heading title={t("topSelling")} />
 
           <div className="mt-2 inline-flex rounded-2xl border border-border/80 bg-surface-subtle p-1.5 shadow-2xs">
             <button
@@ -80,7 +82,7 @@ export default function BestSellingProductsSection() {
                   : "text-muted hover:text-primary"
               }`}
             >
-              On Sale Spotlight
+              {t("onSaleSpotlight")}
             </button>
             <button
               type="button"
@@ -91,7 +93,7 @@ export default function BestSellingProductsSection() {
                   : "text-muted hover:text-primary"
               }`}
             >
-              All-Time Best Sellers
+              {t("allTimeBestSellers")}
             </button>
           </div>
         </div>
@@ -99,7 +101,7 @@ export default function BestSellingProductsSection() {
         {/* ── 4-Column Ranked Showroom Grid ── */}
         <div
           style={{ perspective: "1200px" }}
-          className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4"
         >
           {displayedItems.map((item: Product, index: number) => (
             <div
@@ -109,11 +111,11 @@ export default function BestSellingProductsSection() {
               {/* Rank Crown Bar */}
               <div className="mb-1.5 flex items-center justify-between px-1">
                 <span className="inline-flex items-center gap-1 rounded-md bg-action px-2 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-on-action">
-                  #{index + 1} RANKED
+                  #{index + 1} {t("ranked")}
                 </span>
                 <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-warning">
                   <Flame size={11} className="fill-rating text-warning" />
-                  High Demand
+                  {t("highDemand")}
                 </span>
               </div>
 
@@ -142,7 +144,7 @@ export default function BestSellingProductsSection() {
             className="min-w-[220px] cursor-pointer px-10 py-3.5 text-xs font-black uppercase tracking-[0.18em] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md **:bg-transparent! **:font-black!"
             onClick={handelClick}
           >
-            View All Best Sellers ↗
+            {t("viewAllBestSellers")} ↗
           </SpecularButton>
         </div>
       </div>

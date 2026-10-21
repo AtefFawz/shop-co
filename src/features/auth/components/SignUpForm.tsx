@@ -16,8 +16,10 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { useSignup } from "@/hooks/signup";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const SignUpForm = () => {
+  const { t, locale } = useLocale();
   const { error, user, handleChange, signAction, loading } = useSignup();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -57,7 +59,9 @@ const SignUpForm = () => {
       Boolean,
     ).length;
 
-    const labels = ["Too Short", "Weak", "Fair", "Good", "Atelier Strong"];
+    const labels = locale === "ar"
+      ? [t("authTooShort"), t("authWeak"), t("authFair"), t("authGood"), t("authStrong")]
+      : ["Too short", "Weak", "Fair", "Good", "Strong"];
     const colors = [
       "bg-surface-hover",
       "bg-danger",
@@ -68,13 +72,13 @@ const SignUpForm = () => {
 
     return {
       score,
-      label: pwd.length === 0 ? "Required" : labels[score],
+      label: pwd.length === 0 ? t("authRequired") : labels[score],
       color: colors[score],
       hasLength,
       hasUpper,
       hasNumber,
     };
-  }, [user?.password]);
+  }, [user?.password, locale, t]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,15 +97,15 @@ const SignUpForm = () => {
 
       {/* ── 1. Interactive 3D Avatar Studio Uploader ── */}
       <Field
-        label="Profile Portrait"
+        label={t("authPortrait")}
         rightBadge={
           user?.avatar ? (
             <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-success">
-              <CheckCircle2 size={11} /> Portrait Ready
+              <CheckCircle2 size={11} /> {t("authPortraitReady")}
             </span>
           ) : (
             <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
-              Optional · PNG / JPG
+              {t("authOptionalImage")}
             </span>
           )
         }
@@ -123,7 +127,7 @@ const SignUpForm = () => {
               <>
                 <img
                   src={avatarPreviewUrl}
-                  alt="Avatar preview"
+                  alt={t("authPortrait")}
                   className="h-full w-full object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center bg-action/45 opacity-0 transition-opacity group-hover:opacity-100">
@@ -138,44 +142,44 @@ const SignUpForm = () => {
           </div>
 
           {/* Upload Copy */}
-          <div className="min-w-0 flex-1 text-left">
+          <div className="min-w-0 flex-1 text-start">
             {user?.avatar ? (
               <>
                 <p className="truncate text-xs font-black uppercase tracking-wider text-primary">
-                  {user.avatar.name || "Custom Portrait Selected"}
+                  {user.avatar.name || t("authPortraitSelected")}
                 </p>
                 <p className="mt-0.5 text-[11px] font-semibold text-success">
                   {user.avatar.size
-                    ? `${(user.avatar.size / (1024 * 1024)).toFixed(2)} MB · Click to replace`
-                    : "Click anywhere to change photo"}
+                    ? `${(user.avatar.size / (1024 * 1024)).toFixed(2)} MB · ${t("authClickReplace")}`
+                    : t("authClickChangePhoto")}
                 </p>
               </>
             ) : (
               <>
                 <p className="text-xs font-black uppercase tracking-wider text-primary">
-                  Upload Member Portrait
+                  {t("authUploadPortrait")}
                 </p>
                 <p className="mt-0.5 text-[11px] font-medium text-muted">
-                  Drag &amp; drop or click to browse (Max 5MB)
+                  {t("authDropBrowse")}
                 </p>
               </>
             )}
           </div>
 
           <span className="rounded-xl border border-border bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary transition-colors group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action">
-            {user?.avatar ? "Change" : "Browse"}
+            {user?.avatar ? t("authChange") : t("authBrowse")}
           </span>
         </label>
       </Field>
 
       {/* ── 2. Full Name Field ── */}
       <Field
-        label="Full Name"
+        label={t("fullName")}
         active={focusedField === "fullName"}
         rightBadge={
           isNameValid ? (
             <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-success">
-              <CheckCircle2 size={11} /> Looks Good
+              <CheckCircle2 size={11} /> {t("authLooksGood")}
             </span>
           ) : null
         }
@@ -188,7 +192,7 @@ const SignUpForm = () => {
           }`}
         >
           <span
-            className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
+            className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
               focusedField === "fullName"
                 ? "bg-action text-on-action"
                 : "bg-surface text-muted shadow-2xs"
@@ -200,19 +204,19 @@ const SignUpForm = () => {
           <input
             type="text"
             autoComplete="name"
-            placeholder="John Doe"
+            placeholder={t("fullNamePlaceholder")}
             value={user.fullName}
             onFocus={() => setFocusedField("fullName")}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleChange("fullName", e.target.value)}
-            className="w-full bg-transparent py-3.5 pl-14 pr-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
             required
           />
 
           {isNameValid && (
             <CheckCircle2
               size={16}
-              className="pointer-events-none absolute right-4 text-success animate-in zoom-in duration-200"
+              className="pointer-events-none absolute end-4 text-success animate-in zoom-in duration-200"
             />
           )}
         </div>
@@ -220,12 +224,12 @@ const SignUpForm = () => {
 
       {/* ── 3. Email Address Field ── */}
       <Field
-        label="Email Address"
+        label={t("email")}
         active={focusedField === "email"}
         rightBadge={
           isEmailValid ? (
             <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-success">
-              <CheckCircle2 size={11} /> Valid Email
+              <CheckCircle2 size={11} /> {t("authValidEmail")}
             </span>
           ) : null
         }
@@ -238,7 +242,7 @@ const SignUpForm = () => {
           }`}
         >
           <span
-            className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
+            className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
               focusedField === "email"
                 ? "bg-action text-on-action"
                 : "bg-surface text-muted shadow-2xs"
@@ -255,14 +259,14 @@ const SignUpForm = () => {
             onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleChange("email", e.target.value)}
-            className="w-full bg-transparent py-3.5 pl-14 pr-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
             required
           />
 
           {isEmailValid && (
             <CheckCircle2
               size={16}
-              className="pointer-events-none absolute right-4 text-success animate-in zoom-in duration-200"
+              className="pointer-events-none absolute end-4 text-success animate-in zoom-in duration-200"
             />
           )}
         </div>
@@ -270,7 +274,7 @@ const SignUpForm = () => {
 
       {/* ── 4. Password Field + Live 4-Bar Strength Meter ── */}
       <Field
-        label="Password"
+        label={t("password")}
         active={focusedField === "password"}
         rightBadge={
           <span
@@ -294,7 +298,7 @@ const SignUpForm = () => {
           }`}
         >
           <span
-            className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
+            className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
               focusedField === "password"
                 ? "bg-action text-on-action"
                 : "bg-surface text-muted shadow-2xs"
@@ -306,20 +310,20 @@ const SignUpForm = () => {
           <input
             type={showPassword ? "text" : "password"}
             autoComplete="new-password"
-            placeholder="Create a strong password"
+            placeholder={t("createPasswordPlaceholder")}
             value={user.password}
             onFocus={() => setFocusedField("password")}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleChange("password", e.target.value)}
-            className="w-full bg-transparent py-3.5 pl-14 pr-12 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-12 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
             required
           />
 
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute right-3.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-muted hover:text-primary"
+            aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+            className="absolute end-3.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-muted hover:text-primary"
           >
             {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
           </button>
@@ -342,13 +346,13 @@ const SignUpForm = () => {
 
           <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold text-muted">
             <span className={pwdStrength.hasLength ? "text-success" : ""}>
-              ✓ 8+ Chars
+              ✓ {t("authEightChars")}
             </span>
             <span className={pwdStrength.hasUpper ? "text-success" : ""}>
-              ✓ Uppercase
+              ✓ {t("authUppercase")}
             </span>
             <span className={pwdStrength.hasNumber ? "text-success" : ""}>
-              ✓ Number
+              ✓ {t("authNumber")}
             </span>
           </div>
         </div>
@@ -366,11 +370,11 @@ const SignUpForm = () => {
           {loading ? (
             <>
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              <span>Minting Membership…</span>
+              <span>{t("authCreatingAccount")}</span>
             </>
           ) : (
             <>
-              <span>Create VIP Account</span>
+              <span>{t("authCreateVipAccount")}</span>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-surface group-hover:text-primary">
                 <ArrowRight size={13} />
               </span>

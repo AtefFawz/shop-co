@@ -3,6 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { Package, ShoppingBag, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type OrderItem = {
   _id: string;
@@ -30,6 +32,7 @@ export default function OrderItemsList({
   items: OrderItem[];
   totalPrice: number;
 }) {
+  const { locale, t, direction } = useLocale();
   const totalUnits = items.reduce(
     (acc, item) => acc + (Number(item.quantity) || 1),
     0,
@@ -42,7 +45,7 @@ export default function OrderItemsList({
   );
 
   return (
-    <div className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-7">
+    <div dir={direction} className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-7">
       {/* ── Top Manifest Header ── */}
       <div className="mb-6 flex items-center justify-between border-b border-border-subtle pb-4">
         <div className="flex items-center gap-3">
@@ -51,17 +54,16 @@ export default function OrderItemsList({
           </div>
           <div>
             <h2 className="text-base font-black uppercase tracking-tight text-primary sm:text-lg">
-              Order Manifest
+              {t("orderManifest")}
             </h2>
             <p className="text-xs font-semibold text-muted">
-              {items.length} unique SKU{items.length === 1 ? "" : "s"} ·{" "}
-              {totalUnits} total unit{totalUnits === 1 ? "" : "s"}
+              {items.length} {t("uniqueSku")} · {totalUnits} {t("totalUnits")}
             </p>
           </div>
         </div>
 
         <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-[10px] font-black uppercase tracking-wider text-secondary">
-          VERIFIED ITEMS
+          {t("verifiedItems")}
         </span>
       </div>
 
@@ -72,7 +74,7 @@ export default function OrderItemsList({
           const unitPrice = Number(item.price) || 0;
           const lineTotal = unitPrice * qty;
           const productName =
-            item.name || item.product?.name || "Atelier Garment";
+            item.name || item.product?.name || t("productAtelierEdit");
           const productId = item.product?._id;
 
           return (
@@ -88,7 +90,7 @@ export default function OrderItemsList({
                     alt={productName}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
                   />
-                  <span className="absolute bottom-1.5 right-1.5 rounded-lg bg-action/90 px-2 py-0.5 font-mono text-[10px] font-black text-on-action backdrop-blur-md">
+                  <span className="absolute bottom-1.5 end-1.5 rounded-lg bg-action/90 px-2 py-0.5 font-mono text-[10px] font-black text-on-action backdrop-blur-md">
                     ×{qty}
                   </span>
                 </div>
@@ -96,7 +98,7 @@ export default function OrderItemsList({
                 {/* Item Title & Unit Breakdown */}
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <span className="inline-block font-mono text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                    ITEM // 0{idx + 1}
+                    {t("itemLabel")} // 0{idx + 1}
                   </span>
 
                   <h3 className="truncate text-sm font-black uppercase tracking-tight text-primary sm:text-base">
@@ -104,24 +106,21 @@ export default function OrderItemsList({
                   </h3>
 
                   <div className="flex flex-wrap items-center gap-2 pt-0.5 font-mono text-xs font-bold text-muted">
-                    <span>Unit: {unitPrice.toLocaleString()} EGP</span>
+                    <span>{t("unit")}: {formatCurrency(unitPrice, locale)}</span>
                     <span>•</span>
-                    <span>Qty: {qty}</span>
+                    <span>{t("qty")}: {qty}</span>
                   </div>
                 </div>
               </div>
 
               {/* Right Line Subtotal & Inspect Link */}
               <div className="flex items-center justify-between border-t border-border/60 pt-3 sm:flex-col sm:items-end sm:border-t-0 sm:pt-0">
-                <div className="text-left sm:text-right">
+                <div className="text-start sm:text-end">
                   <span className="block text-[9px] font-bold uppercase tracking-widest text-muted">
-                    Subtotal
+                    {t("subtotal")}
                   </span>
                   <span className="font-mono text-base font-black text-primary sm:text-lg">
-                    {lineTotal.toLocaleString()}{" "}
-                    <span className="text-[10px] font-bold text-muted">
-                      EGP
-                    </span>
+                    {formatCurrency(lineTotal, locale)}
                   </span>
                 </div>
 
@@ -130,7 +129,7 @@ export default function OrderItemsList({
                     href={`/shop/details/${productId}`}
                     className="mt-2 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-muted hover:text-primary"
                   >
-                    <span>View SKU</span>
+                    <span>{t("viewSku")}</span>
                     <ArrowUpRight size={12} />
                   </Link>
                 )}
@@ -144,16 +143,16 @@ export default function OrderItemsList({
       <div className="mt-6 overflow-hidden rounded-3xl bg-action p-5 text-on-action shadow-lg sm:p-6">
         <div className="space-y-2.5 border-b border-white/10 pb-4 text-xs">
           <div className="flex items-center justify-between text-on-action/65">
-            <span>Items Subtotal ({totalUnits} units)</span>
+            <span>{t("subtotal")} ({totalUnits} {t("totalUnits")})</span>
             <span className="font-mono font-bold text-on-action">
-              {calculatedSubtotal.toLocaleString()} EGP
+              {formatCurrency(calculatedSubtotal, locale)}
             </span>
           </div>
 
           <div className="flex items-center justify-between text-on-action/65">
-            <span>Atelier Express Packaging &amp; Handling</span>
+            <span>{t("shippingHandling")}</span>
             <span className="font-mono font-bold text-success">
-              INCLUDED
+              {t("included")}
             </span>
           </div>
         </div>
@@ -161,20 +160,18 @@ export default function OrderItemsList({
         <div className="mt-4 flex items-end justify-between">
           <div>
             <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-on-action/45">
-              FINAL SETTLEMENT AMOUNT
+              {t("finalSettlement")}
             </span>
             <span className="mt-0.5 inline-flex items-center gap-1.5 text-xs font-bold text-success">
-              <ShieldCheck size={14} /> Verified Official Invoice
+              <ShieldCheck size={14} /> {t("verifiedInvoice")}
             </span>
           </div>
 
-          <div className="text-right font-mono">
+          <div className="text-end font-mono">
             <span className="text-2xl font-black tracking-tight text-on-action sm:text-3xl">
-              {Number(totalPrice || calculatedSubtotal).toLocaleString()}
+              {formatCurrency(Number(totalPrice || calculatedSubtotal), locale)}
             </span>
-            <span className="ml-1.5 text-xs font-extrabold text-on-action/60">
-              EGP
-            </span>
+
           </div>
         </div>
       </div>

@@ -13,6 +13,7 @@ import {
 import type { Notification } from "@/store/notificationStore";
 import type { FilterTab } from "./NotificationDropdown";
 import { NotificationItem } from "./NotificationItem";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type NotificationListProps = {
   notifications: Notification[];
@@ -44,6 +45,7 @@ export default function NotificationList({
   onNotificationClick,
   onMarkAsRead,
 }: NotificationListProps) {
+  const { t } = useLocale();
   const reduceMotion = useReducedMotion();
 
   const grouped = useMemo(() => {
@@ -70,7 +72,7 @@ export default function NotificationList({
   if (loading) {
     return (
       <div
-        aria-label="Loading notifications"
+        aria-label={t("notifLoading")}
         aria-busy="true"
         className="space-y-2.5 overflow-hidden p-3"
       >
@@ -101,20 +103,20 @@ export default function NotificationList({
     const isUnreadTab = activeTab === "unread";
 
     const title = hasSearch
-      ? "No matching notifications"
+      ? t("notifNoSearchResults")
       : isUnreadTab
-        ? "You're all caught up"
+        ? t("notifNoUnread")
         : activeTab === "orders"
-          ? "No order notifications"
-          : "No notifications yet";
+          ? t("notifNoOrderAlerts")
+          : t("notifEmpty");
 
     const description = hasSearch
-      ? `No notifications matched "${searchQuery.trim()}". Try another search term.`
+      ? t("notifSearchMatchHint").replace("{query}", searchQuery.trim())
       : isUnreadTab
-        ? "There are no unread updates at the moment."
+        ? t("notifNoUnreadHint")
         : activeTab === "orders"
-          ? "Order updates will appear here when available."
-          : "Order updates and other alerts will appear here.";
+          ? t("notifNoOrderHint")
+          : t("notifEmptyHint");
 
     return (
       <motion.div
@@ -176,7 +178,7 @@ export default function NotificationList({
             "
           >
             <RotateCcw size={12} />
-            Clear search
+            {t("notifClearSearch")}
           </button>
         )}
       </motion.div>
@@ -263,7 +265,7 @@ export default function NotificationList({
   return (
     <div
       role="region"
-      aria-label="Notification results"
+      aria-label={t("notifResultsRegion")}
       aria-live="polite"
       className="
         min-h-0 flex-1 overflow-y-auto overscroll-contain
@@ -273,8 +275,8 @@ export default function NotificationList({
         dark:[scrollbar-color:theme(colors.neutral.700)_transparent]
       "
     >
-      {renderGroup("Today", grouped.today, "group-today", true)}
-      {renderGroup("Earlier", grouped.earlier, "group-earlier")}
+      {renderGroup(t("notifToday"), grouped.today, "group-today", true)}
+      {renderGroup(t("notifEarlier"), grouped.earlier, "group-earlier")}
     </div>
   );
 }

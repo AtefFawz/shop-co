@@ -12,6 +12,7 @@ import {
   User,
 } from "lucide-react";
 import api from "@/lib/api";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface UpdateProfileModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ export default function UpdateAccountForm({
   currentUser,
   onSuccess,
 }: UpdateProfileModalProps) {
+  const { locale, t, direction } = useLocale();
   const [fullName, setFullName] = useState(currentUser.fullName || "");
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState(currentUser.avatar || "");
@@ -65,7 +67,7 @@ export default function UpdateAccountForm({
       if (!file.type.startsWith("image/")) {
         setStatus({
           type: "error",
-          message: "Please select a valid image file",
+          message: t("uiProfileInvalidImage"),
         });
         return;
       }
@@ -95,7 +97,7 @@ export default function UpdateAccountForm({
       if (res.status === 200) {
         setStatus({
           type: "success",
-          message: "Atelier profile updated successfully!",
+          message: t("uiProfileUpdated"),
         });
         setTimeout(() => {
           onSuccess();
@@ -103,7 +105,10 @@ export default function UpdateAccountForm({
         }, 900);
       }
     } catch (err: any) {
-      const msg = err.response?.data?.message || "Failed to update profile";
+      const serverMessage = err.response?.data?.message;
+      const msg = locale === "en" && typeof serverMessage === "string"
+        ? serverMessage
+        : t("uiProfileUpdateFailed");
       setStatus({ type: "error", message: msg });
     } finally {
       setLoading(false);
@@ -113,7 +118,7 @@ export default function UpdateAccountForm({
   const hasValidPreview = Boolean(previewUrl) && !imgError;
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div dir={direction} className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
       {/* Backdrop */}
       <div
         onClick={() => !loading && onClose()}
@@ -126,10 +131,10 @@ export default function UpdateAccountForm({
         <div className="mb-6 flex items-center justify-between border-b border-border-subtle pb-4">
           <div>
             <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-              <Sparkles size={10} className="text-primary" /> ATELIER IDENTITY
+              <Sparkles size={10} className="text-primary" /> {t("uiProfileIdentity")}
             </span>
             <h2 className="mt-0.5 text-lg font-black uppercase tracking-tight text-primary">
-              Edit Profile Details
+              {t("uiProfileEditDetails")}
             </h2>
           </div>
 
@@ -171,7 +176,7 @@ export default function UpdateAccountForm({
               {hasValidPreview ? (
                 <img
                   src={previewUrl}
-                  alt="Avatar Preview"
+                  alt={t("uiAvatarPreviewAlt")}
                   onError={() => setImgError(true)}
                   className="h-full w-full object-cover"
                 />
@@ -182,7 +187,7 @@ export default function UpdateAccountForm({
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-action/55 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
                 <Camera className="text-on-action" size={22} />
                 <span className="font-sans text-[8px] font-black uppercase tracking-widest text-on-action">
-                  Change
+                  {t("uiProfileChangePhoto")}
                 </span>
               </div>
             </label>
@@ -198,26 +203,26 @@ export default function UpdateAccountForm({
             <span className="mt-2.5 text-[10px] font-bold uppercase tracking-widest text-muted">
               {avatarFile
                 ? avatarFile.name
-                : "Click portrait to upload new photo"}
+                : t("uiProfileClickToUpload")}
             </span>
           </div>
 
           {/* Full Name Input */}
           <div className="space-y-2">
             <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-              Full Name
+              {t("uiProfileFullName")}
             </label>
             <div className="relative flex items-center">
               <User
                 size={15}
-                className="pointer-events-none absolute left-4 text-muted"
+                className="pointer-events-none absolute start-4 text-muted"
               />
               <input
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
-                placeholder="Enter your full name"
-                className="w-full rounded-2xl border border-border bg-surface-subtle py-3.5 pl-11 pr-4 text-xs font-bold text-primary transition-all focus:border-border focus:bg-surface focus:outline-none"
+                placeholder={t("uiProfileFullNamePlaceholder")}
+                className="w-full rounded-2xl border border-border bg-surface-subtle py-3.5 ps-11 pe-4 text-xs font-bold text-primary transition-all focus:border-border focus:bg-surface focus:outline-none"
                 required
               />
             </div>
@@ -231,7 +236,7 @@ export default function UpdateAccountForm({
               onClick={onClose}
               className="flex-1 cursor-pointer rounded-2xl border border-border bg-surface py-3.5 text-xs font-black uppercase tracking-wider text-secondary transition hover:border-border-strong hover:bg-surface-subtle disabled:opacity-50"
             >
-              Cancel
+              {t("uiProfileCancel")}
             </button>
 
             <button
@@ -242,10 +247,10 @@ export default function UpdateAccountForm({
               {loading ? (
                 <>
                   <Loader2 size={15} className="animate-spin" />
-                  <span>Saving...</span>
+                  <span>{t("uiProfileSaving")}</span>
                 </>
               ) : (
-                <span>Save Changes</span>
+                <span>{t("uiProfileSaveChanges")}</span>
               )}
             </button>
           </div>

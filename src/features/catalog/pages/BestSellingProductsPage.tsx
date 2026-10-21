@@ -23,8 +23,11 @@ import { Product } from "@/types";
 import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton";
 import useData from "@/hooks/getData";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function BestSellingProductsPage() {
+  const { t, locale, direction } = useLocale();
   const { data, loading, page, goToPage, totalPages } = useData("/product");
   const rawProducts: Product[] = data?.data?.Products ?? [];
 
@@ -39,8 +42,8 @@ export default function BestSellingProductsPage() {
   const [gridCols, setGridCols] = useState<3 | 4>(4);
 
   useEffect(() => {
-    document.title = "Top Selling & Archive Sale | SHOP.CO™";
-  }, []);
+    document.title = `${t("topSelling")} | SHOP.CO™`;
+  }, [locale, t]);
 
   // Live Telemetry from current products batch
   const telemetry = useMemo(() => {
@@ -117,7 +120,10 @@ export default function BestSellingProductsPage() {
   };
 
   return (
-    <section className="relative isolate min-h-screen overflow-hidden bg-surface-subtle  text-primary  ">
+    <section
+      dir={direction}
+      className="relative isolate min-h-screen overflow-hidden bg-surface-subtle  text-primary  "
+    >
       {/* GPU 3D Pedestal Hover Styles */}
       <style>{`
         .selling-3d-card {
@@ -152,22 +158,21 @@ export default function BestSellingProductsPage() {
                   size={12}
                   className="transition-transform group-hover:-translate-x-0.5"
                 />
-                <span>Flagship</span>
+                <span>{t("sellingFlagship")}</span>
               </Link>
 
               <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
                 <Crown size={11} className="text-rating" />
-                HIGH-DEMAND ARCHIVE
+                {t("sellingHighDemandArchive")}
               </span>
             </div>
 
             <div className="pt-1">
-              <Heading title="TOP SELLING" styling="text-start !my-0" />
+              <Heading title={t("topSelling")} styling="text-start !my-0" />
             </div>
 
             <p className="max-w-xl text-xs font-medium leading-relaxed text-muted">
-              Explore our most coveted garments, seasonal markdowns, and
-              highest-rated pieces curated from global luxury houses.
+              {t("sellingDescription")}
             </p>
           </div>
 
@@ -175,10 +180,10 @@ export default function BestSellingProductsPage() {
           <div className="flex flex-wrap items-center gap-5 rounded-2xl bg-action px-5 py-4 text-on-action shadow-lg sm:gap-7">
             <div>
               <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                Active Promos
+                {t("sellingActivePromos")}
               </span>
               <span className="mt-0.5 block font-mono text-lg font-black text-success">
-                {telemetry.saleCount} Drops
+                {telemetry.saleCount} {t("sellingDrops")}
               </span>
             </div>
 
@@ -186,10 +191,10 @@ export default function BestSellingProductsPage() {
 
             <div>
               <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                Starting At
+                {t("sellingStartingAt")}
               </span>
               <span className="mt-0.5 block font-mono text-lg font-black text-on-action">
-                ${telemetry.minPrice.toLocaleString()}
+                {formatCurrency(telemetry.minPrice, locale)}
               </span>
             </div>
 
@@ -197,7 +202,7 @@ export default function BestSellingProductsPage() {
 
             <div>
               <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                Avg Sentiment
+                {t("sellingAvgRating")}
               </span>
               <span className="mt-0.5 block font-mono text-lg font-black text-rating">
                 {telemetry.avgRating} ★
@@ -223,7 +228,9 @@ export default function BestSellingProductsPage() {
                 }`}
               >
                 <Tag size={11} />
-                <span>On Sale ({telemetry.saleCount})</span>
+                <span>
+                  {t("navSale")} ({telemetry.saleCount})
+                </span>
               </button>
 
               <button
@@ -235,7 +242,7 @@ export default function BestSellingProductsPage() {
                     : "text-muted hover:text-primary"
                 }`}
               >
-                All Best Sellers ({rawProducts.length})
+                {t("sellingAllBestSellers")} ({rawProducts.length})
               </button>
 
               <button
@@ -247,7 +254,7 @@ export default function BestSellingProductsPage() {
                     : "text-muted hover:text-primary"
                 }`}
               >
-                Under $150
+                {t("sellingUnder150")}
               </button>
             </div>
 
@@ -255,14 +262,14 @@ export default function BestSellingProductsPage() {
             <div className="relative min-w-[200px] flex-1 sm:w-56 sm:flex-initial">
               <Search
                 size={13}
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
+                className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search garment or style..."
-                className="w-full rounded-xl border border-border/90 bg-surface-subtle py-2 pl-9 pr-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
+                placeholder={t("sellingSearchPlaceholder")}
+                className="w-full rounded-xl border border-border/90 bg-surface-subtle py-2 ps-9 pe-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
               />
             </div>
           </div>
@@ -270,24 +277,24 @@ export default function BestSellingProductsPage() {
           {/* Right: Sort Dropdown + Grid Density Switcher */}
           <div className="flex items-center justify-between gap-2.5 sm:justify-end">
             <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
-              {displayedProducts.length} Showing
+              {displayedProducts.length} {t("sellingShowing")}
             </span>
 
             <div className="relative inline-flex items-center">
               <ArrowUpDown
                 size={12}
-                className="pointer-events-none absolute left-3 text-muted"
+                className="pointer-events-none absolute start-3 text-muted"
               />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                aria-label="Sort top selling products"
-                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 pl-8 pr-7 text-[11px] font-black uppercase tracking-wider text-primary focus:border-primary focus:bg-surface focus:outline-none"
+                aria-label={t("catalogSort")}
+                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-black uppercase tracking-wider text-primary focus:border-primary focus:bg-surface focus:outline-none"
               >
-                <option value="featured">Sort: Featured Rank</option>
-                <option value="price-asc">Price: Low → High</option>
-                <option value="price-desc">Price: High → Low</option>
-                <option value="rating-desc">Rating: Highest First</option>
+                <option value="featured">{t("sellingSortFeatured")}</option>
+                <option value="price-asc">{t("sellingSortPriceLow")}</option>
+                <option value="price-desc">{t("sellingSortPriceHigh")}</option>
+                <option value="rating-desc">{t("sellingSortRating")}</option>
               </select>
             </div>
 
@@ -295,7 +302,7 @@ export default function BestSellingProductsPage() {
               <button
                 type="button"
                 onClick={() => setGridCols(3)}
-                title="3-Column Editorial View"
+                title={t("sellingThreeColumn")}
                 className={`cursor-pointer rounded-lg p-1.5 transition-all ${
                   gridCols === 3
                     ? "bg-action text-on-action shadow-2xs"
@@ -307,7 +314,7 @@ export default function BestSellingProductsPage() {
               <button
                 type="button"
                 onClick={() => setGridCols(4)}
-                title="4-Column Compact View"
+                title={t("sellingFourColumn")}
                 className={`cursor-pointer rounded-lg p-1.5 transition-all ${
                   gridCols === 4
                     ? "bg-action text-on-action shadow-2xs"
@@ -325,7 +332,7 @@ export default function BestSellingProductsPage() {
         {/* ================================================================ */}
         {loading ? (
           <div
-            className={`grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 ${
+            className={`grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 ${
               gridCols === 4 ? " lg:grid-cols-4" : "lg:grid-cols-3"
             }`}
           >
@@ -340,12 +347,11 @@ export default function BestSellingProductsPage() {
             </div>
 
             <h3 className="text-sm font-black uppercase tracking-wider text-primary">
-              No Matching Drops on This Page
+              {t("sellingNoMatching")}
             </h3>
 
             <p className="mt-1.5 max-w-xs text-xs leading-relaxed text-muted">
-              No garments in the current batch match your active filter. Switch
-              to &ldquo;All Best Sellers&rdquo; or reset your search.
+              {t("sellingNoMatchingHint")}
             </p>
 
             <button
@@ -358,13 +364,13 @@ export default function BestSellingProductsPage() {
               className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-2xl bg-action px-5 py-3 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition-all hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <RotateCcw size={13} />
-              <span>Show All Best Sellers</span>
+              <span>{t("sellingShowAll")}</span>
             </button>
           </div>
         ) : (
           <div
             style={{ perspective: "1200px" }}
-            className={`grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 ${
+            className={`grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 ${
               gridCols === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
             }`}
           >
@@ -376,17 +382,18 @@ export default function BestSellingProductsPage() {
                 {/* Top Rank Crown Header */}
                 <div className="mb-1.5 flex items-center justify-between px-1">
                   <span className="inline-flex items-center gap-1 rounded-md bg-action px-2 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-on-action">
-                    #{String((page - 1) * 8 + index + 1).padStart(2, "0")} RANK
+                    #{String((page - 1) * 8 + index + 1).padStart(2, "0")}{" "}
+                    {t("sellingRank").toUpperCase()}
                   </span>
 
                   {item.isSale ? (
                     <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-success">
-                      <Sparkles size={10} /> Markdown
+                      <Sparkles size={10} /> {t("sellingDiscount")}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-warning">
                       <Flame size={10} className="fill-rating text-warning" />
-                      Coveted
+                      {t("sellingPopular")}
                     </span>
                   )}
                 </div>
@@ -407,7 +414,9 @@ export default function BestSellingProductsPage() {
             <div className="flex items-center gap-2 text-xs font-bold text-muted">
               <Layers size={14} className="text-primary" />
               <span>
-                Archive Page <strong className="text-primary">{page}</strong> of{" "}
+                {t("catalogPage")}{" "}
+                <strong className="text-primary">{page}</strong>{" "}
+                {t("catalogOf")}{" "}
                 <strong className="text-primary">{totalPages}</strong>
               </span>
             </div>

@@ -18,10 +18,12 @@ import { useNotifications } from "@/hooks/useNotifications";
 import NotificationHeader from "./NotificationHeader";
 import NotificationList from "./NotificationList";
 import NotificationFooter from "./NotificationFooter";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export type FilterTab = "all" | "unread" | "orders";
 
 export default function NotificationDropdown() {
+  const { direction, t } = useLocale();
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -133,8 +135,8 @@ export default function NotificationDropdown() {
         type="button"
         aria-label={
           unreadCount > 0
-            ? `Notifications, ${unreadCount} unread`
-            : "Notifications"
+            ? `${t("notifTitle")}, ${unreadCount} ${t("notifUnreadLabel")}`
+            : t("notifTitle")
         }
         aria-expanded={open}
         aria-controls={panelId}
@@ -206,7 +208,7 @@ export default function NotificationDropdown() {
             {/* Mobile backdrop */}
             <motion.button
               type="button"
-              aria-label="Close notification panel"
+              aria-label={t("notifClosePanel")}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -222,7 +224,7 @@ export default function NotificationDropdown() {
             <motion.div
               id={panelId}
               role="dialog"
-              aria-label="Notifications"
+              aria-label={t("notifTitle")}
               aria-modal="false"
               initial={
                 reduceMotion ? false : { opacity: 0, y: 10, scale: 0.98 }
@@ -234,7 +236,8 @@ export default function NotificationDropdown() {
                   : { opacity: 0, y: 6, scale: 0.985 }
               }
               transition={transition}
-              className="
+              dir={direction}
+              className={`
                 fixed inset-x-3 top-19 z-50 mx-auto
                 flex max-h-[min(78dvh,680px)] w-auto
                 max-w-[430px] flex-col overflow-hidden
@@ -242,11 +245,12 @@ export default function NotificationDropdown() {
                 bg-[#F7F6F3] shadow-[0_24px_70px_rgba(0,0,0,0.18)]
                 dark:border-neutral-700 dark:bg-neutral-900
                 dark:shadow-[0_24px_70px_rgba(0,0,0,0.5)]
-                sm:absolute sm:inset-x-auto sm:right-0
+                sm:absolute sm:inset-x-auto
                 sm:top-[calc(100%+12px)] sm:mx-0 sm:w-[420px]
                 sm:max-h-[min(650px,calc(100dvh-100px))]
-              "
-              style={{ transformOrigin: "top right" }}
+                ${direction === "rtl" ? "sm:left-0 sm:right-auto" : "sm:right-0 sm:left-auto"}
+              `}
+              style={{ transformOrigin: direction === "rtl" ? "top left" : "top right" }}
             >
               <NotificationHeader
                 unreadCount={unreadCount}

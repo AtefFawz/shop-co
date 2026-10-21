@@ -4,9 +4,11 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, ArrowUp } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export const CatalogNavigationTrail = () => {
   const router = useRouter();
+  const { t, direction } = useLocale();
   const [showTop, setShowTop] = useState(false);
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export const CatalogNavigationTrail = () => {
   };
 
   return (
-    <div className="fixed bottom-6 left-4 z-40 flex items-center gap-2 lg:left-8">
+    <div dir={direction} className="fixed bottom-6 start-4 z-40 flex items-center gap-2 lg:start-8">
       <motion.button
         type="button"
         whileHover={{ scale: 1.04, y: -2 }}
@@ -30,8 +32,8 @@ export const CatalogNavigationTrail = () => {
         onClick={() => router.back()}
         className="flex cursor-pointer items-center gap-2 rounded-full border border-white/15 bg-action/95 px-4 py-3 text-xs font-black uppercase tracking-widest text-on-action shadow-[0_16px_36px_rgba(var(--shadow-rgb),0.28)] backdrop-blur-md transition-colors hover:bg-action"
       >
-        <ArrowLeft size={14} />
-        <span className="hidden sm:inline">Back</span>
+        <ArrowLeft size={14} className={direction === "rtl" ? "rotate-180" : undefined} />
+        <span className="hidden sm:inline">{t("back")}</span>
       </motion.button>
 
       <AnimatePresence>
@@ -44,7 +46,7 @@ export const CatalogNavigationTrail = () => {
             whileHover={{ scale: 1.06, y: -2 }}
             whileTap={{ scale: 0.94 }}
             onClick={scrollToTop}
-            title="Scroll to top"
+            title={t("catalogScrollToTop")}
             className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border-subtle bg-surface/95 text-primary shadow-[0_12px_28px_rgba(var(--shadow-rgb),0.15)] backdrop-blur-md hover:bg-action hover:text-on-action"
           >
             <ArrowUp size={15} />

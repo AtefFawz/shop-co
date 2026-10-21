@@ -12,14 +12,16 @@ import {
 import useData from "@/hooks/getData";
 import OrderCard from "@/features/orders/components/CustomerOrderCard";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function CustomerOrderHistoryPage() {
+  const { t, locale } = useLocale();
   const { data, loading, refetch, page, totalPages, goToPage } =
     useData("profile/my-orders");
 
   useEffect(() => {
-    document.title = "My Orders & Tracking · Account | SHOP.CO™";
-  }, []);
+    document.title = `${t("orderHistoryTitle")} · SHOP.CO™`;
+  }, [locale, t]);
 
   const orders: any[] = data?.data?.orders ?? [];
   const total = data?.pagination?.total ?? orders.length;
@@ -63,7 +65,7 @@ export default function CustomerOrderHistoryPage() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
               </span>
               <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-                ACCOUNT ARCHIVE · MY ORDERS
+                {t("orderHistoryLabel")}
               </span>
             </div>
 
@@ -73,7 +75,7 @@ export default function CustomerOrderHistoryPage() {
               </h1>
               {orders.length > 0 && (
                 <span className="rounded-full bg-surface-muted px-3 py-0.5 font-mono text-xs font-black text-secondary">
-                  {total} Record{total !== 1 ? "s" : ""}
+                  {total} {t("orderRecords")}
                 </span>
               )}
             </div>
@@ -94,7 +96,7 @@ export default function CustomerOrderHistoryPage() {
                     : "transition-transform group-hover:rotate-180"
                 }
               />
-              <span>{loading ? "Syncing..." : "Sync Orders"}</span>
+              <span>{loading ? t("syncingOrders") : t("syncOrders")}</span>
             </button>
           )}
         </header>
@@ -109,16 +111,15 @@ export default function CustomerOrderHistoryPage() {
             </div>
 
             <span className="inline-flex items-center gap-1 rounded-full bg-surface-subtle px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-secondary">
-              <Sparkles size={10} /> NO TRANSACTION HISTORY
+              <Sparkles size={10} /> {t("noTransactionHistory")}
             </span>
 
             <h3 className="mt-3 text-xl font-black uppercase tracking-tight text-primary sm:text-2xl">
-              No Orders Placed Yet
+              {t("noOrdersYet")}
             </h3>
 
             <p className="mt-1.5 max-w-sm text-xs font-medium leading-relaxed text-muted">
-              You haven&apos;t completed any purchases with us. Explore the
-              flagship archive to curate your first look.
+              {t("noOrdersHint")}
             </p>
 
             <Link
@@ -126,7 +127,7 @@ export default function CustomerOrderHistoryPage() {
               className="group mt-7 inline-flex items-center gap-2.5 rounded-2xl bg-action px-8 py-4 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.4)] transition-all hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <ShoppingBag size={14} />
-              <span>Start Shopping</span>
+              <span>{t("startShopping")}</span>
             </Link>
           </div>
         ) : (
@@ -153,9 +154,9 @@ export default function CustomerOrderHistoryPage() {
             <div className="flex items-center gap-2 text-xs font-bold text-muted">
               <Layers size={14} className="text-primary" />
               <span>
-                Page <strong className="text-primary">{page}</strong> of{" "}
+                {t("catalogPage")} <strong className="text-primary">{page}</strong> {t("catalogOf")} {" "}
                 <strong className="text-primary">{totalPages}</strong> (
-                {total} orders)
+                {total} {t("ordersTotal")})
               </span>
             </div>
 

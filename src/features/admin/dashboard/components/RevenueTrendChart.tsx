@@ -2,6 +2,8 @@
 "use client";
 
 import React, { useState, useRef } from "react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 import {
   BarChart3,
   Activity,
@@ -22,6 +24,26 @@ const DEFAULT_WEEK = [
 ];
 
 export const RevenueTrendChart = (props: any) => {
+  const { t, locale, direction } = useLocale();
+  const dayTranslationKeys: Record<string, string> = {
+    mon: "dashboardDayMon",
+    tue: "dashboardDayTue",
+    wed: "dashboardDayWed",
+    thu: "dashboardDayThu",
+    fri: "dashboardDayFri",
+    sat: "dashboardDaySat",
+    sun: "dashboardDaySun",
+  };
+  const formatDay = (day: string) => {
+    const normalized = String(day || "").slice(0, 3).toLowerCase();
+    const key = dayTranslationKeys[normalized];
+    return key ? t(key as any) : day;
+  };
+  const formatCompactRevenue = (value: number) =>
+    new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-EG", {
+      notation: "compact",
+      maximumFractionDigits: 1,
+    }).format(Number.isFinite(value) ? value : 0);
   const rawWeekly =
     props?.stats?.weeklySales || props?.weeklySales || DEFAULT_WEEK;
 
@@ -101,7 +123,7 @@ export const RevenueTrendChart = (props: any) => {
       : "";
 
   return (
-    <div className="xl:col-span-8 flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] sm:p-6">
+    <div dir={direction} className="xl:col-span-8 flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] sm:p-6">
       {/* ================================================================== */}
       {/* 1. HEADER & INTERACTIVE MODE SWITCHER                              */}
       {/* ================================================================== */}
@@ -110,11 +132,11 @@ export const RevenueTrendChart = (props: any) => {
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-action" />
             <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-              Revenue Trajectory · Interactive 3D Stage
+              {t("dashboardRevenueTrajectory")}
             </p>
           </div>
           <h3 className="mt-1 text-base font-black uppercase tracking-tight text-primary sm:text-lg">
-            Weekly Sales Analytics
+            {t("dashboardWeeklySalesAnalytics")}
           </h3>
         </div>
 
@@ -131,7 +153,7 @@ export const RevenueTrendChart = (props: any) => {
             }`}
           >
             <Eye size={12} />
-            <span>Avg Line</span>
+            <span>{t("dashboardAvgLine")}</span>
           </button>
 
           {/* View Switcher: 3D Columns vs Area Wave */}
@@ -146,7 +168,7 @@ export const RevenueTrendChart = (props: any) => {
               }`}
             >
               <BarChart3 size={12} />
-              <span>3D Bars</span>
+              <span>{t("dashboard3dBars")}</span>
             </button>
             <button
               type="button"
@@ -158,7 +180,7 @@ export const RevenueTrendChart = (props: any) => {
               }`}
             >
               <Activity size={12} />
-              <span>Wave</span>
+              <span>{t("dashboardWave")}</span>
             </button>
           </div>
         </div>
@@ -171,39 +193,39 @@ export const RevenueTrendChart = (props: any) => {
         <div>
           <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
             {selectedDay
-              ? `Inspecting (${selectedDay.day})`
-              : `Peak Day (${peakDay.day})`}
+              ? t("dashboardInspecting").replace("{day}", formatDay(selectedDay.day))
+              : t("dashboardPeakDay").replace("{day}", formatDay(peakDay.day))}
           </span>
           <span className="mt-0.5 block font-mono text-base font-black text-primary sm:text-lg">
-            ${(Number(activeData?.revenue) || 0).toLocaleString()}
+            {formatCurrency(Number(activeData?.revenue) || 0, locale)}
           </span>
         </div>
 
         <div>
           <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
-            Weekly Total
+            {t("dashboardWeeklyTotal")}
           </span>
           <span className="mt-0.5 block font-mono text-base font-black text-primary sm:text-lg">
-            ${totalWeeklyRevenue.toLocaleString()}
+            {formatCurrency(totalWeeklyRevenue, locale)}
           </span>
         </div>
 
         <div>
           <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
-            Daily Average
+            {t("dashboardDailyAverage")}
           </span>
           <span className="mt-0.5 block font-mono text-base font-black text-secondary sm:text-lg">
-            ${avgDailyRevenue.toLocaleString()}
+            {formatCurrency(avgDailyRevenue, locale)}
           </span>
         </div>
 
         <div>
           <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
-            Day Share
+            {t("dashboardDayShare")}
           </span>
           <span className="mt-0.5 inline-flex items-center gap-1 font-mono text-base font-black text-success sm:text-lg">
             <TrendingUp size={14} />
-            {activeShare}% of week
+            {activeShare}% {t("dashboardOfWeek")}
           </span>
         </div>
       </div>
@@ -223,16 +245,16 @@ export const RevenueTrendChart = (props: any) => {
             transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
             transformStyle: "preserve-3d",
           }}
-          className="relative h-56 w-full rounded-2xl border border-border-subtle bg-grid-subtle bg-size-[2.5rem_2.5rem] px-1 overflow-x-scroll pt-8 pb-3 transition-transform duration-200 ease-out sm:px-6"
+          className="relative h-56 w-full overflow-x-auto rounded-2xl border border-border-subtle bg-grid-subtle bg-size-[2.5rem_2.5rem] px-1 pb-3 pt-8 transition-transform duration-200 ease-out sm:px-6"
         >
-          {/* Optional Animated Daily Average Laser Line */}
+          {/* Optional animated daily-average guide */}
           {showAvgLine && totalWeeklyRevenue > 0 && (
             <div
               style={{ bottom: `${avgLinePercent}%` }}
               className="pointer-events-none absolute inset-x-4 z-20 flex items-center border-b border-dashed border-border-strong/80 transition-all duration-500"
             >
-              <span className="-top-2.5 right-0 ml-auto rounded-md bg-action px-2 py-0.5 font-mono text-[8px] font-bold uppercase tracking-widest text-on-action shadow-xs">
-                AVG ${avgDailyRevenue.toLocaleString()}
+              <span className="-top-2.5 end-0 ms-auto rounded-md bg-action px-2 py-0.5 font-mono text-[8px] font-bold uppercase tracking-widest text-on-action shadow-xs">
+                {t("dashboardAvgAbbrev")} {formatCompactRevenue(avgDailyRevenue)}
               </span>
             </div>
           )}
@@ -265,7 +287,7 @@ export const RevenueTrendChart = (props: any) => {
                           : "bg-surface/90 text-muted group-hover:-translate-y-1 group-hover:bg-action group-hover:text-on-action"
                       }`}
                     >
-                      ${rev.toLocaleString()}
+                      {formatCompactRevenue(rev)}
                     </div>
 
                     {/* 3D Extruded Column Pedestal */}
@@ -298,7 +320,7 @@ export const RevenueTrendChart = (props: any) => {
                           : "font-bold text-muted group-hover:text-primary"
                       }`}
                     >
-                      {bar.day}
+                      {formatDay(bar.day)}
                     </span>
                   </div>
                 );
@@ -367,7 +389,7 @@ export const RevenueTrendChart = (props: any) => {
                     onMouseEnter={() => setSelectedDay(d)}
                     className="cursor-pointer text-[10px] font-bold uppercase text-muted hover:text-primary"
                   >
-                    {d.day}
+                    {formatDay(d.day)}
                   </span>
                 ))}
               </div>
@@ -382,11 +404,10 @@ export const RevenueTrendChart = (props: any) => {
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-muted">
         <span className="inline-flex items-center gap-1.5">
           <Calendar size={13} className="text-secondary" />
-          Hover or click any day column to inspect live revenue share
+          {t("dashboardInspectHint")}
         </span>
         <span className="font-mono text-[10px] font-extrabold uppercase tracking-wider text-primary">
-          TOP PERFORMER: {peakDay.day} ($
-          {(Number(peakDay.revenue) || 0).toLocaleString()})
+          {t("dashboardTopPerformer").replace("{day}", formatDay(peakDay.day)).replace("{amount}", formatCurrency(Number(peakDay.revenue) || 0, locale))}
         </span>
       </div>
     </div>

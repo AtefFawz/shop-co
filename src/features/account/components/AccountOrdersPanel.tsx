@@ -7,8 +7,10 @@ import { AccountSectionHeader } from "@/features/account/components/AccountSecti
 import OrderCard from "@/features/orders/components/CustomerOrderCard";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
 import useData from "@/hooks/getData";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function AccountOrdersPanel() {
+  const { t } = useLocale();
   const { data, loading, page, totalPages, goToPage, refetch } =
     useData("profile/my-orders");
 
@@ -41,16 +43,16 @@ export default function AccountOrdersPanel() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <AccountSectionHeader icon={Package} title="Your Orders" count={total} />
+        <AccountSectionHeader icon={Package} title={t("uiYourOrders")} count={total} />
 
         {/* Live Status Filter Pills */}
         {orders.length > 0 && (
           <div className="inline-flex flex-wrap rounded-xl border border-border/80 bg-surface p-1 shadow-2xs">
             {[
-              { id: "all", label: "All" },
-              { id: "pending", label: "Pending" },
-              { id: "shipped", label: "Shipped" },
-              { id: "delivered", label: "Delivered" },
+              { id: "all", label: t("uiFilterAll") },
+              { id: "pending", label: t("uiFilterPending") },
+              { id: "shipped", label: t("uiFilterShipped") },
+              { id: "delivered", label: t("uiFilterDelivered") },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -83,8 +85,15 @@ export default function AccountOrdersPanel() {
         <EmptyAccountState
           message={
             orders.length === 0
-              ? "You haven't placed any orders yet."
-              : `No ${statusFilter} orders found on this page.`
+              ? t("uiNoOrdersYet")
+              : t("uiNoStatusOrders").replace(
+                  "{status}",
+                  statusFilter === "pending"
+                    ? t("uiFilterPending")
+                    : statusFilter === "shipped"
+                      ? t("uiFilterShipped")
+                      : t("uiFilterDelivered"),
+                )
           }
         />
       )}

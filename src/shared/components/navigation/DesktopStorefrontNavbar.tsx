@@ -12,11 +12,25 @@ import { useEffect, useState } from "react";
 import NotificationDropdown from "@/features/notifications/components/NotificationDropdown";
 import StrokeText from "@/shared/components/motion/StrokeText";
 import { motion, LayoutGroup } from "framer-motion";
+import { Heart } from "lucide-react";
+import { useWishlistStore } from "@/store/wishlistStore";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
+import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function DesktopStorefrontNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t } = useLocale();
+  const wishlistCount = useWishlistStore((state) => state.items.length);
+
+  const navLabel = (path: string) => {
+    if (path === "/") return t("navHome");
+    if (path === "/selling") return t("navSale");
+    if (path === "/category") return t("navCategory");
+    if (path === "/brand") return t("navBrands");
+    return path;
+  };
 
   const [photo, setPhoto] = useState("");
 
@@ -44,17 +58,24 @@ export default function DesktopStorefrontNavbar() {
     {
       Icon: AddShoppingCartIcon,
       key: "cart",
-      label: "Shopping cart",
+      label: t("navCart"),
       action: () => {
         router.push("/shop/details/cart/");
       },
       isFound: true,
     },
     {
+      Icon: Heart,
+      key: "wishlist",
+      label: t("wishlist"),
+      badgeCount: wishlistCount,
+      action: () => router.push("/wishlist"),
+    },
+    {
       Icon: AccountCircleOutlinedIcon,
       photo: photo,
       key: "profile",
-      label: "Profile",
+      label: t("navProfile"),
       action: () => {
         router.push("/user/profile/");
       },
@@ -66,7 +87,10 @@ export default function DesktopStorefrontNavbar() {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: "spring", stiffness: 300, damping: 28 }}
-      className="hidden md:block w-full sticky top-0 z-50 md:py-3 "
+      // Keep the full navigation for wide screens. At tablet widths its
+      // fixed-width groups compete with the search field and were clipping
+      // the action icons, so the compact navigation is used until xl.
+      className="hidden xl:block w-full sticky top-0 z-50 xl:py-3"
     >
       <header className="mx-auto flex w-full max-w-full items-center justify-between gap-2 lg:gap-5 xl:gap-8 px-2 py-3">
         <div className="flex items-center gap-2.5 lg:gap-6 xl:gap-10 shrink-0">
@@ -119,7 +143,7 @@ export default function DesktopStorefrontNavbar() {
                             : "text-muted hover:text-primary hover:bg-surface-muted/60"
                         }`}
                       >
-                        <span className="relative z-10">{item.name}</span>
+                        <span className="relative z-10">{navLabel(item.path)}</span>
 
                         {isActive && (
                           <motion.span
@@ -162,6 +186,7 @@ export default function DesktopStorefrontNavbar() {
             iconClass="p-1.5 lg:p-2 text-secondary hover:text-primary hover:bg-surface-muted/80 rounded-full transition-all duration-200 cursor-pointer active:scale-95"
           />
 
+          <LocaleSwitcher compact className="mx-0.5 lg:mx-1" />
           <ThemeToggle compact className="mx-0.5 lg:mx-1" />
 
           <div className="h-5 w-px bg-surface-hover mx-0.5 lg:mx-1 rounded-full shrink-0" />

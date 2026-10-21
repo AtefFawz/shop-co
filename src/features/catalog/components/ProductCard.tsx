@@ -4,11 +4,14 @@ import React, { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Flame, Sparkles, Eye } from "lucide-react";
+import { ArrowUpRight, Flame, Sparkles, Eye, Heart } from "lucide-react";
+import toast from "react-hot-toast";
 
 import StarRating from "@/shared/components/feedback/StarRating";
 import Pricing from "@/features/catalog/components/ProductPrice";
 import { Product } from "@/types";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 /* -------------------------------------------------------------------------- */
 /*                                HELPER UTILS                                */
@@ -17,7 +20,7 @@ import { Product } from "@/types";
 const CLOUDINARY_BASE = "https://res.cloudinary.com/dudit0nty/image/upload/";
 
 const getImageUrl = (url?: string): string => {
-  if (!url) return "";
+  if (!url?.trim()) return "";
   return url.startsWith("http") ? url : `${CLOUDINARY_BASE}${url}`;
 };
 
@@ -26,6 +29,11 @@ const getImageUrl = (url?: string): string => {
 /* -------------------------------------------------------------------------- */
 
 export default function ProductCard({ product }: { product: Product }) {
+  const { t, direction } = useLocale();
+  const isSaved = useWishlistStore((state) =>
+    state.items.some((item) => item._id === product._id),
+  );
+  const toggleSaved = useWishlistStore((state) => state.toggleItem);
   const detailUrl = `/shop/details/${product._id}`;
 
   // 1. Stock Telemetry
@@ -36,7 +44,9 @@ export default function ProductCard({ product }: { product: Product }) {
   // 2. Normalized Image List
   const images = useMemo<string[]>(() => {
     if (Array.isArray(product.images) && product.images.length > 0) {
-      return product.images.filter(Boolean);
+      return product.images.filter(
+        (image): image is string => typeof image === "string" && image.trim().length > 0,
+      );
     }
     return product.photo ? [product.photo] : [];
   }, [product.images, product.photo]);
@@ -56,11 +66,12 @@ export default function ProductCard({ product }: { product: Product }) {
   }, [isPaused, images.length]);
 
   const categoryLabel =
-    (product as any).category || (product as any).section || "Atelier Edit";
+    (product as any).category || (product as any).section || t("productAtelierEdit");
   const ratingValue = Number(product?.ratingsAverage || 0);
 
   return (
     <motion.article
+      dir={direction}
       initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-30px" }}
@@ -98,7 +109,7 @@ export default function ProductCard({ product }: { product: Product }) {
               >
                 <Image
                   src={getImageUrl(imgUrl)}
-                  alt={product.name || "Product"}
+                  alt={product.name || t("productImageAlt")}
                   fill
                   quality={85}
                   priority={idx === 0}
@@ -124,10 +135,10 @@ export default function ProductCard({ product }: { product: Product }) {
         />
 
         {/* Top-Left Status Badges (Compact on Mobile) */}
-        <div className="absolute left-2 top-2 z-30 flex flex-col items-start gap-1 sm:left-2.5 sm:top-2.5">
+        <div className="absolute start-2 top-2 z-30 flex flex-col items-start gap-1 sm:start-2.5 sm:top-2.5">
           {isOutOfStock ? (
             <span className="rounded-full bg-danger px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-on-danger shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[9px]">
-              Sold Out
+              {t("soldOut")}
             </span>
           ) : (
             <>
@@ -137,14 +148,14 @@ export default function ProductCard({ product }: { product: Product }) {
                     size={8}
                     className="text-rating sm:h-2.5 sm:w-2.5"
                   />
-                  <span>Sale</span>
+                  <span>{t("sale")}</span>
                 </span>
               )}
 
               {isLowStock && (
                 <span className="inline-flex items-center gap-0.5 rounded-full bg-surface/95 px-2 py-0.5 text-[7px] font-black uppercase tracking-wider text-warning shadow-xs backdrop-blur-md sm:text-[8px]">
                   <Flame size={8} className="fill-rating text-warning" />
-                  <span>{stockCount} Left</span>
+                  <span>{stockCount} {t("leftInStock")}</span>
                 </span>
               )}
             </>
@@ -153,7 +164,7 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Top-Right Image Switcher Dots */}
         {images.length > 1 && (
-          <div className="absolute right-2 top-2 z-30 flex items-center gap-1 rounded-full bg-action/40 px-1.5 py-1 backdrop-blur-md sm:right-2.5 sm:top-2.5 sm:px-2">
+          <div className="absolute end-2 top-2 z-30 flex items-center gap-1 rounded-full bg-action/40 px-1.5 py-1 backdrop-blur-md sm:end-2.5 sm:top-2.5 sm:px-2">
             {images.map((_, i) => (
               <button
                 key={i}
@@ -163,7 +174,7 @@ export default function ProductCard({ product }: { product: Product }) {
                   setActiveIdx(i);
                 }}
                 onMouseEnter={() => setActiveIdx(i)}
-                aria-label={`Image ${i + 1}`}
+                aria-label={t("productImageAlt")}
                 className={`h-1 cursor-pointer rounded-full transition-all duration-300 ${
                   i === activeIdx
                     ? "w-3 bg-surface sm:w-3.5"
@@ -185,12 +196,29 @@ export default function ProductCard({ product }: { product: Product }) {
           >
             <span className="inline-flex items-center gap-1.5">
               <Eye size={12} />
-              <span>{isOutOfStock ? "Out of Stock" : "Quick View"}</span>
+              <span>{isOutOfStock ? t("outOfStock") : t("quickView")}</span>
             </span>
             <ArrowUpRight size={13} />
           </span>
         </div>
       </Link>
+
+      {/* Save product without interrupting the product-details link. */}
+      <button
+        type="button"
+        aria-label={isSaved ? t("removeFromWishlist") : t("addToWishlist")}
+        aria-pressed={isSaved}
+        title={isSaved ? t("removeFromWishlist") : t("addToWishlist")}
+        onClick={(event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          toggleSaved(product);
+          toast.success(t(isSaved ? "removeFromWishlist" : "addToWishlist"));
+        }}
+        className="absolute end-4 top-4 z-40 flex h-9 w-9 items-center justify-center rounded-full border border-border/80 bg-surface/95 text-secondary shadow-sm backdrop-blur transition-all hover:scale-105 hover:text-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus sm:end-5 sm:top-5 sm:h-10 sm:w-10"
+      >
+        <Heart size={17} fill={isSaved ? "currentColor" : "none"} className={isSaved ? "text-danger" : ""} />
+      </button>
 
       {/* ================================================================== */}
       {/* 2. GARMENT METADATA & FOOTER (ERGONOMIC MOBILE SPACING)            */}
@@ -210,7 +238,7 @@ export default function ProductCard({ product }: { product: Product }) {
               </div>
               <span className="text-[10px] text-rating sm:hidden">★</span>
               <span className="font-mono text-[9px] font-extrabold text-muted sm:text-[10px]">
-                {ratingValue > 0 ? ratingValue.toFixed(1) : "New"}
+                {ratingValue > 0 ? ratingValue.toFixed(1) : t("productNewLabel")}
               </span>
             </div>
           </div>
@@ -243,7 +271,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {/* Tactile Micro Action Button (Great for Mobile Tap & Desktop Hover) */}
           <Link
             href={detailUrl}
-            aria-label={`View ${product.name || "product"}`}
+            aria-label={`${t("productViewProduct")}: ${product.name || t("products")}`}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-surface-subtle text-primary transition-all duration-300 group-hover:rotate-45 group-hover:bg-action group-hover:text-on-action sm:h-8 sm:w-8"
           >
             <ArrowUpRight size={13} />

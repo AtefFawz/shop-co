@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import OrderStatusUpdater from "@/features/admin/orders/components/OrderStatusUpdater";
 import { DesktopOrderProps } from "@/features/admin/orders/components/AdminDesktopOrdersTable";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const getItemImageUrl = (raw?: string) => {
   if (!raw) return "https://placehold.co/80x80/111111/FFFFFF?text=SKU";
@@ -20,25 +21,30 @@ const AdminMobileOrdersList = ({
   onOrderDeleted,
   goToPage,
 }: DesktopOrderProps) => {
+  const { t, locale, direction } = useLocale();
+  const currencyFormatter = new Intl.NumberFormat(
+    locale === "ar" ? "ar-EG" : "en-EG",
+    { style: "currency", currency: "EGP", maximumFractionDigits: 0 },
+  );
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopyId = (id: string) => {
     navigator.clipboard?.writeText(id);
     setCopiedId(id);
-    toast.success(`Order #${id.slice(-6).toUpperCase()} copied`);
+    toast.success(`${t("orderIdCopied")}: #${id.slice(-6).toUpperCase()}`);
     setTimeout(() => setCopiedId(null), 1800);
   };
 
   return (
-    <div className="space-y-4 md:hidden">
+    <div dir={direction} className="space-y-4 md:hidden">
       {orders.length > 0 && (
         <div className="space-y-3.5">
           {orders.map((order: any) => {
             const shortId = (order._id || "").slice(-6).toUpperCase();
             const isExpanded = expandedId === order._id;
             const itemsList: any[] = order.orderItems || [];
-            const initials = (order.user?.fullName || "Guest")
+            const initials = (order.user?.fullName || t("ordersGuestClient"))
               .split(" ")
               .map((n: string) => n[0])
               .join("")
@@ -58,30 +64,30 @@ const AdminMobileOrdersList = ({
                     </div>
                     <div className="min-w-0">
                       <p className="truncate text-sm font-black leading-tight text-primary">
-                        {order.user?.fullName || "Guest Customer"}
+                        {order.user?.fullName || t("ordersGuestClient")}
                       </p>
                       <p className="mt-0.5 truncate text-[11px] font-medium text-muted">
-                        {order.user?.email || "No email"}
+                        {order.user?.email || t("ordersNoEmail")}
                       </p>
                     </div>
                   </div>
 
-                  <div className="shrink-0 text-right">
+                  <div className="shrink-0 text-end">
                     <p className="font-mono text-lg font-black leading-none text-primary">
-                      ${Number(order.totalPrice || 0).toLocaleString()}
+                      {currencyFormatter.format(Number(order.totalPrice || 0))}
                     </p>
                     <p className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-muted">
                       <Calendar size={10} />
                       {order.createdAt
                         ? new Date(order.createdAt).toLocaleDateString(
-                            "en-GB",
+                            locale === "ar" ? "ar-EG" : "en-GB",
                             {
                               day: "2-digit",
                               month: "short",
                               year: "numeric",
                             },
                           )
-                        : "Recent"}
+                        : t("ordersRecent")}
                     </p>
                   </div>
                 </div>
@@ -104,7 +110,7 @@ const AdminMobileOrdersList = ({
                       )}
                     </button>
 
-                    <div className="flex -space-x-2">
+                    <div className="flex gap-1">
                       {itemsList.slice(0, 3).map((item: any, idx: number) => (
                         <img
                           key={idx}
@@ -144,8 +150,8 @@ const AdminMobileOrdersList = ({
                     <span className="inline-flex items-center gap-1.5">
                       <ShoppingBag size={11} />
                       {isExpanded
-                        ? "Hide Order Manifest"
-                        : `Inspect Manifest (${itemsList.length} items)`}
+                        ? t("ordersHideManifest")
+                        : `${t("ordersInspectManifest")} (${itemsList.length} ${t(itemsList.length === 1 ? "ordersUnitSingular" : "ordersUnitPlural")})`}
                     </span>
                     <ChevronDown
                       size={13}
@@ -171,10 +177,10 @@ const AdminMobileOrdersList = ({
                             <p className="truncate text-xs font-extrabold text-primary">
                               {item.product?.name ||
                                 item.name ||
-                                "Catalog Garment"}
+                                t("adminProductDetails")}
                             </p>
                             <p className="font-mono text-[10px] font-bold text-muted">
-                              Qty: {item.quantity || item.qty || 1}
+                              {t("qty")}: {item.quantity || item.qty || 1}
                             </p>
                           </div>
                         </div>

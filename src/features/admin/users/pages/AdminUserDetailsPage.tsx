@@ -1,4 +1,6 @@
+import { cookies } from "next/headers";
 import { serverApi } from "@/lib/serverApi";
+import { messages, type Locale } from "@/shared/i18n/messages";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -13,8 +15,6 @@ import {
   PackageCheck,
   Sparkles,
   Crown,
-  Award,
-  TrendingUp,
   CheckCircle2,
   Clock,
   Truck,
@@ -24,7 +24,6 @@ import {
 import RoleSelector from "@/features/admin/users/components/UserRoleSelector";
 import DeleteUserButton from "@/features/admin/users/components/DeleteUserButton";
 import { AdminMetricCard } from "@/features/admin/dashboard/components/AdminMetricCard";
-
 
 /* -------------------------------------------------------------------------- */
 /*                                HELPER UTILS                                */
@@ -46,6 +45,21 @@ export default async function AdminUserDetailsPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const cookieStore = await cookies();
+  const locale: Locale =
+    cookieStore.get("shopco-language")?.value === "en" ? "en" : "ar";
+  const t = messages[locale];
+  const direction = locale === "ar" ? "rtl" : "ltr";
+
+  const currencyFormatter = new Intl.NumberFormat(
+    locale === "ar" ? "ar-EG" : "en-EG",
+    {
+      style: "currency",
+      currency: "EGP",
+      maximumFractionDigits: 0,
+    },
+  );
+
   let user = null;
 
   try {
@@ -86,35 +100,35 @@ export default async function AdminUserDetailsPage({
   const loyaltyTier =
     totalSpent >= 1500
       ? {
-          name: "BLACK MONOLITH VIP",
+          name: t.userTierBlack,
           nextGoal: 3000,
           progress: 100,
-          badge: "Top 1% Client",
+          badge: t.userBadgeTop,
         }
       : totalSpent >= 500
         ? {
-            name: "GOLD ATELIER",
+            name: t.userTierGold,
             nextGoal: 1500,
             progress: Math.min(100, Math.round((totalSpent / 1500) * 100)),
-            badge: "Priority Client",
+            badge: t.userBadgePriority,
           }
         : totalSpent > 0
           ? {
-              name: "SILVER ARCHIVE",
+              name: t.userTierSilver,
               nextGoal: 500,
               progress: Math.min(100, Math.round((totalSpent / 500) * 100)),
-              badge: "Verified Buyer",
+              badge: t.userBadgeVerified,
             }
           : {
-              name: "REGISTERED MEMBER",
+              name: t.userTierRegistered,
               nextGoal: 250,
               progress: 12,
-              badge: "New Account",
+              badge: t.userBadgeNew,
             };
 
   const joinDate = new Date(
     user.memberSince || user.createdAt || Date.now(),
-  ).toLocaleDateString("en-US", {
+  ).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
     month: "short",
     day: "numeric",
     year: "numeric",
@@ -131,10 +145,32 @@ export default async function AdminUserDetailsPage({
   };
 
   const roleUpper = (user.role || "USER").toUpperCase();
+  const roleLabel =
+    roleUpper === "ADMIN"
+      ? t.usersRoleAdmin
+      : roleUpper === "MANAGER" || roleUpper === "MANGER"
+        ? t.usersRoleManager
+        : t.usersRoleMember;
+
+  const statusLabel = (raw: string) => {
+    const status = raw.toLowerCase();
+    if (status === "delivered" || status === "completed")
+      return t.userDetailDelivered;
+    if (status === "shipped" || status === "transit" || status === "in transit")
+      return t.ordersFilterShipped;
+    if (status === "processing") return t.ordersFilterProcessing;
+    if (status === "cancelled" || status === "canceled")
+      return t.ordersFilterCancelled;
+    return t.ordersFilterPending;
+  };
+
   const shortId = (user._id || "").slice(-6).toUpperCase();
 
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8">
+    <div
+      dir={direction}
+      className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8"
+    >
       {/* ================================================================== */}
       {/* GPU 3D ANIMATIONS & HOLOGRAPHIC CARD STYLES                        */}
       {/* ================================================================== */}
@@ -172,7 +208,7 @@ export default async function AdminUserDetailsPage({
         className="pointer-events-none absolute inset-0 bg-grid-subtle bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_85%_70%_at_50%_20%,#000_55%,transparent_100%)]"
       />
 
-      <div className="Responsive relative z-10  w-full! space-y-6 ">
+      <div className="Responsive relative z-10 w-full! space-y-6">
         {/* ================================================================ */}
         {/* 1. TOP COMMAND BAR & NAVIGATION                                  */}
         {/* ================================================================ */}
@@ -185,13 +221,15 @@ export default async function AdminUserDetailsPage({
               size={15}
               className="transition-transform duration-300 group-hover:-translate-x-1"
             />
-            <span>Back to Directory</span>
+            <span>{t.userDetailBack}</span>
           </Link>
 
           <div className="flex items-center gap-3">
             <div className="hidden items-center gap-2 rounded-2xl border border-border/80 bg-surface-subtle px-3.5 py-2 font-mono text-[11px] font-bold text-secondary sm:flex">
               <span className="h-2 w-2 rounded-full bg-success" />
-              <span>DOSSIER #{shortId}</span>
+              <span>
+                {t.userDetailDossier} #{shortId}
+              </span>
             </div>
 
             <DeleteUserButton userId={user._id} userName={user.fullName} />
@@ -212,14 +250,14 @@ export default async function AdminUserDetailsPage({
 
           <div className="relative z-10 grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
             {/* Left 7 Columns: Avatar & Identity Details */}
-            <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-left lg:col-span-7">
+            <div className="flex flex-col items-center gap-6 text-center sm:flex-row sm:text-start lg:col-span-7">
               {/* Avatar Stage */}
               <div className="relative shrink-0">
                 {user.avatar ? (
                   <div className="relative h-28 w-28 overflow-hidden rounded-4xl border-4 border-border bg-surface-muted shadow-lg sm:h-34 sm:w-34">
                     <Image
                       src={user.avatar}
-                      alt={user.fullName || "User"}
+                      alt={user.fullName || t.userDetailUnnamed}
                       fill
                       sizes="136px"
                       priority
@@ -242,7 +280,7 @@ export default async function AdminUserDetailsPage({
                 <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
                     <Crown size={11} className="text-rating" />
-                    {roleUpper} CLEARANCE
+                    {roleLabel} · {t.userDetailClearance}
                   </span>
 
                   <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-[10px] font-extrabold text-secondary">
@@ -252,7 +290,7 @@ export default async function AdminUserDetailsPage({
 
                 <div>
                   <h1 className="truncate text-2xl font-black uppercase tracking-[-0.03em] text-primary sm:text-3xl">
-                    {user.fullName || "Unnamed Client"}
+                    {user.fullName || t.userDetailUnnamed}
                   </h1>
 
                   <div className="mt-2 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs font-bold text-muted sm:justify-start">
@@ -262,7 +300,7 @@ export default async function AdminUserDetailsPage({
                     </span>
                     <span className="inline-flex items-center gap-1.5">
                       <Calendar size={13} className="text-primary" />
-                      Member since {joinDate}
+                      {t.userDetailMemberSince} {joinDate}
                     </span>
                   </div>
                 </div>
@@ -270,7 +308,7 @@ export default async function AdminUserDetailsPage({
                 {/* Role Switcher */}
                 <div className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:justify-start">
                   <span className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-                    Modify Clearance:
+                    {t.userDetailModifyRole}
                   </span>
                   <RoleSelector userId={user._id} initialRole={user.role} />
                 </div>
@@ -292,7 +330,7 @@ export default async function AdminUserDetailsPage({
                       S.
                     </span>
                     <span className="text-xs font-black tracking-[0.22em] text-on-action">
-                      SHOP.CO PASS
+                      {t.userDetailPass}
                     </span>
                   </div>
 
@@ -305,19 +343,19 @@ export default async function AdminUserDetailsPage({
                 <div className="relative z-10 my-5 flex items-end justify-between">
                   <div>
                     <span className="block text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/45">
-                      Cumulative Spend
+                      {t.userDetailCumulativeSpend}
                     </span>
                     <span className="mt-0.5 block font-mono text-2xl font-black tracking-tight text-on-action">
-                      ${totalSpent.toLocaleString()}
+                      {currencyFormatter.format(totalSpent)}
                     </span>
                   </div>
 
-                  <div className="text-right font-mono">
+                  <div className="text-end font-mono">
                     <span className="block text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/45">
-                      Avg Order
+                      {t.userDetailAverageOrder}
                     </span>
                     <span className="mt-0.5 block text-sm font-black text-success">
-                      ${avgOrderValue.toLocaleString()}
+                      {currencyFormatter.format(avgOrderValue)}
                     </span>
                   </div>
                 </div>
@@ -325,7 +363,7 @@ export default async function AdminUserDetailsPage({
                 {/* Tier Progress Bar */}
                 <div className="relative z-10 space-y-1.5">
                   <div className="flex items-center justify-between font-mono text-[9px] font-bold uppercase tracking-widest text-on-action/55">
-                    <span>Tier Readiness</span>
+                    <span>{t.userDetailTierReadiness}</span>
                     <span>{loyaltyTier.progress}%</span>
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/10">
@@ -357,11 +395,12 @@ export default async function AdminUserDetailsPage({
               </span>
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/50">
-                  Client Intelligence Summary
+                  {t.userDetailIntelligence}
                 </p>
                 <p className="text-xs font-extrabold tracking-wide text-on-action">
-                  {deliveredOrders} of {ordersList.length} Orders Fulfilled ·{" "}
-                  {avgRating}★ Average Product Sentiment
+                  {t.userDetailOrdersSummary
+                    .replace("{orders}", String(deliveredOrders))
+                    .replace("{rating}", avgRating)}
                 </p>
               </div>
             </div>
@@ -369,10 +408,10 @@ export default async function AdminUserDetailsPage({
             <div className="flex flex-wrap items-center gap-6 sm:gap-8">
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  Average Ticket
+                  {t.userDetailAverageTicket}
                 </span>
                 <span className="font-mono text-sm font-black text-on-action">
-                  ${avgOrderValue.toLocaleString()}
+                  {currencyFormatter.format(avgOrderValue)}
                 </span>
               </div>
 
@@ -380,10 +419,10 @@ export default async function AdminUserDetailsPage({
 
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  Completed Orders
+                  {t.userDetailCompletedOrders}
                 </span>
                 <span className="font-mono text-sm font-black text-success">
-                  {deliveredOrders} Delivered
+                  {deliveredOrders} {t.userDetailDelivered}
                 </span>
               </div>
 
@@ -391,7 +430,7 @@ export default async function AdminUserDetailsPage({
 
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  Client Rating
+                  {t.userDetailClientRating}
                 </span>
                 <span className="font-mono text-sm font-black text-rating">
                   {avgRating} / 5.0 ★
@@ -406,35 +445,42 @@ export default async function AdminUserDetailsPage({
         {/* ================================================================ */}
         <div className="dossier-stagger-3 grid grid-cols-1 gap-4 sm:grid-cols-3">
           <AdminMetricCard
-            icon={ShoppingBag}
-            title="Total Orders Placed"
+            icon={<ShoppingBag />}
+            title={t.userDetailAllOrders}
             value={ordersList.length}
             trend={
               ordersList.length > 0
-                ? `${deliveredOrders} Completed`
-                : "No Orders"
+                ? `${deliveredOrders} ${t.userDetailCompleted}`
+                : t.userDetailNoOrders
             }
             trendUp={ordersList.length > 0}
-            subtitle="All-time checkout volume"
+            subtitle={t.userDetailAllTimeVolume}
+            verifiedLabel={t.userBadgeVerified}
+            liveLabel={t.dashboardLiveStatus}
           />
 
           <AdminMetricCard
-            icon={DollarSign}
-            title="Lifetime Value (LTV)"
-            value={totalSpent}
-            prefix="$"
+            icon={<DollarSign />}
+            title={t.userDetailLifetimeValue}
+            value={currencyFormatter.format(totalSpent)}
             trend={loyaltyTier.badge}
             trendUp={true}
-            subtitle={`Avg. $${avgOrderValue.toLocaleString()} per order`}
+            subtitle={`${t.userDetailAvgPerOrder}: ${currencyFormatter.format(
+              avgOrderValue,
+            )}`}
+            verifiedLabel={t.userBadgeVerified}
+            liveLabel={t.dashboardLiveStatus}
           />
 
           <AdminMetricCard
-            icon={Star}
-            title="Submitted Reviews"
+            icon={<Star />}
+            title={t.userDetailSubmittedReviews}
             value={reviewsList.length}
-            trend={`${avgRating} ★ Avg`}
+            trend={`${avgRating} ★ ${t.userDetailRatingAverage}`}
             trendUp={Number(avgRating) >= 4}
-            subtitle="Verified catalog feedback"
+            subtitle={t.userDetailVerifiedFeedback}
+            verifiedLabel={t.userBadgeVerified}
+            liveLabel={t.dashboardLiveStatus}
           />
         </div>
 
@@ -448,16 +494,16 @@ export default async function AdminUserDetailsPage({
               <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-                    Transaction Log
+                    {t.userDetailTransactionLog}
                   </p>
                   <h2 className="mt-0.5 flex items-center gap-2 text-base font-black uppercase tracking-tight text-primary sm:text-lg">
                     <PackageCheck size={18} className="text-primary" />
-                    Order History
+                    {t.userDetailOrderHistory}
                   </h2>
                 </div>
 
                 <span className="rounded-full bg-surface-subtle px-3 py-1 font-mono text-xs font-black text-primary">
-                  {ordersList.length} Record{ordersList.length === 1 ? "" : "s"}
+                  {ordersList.length} {t.userDetailRecords}
                 </span>
               </div>
 
@@ -467,17 +513,18 @@ export default async function AdminUserDetailsPage({
                     <ShoppingBag size={20} />
                   </div>
                   <p className="text-xs font-black uppercase tracking-wider text-primary">
-                    No Orders Placed Yet
+                    {t.userDetailNoOrdersTitle}
                   </p>
                   <p className="mt-1 text-[11px] text-muted">
-                    Purchases made by this client will appear here
-                    automatically.
+                    {t.userDetailNoOrdersDescription}
                   </p>
                 </div>
               ) : (
-                <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pr-1">
+                <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pe-1">
                   {ordersList.map((order: any) => {
-                    const status = (order.status || "Pending").toLowerCase();
+                    const status = (
+                      order.status || t.userDetailStatus
+                    ).toLowerCase();
                     const isDelivered =
                       status === "delivered" || status === "completed";
                     const isShipped =
@@ -516,7 +563,7 @@ export default async function AdminUserDetailsPage({
                               {order.createdAt && (
                                 <span className="text-[10px] font-bold text-muted">
                                   {new Date(order.createdAt).toLocaleDateString(
-                                    "en-GB",
+                                    locale === "ar" ? "ar-EG" : "en-GB",
                                     {
                                       day: "2-digit",
                                       month: "short",
@@ -528,11 +575,12 @@ export default async function AdminUserDetailsPage({
                             </div>
 
                             <p className="mt-1 font-mono text-sm font-black text-primary">
-                              ${Number(order.totalPrice || 0).toLocaleString()}
+                              {currencyFormatter.format(
+                                Number(order.totalPrice || 0),
+                              )}
                               {items.length > 0 && (
-                                <span className="ml-2 font-sans text-[11px] font-semibold text-muted">
-                                  · {items.length} item
-                                  {items.length === 1 ? "" : "s"}
+                                <span className="ms-2 font-sans text-[11px] font-semibold text-muted">
+                                  · {items.length} {t.userDetailUnits}
                                 </span>
                               )}
                             </p>
@@ -556,7 +604,7 @@ export default async function AdminUserDetailsPage({
                           ) : (
                             <Clock size={11} />
                           )}
-                          {order.status || "Pending"}
+                          {statusLabel(order.status || t.userDetailStatus)}
                         </span>
                       </div>
                     );
@@ -572,17 +620,16 @@ export default async function AdminUserDetailsPage({
               <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
                   <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-                    Client Sentiment
+                    {t.userDetailCustomerSentiment}
                   </p>
                   <h2 className="mt-0.5 flex items-center gap-2 text-base font-black uppercase tracking-tight text-primary sm:text-lg">
                     <MessageSquareQuote size={18} className="text-primary" />
-                    Latest Reviews
+                    {t.userDetailLatestReviews}
                   </h2>
                 </div>
 
                 <span className="rounded-full bg-surface-subtle px-3 py-1 font-mono text-xs font-black text-primary">
-                  {reviewsList.length} Review
-                  {reviewsList.length === 1 ? "" : "s"}
+                  {reviewsList.length} {t.userDetailReviewCount}
                 </span>
               </div>
 
@@ -592,14 +639,14 @@ export default async function AdminUserDetailsPage({
                     <Star size={20} />
                   </div>
                   <p className="text-xs font-black uppercase tracking-wider text-primary">
-                    No Reviews Submitted Yet
+                    {t.userDetailNoReviews}
                   </p>
                   <p className="mt-1 text-[11px] text-muted">
-                    Product ratings and written feedback will appear here.
+                    {t.userDetailNoReviewsDescription}
                   </p>
                 </div>
               ) : (
-                <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pr-1">
+                <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pe-1">
                   {reviewsList.map((review: any) => {
                     const rating = Number(review.rating) || 5;
                     return (
@@ -628,7 +675,7 @@ export default async function AdminUserDetailsPage({
                           </div>
 
                           <span className="truncate max-w-[180px] rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-secondary shadow-2xs">
-                            {review.product?.name || "Catalog Garment"}
+                            {review.product?.name || t.userDetailCatalogGarment}
                           </span>
                         </div>
 

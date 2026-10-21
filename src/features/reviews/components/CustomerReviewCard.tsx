@@ -6,6 +6,7 @@ import useData from "@/hooks/getData";
 import { AccountSectionHeader } from "@/features/account/components/AccountSectionHeader";
 import { EmptyAccountState } from "@/features/account/components/EmptyAccountState";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 function CustomerReviewCard({
   rev,
@@ -18,6 +19,7 @@ function CustomerReviewCard({
     product?: { name?: string };
   };
 }) {
+  const { t, locale } = useLocale();
   const rating = Number(rev.rating) || 5;
   const dateStr = rev.updatedAt || rev.createdAt;
 
@@ -66,13 +68,13 @@ function CustomerReviewCard({
       {/* Footer */}
       <div className="flex items-center justify-between border-t border-border-subtle pt-4 text-[10px] font-black uppercase tracking-widest text-muted">
         <span className="inline-flex items-center gap-1.5 text-success">
-          <CheckCircle2 size={12} /> Verified Patron Review
+          <CheckCircle2 size={12} /> {t("uiReviewVerified")}
         </span>
 
         {dateStr && (
           <span className="inline-flex items-center gap-1 font-mono text-muted">
             <Calendar size={11} />
-            {new Date(dateStr).toLocaleDateString("en-GB", {
+            {new Date(dateStr).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
               day: "2-digit",
               month: "short",
               year: "numeric",
@@ -88,6 +90,7 @@ function ReviewsContent() {
   const { data, loading, goToPage, page, totalPages } = useData(
     "/profile/my-reviews",
   );
+  const { t } = useLocale();
   const reviews = data?.data?.reviews ?? [];
   const total = data?.pagination?.total ?? reviews.length;
 
@@ -109,10 +112,10 @@ function ReviewsContent() {
 
   return (
     <div className="space-y-6">
-      <AccountSectionHeader icon={Star} title="My Published Feedback" count={total} />
+      <AccountSectionHeader icon={Star} title={t("uiMyPublishedFeedback")} count={total} />
 
       {reviews.length === 0 ? (
-        <EmptyAccountState message="You haven't published any product reviews yet." />
+        <EmptyAccountState message={t("uiNoPublishedReviews")} />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {reviews.map((rev: any) => (

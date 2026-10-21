@@ -15,8 +15,10 @@ import {
   KeyRound,
 } from "lucide-react";
 import { useLogin } from "@/hooks/signIn";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const SignInForm = () => {
+  const { t } = useLocale();
   const { error, user, isLoading, handleChange, submitAction } = useLogin();
 
   const [showPassword, setShowPassword] = useState(false);
@@ -35,7 +37,6 @@ const SignInForm = () => {
     e.preventDefault();
     try {
       await submitAction();
-      console.log("✅ Logged in successfully!");
     } catch (err) {
       console.error("❌ Submission failed but page is stable.", err);
     }
@@ -53,12 +54,12 @@ const SignInForm = () => {
 
       {/* ── Email Address Field ── */}
       <Field
-        label="Email Address"
+        label={t("email")}
         active={focusedField === "email"}
         rightBadge={
           isEmailValid ? (
             <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-success">
-              <CheckCircle2 size={11} /> Verified Format
+              <CheckCircle2 size={11} /> {t("authEmailVerified")}
             </span>
           ) : null
         }
@@ -71,7 +72,7 @@ const SignInForm = () => {
           }`}
         >
           <span
-            className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
+            className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
               focusedField === "email"
                 ? "bg-action text-on-action"
                 : "bg-surface text-muted shadow-2xs"
@@ -84,19 +85,19 @@ const SignInForm = () => {
             id="email"
             type="email"
             autoComplete="email"
-            placeholder="name@example.com"
+            placeholder={t("authEmailPlaceholder")}
             value={user.email}
             onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleChange("email", e.target.value)}
-            className="w-full bg-transparent py-3.5 pl-14 pr-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
             required
           />
 
           {isEmailValid && (
             <CheckCircle2
               size={16}
-              className="pointer-events-none absolute right-4 text-success animate-in zoom-in duration-200"
+              className="pointer-events-none absolute end-4 text-success animate-in zoom-in duration-200"
             />
           )}
         </div>
@@ -104,19 +105,19 @@ const SignInForm = () => {
 
       {/* ── Password Field ── */}
       <Field
-        label="Password"
+        label={t("password")}
         active={focusedField === "password"}
         rightBadge={
           capsLockOn ? (
             <span className="inline-flex items-center gap-1 rounded-md bg-warning-soft px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-warning">
-              ⇪ Caps Lock ON
+              ⇪ {t("authCapsLock")}
             </span>
           ) : (
             <Link
               href="/auth/forgot-password"
               className="text-[10px] font-black uppercase tracking-wider text-muted underline decoration-border-strong underline-offset-4 transition-colors hover:text-primary hover:decoration-primary"
             >
-              Forgot Password?
+              {t("forgotPassword")}
             </Link>
           )
         }
@@ -129,7 +130,7 @@ const SignInForm = () => {
           }`}
         >
           <span
-            className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
+            className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors duration-300 ${
               focusedField === "password"
                 ? "bg-action text-on-action"
                 : "bg-surface text-muted shadow-2xs"
@@ -149,15 +150,15 @@ const SignInForm = () => {
             onKeyUp={handleKeyEvents}
             onKeyDown={handleKeyEvents}
             onChange={(e) => handleChange("password", e.target.value)}
-            className="w-full bg-transparent py-3.5 pl-14 pr-12 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-12 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
             required
           />
 
           <button
             type="button"
             onClick={() => setShowPassword((prev) => !prev)}
-            aria-label={showPassword ? "Hide password" : "Show password"}
-            className="absolute right-3.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-muted hover:text-primary"
+            aria-label={showPassword ? t("hidePassword") : t("showPassword")}
+            className="absolute end-3.5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-muted hover:text-primary"
           >
             {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
           </button>
@@ -177,11 +178,11 @@ const SignInForm = () => {
           {isLoading ? (
             <>
               <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-              <span>Authenticating Session…</span>
+              <span>{t("loggingIn")}</span>
             </>
           ) : (
             <>
-              <span>Enter Atelier</span>
+              <span>{t("enterStore")}</span>
               <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-surface group-hover:text-primary">
                 <ArrowRight size={13} />
               </span>
@@ -192,7 +193,7 @@ const SignInForm = () => {
         {/* Micro Security Footer */}
         <div className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">
           <ShieldCheck size={12} className="text-success" />
-          <span>256-Bit Encrypted Member Access</span>
+          <span>{t("verifiedSecure")}</span>
         </div>
       </div>
     </form>

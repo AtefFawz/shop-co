@@ -1,6 +1,9 @@
+"use client";
+
 // Pagination navigation for URL-driven route state.
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type LinkPaginationProps = {
   currentPage: number;
@@ -24,24 +27,25 @@ const getVisiblePages = (current: number, total: number) => {
 };
 
 export default function LinkPagination({ currentPage, totalPages }: LinkPaginationProps) {
+  const { t, direction } = useLocale();
   if (totalPages <= 1) return null;
 
   const visiblePages = getVisiblePages(currentPage, totalPages);
 
   return (
-    <div className="flex items-center justify-between sm:justify-center gap-2 pt-4 border-t border-border-subtle">
+    <div dir={direction} className="flex items-center justify-between gap-2 border-t border-border-subtle pt-4 sm:justify-center">
       {currentPage > 1 ? (
         <Link
           href={`?page=${currentPage - 1}`}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-bold text-secondary hover:bg-surface-subtle active:scale-95 transition-all shadow-sm"
         >
-          <ChevronLeft size={16} />
-          <span className="hidden sm:inline">Previous</span>
+          {direction === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          <span className="hidden sm:inline">{t("paginationPrevious")}</span>
         </Link>
       ) : (
         <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border-subtle bg-surface-subtle text-xs font-bold text-subtle cursor-not-allowed">
-          <ChevronLeft size={16} />
-          <span className="hidden sm:inline">Previous</span>
+          {direction === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+          <span className="hidden sm:inline">{t("paginationPrevious")}</span>
         </span>
       )}
 
@@ -84,13 +88,13 @@ export default function LinkPagination({ currentPage, totalPages }: LinkPaginati
           href={`?page=${currentPage + 1}`}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-bold text-secondary hover:bg-surface-subtle active:scale-95 transition-all shadow-sm"
         >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight size={16} />
+          <span className="hidden sm:inline">{t("paginationNext")}</span>
+          {direction === "rtl" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
         </Link>
       ) : (
         <span className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border-subtle bg-surface-subtle text-xs font-bold text-subtle cursor-not-allowed">
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight size={16} />
+          <span className="hidden sm:inline">{t("paginationNext")}</span>
+          {direction === "rtl" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
         </span>
       )}
     </div>

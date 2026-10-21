@@ -6,16 +6,18 @@ import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { brandCatalogItems } from "@/features/home/data/brandCatalog";
 import { ArrowUpRight, ShieldCheck, Sparkles } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export const BrandShowcase = () => {
   const router = useRouter();
+  const { t, direction } = useLocale();
 
   const handleNavigateShop = () => {
     router.push("/shop");
   };
 
   return (
-    <section className="relative isolate overflow-hidden bg-surface-subtle py-16 text-primary sm:py-22">
+    <section dir={direction} className="relative isolate overflow-hidden bg-surface-subtle py-16 text-primary sm:py-22">
       {/* Architectural Studio Grid */}
       <div
         aria-hidden="true"
@@ -29,17 +31,16 @@ export const BrandShowcase = () => {
             <div className="mb-2.5 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1 shadow-2xs">
               <span className="h-2 w-2 rounded-full bg-success" />
               <span className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">
-                OFFICIAL FLAGSHIP PARTNERS
+                {t("brandOfficialPartners")}
               </span>
             </div>
             <h2 className="text-2xl font-black uppercase tracking-[-0.04em] leading-none text-primary sm:text-3xl lg:text-4xl">
-              Browse Luxury Houses
+              {t("brandBrowseLuxuryHouses")}
             </h2>
           </div>
 
-          <p className="max-w-xs text-xs font-medium leading-relaxed text-muted sm:text-right sm:text-sm">
-            Shop authenticated garments from the world&apos;s most iconic
-            fashion labels, curated in one archive.
+          <p className="max-w-xs text-xs font-medium leading-relaxed text-muted sm:text-start sm:text-sm">
+            {t("brandDescription")}
           </p>
         </div>
 
@@ -111,7 +112,7 @@ export const BrandShowcase = () => {
               whileTap={{ scale: 0.97 }}
               className="group flex cursor-pointer items-center gap-2.5 rounded-full bg-action px-7 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.35)] transition-all hover:bg-action-hover sm:px-9"
             >
-              <span>Explore All Partners</span>
+              <span>{t("brandExploreAllPartners")}</span>
               <ArrowUpRight
                 size={15}
                 className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

@@ -19,94 +19,44 @@ import {
   useNotificationStore,
   type Notification,
 } from "@/store/notificationStore";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-type WindowWithWebkitAudio = Window & {
-  webkitAudioContext?: typeof AudioContext;
-};
-
-function playNotificationChime() {
-  if (typeof window === "undefined") return;
-
-  try {
-    if (localStorage.getItem("shopco_notif_sound") === "muted") return;
-  } catch {
-    // Ignore storage restrictions and continue with the default preference.
-  }
-
-  const AudioContextClass =
-    window.AudioContext || (window as WindowWithWebkitAudio).webkitAudioContext;
-
-  if (!AudioContextClass) return;
-
-  try {
-    const context = new AudioContextClass();
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(880, context.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(
-      1318.5,
-      context.currentTime + 0.14,
-    );
-
-    gain.gain.setValueAtTime(0.045, context.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, context.currentTime + 0.38);
-
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-
-    oscillator.onended = () => {
-      void context.close().catch(() => undefined);
-    };
-
-    oscillator.start();
-    oscillator.stop(context.currentTime + 0.4);
-
-    if (context.state === "suspended") {
-      void context.resume().catch(() => undefined);
-    }
-  } catch {
-    // Audio can be unavailable until a user gesture or due to browser settings.
-  }
-}
-
-function getToastVisuals(title = "", message = "") {
+function getToastVisuals(title = "", message = "", t: (key: import("@/shared/i18n/messages").MessageKey) => string) {
   const content = `${title} ${message}`.toLocaleLowerCase();
 
   if (
-    ["ship", "deliver", "transit", "courier"].some((word) =>
+    ["ship", "deliver", "transit", "courier", "شحن", "توصيل", "وصل", "مندوب"].some((word) =>
       content.includes(word),
     )
   ) {
     return {
       Icon: Truck,
-      label: "Shipping update",
+      label: t("notifShippingCategory"),
       iconStyle: "bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300",
     };
   }
 
   if (
-    ["cancel", "fail", "alert", "refund", "issue"].some((word) =>
+    ["cancel", "fail", "alert", "refund", "issue", "إلغاء", "فشل", "تنبيه", "استرداد", "مشكلة"].some((word) =>
       content.includes(word),
     )
   ) {
     return {
       Icon: AlertTriangle,
-      label: "Attention required",
+      label: t("notifAttentionCategory"),
       iconStyle:
         "bg-rose-100 text-rose-700 dark:bg-rose-400/15 dark:text-rose-300",
     };
   }
 
   if (
-    ["confirm", "complete", "success", "paid"].some((word) =>
+    ["confirm", "complete", "success", "paid", "تأكيد", "تم بنجاح", "دفع", "مؤكد"].some((word) =>
       content.includes(word),
     )
   ) {
     return {
       Icon: CheckCircle2,
-      label: "Order confirmed",
+      label: t("notifOrderConfirmed"),
       iconStyle:
         "bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
     };
@@ -114,7 +64,7 @@ function getToastVisuals(title = "", message = "") {
 
   return {
     Icon: Bell,
-    label: "New notification",
+    label: t("notifNew"),
     iconStyle:
       "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100",
   };
@@ -122,6 +72,7 @@ function getToastVisuals(title = "", message = "") {
 
 export default function NotificationListener() {
   const router = useRouter();
+  const { locale, t } = useLocale();
   const seenNotificationIds = useRef(new Set<string>());
   const refreshingToken = useRef(false);
 
@@ -149,23 +100,23 @@ export default function NotificationListener() {
       }
 
       addNotification(notification);
-      playNotificationChime();
-
       const { Icon, label, iconStyle } = getToastVisuals(
         notification.title,
         notification.message,
+        t,
       );
 
       toast.custom(
-        (t) => (
-          <motion.div
+        (toastItem) => (
+            <motion.div
             role="status"
             aria-live="polite"
+              dir={locale === "ar" ? "rtl" : "ltr"}
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{
-              opacity: t.visible ? 1 : 0,
-              y: t.visible ? 0 : 8,
-              scale: t.visible ? 1 : 0.985,
+              opacity: toastItem.visible ? 1 : 0,
+              y: toastItem.visible ? 0 : 8,
+              scale: toastItem.visible ? 1 : 0.985,
             }}
             transition={{ duration: 0.2 }}
             className="
@@ -197,7 +148,7 @@ export default function NotificationListener() {
                 </div>
 
                 <p className="mt-1 break-words text-sm font-bold text-neutral-900 dark:text-neutral-100">
-                  {notification.title || "New notification"}
+                  {notification.title || t("notifNew")}
                 </p>
 
                 {notification.message && (
@@ -210,7 +161,7 @@ export default function NotificationListener() {
                   <button
                     type="button"
                     onClick={() => {
-                      toast.dismiss(t.id);
+                      toast.dismiss(toastItem.id);
                       router.push(`/shop/orders/${notification.order}`);
                     }}
                     className="
@@ -225,7 +176,7 @@ export default function NotificationListener() {
                     "
                   >
                     <span>
-                      View order #
+                      {t("notifViewOrder")} #
                       {String(notification.order).slice(-6).toUpperCase()}
                     </span>
                     <ArrowUpRight size={12} />
@@ -235,8 +186,8 @@ export default function NotificationListener() {
 
               <button
                 type="button"
-                onClick={() => toast.dismiss(t.id)}
-                aria-label="Dismiss notification"
+                onClick={() => toast.dismiss(toastItem.id)}
+                aria-label={t("notifClose")}
                 className="
                   flex h-7 w-7 shrink-0 cursor-pointer items-center
                   justify-center rounded-lg text-neutral-500
@@ -254,11 +205,11 @@ export default function NotificationListener() {
         ),
         {
           duration: 5000,
-          position: "bottom-right",
+          position: locale === "ar" ? "bottom-left" : "bottom-right",
         },
       );
     },
-    [addNotification, router],
+    [addNotification, locale, router, t],
   );
 
   useEffect(() => {
@@ -283,7 +234,7 @@ export default function NotificationListener() {
         socket.connect();
       } catch {
         if (!disposed) {
-          toast.error("Your session may have expired. Please sign in again.");
+          toast.error(t("authSessionExpiredToast"));
         }
       } finally {
         refreshingToken.current = false;

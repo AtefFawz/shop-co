@@ -10,7 +10,7 @@ import { useProduct } from "@/store/cardStore";
 import { useRouter } from "next/navigation";
 
 export default function ProductClientWrapper({ product }: { product: any }) {
-  const update = useProduct((state) => state.update);
+  const addItem = useProduct((state) => state.addItem);
   const router = useRouter();
 
   // Safely initialize first color/size if array is provided
@@ -42,7 +42,11 @@ export default function ProductClientWrapper({ product }: { product: any }) {
       isChose: true,
     };
 
-    update(finalProduct);
+    addItem({
+      ...finalProduct,
+      colors: selectedColor ? [selectedColor] : [],
+      size: selectedSize ? [selectedSize] : [],
+    });
 
     if (redirectImmediate) {
       router.push("/shop/details/cart");
@@ -50,7 +54,7 @@ export default function ProductClientWrapper({ product }: { product: any }) {
     }
 
     toast.success(
-      (t) => (
+      (toastItem) => (
         <div className="flex items-center gap-3.5">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
@@ -64,7 +68,7 @@ export default function ProductClientWrapper({ product }: { product: any }) {
             type="button"
             onClick={() => {
               router.push("/shop/details/cart");
-              toast.dismiss(t.id);
+              toast.dismiss(toastItem.id);
             }}
             className="shrink-0 cursor-pointer rounded-full bg-white px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-[#111111] transition-transform hover:scale-105"
           >

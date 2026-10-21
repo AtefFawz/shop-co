@@ -4,6 +4,8 @@ import React from "react";
 import { ShoppingBag, ShieldCheck, Sparkles, Truck } from "lucide-react";
 import { Product } from "@/types";
 import { calculateFinalPrice } from "@/lib/logicPricing";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 const FREE_SHIPPING_THRESHOLD = 200;
 
@@ -14,6 +16,7 @@ const getImageUrl = (raw?: string) => {
 };
 
 export const OrderSummary = ({ items }: { items: Product[] }) => {
+  const { t, locale, direction } = useLocale();
   const { rawSubtotal, discountedSubtotal, totalUnits } = items.reduce(
     (acc, item) => {
       const qty = Number(item.count ?? 1);
@@ -38,7 +41,7 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
   const grandTotal = discountedSubtotal + deliveryFee;
 
   return (
-    <div className="sticky top-24 overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-7">
+    <div dir={direction} className="sticky top-24 overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-7">
       {/* Header */}
       <div className="mb-5 flex items-center justify-between border-b border-border-subtle pb-4">
         <div className="flex items-center gap-3">
@@ -47,22 +50,21 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
           </div>
           <div>
             <h3 className="text-base font-black uppercase tracking-tight text-primary">
-              Order Manifest
+              {t("productManifest")}
             </h3>
             <p className="text-xs font-semibold text-muted">
-              {items.length} SKU{items.length === 1 ? "" : "s"} · {totalUnits}{" "}
-              unit{totalUnits === 1 ? "" : "s"}
+              {items.length} {t("products")} · {totalUnits} {t("units")}
             </p>
           </div>
         </div>
 
         <span className="rounded-full bg-surface-subtle px-3 py-1 font-mono text-[10px] font-black uppercase text-primary">
-          VERIFIED
+          {t("verified")}
         </span>
       </div>
 
       {/* Scrollable Items Manifest */}
-      <div className="max-h-[320px] space-y-3 overflow-y-auto pr-1">
+      <div className="max-h-[320px] space-y-3 overflow-y-auto pe-1">
         {items.map((item) => {
           const qty = Number(item.count ?? 1);
           const lineFinal = calculateFinalPrice(
@@ -85,7 +87,7 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
                     alt={item.name}
                     className="h-full w-full object-cover object-top"
                   />
-                  <span className="absolute bottom-0.5 right-0.5 rounded bg-action/90 px-1.5 py-0.2 font-mono text-[8px] font-black text-on-action">
+                  <span className="absolute bottom-0.5 end-0.5 rounded bg-action/90 px-1.5 py-0.2 font-mono text-[8px] font-black text-on-action">
                     ×{qty}
                   </span>
                 </div>
@@ -95,14 +97,14 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
                     {item.name}
                   </p>
                   <div className="mt-0.5 flex items-center gap-2 text-[10px] font-bold text-muted">
-                    {item.size && <span>Size: {item.size}</span>}
-                    {item.colors && <span>· {item.colors}</span>}
+                    {item.size && <span>{t("size")}: {Array.isArray(item.size) ? item.size.join(", ") : item.size}</span>}
+                    {item.colors && <span>· {Array.isArray(item.colors) ? item.colors.join(", ") : item.colors}</span>}
                   </div>
                 </div>
               </div>
 
               <span className="shrink-0 font-mono text-xs font-black text-primary">
-                ${lineFinal.toFixed(2)}
+                {formatCurrency(lineFinal, locale)}
               </span>
             </div>
           );
@@ -112,32 +114,32 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
       {/* Financial Breakdown */}
       <div className="mt-5 space-y-2.5 border-t border-border-subtle pt-4 text-xs">
         <div className="flex justify-between">
-          <span className="font-semibold text-muted">Items Subtotal</span>
+          <span className="font-semibold text-muted">{t("originalSubtotal")}</span>
           <span className="font-mono font-bold text-primary">
-            ${rawSubtotal.toFixed(2)}
+            {formatCurrency(rawSubtotal, locale)}
           </span>
         </div>
 
         {totalSaved > 0 && (
           <div className="flex justify-between text-success">
-            <span className="font-semibold">Atelier Savings</span>
+            <span className="font-semibold">{t("youSave")}</span>
             <span className="font-mono font-black">
-              -${totalSaved.toFixed(2)}
+              -{formatCurrency(totalSaved, locale)}
             </span>
           </div>
         )}
 
         <div className="flex justify-between">
           <span className="font-semibold text-muted">
-            Courier Dispatch Fee
+            {t("delivery")}
           </span>
           {deliveryFee === 0 ? (
             <span className="font-mono text-[10px] font-black uppercase text-success">
-              COMPLIMENTARY
+              {t("free")}
             </span>
           ) : (
             <span className="font-mono font-bold text-primary">
-              +${deliveryFee.toFixed(2)}
+              +{formatCurrency(deliveryFee, locale)}
             </span>
           )}
         </div>
@@ -148,15 +150,15 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
         <div className="flex items-end justify-between">
           <div>
             <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-on-action/45">
-              TOTAL SETTLEMENT
+              {t("estimatedTotal")}
             </span>
             <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-bold text-success">
-              <ShieldCheck size={13} /> Guaranteed Price
+              <ShieldCheck size={13} /> {t("verifiedSecure")}
             </span>
           </div>
 
           <span className="font-mono text-2xl font-black leading-none text-on-action">
-            ${grandTotal.toFixed(2)}
+            {formatCurrency(grandTotal, locale)}
           </span>
         </div>
       </div>

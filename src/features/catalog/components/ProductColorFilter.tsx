@@ -2,6 +2,8 @@
 
 import React, { useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import type { MessageKey } from "@/shared/i18n/messages";
 
 const PALETTE = [
   { hex: "#9f0712", name: "Crimson" },
@@ -21,7 +23,16 @@ const PALETTE = [
   { hex: "#3C467B", name: "Slate" },
 ];
 
+const COLOR_TRANSLATIONS: Record<string, MessageKey> = {
+  "#9f0712": "colorCrimson", "#193cb8": "colorCobalt", "#7bf1a8": "colorMint",
+  "#000000": "colorOnyx", "#fff085": "colorButter", "#6e11b0": "colorViolet",
+  "#3d2b1f": "colorEspresso", "#7b3306": "colorCognac", "#0F2854": "colorNavy",
+  "#89986D": "colorOliveSage", "#301CA0": "colorIndigo", "#FF937E": "colorCoral",
+  "#540863": "colorPlum", "#777C6D": "colorStone", "#3C467B": "colorSlate",
+};
+
 export const ProductColorFilter = () => {
+  const { t, locale } = useLocale();
   const [isOpen, setIsOpen] = useState(true);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
@@ -36,11 +47,11 @@ export const ProductColorFilter = () => {
       >
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-black uppercase tracking-[0.16em] text-secondary">
-            Color Palette
+            {t("colorPalette")}
           </span>
           {selectedObj && (
             <span className="rounded-full bg-surface-muted px-2 py-0.5 text-[9px] font-bold text-secondary">
-              {selectedObj.name}
+              {locale === "ar" ? t(COLOR_TRANSLATIONS[selectedObj.hex] ?? "colorPalette") : selectedObj.name}
             </span>
           )}
         </div>
@@ -80,7 +91,7 @@ export const ProductColorFilter = () => {
                       : "hover:scale-108"
                   }`}
                   style={{ backgroundColor: item.hex }}
-                  title={item.name}
+                  title={locale === "ar" ? t(COLOR_TRANSLATIONS[item.hex] ?? "colorPalette") : item.name}
                 >
                   {isSelected && (
                     <Check

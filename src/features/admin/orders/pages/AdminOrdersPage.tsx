@@ -17,12 +17,20 @@ import {
   Filter,
 } from "lucide-react";
 import useData from "@/hooks/getData";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { AdminMobileOrdersList } from "@/features/admin/orders/components/AdminMobileOrdersList";
 import { AdminDesktopOrdersTable } from "@/features/admin/orders/components/AdminDesktopOrdersTable";
 
 export default function AdminOrdersPage() {
+  const { t, locale, direction } = useLocale();
   const { loading, data, page, totalPages, goToPage, refetch, total } =
     useData("/order/all");
+  const formatMoney = (value: number) =>
+    new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-EG", {
+      style: "currency",
+      currency: "EGP",
+      maximumFractionDigits: 0,
+    }).format(value);
 
   // Interactive Studio States
   const [searchQuery, setSearchQuery] = useState("");
@@ -33,8 +41,8 @@ export default function AdminOrdersPage() {
 
   // Set Browser Tab Title
   useEffect(() => {
-    document.title = "Fulfillment Studio · Orders | SHOP.CO™";
-  }, []);
+    document.title = `${t("ordersAllOrders")} | SHOP.CO™`;
+  }, [t]);
 
   const handleDeleteOrder = () => {
     refetch();
@@ -134,7 +142,7 @@ export default function AdminOrdersPage() {
   }, [orders, searchQuery, statusFilter, sortBy]);
 
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8">
+    <div dir={direction} className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8">
       {/* ================================================================== */}
       {/* GPU 3D ANIMATIONS & ENTRANCE KEYFRAMES                             */}
       {/* ================================================================== */}
@@ -183,22 +191,21 @@ export default function AdminOrdersPage() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
               </span>
               <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-                ADMIN PANEL · FULFILLMENT &amp; LOGISTICS
+                {t("ordersPanelTitle")}
               </span>
             </div>
 
             <div className="flex flex-wrap items-baseline gap-3">
               <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-                All Orders
+                {t("ordersAllOrders")}
               </h1>
               <span className="rounded-full bg-surface-muted px-2.5 py-0.5 font-mono text-[11px] font-black text-secondary">
-                {total ?? 0} Record{total !== 1 ? "s" : ""}
+                {total ?? 0} {t("ordersRecords")}
               </span>
             </div>
 
             <p className="text-xs font-medium text-muted">
-              Real-time dispatch queue, customer manifests, and payment
-              telemetry.
+              {t("ordersRealtimeDescription")}
             </p>
           </div>
 
@@ -209,7 +216,7 @@ export default function AdminOrdersPage() {
               className="group inline-flex items-center gap-2 rounded-2xl border border-border/90 bg-surface px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-secondary transition-all duration-200 hover:border-border-strong hover:bg-surface-subtle"
             >
               <Store size={14} />
-              <span className="hidden sm:inline">Overview</span>
+              <span className="hidden sm:inline">{t("ordersOverview")}</span>
               <ArrowUpRight
                 size={13}
                 className="text-muted transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
@@ -230,7 +237,7 @@ export default function AdminOrdersPage() {
                     : "transition-transform duration-500 group-hover:rotate-180"
                 }
               />
-              <span>{loading ? "Syncing..." : "Sync Telemetry"}</span>
+              <span>{loading ? t("ordersSyncing") : t("ordersSyncTelemetry")}</span>
             </button>
           </div>
         </header>
@@ -246,11 +253,10 @@ export default function AdminOrdersPage() {
               </span>
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/50">
-                  Logistics Velocity
+                  {t("ordersLogisticsVelocity")}
                 </p>
                 <p className="text-xs font-extrabold tracking-wide text-on-action">
-                  {telemetry.fulfillmentRate}% Dispatch &amp; Completion Rate on
-                  Current Page
+                  {telemetry.fulfillmentRate}% {t("ordersDispatchCompletion")}
                 </p>
               </div>
             </div>
@@ -258,10 +264,10 @@ export default function AdminOrdersPage() {
             <div className="flex flex-wrap items-center gap-6 sm:gap-8">
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  Page Volume
+                  {t("ordersPageVolume")}
                 </span>
                 <span className="font-mono text-sm font-black text-on-action">
-                  ${telemetry.batchRevenue.toLocaleString()}
+                  {formatMoney(telemetry.batchRevenue)}
                 </span>
               </div>
 
@@ -269,10 +275,10 @@ export default function AdminOrdersPage() {
 
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  Avg. Ticket
+                  {t("ordersAverageTicket")}
                 </span>
                 <span className="font-mono text-sm font-black text-success">
-                  ${telemetry.avgTicket.toLocaleString()}
+                  {formatMoney(telemetry.avgTicket)}
                 </span>
               </div>
 
@@ -280,7 +286,7 @@ export default function AdminOrdersPage() {
 
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  Awaiting Action
+                  {t("ordersAwaitingAction")}
                 </span>
                 <span
                   className={`font-mono text-sm font-black ${
@@ -289,8 +295,7 @@ export default function AdminOrdersPage() {
                       : "text-success"
                   }`}
                 >
-                  {telemetry.pendingCount} Order
-                  {telemetry.pendingCount === 1 ? "" : "s"}
+                  {telemetry.pendingCount} {t(telemetry.pendingCount === 1 ? "ordersOrderSingular" : "ordersOrderPlural")}
                 </span>
               </div>
             </div>
@@ -308,13 +313,13 @@ export default function AdminOrdersPage() {
           <div className="order-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Master Log
+                {t("ordersMasterLog")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-primary sm:text-2xl">
                 {total ?? 0}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                Total Orders Placed
+                {t("ordersTotalPlaced")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-surface-subtle text-primary transition-colors group-hover:bg-action group-hover:text-on-action">
@@ -326,13 +331,13 @@ export default function AdminOrdersPage() {
           <div className="order-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Queue Status
+                {t("ordersQueueStatus")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-warning sm:text-2xl">
                 {telemetry.pendingCount}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                Pending / Processing
+                {t("ordersPendingProcessing")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-warning-soft text-warning">
@@ -344,13 +349,13 @@ export default function AdminOrdersPage() {
           <div className="order-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Dispatched
+                {t("ordersDispatched")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-primary sm:text-2xl">
                 {telemetry.shippedCount}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                In Transit Couriers
+                {t("ordersInTransit")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-surface-muted text-secondary group-hover:bg-action group-hover:text-on-action transition-colors">
@@ -362,13 +367,13 @@ export default function AdminOrdersPage() {
           <div className="order-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Fulfilled
+                {t("ordersFulfilled")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-success sm:text-2xl">
                 {telemetry.deliveredCount}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                Delivered to Client
+                {t("ordersDeliveredToClient")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-success-soft text-success">
@@ -386,26 +391,26 @@ export default function AdminOrdersPage() {
             <div className="relative min-w-[230px] flex-1 sm:w-64 sm:flex-initial">
               <Search
                 size={14}
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
+                className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search #ID, customer, email..."
-                className="w-full rounded-xl border border-border/90 bg-surface-subtle py-2 pl-9 pr-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
+                placeholder={t("ordersSearchPlaceholder")}
+                className="w-full rounded-xl border border-border/90 bg-surface-subtle py-2 ps-9 pe-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
               />
             </div>
 
             {/* Status Tabs */}
             <div className="inline-flex flex-wrap rounded-xl border border-border/90 bg-surface-subtle p-1">
               {[
-                { id: "all", label: "All" },
-                { id: "pending", label: "Pending" },
-                { id: "processing", label: "Processing" },
-                { id: "shipped", label: "Shipped" },
-                { id: "delivered", label: "Delivered" },
-                { id: "cancelled", label: "Cancelled" },
+                { id: "all", label: t("ordersFilterAll") },
+                { id: "pending", label: t("ordersFilterPending") },
+                { id: "processing", label: t("ordersFilterProcessing") },
+                { id: "shipped", label: t("ordersFilterShipped") },
+                { id: "delivered", label: t("ordersFilterDelivered") },
+                { id: "cancelled", label: t("ordersFilterCancelled") },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -426,24 +431,24 @@ export default function AdminOrdersPage() {
           {/* Right: Sort Dropdown */}
           <div className="flex items-center justify-between gap-2.5 sm:justify-end">
             <span className="text-[10px] font-bold uppercase tracking-widest text-muted">
-              Showing {processedOrders.length} of {orders.length}
+              {t("ordersShowing")} {processedOrders.length} {t("ordersOf")} {orders.length}
             </span>
 
             <div className="relative inline-flex items-center">
               <ArrowUpDown
                 size={12}
-                className="pointer-events-none absolute left-3 text-muted"
+                className="pointer-events-none absolute start-3 text-muted"
               />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                aria-label="Sort orders"
-                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 pl-8 pr-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:bg-surface focus:outline-none"
+                aria-label={t("ordersSortLabel")}
+                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:bg-surface focus:outline-none"
               >
-                <option value="newest">Sort: Newest First</option>
-                <option value="total-desc">Total: High → Low</option>
-                <option value="total-asc">Total: Low → High</option>
-                <option value="items-desc">Items: Most First</option>
+                <option value="newest">{t("ordersSortNewest")}</option>
+                <option value="total-desc">{t("ordersSortTotalHighLow")}</option>
+                <option value="total-asc">{t("ordersSortTotalLowHigh")}</option>
+                <option value="items-desc">{t("ordersSortItemsMost")}</option>
               </select>
             </div>
           </div>
@@ -477,12 +482,12 @@ export default function AdminOrdersPage() {
               <Package size={28} strokeWidth={1.5} />
             </div>
             <p className="text-sm font-black uppercase tracking-wider text-primary">
-              {total === 0 ? "No Orders Recorded Yet" : "No Matching Orders"}
+              {total === 0 ? t("ordersNoRecords") : t("ordersNoMatches")}
             </p>
             <p className="mt-1 max-w-xs text-xs text-muted">
               {total === 0
-                ? "Incoming customer orders will appear here in real time."
-                : "Try clearing your search query or switching the active status filter."}
+                ? t("ordersIncomingDescription")
+                : t("ordersAdjustFilters")}
             </p>
             {total !== 0 && (
               <button
@@ -494,7 +499,7 @@ export default function AdminOrdersPage() {
                 }}
                 className="mt-4 cursor-pointer rounded-xl bg-action px-4 py-2 text-[10px] font-black uppercase tracking-widest text-on-action hover:bg-action-hover"
               >
-                Reset Active Filters
+                {t("ordersClearFilters")}
               </button>
             )}
           </div>

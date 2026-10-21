@@ -11,6 +11,9 @@ import {
 import { LogOut, Store, type LucideIcon } from "lucide-react";
 
 import { signOut } from "@/lib/signOut";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
+import ThemeToggle from "@/shared/theme/ThemeToggle";
 
 export interface NavItem {
   id: string;
@@ -25,6 +28,7 @@ interface NavMobileProps {
   goTo?: (id: string) => void;
   showExitButton?: boolean;
   showStoreButton?: boolean;
+  showAppearanceControls?: boolean;
 }
 
 const spring = {
@@ -40,7 +44,9 @@ export const MobileAdminNavigation = ({
   goTo,
   showExitButton = true,
   showStoreButton = true,
+  showAppearanceControls = false,
 }: NavMobileProps) => {
+  const { t } = useLocale();
   const reduceMotion = useReducedMotion();
   const [isExiting, setIsExiting] = useState(false);
   const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -76,8 +82,9 @@ export const MobileAdminNavigation = ({
   };
 
   return (
-    <motion.nav
-      aria-label="Mobile navigation"
+    <div className="flex w-full flex-col gap-2">
+      <motion.nav
+      aria-label={t("uiWorkspaceNavigation")}
       initial={reduceMotion ? false : { opacity: 0, y: 18, scale: 0.97 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={spring}
@@ -183,18 +190,24 @@ export const MobileAdminNavigation = ({
       </LayoutGroup>
 
       {(showExitButton || showStoreButton) && (
-        <div className="flex shrink-0 items-center pl-0.5 pr-0.5 sm:pl-1">
+        <div className="flex shrink-0 items-center ps-0.5 pe-0.5 sm:ps-1">
           <div
             aria-hidden="true"
             className="mx-1 h-7 w-px shrink-0 bg-surface-hover/80 sm:mx-1.5 sm:h-8"
           />
 
           <div className="flex items-center gap-1 sm:gap-1.5">
+            {showAppearanceControls && (
+              <>
+                <LocaleSwitcher compact className="h-9 w-9 min-w-9 px-0 [&>span]:hidden" />
+                <ThemeToggle compact className="h-9 w-9" />
+              </>
+            )}
             {showStoreButton && (
               <Link
                 href="/"
-                aria-label="Back to Store"
-                title="Back to Store"
+                aria-label={t("backToStorefront")}
+                title={t("backToStorefront")}
                 className="group relative flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center overflow-hidden rounded-[18px] border border-transparent bg-transparent outline-none transition-colors duration-200 hover:bg-surface-muted/80 active:scale-95 sm:h-12 sm:w-12 sm:rounded-[20px]"
                 style={{ WebkitTapHighlightColor: "transparent" }}
               >
@@ -210,8 +223,8 @@ export const MobileAdminNavigation = ({
             {showExitButton && (
               <motion.button
                 type="button"
-                aria-label={isExiting ? "Signing out" : "Sign out"}
-                title="Sign out"
+                aria-label={isExiting ? t("uiSigningOut") : t("uiEndSession")}
+                title={t("uiEndSession")}
                 disabled={isExiting}
                 onClick={handleExit}
                 whileTap={reduceMotion ? undefined : { scale: 0.88 }}
@@ -256,6 +269,7 @@ export const MobileAdminNavigation = ({
           scrollbar-width: none;
         }
       `}</style>
-    </motion.nav>
+      </motion.nav>
+    </div>
   );
 };

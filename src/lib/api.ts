@@ -22,16 +22,32 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
-    const status = error.response?.status;
-    const msg = error.response?.data?.message || "Something went wrong";
-    console.log(error);
+    // Axios cancellations occur during navigation, refreshes, and fast filter
+    // changes. Treat them as control flow, not as an error or a toast.
+    if (
+      axios.isCancel(error) ||
+      error?.name === "CanceledError" ||
+      error?.code === "ERR_CANCELED"
+    ) {
+      return Promise.reject(error);
+    }
+
+    const originalRequest = error?.config;
+    const status = error?.response?.status;
+    const currentLocale =
+      typeof document !== "undefined" && document.documentElement.dataset.locale === "ar"
+        ? "ar"
+        : "en";
+    const msg =
+      error?.response?.data?.message ||
+      (currentLocale === "ar" ? "حدث خطأ غير متوقع. حاول مرة أخرى." : "Something went wrong. Please try again.");
+    console.error("API request failed:", status ?? "network error", msg);
     const isAuthEndpoint =
       originalRequest?.url?.includes("/auth/signin") ||
       originalRequest?.url?.includes("/auth/login") ||
       originalRequest?.url?.includes("/auth/refresh-token");
 
-    if (status === 401 && !originalRequest._retry && !isAuthEndpoint) {
+    if (status === 401 && originalRequest && !originalRequest._retry && !isAuthEndpoint) {
       originalRequest._retry = true;
 
       try {
@@ -44,6 +60,7 @@ api.interceptors.response.use(
 
         if (newAccessToken) {
           Cookies.set("token", newAccessToken, { path: "/" });
+          originalRequest.headers = originalRequest.headers || {};
           originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
           return api(originalRequest);
         }
@@ -63,14 +80,6 @@ api.interceptors.response.use(
       }
     }
 
-    //
-    if (
-      axios.isCancel(error) ||
-      error.name === "CanceledError" ||
-      error.code === "ERR_CANCELED"
-    ) {
-      return Promise.reject(error);
-    }
     if (status !== 401 && typeof window !== "undefined") {
       toast.error(msg);
     }

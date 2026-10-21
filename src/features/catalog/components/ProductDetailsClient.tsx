@@ -8,9 +8,12 @@ import Sizes from "@/features/catalog/components/ProductSizeSelector";
 import Counter from "@/features/catalog/components/ProductQuantitySelector";
 import { useProduct } from "@/store/cartStore";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 export default function ProductDetailsClient({ product }: { product: any }) {
-  const update = useProduct((state) => state.update);
+  const { t, locale, direction } = useLocale();
+  const addItem = useProduct((state) => state.addItem);
   const router = useRouter();
 
   // Safely initialize first color/size if array is provided
@@ -36,13 +39,13 @@ export default function ProductDetailsClient({ product }: { product: any }) {
   const handleAddToCart = (redirectImmediate = false) => {
     const finalProduct = {
       ...product,
-      colors: selectedColor,
-      size: selectedSize,
+      colors: selectedColor ? [selectedColor] : [],
+      size: selectedSize ? [selectedSize] : [],
       count: quantity,
       isChose: true,
     };
 
-    update(finalProduct);
+    addItem(finalProduct);
 
     if (redirectImmediate) {
       router.push("/shop/details/cart");
@@ -50,11 +53,11 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     }
 
     toast.success(
-      (t) => (
+      (toastItem) => (
         <div className="flex items-center gap-3.5">
           <div className="min-w-0 flex-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-success">
-              Added to Atelier Bag
+              {t("productAddedToBag")}
             </p>
             <p className="truncate text-xs font-bold text-on-action">
               {quantity}× {product.name || product.section}
@@ -64,11 +67,11 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             type="button"
             onClick={() => {
               router.push("/shop/details/cart");
-              toast.dismiss(t.id);
+              toast.dismiss(toastItem.id);
             }}
             className="shrink-0 cursor-pointer rounded-full bg-surface px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-primary transition-transform hover:scale-105"
           >
-            View Bag ↗
+            {t("productViewBag")} ↗
           </button>
         </div>
       ),
@@ -80,7 +83,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
   };
 
   return (
-    <div className="flex w-full flex-col gap-5">
+    <div dir={direction} className="flex w-full flex-col gap-5">
       {/* ── Interactive Size Guide Modal ── */}
       {sizeGuideOpen && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-action/60 p-4 backdrop-blur-md animate-in fade-in duration-200">
@@ -88,7 +91,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             <button
               type="button"
               onClick={() => setSizeGuideOpen(false)}
-              className="absolute right-5 top-5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface-muted text-secondary hover:bg-action hover:text-on-action"
+              className="absolute end-5 top-5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-surface-muted text-secondary hover:bg-action hover:text-on-action"
             >
               <X size={15} />
             </button>
@@ -96,40 +99,40 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             <div className="mb-4 flex items-center gap-2">
               <Ruler size={16} />
               <h4 className="text-sm font-black uppercase tracking-wider">
-                SHOP.CO™ Standard Sizing (CM)
+                {t("productStandardSizing")}
               </h4>
             </div>
 
-            <table className="w-full border-collapse text-left text-xs">
+            <table className="w-full border-collapse text-start text-xs">
               <thead>
                 <tr className="border-b border-border text-[10px] font-black uppercase text-muted">
-                  <th className="py-2">Size</th>
-                  <th className="py-2">Chest</th>
-                  <th className="py-2">Waist</th>
-                  <th className="py-2">Length</th>
+                  <th className="py-2">{t("size")}</th>
+                  <th className="py-2">{t("productChest")}</th>
+                  <th className="py-2">{t("productWaist")}</th>
+                  <th className="py-2">{t("productLength")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border-subtle font-mono text-xs font-bold">
                 <tr>
-                  <td className="py-2 font-sans font-black">Small (S)</td>
+                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeSmall") : "Small (S)"}</td>
                   <td className="py-2">92–96</td>
                   <td className="py-2">76–80</td>
                   <td className="py-2">70</td>
                 </tr>
                 <tr>
-                  <td className="py-2 font-sans font-black">Medium (M)</td>
+                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeMedium") : "Medium (M)"}</td>
                   <td className="py-2">98–102</td>
                   <td className="py-2">82–86</td>
                   <td className="py-2">72</td>
                 </tr>
                 <tr>
-                  <td className="py-2 font-sans font-black">Large (L)</td>
+                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeLarge") : "Large (L)"}</td>
                   <td className="py-2">104–108</td>
                   <td className="py-2">88–92</td>
                   <td className="py-2">74</td>
                 </tr>
                 <tr>
-                  <td className="py-2 font-sans font-black">X-Large (XL)</td>
+                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeXL") : "X-Large (XL)"}</td>
                   <td className="py-2">110–116</td>
                   <td className="py-2">94–100</td>
                   <td className="py-2">76</td>
@@ -144,7 +147,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
       <div className="space-y-2.5">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
-            Select Finish / Color
+            {t("productSelectColor")}
           </h3>
           {selectedColor && typeof selectedColor === "string" && (
             <span className="font-mono text-[10px] font-bold uppercase text-secondary">
@@ -165,7 +168,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
       <div className="space-y-2.5 border-t border-border-subtle pt-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
-            Select Tailored Size
+            {t("productSelectSize")}
           </h3>
           <button
             type="button"
@@ -173,7 +176,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
             className="inline-flex cursor-pointer items-center gap-1 text-[10px] font-black uppercase tracking-wider text-secondary underline decoration-border-strong underline-offset-4 hover:text-primary"
           >
             <Ruler size={12} />
-            <span>Size Guide</span>
+            <span>{t("sizeGuide")}</span>
           </button>
         </div>
 
@@ -190,10 +193,10 @@ export default function ProductDetailsClient({ product }: { product: any }) {
       <div className="space-y-3 border-t border-border-subtle pt-4">
         <div className="flex items-center justify-between">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
-            Quantity &amp; Dispatch
+            {t("productQuantityDispatch")}
           </h3>
           <span className="font-mono text-[10px] font-bold text-muted">
-            Max available: {maxStock}
+            {t("maxAvailable")} {maxStock}
           </span>
         </div>
 
@@ -219,10 +222,10 @@ export default function ProductDetailsClient({ product }: { product: any }) {
           >
             <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
             <ShoppingBag size={15} className="relative z-10" />
-            <span className="relative z-10">Add To Bag</span>
+            <span className="relative z-10">{t("productAddToBag")}</span>
             {totalSelectedPrice > 0 && (
               <span className="relative z-10 rounded-full bg-white/15 px-2.5 py-0.5 font-mono text-[11px] font-black text-on-action">
-                ${totalSelectedPrice.toLocaleString()}
+                {formatCurrency(totalSelectedPrice, locale)}
               </span>
             )}
           </button>

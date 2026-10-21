@@ -17,6 +17,8 @@ import {
 import toast from "react-hot-toast";
 
 import type { Notification } from "@/store/notificationStore";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import type { MessageKey } from "@/shared/i18n/messages";
 
 type NotificationItemProps = {
   notification: Notification;
@@ -24,79 +26,86 @@ type NotificationItemProps = {
   onMarkAsRead?: () => void;
 };
 
-function formatRelativeTime(dateValue: string | Date) {
+function formatRelativeTime(dateValue: string | Date, locale: "ar" | "en") {
   const date = new Date(dateValue);
   const now = new Date();
   const diffSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const formatter = new Intl.RelativeTimeFormat(locale === "ar" ? "ar-EG" : "en", {
+    numeric: "auto",
+  });
 
-  if (Number.isNaN(diffSeconds) || diffSeconds < 0) return "Just now";
-  if (diffSeconds < 60) return "Just now";
+  if (Number.isNaN(diffSeconds)) return formatter.format(0, "second");
+  if (diffSeconds < 60) return formatter.format(0, "second");
 
   const minutes = Math.floor(diffSeconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return formatter.format(-minutes, "minute");
 
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return formatter.format(-hours, "hour");
 
   const days = Math.floor(hours / 24);
-  if (days < 7) return `${days}d ago`;
+  if (days < 7) return formatter.format(-days, "day");
 
-  return date.toLocaleDateString("en-US", {
+  return date.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-US", {
     month: "short",
     day: "numeric",
   });
 }
 
-function getNotificationVisuals(title = "", message = "") {
+function getNotificationVisuals(
+  title = "",
+  message = "",
+  t: (key: MessageKey) => string,
+) {
   const text = `${title} ${message}`.toLocaleLowerCase();
 
   if (
-    ["deliver", "ship", "transit", "on the way", "courier"].some((word) =>
+    ["deliver", "ship", "transit", "on the way", "courier", "شحن", "توصيل", "وصل", "مندوب"].some((word) =>
       text.includes(word),
     )
   ) {
     return {
       Icon: Truck,
-      category: "Shipping",
+      category: t("notifShippingCategory"),
       iconStyle:
         "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-400/25 dark:bg-sky-400/10 dark:text-sky-300",
     };
   }
 
   if (
-    ["complete", "success", "confirm", "paid", "verified"].some((word) =>
+    ["complete", "success", "confirm", "paid", "verified", "تأكيد", "تم بنجاح", "دفع", "موثق", "مؤكد"].some((word) =>
       text.includes(word),
     )
   ) {
     return {
       Icon: CheckCircle2,
-      category: "Confirmed",
+      category: t("notifConfirmedCategory"),
       iconStyle:
         "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-300",
     };
   }
 
   if (
-    ["cancel", "fail", "alert", "issue", "refund"].some((word) =>
+    ["cancel", "fail", "alert", "issue", "refund", "إلغاء", "فشل", "تنبيه", "استرداد", "مشكلة"].some((word) =>
       text.includes(word),
     )
   ) {
     return {
       Icon: AlertTriangle,
-      category: "Attention",
+      category: t("notifAttentionCategory"),
       iconStyle:
         "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/25 dark:bg-rose-400/10 dark:text-rose-300",
     };
   }
 
   if (
-    ["offer", "welcome", "promo", "discount", "drop"].some((word) =>
+    ["offer", "welcome", "promo", "discount", "drop", "عرض", "ترحيب", "خصم", "مجموعة"].some((word) =>
       text.includes(word),
     )
   ) {
     return {
       Icon: Sparkles,
-      category: "Offer",
+      category: t("notifOfferCategory"),
       iconStyle:
         "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-300",
     };
@@ -104,7 +113,7 @@ function getNotificationVisuals(title = "", message = "") {
 
   return {
     Icon: Package,
-    category: "Order",
+    category: t("notifOrderCategory"),
     iconStyle:
       "border-neutral-200 bg-neutral-100 text-neutral-800 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100",
   };
@@ -115,6 +124,7 @@ export function NotificationItem({
   onClick,
   onMarkAsRead,
 }: NotificationItemProps) {
+  const { locale, t } = useLocale();
   const [expanded, setExpanded] = useState(false);
   const [copiedOrder, setCopiedOrder] = useState(false);
   const resetCopiedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -129,8 +139,8 @@ export function NotificationItem({
 
   const isUnread = !notification.read;
   const message = notification.message || "";
-  const title = notification.title || "Notification";
-  const { Icon, category, iconStyle } = getNotificationVisuals(title, message);
+  const title = notification.title || t("notifTitle");
+  const { Icon, category, iconStyle } = getNotificationVisuals(title, message, t);
 
   const isLongMessage = message.length > 100;
   const orderId = notification.order ? String(notification.order) : "";
@@ -153,7 +163,7 @@ export function NotificationItem({
 
       await navigator.clipboard.writeText(orderId);
       setCopiedOrder(true);
-      toast.success(`Order #${shortOrderId} copied`);
+      toast.success(t("notifOrderCopied").replace("{id}", `#${shortOrderId}`));
 
       if (resetCopiedTimer.current) {
         clearTimeout(resetCopiedTimer.current);
@@ -163,7 +173,7 @@ export function NotificationItem({
         setCopiedOrder(false);
       }, 1800);
     } catch {
-      toast.error("Couldn't copy the order ID");
+      toast.error(t("notifCopyOrderFailed"));
     }
   };
 
@@ -187,7 +197,7 @@ export function NotificationItem({
       {isUnread && (
         <span
           aria-hidden="true"
-          className="absolute inset-y-3 left-0 w-[3px] rounded-r-full bg-neutral-900 dark:bg-neutral-200"
+          className="absolute inset-y-3 start-0 w-[3px] rounded-s-full bg-neutral-900 dark:bg-neutral-200"
         />
       )}
 
@@ -195,10 +205,10 @@ export function NotificationItem({
       <button
         type="button"
         onClick={onClick}
-        aria-label={`Open notification: ${title}`}
+        aria-label={`${t("notifTitle")}: ${title}`}
         className="
           flex w-full cursor-pointer items-start gap-3 px-3.5 pb-1 pt-3.5
-          text-left outline-none
+          text-start outline-none
           focus-visible:ring-2 focus-visible:ring-inset
           focus-visible:ring-neutral-900
           dark:focus-visible:ring-neutral-200
@@ -224,11 +234,11 @@ export function NotificationItem({
             </span>
 
             <span
-              title={new Date(notification.createdAt).toLocaleString()}
+              title={new Date(notification.createdAt).toLocaleString(locale === "ar" ? "ar-EG" : "en-US")}
               className="inline-flex shrink-0 items-center gap-1 text-[9px] font-medium text-neutral-500 dark:text-neutral-400"
             >
               <Clock size={10} />
-              {formatRelativeTime(notification.createdAt)}
+              {formatRelativeTime(notification.createdAt, locale)}
             </span>
           </span>
 
@@ -256,22 +266,21 @@ export function NotificationItem({
               }
             `}
           >
-            {message ||
-              "There are no additional details for this notification."}
+            {message || t("notifNoDetails")}
           </span>
         </span>
 
         {isUnread && (
           <span
-            aria-label="Unread"
-            title="Unread"
+            aria-label={t("notifUnreadStatus")}
+            title={t("notifUnreadStatus")}
             className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-rose-600 dark:bg-rose-400"
           />
         )}
       </button>
 
       {/* Secondary actions, separate from the main button */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 pb-3 pt-2.5 pl-[4.35rem]">
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 pb-3 pt-2.5 ps-[4.35rem]">
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
           {orderId && (
             <>
@@ -284,14 +293,14 @@ export function NotificationItem({
                 dark:text-neutral-200
               "
               >
-                Order #{shortOrderId}
+                {t("notifOrderReference").replace("{id}", `#${shortOrderId}`)}
               </span>
 
               <button
                 type="button"
                 onClick={handleCopyOrder}
-                aria-label={`Copy order ID ${shortOrderId}`}
-                title="Copy order ID"
+                aria-label={`${t("notifCopyOrderId")} ${shortOrderId}`}
+                title={t("notifCopyOrderId")}
                 className="
                   inline-flex h-6 w-6 cursor-pointer items-center
                   justify-center rounded-lg border border-neutral-200
@@ -332,7 +341,7 @@ export function NotificationItem({
                 dark:hover:text-white dark:focus-visible:ring-neutral-200
               "
             >
-              <span>{expanded ? "Show less" : "Show more"}</span>
+              <span>{expanded ? t("notifShowLess") : t("notifShowMore")}</span>
               <ChevronDown
                 size={11}
                 className={`transition-transform duration-200 ${
@@ -362,7 +371,7 @@ export function NotificationItem({
             "
           >
             <Check size={11} />
-            <span>Mark read</span>
+            <span>{t("notifMarkRead")}</span>
           </button>
         )}
       </div>

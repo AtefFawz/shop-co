@@ -1,5 +1,8 @@
+"use client";
+
 // @/features/admin/dashboard/components/StatCard.tsx
 import React from "react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 import {
   TrendingUp,
   TrendingDown,
@@ -16,6 +19,8 @@ export interface AdminMetricCardProps {
   trendUp?: boolean;
   prefix?: string;
   subtitle?: string;
+  verifiedLabel?: string;
+  liveLabel?: string;
 }
 
 export function AdminMetricCard({
@@ -27,8 +32,13 @@ export function AdminMetricCard({
   trendUp = true,
   prefix = "",
   subtitle,
+  verifiedLabel,
+  liveLabel,
 }: AdminMetricCardProps) {
-  const displayTitle = title || label || "Metric";
+  const { t } = useLocale();
+  const displayTitle = title || label || t("genericMetricTitle");
+  const resolvedVerifiedLabel = verifiedLabel || t("dashboardVerified");
+  const resolvedLiveLabel = liveLabel || t("dashboardLiveStatus");
   const formattedValue =
     typeof value === "number" ? value.toLocaleString() : (value ?? "—");
 
@@ -92,7 +102,7 @@ export function AdminMetricCard({
             </span>
           ) : (
             <span className="rounded-full border border-border/70 bg-surface-subtle px-2.5 py-1 font-mono text-[9px] font-extrabold uppercase tracking-widest text-muted">
-              VERIFIED
+              {resolvedVerifiedLabel}
             </span>
           )}
         </div>
@@ -118,9 +128,9 @@ export function AdminMetricCard({
         {/* Bottom Row: Subtitle & Animated Telemetry Laser Bar */}
         <div className="relative z-10 space-y-2.5 border-t border-border-subtle pt-3 [transform:translateZ(20px)]">
           <div className="flex items-center justify-between text-[11px] font-semibold text-muted">
-            <span className="truncate">{subtitle || "Live telemetry"}</span>
+            <span className="truncate">{subtitle || t("genericMetricTelemetry")}</span>
             <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted group-hover:text-primary">
-              LIVE
+              {resolvedLiveLabel}
             </span>
           </div>
 

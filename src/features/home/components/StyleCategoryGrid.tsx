@@ -7,8 +7,10 @@ import { styleCategories } from "@/features/home/data/styleCategories";
 import Heading from "@/shared/components/ui/SectionHeading";
 import { useFilterStore } from "@/store/filterStore";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function StyleCategoryGrid() {
+  const { t, locale } = useLocale();
   const { filterByStyle } = useFilterStore((state) => state);
   const router = useRouter();
 
@@ -32,11 +34,11 @@ export default function StyleCategoryGrid() {
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface/85 px-3.5 py-1 shadow-2xs backdrop-blur-md">
             <Layers size={12} className="text-primary" />
             <span className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">
-              AESTHETIC ARCHIVE · 2026
+              {locale === "ar" ? "مختارات الأناقة · ٢٠٢٦" : "AESTHETIC ARCHIVE · 2026"}
             </span>
           </div>
 
-          <Heading title="BROWSE BY DRESS STYLE" />
+          <Heading title={t("browseStyles")} />
         </div>
 
         {/* 3D Bento Grid */}
@@ -44,16 +46,20 @@ export default function StyleCategoryGrid() {
           style={{ perspective: "1200px" }}
           className="relative z-10 mt-8 grid w-full auto-rows-[210px] grid-cols-1 gap-4 sm:mt-10 md:auto-rows-[285px] md:grid-cols-3 md:gap-5"
         >
-          {styleCategories.map((e, index) => (
+          {styleCategories.map((e, index) => {
+            const displayName = locale === "ar"
+              ? [t("casual"), t("formal"), t("party"), t("gym")][index] || e.name
+              : e.name;
+            return (
             <div
-              key={e.name}
+              key={displayName}
               onClick={() => handleClick(e.name)}
               className={`${e.cols} group/bento relative cursor-pointer overflow-hidden rounded-3xl border-2 border-surface bg-surface shadow-[0_14px_34px_-12px_rgba(var(--shadow-rgb),0.10)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5 hover:border-border hover:shadow-[0_28px_55px_-14px_rgba(var(--shadow-rgb),0.2)]`}
             >
               {/* Background Style Image */}
               <Image
                 src={e.image}
-                alt={e.name}
+                alt={displayName}
                 fill
                 sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                 className="object-cover transition-transform duration-700 ease-out group-hover/bento:scale-108"
@@ -69,7 +75,7 @@ export default function StyleCategoryGrid() {
                     STYLE // 0{index + 1}
                   </span>
                   <span className="text-xl font-black uppercase tracking-tight text-primary sm:text-2xl">
-                    {e.name}
+                    {displayName}
                   </span>
                 </div>
               </div>
@@ -77,7 +83,7 @@ export default function StyleCategoryGrid() {
               {/* Bottom-Right Interactive Action Trigger */}
               <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2">
                 <span className="translate-x-2 rounded-full bg-surface/95 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary opacity-0 shadow-md backdrop-blur-md transition-all duration-300 group-hover/bento:translate-x-0 group-hover/bento:opacity-100">
-                  Explore Edit
+                  {t("exploreCollection")}
                 </span>
 
                 <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-action text-on-action shadow-lg transition-all duration-300 group-hover/bento:rotate-45 group-hover/bento:scale-110 group-hover/bento:bg-surface group-hover/bento:text-primary">
@@ -85,7 +91,8 @@ export default function StyleCategoryGrid() {
                 </span>
               </div>
             </div>
-          ))}
+          );
+          })}
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/shared/theme/ThemeProvider";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface ThemeToggleProps {
   compact?: boolean;
@@ -14,15 +15,16 @@ export default function ThemeToggle({
   className = "",
 }: ThemeToggleProps) {
   const { theme, toggleTheme, mounted } = useTheme();
+  const { t } = useLocale();
   const reduceMotion = useReducedMotion();
   const isDark = theme === "dark";
 
   return (
     <motion.button
       type="button"
-      aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      aria-label={isDark ? t("themeSwitchToLight") : t("themeSwitchToDark")}
       aria-pressed={isDark}
-      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      title={isDark ? t("themeSwitchToLight") : t("themeSwitchToDark")}
       onClick={toggleTheme}
       whileTap={reduceMotion ? undefined : { scale: 0.9, rotate: -8 }}
       className={`group relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/80 bg-surface text-secondary shadow-sm outline-none transition-colors duration-200 hover:bg-surface-muted focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 ${compact ? "h-9 w-9" : "h-10 w-10"} ${className}`}

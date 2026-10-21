@@ -9,36 +9,38 @@ import { GoArrowUpRight } from "react-icons/go";
 import { Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useFilterStore } from "@/store/filterStore";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export const CategoryGallery = () => {
   const router = useRouter();
+  const { t, direction } = useLocale();
   const setType = useFilterStore((state) => state.filterByGender);
 
   const categories = [
     {
       id: 1,
       code: "DEPT // 01",
-      title: "Kids",
-      subtitle: "Playful Everyday Comfort & Mini Streetwear",
-      badge: "Junior Edit",
+      title: t("catalogKidsTitle"),
+      subtitle: t("catalogKidsSubtitle"),
+      badge: t("catalogKidsBadge"),
       img: Kids,
       slug: "KIDS",
     },
     {
       id: 2,
       code: "DEPT // 02",
-      title: "Men",
-      subtitle: "Tailored Outerwear, Heavy Tees & Urban Essentials",
-      badge: "Menswear Studio",
+      title: t("catalogMenTitle"),
+      subtitle: t("catalogMenSubtitle"),
+      badge: t("catalogMenBadge"),
       img: Men,
       slug: "MEN",
     },
     {
       id: 3,
       code: "DEPT // 03",
-      title: "Women",
-      subtitle: "Contemporary Silhouettes & Minimalist Luxury",
-      badge: "Womenswear Edit",
+      title: t("catalogWomenTitle"),
+      subtitle: t("catalogWomenSubtitle"),
+      badge: t("catalogWomenBadge"),
       img: Women,
       slug: "WOMEN",
     },
@@ -50,7 +52,7 @@ export const CategoryGallery = () => {
   };
 
   return (
-    <div className="Responsive ">
+    <div dir={direction} className="Responsive ">
       <style>{`
         .dept-3d-card {
           transform-style: preserve-3d;
@@ -70,17 +72,16 @@ export const CategoryGallery = () => {
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
             <Sparkles size={11} className="text-primary" />
             <span className="text-[9px] font-black uppercase tracking-[0.24em] text-secondary">
-              CURATED DEPARTMENTS
+              {t("catalogCuratedDepartments")}
             </span>
           </div>
           <h2 className="h1-main font-integral text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl lg:text-4xl">
-            Browse By Department
+            {t("catalogBrowseByDepartment")}
           </h2>
         </div>
 
-        <p className="max-w-xs text-xs font-medium leading-relaxed text-muted sm:text-right">
-          Select a dedicated fashion house division to filter our 2026 lookbook
-          instantly.
+        <p className="max-w-xs text-xs font-medium leading-relaxed text-muted sm:text-start">
+          {t("catalogDepartmentDescription")}
         </p>
       </div>
 
@@ -127,7 +128,7 @@ export const CategoryGallery = () => {
                   {cat.subtitle}
                 </p>
                 <span className="mt-2.5 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-success">
-                  <span>Explore Collection</span>
+                  <span>{t("categoryExploreCollection")}</span>
                   <span>→</span>
                 </span>
               </div>

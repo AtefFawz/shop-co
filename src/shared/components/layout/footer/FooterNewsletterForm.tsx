@@ -8,8 +8,10 @@ import {
   useMotionTemplate,
 } from "framer-motion";
 import { Mail, ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function FooterNewsletterForm() {
+  const { t } = useLocale();
   const [email, setEmail] = useState("");
   const [isFocused, setIsFocused] = useState(false);
   const [subscribed, setSubscribed] = useState(false);
@@ -81,11 +83,11 @@ export default function FooterNewsletterForm() {
             className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/6 px-3 py-1 text-[9.5px] font-black uppercase tracking-[0.2em] text-on-action-muted backdrop-blur-md"
           >
             <Sparkles size={11} className="text-rating animate-pulse" />
-            <span>Exclusive Member Drops</span>
+            <span>{t("exclusiveDrops")}</span>
           </motion.div>
 
           <h2 className="text-2xl font-black uppercase tracking-tight text-on-action sm:text-3xl lg:text-[38px] lg:leading-[1.12]">
-            STAY UPTO DATE ABOUT OUR LATEST OFFERS
+            {t("stayUpdated")}
           </h2>
         </div>
 
@@ -111,7 +113,7 @@ export default function FooterNewsletterForm() {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setIsFocused(false)}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
+              placeholder={t("newsletterPlaceholder")}
               className="h-12 w-full rounded-full bg-surface pl-11 pr-4 text-xs font-semibold text-primary outline-none ring-2 ring-transparent transition-all placeholder:font-medium placeholder:text-muted focus:ring-white/40 sm:h-12.5 sm:text-sm"
             />
           </motion.div>
@@ -136,7 +138,7 @@ export default function FooterNewsletterForm() {
                   className="flex items-center gap-2"
                 >
                   <CheckCircle2 size={16} />
-                  <span>Welcome to the Club!</span>
+                  <span>{t("welcomeClub")}</span>
                 </motion.span>
               ) : (
                 <motion.span
@@ -146,10 +148,11 @@ export default function FooterNewsletterForm() {
                   exit={{ opacity: 0, y: -12 }}
                   className="flex items-center gap-2"
                 >
-                  <span>Subscribe to Newsletter</span>
+                  <span>{t("subscribeNewsletter")}</span>
                   <ArrowRight
                     size={15}
-                    className="transition-transform duration-300 group-hover/btn:translate-x-1"
+                    // className="rtl-mirror"
+                    className="transition-transform duration-300 group-hover/btn:translate-x-1 rtl-mirror"
                   />
                 </motion.span>
               )}

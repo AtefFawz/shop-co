@@ -3,10 +3,12 @@
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { ProductStyleFilter } from "@/features/catalog/components/ProductStyleFilter";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const DRESS_STYLES = ["Casual", "Formal", "Party", "Gym"];
 
 export const StyleFilterSection = () => {
+  const { t } = useLocale();
   const [active, setActive] = useState(true);
 
   return (
@@ -17,7 +19,7 @@ export const StyleFilterSection = () => {
         className="flex w-full cursor-pointer items-center justify-between py-3.5"
       >
         <span className="text-[11px] font-black uppercase tracking-[0.16em] text-secondary">
-          Dress Aesthetic
+          {t("dressAesthetic")}
         </span>
         <ChevronDown
           size={15}

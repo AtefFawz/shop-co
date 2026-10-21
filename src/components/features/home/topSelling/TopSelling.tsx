@@ -57,7 +57,7 @@ export default function TopSelling() {
   }
 
   return (
-    <div className="relative isolate overflow-hidden ">
+    <div className="relative isolate overflow-hidden  ">
       <div className="Responsive space-y-8">
         {/* ── Header & Mode Switcher ── */}
         <div className="flex flex-col items-center text-center">
@@ -99,7 +99,7 @@ export default function TopSelling() {
         {/* ── 4-Column Ranked Showroom Grid ── */}
         <div
           style={{ perspective: "1200px" }}
-          className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4"
         >
           {displayedItems.map((item: Product, index: number) => (
             <div

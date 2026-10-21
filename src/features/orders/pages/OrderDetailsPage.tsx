@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 import OrderHeader from "@/features/orders/components/OrderDetailsHeader";
 import OrderStatusTracker from "@/features/orders/components/OrderStatusTracker";
@@ -73,6 +74,7 @@ export default function OrderDetailsPage() {
   const params = useParams();
   const router = useRouter();
   const orderId = params.id as string;
+  const { t, locale } = useLocale();
 
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
@@ -139,21 +141,21 @@ export default function OrderDetailsPage() {
         setError("");
 
         if (fetchedOrder?._id) {
-          document.title = `Order #${fetchedOrder._id
+          document.title = `${t("orderOrderNumber")} #${fetchedOrder._id
             .slice(-6)
-            .toUpperCase()} · Dossier | SHOP.CO™`;
+            .toUpperCase()} · SHOP.CO™`;
         }
       } catch (err: any) {
         console.error(err);
         setError(
-          err.response?.data?.message || "Failed to load order telemetry",
+          err.response?.data?.message || t("orderLoadingFailure"),
         );
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [orderId],
+    [orderId, locale, t],
   );
 
   useEffect(() => {
@@ -172,12 +174,12 @@ export default function OrderDetailsPage() {
     try {
       await api.patch(`/order/${orderId}`, { status: newStatus });
       toast.success(
-        `Order #${orderId.slice(-6).toUpperCase()} updated to ${newStatus}`,
+        `${t("orderUpdateSuccess")}: ${({ Pending: t("orderStatusPending"), Shipped: t("orderStatusShipped"), Delivered: t("orderStatusDelivered"), Cancelled: t("orderStatusCancelled") } as Record<OrderStatus, string>)[newStatus]}`,
       );
       router.refresh();
     } catch (err: any) {
       console.error("Failed to update status:", err);
-      toast.error(err.response?.data?.message || "Failed to update status");
+      toast.error(err.response?.data?.message || t("orderUpdateFailure"));
       setOrder((prev) => (prev ? { ...prev, status: previousStatus } : prev));
     } finally {
       setUpdatingStatus(false);
@@ -191,13 +193,13 @@ export default function OrderDetailsPage() {
       setDeleting(true);
       await api.delete(`/order/${orderId}`);
       toast.success(
-        `Order #${orderId.slice(-6).toUpperCase()} permanently deleted`,
+        t("orderDeleteSuccessMessage"),
       );
       router.push("/dashboard/orders");
       router.refresh();
     } catch (err: any) {
       console.error("Failed to delete order:", err);
-      toast.error(err.response?.data?.message || "Failed to delete order");
+      toast.error(err.response?.data?.message || t("orderDeleteFailure"));
       setDeleting(false);
       setConfirmDelete(false);
     }
@@ -216,16 +218,15 @@ export default function OrderDetailsPage() {
           </div>
 
           <span className="mt-5 inline-block rounded-full bg-surface-muted px-3 py-1 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-            ARCHIVE LOOKUP FAILED
+            {t("archiveLookupFailed")}
           </span>
 
           <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-primary">
-            Order Not Found
+            {t("orderMissingTitle")}
           </h2>
 
           <p className="mt-2 text-xs font-medium leading-relaxed text-muted">
-            {error ||
-              "We couldn't locate this order manifest. It may have been removed or the ID is invalid."}
+            {error || t("orderMissingHint")}
           </p>
 
           <div className="mt-7 flex gap-3">
@@ -234,13 +235,13 @@ export default function OrderDetailsPage() {
               onClick={() => router.back()}
               className="flex-1 cursor-pointer rounded-2xl border border-border bg-surface py-3.5 text-xs font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong"
             >
-              Go Back
+              {t("orderBack")}
             </button>
             <Link
               href="/shop"
               className="flex flex-1 items-center justify-center rounded-2xl bg-action py-3.5 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition-all hover:bg-action-hover"
             >
-              Visit Shop
+              {t("visitShop")}
             </Link>
           </div>
         </div>
@@ -299,7 +300,7 @@ export default function OrderDetailsPage() {
               size={15}
               className="transition-transform duration-300 group-hover:-translate-x-1"
             />
-            <span>Back</span>
+            <span>{t("orderBack")}</span>
           </button>
 
           <div className="flex flex-wrap items-center gap-2.5">
@@ -310,7 +311,7 @@ export default function OrderDetailsPage() {
               className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-border/90 bg-surface px-4 py-2 text-xs font-black uppercase tracking-wider text-secondary transition-all hover:border-border-strong hover:text-primary"
             >
               <Printer size={14} />
-              <span className="hidden sm:inline">Print Invoice</span>
+              <span className="hidden sm:inline">{t("orderPrintInvoice")}</span>
             </button>
 
             {/* Sync Telemetry Button */}
@@ -324,7 +325,7 @@ export default function OrderDetailsPage() {
                 size={13}
                 className={refreshing ? "animate-spin text-success" : ""}
               />
-              <span>{refreshing ? "Syncing..." : "Sync Status"}</span>
+              <span>{refreshing ? t("orderSyncing") : t("orderSyncStatus")}</span>
             </button>
           </div>
         </div>
@@ -342,7 +343,7 @@ export default function OrderDetailsPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-black uppercase tracking-[0.22em] text-rating">
-                      ADMIN COMMAND MODE ACTIVE
+                      {t("orderAdminCommandMode")}
                     </span>
                     {updatingStatus && (
                       <Loader2
@@ -352,11 +353,10 @@ export default function OrderDetailsPage() {
                     )}
                   </div>
                   <h3 className="mt-0.5 text-sm font-black uppercase tracking-wide text-on-action sm:text-base">
-                    Instant Order Status Override
+                    {t("orderStatusOverride")}
                   </h3>
                   <p className="mt-0.5 text-xs text-on-action/55">
-                    Click any fulfillment stage below to update this order in
-                    real time.
+                    {t("orderStatusOverrideHint")}
                   </p>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export default function OrderDetailsPage() {
                           : "border border-white/15 bg-white/5 text-on-action/70 hover:bg-white/15 hover:text-on-action"
                       }`}
                     >
-                      {isCurrent ? `✓ ${st}` : st}
+                      {isCurrent ? `✓ ` : ""}{({ Pending: t("orderStatusPending"), Shipped: t("orderStatusShipped"), Delivered: t("orderStatusDelivered"), Cancelled: t("orderStatusCancelled") } as Record<OrderStatus, string>)[st]}
                     </button>
                   );
                 })}
@@ -393,7 +393,7 @@ export default function OrderDetailsPage() {
                     className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-danger-border bg-danger-soft px-3.5 py-2 text-[10px] font-black uppercase tracking-widest text-danger transition-all hover:bg-danger hover:text-on-danger"
                   >
                     <Trash2 size={13} />
-                    <span>Purge</span>
+                    <span>{t("orderPurge")}</span>
                   </button>
                 ) : (
                   <div className="inline-flex items-center gap-1.5 rounded-2xl border border-danger-border bg-danger/60 p-1">
@@ -403,14 +403,14 @@ export default function OrderDetailsPage() {
                       onClick={handleDeleteOrder}
                       className="cursor-pointer rounded-xl bg-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-on-danger hover:bg-danger"
                     >
-                      {deleting ? "Deleting..." : "Confirm Purge"}
+                      {deleting ? t("orderDeleting") : t("orderConfirmPurge")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setConfirmDelete(false)}
                       className="cursor-pointer rounded-xl px-2.5 py-1.5 text-[10px] font-black uppercase text-on-action/70 hover:text-on-action"
                     >
-                      Cancel
+                      {t("orderCancel")}
                     </button>
                   </div>
                 )}
@@ -440,22 +440,22 @@ export default function OrderDetailsPage() {
               <div className="flex items-center gap-2">
                 <Sparkles size={13} className="text-primary" />
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
-                  LOGISTICS PIPELINE
+                  {t("orderLogisticsPipeline")}
                 </span>
               </div>
               <h2 className="mt-1 text-lg font-black uppercase tracking-tight text-primary sm:text-xl">
-                Order Fulfillment Telemetry
+                {t("orderFulfillmentTelemetry")}
               </h2>
             </div>
 
             {isAdmin ? (
               <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-subtle px-3 py-1 text-[10px] font-black uppercase tracking-wider text-secondary">
                 <ShieldCheck size={13} className="text-success" />
-                Admin Interactive Pipeline: Click any node to switch status
+                {t("orderAdminPipelineHint")}
               </span>
             ) : (
               <span className="text-xs font-semibold text-muted">
-                Live courier &amp; warehouse synchronization
+                {t("orderLiveSyncHint")}
               </span>
             )}
           </div>

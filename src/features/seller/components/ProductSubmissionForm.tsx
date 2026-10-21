@@ -1,203 +1,322 @@
 "use client";
+
+import { useState, type ChangeEvent, type FormEvent } from "react";
+import { CheckCircle2, ImagePlus, LoaderCircle, PackagePlus } from "lucide-react";
+import toast from "react-hot-toast";
 import api from "@/lib/api";
-import { useState } from "react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+
+type ProductSubmission = {
+  name: string;
+  description: string;
+  price: string;
+  category: string;
+  type: string;
+  section: string;
+  isSale: string;
+  discount: string;
+  size: string;
+  colors: string;
+  photo: File | null;
+};
+
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set(["image/png", "image/jpeg"]);
+
+const initialProduct: ProductSubmission = {
+  name: "",
+  description: "",
+  price: "",
+  category: "",
+  type: "",
+  section: "",
+  isSale: "false",
+  discount: "0",
+  size: "",
+  colors: "",
+  photo: null,
+};
 
 export const ProductSubmissionForm = () => {
+  const { t, direction } = useLocale();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [item, setItem] = useState({
-    name: "",
-    description: "",
-    price: "",
-    category: "",
-    type: "",
-    section: "",
-    isSale: "",
-    discount: "",
-    size: "",
-    colors: "",
-    photo: null as File | null,
-  });
+  const [item, setItem] = useState<ProductSubmission>(initialProduct);
 
-  const handleChange = (name: string, value: string | File) => {
-    setItem({ ...item, [name]: value });
+  const handleChange = <K extends keyof ProductSubmission>(
+    name: K,
+    value: ProductSubmission[K],
+  ) => {
+    setItem((current) => ({ ...current, [name]: value }));
+    if (error) setError("");
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const formData = new FormData();
+  const handlePhotoChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
 
+    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+      handleChange("photo", null);
+      setError(t("sellerImageTypeError"));
+      event.target.value = "";
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      handleChange("photo", null);
+      setError(t("sellerImageTooLarge"));
+      event.target.value = "";
+      return;
+    }
+
+    handleChange("photo", file);
+    event.target.value = "";
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (loading) return;
+
+    const price = Number(item.price);
+    if (!item.name.trim() || !item.category.trim() || item.price.trim() === "" || !item.photo) {
+      setError(t("sellerFormRequired"));
+      return;
+    }
+    if (!Number.isFinite(price) || price < 0) {
+      setError(t("sellerInvalidPrice"));
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    const formData = new FormData();
     Object.entries(item).forEach(([key, value]) => {
-      if (value !== null) formData.append(key, value);
+      if (value !== null && value !== "") formData.append(key, value);
     });
 
     try {
       await api.post("product", formData);
-      alert("Product added successfully! 🎉");
-    } catch (error: any) {
-      setError(`Error: ${error.message}`);
+      toast.success(t("sellerAddSuccess"));
+      setItem({ ...initialProduct });
+    } catch {
+      const message = t("sellerAddFailed");
+      setError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className=" p-8 bg-surface rounded-2xl shadow-xl border border-border-subtle">
-      <div className="mb-8 text-center">
-        <h2 className="text-3xl font-bold text-secondary italic">
-          Add New Product
-        </h2>
-        <p className="text-muted mt-2">
-          Fill in the details to list a new item in your store
-        </p>
-      </div>
+  const inputClass =
+    "min-h-11 w-full rounded-xl border border-border-subtle bg-surface px-3.5 py-2.5 text-sm text-primary outline-none transition placeholder:text-muted focus:border-border-strong focus:ring-2 focus:ring-focus/20";
+  const labelClass = "mb-1.5 block text-sm font-semibold text-secondary";
 
-      <form onSubmit={handleSubmit} className="space-y-8">
-        {/* Section 1: Basic Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-secondary ml-1">
-              Product Name
+  return (
+    <section
+      dir={direction}
+      className="mx-auto w-full max-w-4xl rounded-3xl border border-border-subtle bg-surface p-4 shadow-xl shadow-black/5 sm:p-7 lg:p-9"
+    >
+      <header className="mb-7 flex items-start gap-3 border-b border-border-subtle pb-6 sm:mb-8">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-surface-subtle text-primary">
+          <PackagePlus size={21} />
+        </span>
+        <div className="min-w-0">
+          <h1 className="text-xl font-bold tracking-tight text-primary sm:text-2xl">
+            {t("sellerAddProductTitle")}
+          </h1>
+          <p className="mt-1.5 text-sm leading-6 text-muted">
+            {t("sellerAddProductDescription")}
+          </p>
+        </div>
+      </header>
+
+      <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+          <div>
+            <label htmlFor="seller-product-name" className={labelClass}>
+              {t("sellerProductName")} <span aria-hidden="true" className="text-danger">*</span>
             </label>
             <input
-              className="input-style"
+              id="seller-product-name"
+              className={inputClass}
               type="text"
-              placeholder="e.g. Premium T-Shirt"
+              autoComplete="off"
+              placeholder={t("sellerProductNamePlaceholder")}
               value={item.name}
-              onChange={(e) => handleChange("name", e.target.value)}
+              onChange={(event) => handleChange("name", event.target.value)}
               required
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-secondary ml-1">
-              Category
+
+          <div>
+            <label htmlFor="seller-category" className={labelClass}>
+              {t("sellerCategory")} <span aria-hidden="true" className="text-danger">*</span>
             </label>
             <input
-              className="input-style "
+              id="seller-category"
+              className={inputClass}
               type="text"
-              placeholder="e.g. Men's Fashion"
+              placeholder={t("sellerCategoryPlaceholder")}
               value={item.category}
-              onChange={(e) => handleChange("category", e.target.value)}
+              onChange={(event) => handleChange("category", event.target.value)}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="seller-type" className={labelClass}>{t("adminDressStyleLabel")}</label>
+            <input
+              id="seller-type"
+              className={inputClass}
+              type="text"
+              value={item.type}
+              onChange={(event) => handleChange("type", event.target.value)}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="seller-section" className={labelClass}>{t("adminProductSectionLabel")}</label>
+            <input
+              id="seller-section"
+              className={inputClass}
+              type="text"
+              value={item.section}
+              onChange={(event) => handleChange("section", event.target.value)}
             />
           </div>
         </div>
 
-        {/* Section 2: Description */}
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-semibold text-secondary ml-1">
-            Description
-          </label>
+        <div>
+          <label htmlFor="seller-description" className={labelClass}>{t("sellerDescription")}</label>
           <textarea
-            className="input-style min-h-[100px] py-3"
-            placeholder="Describe your product in detail..."
+            id="seller-description"
+            className={`${inputClass} min-h-28 resize-y leading-6`}
+            placeholder={t("sellerDescriptionPlaceholder")}
             value={item.description}
-            onChange={(e) => handleChange("description", e.target.value)}
+            onChange={(event) => handleChange("description", event.target.value)}
+            rows={4}
           />
         </div>
 
-        {/* Section 3: Pricing & Sale */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-surface-subtle p-6 rounded-xl">
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-secondary">
-              Price ($)
+        <div className="grid grid-cols-1 gap-4 rounded-2xl bg-surface-subtle p-4 sm:grid-cols-3 sm:gap-5 sm:p-5">
+          <div>
+            <label htmlFor="seller-price" className={labelClass}>
+              {t("sellerPriceEGP")} <span aria-hidden="true" className="text-danger">*</span>
             </label>
             <input
-              className="input-style bg-surface"
+              id="seller-price"
+              className={inputClass}
               type="number"
-              placeholder="0.00"
+              min="0"
+              step="0.01"
+              inputMode="decimal"
+              placeholder={t("adminPricePlaceholder")}
               value={item.price}
-              onChange={(e) => handleChange("price", e.target.value)}
+              onChange={(event) => handleChange("price", event.target.value)}
+              required
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-secondary">
-              Discount (%)
-            </label>
+          <div>
+            <label htmlFor="seller-discount" className={labelClass}>{t("sellerDiscount")}</label>
             <input
-              className="input-style bg-surface"
+              id="seller-discount"
+              className={inputClass}
               type="number"
+              min="0"
+              max="100"
+              step="1"
+              inputMode="numeric"
               placeholder="0"
               value={item.discount}
-              onChange={(e) => handleChange("discount", e.target.value)}
+              onChange={(event) => handleChange("discount", event.target.value)}
             />
           </div>
-          <div className="flex flex-col gap-2">
-            <label className="text-sm font-semibold text-secondary">
-              On Sale?
-            </label>
+          <div>
+            <label htmlFor="seller-on-sale" className={labelClass}>{t("sellerOnSale")}</label>
             <select
-              className="input-style bg-surface"
+              id="seller-on-sale"
+              className={inputClass}
               value={item.isSale}
-              onChange={(e) => handleChange("isSale", e.target.value)}
+              onChange={(event) => handleChange("isSale", event.target.value)}
             >
-              <option value="">Select</option>
-              <option value="true">Yes</option>
-              <option value="false">No</option>
+              <option value="">{t("sellerSelectOption")}</option>
+              <option value="true">{t("sellerYes")}</option>
+              <option value="false">{t("sellerNo")}</option>
             </select>
           </div>
         </div>
 
-        {/* Section 4: Specifications */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <input
-            className="input-style"
-            type="text"
-            placeholder="Sizes (S, M, L, XL)"
-            value={item.size}
-            onChange={(e) => handleChange("size", e.target.value)}
-          />
-          <input
-            className="input-style"
-            type="text"
-            placeholder="Colors (Red, Blue, Black)"
-            value={item.colors}
-            onChange={(e) => handleChange("colors", e.target.value)}
-          />
-        </div>
-
-        {/* Section 5: Photo Upload */}
-        <div className="relative group border-2 border-dashed border-border-strong rounded-xl p-8 text-center hover:border-border-strong transition-colors">
-          <input
-            type="file"
-            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-            onChange={(e) =>
-              e.target.files && handleChange("photo", e.target.files[0])
-            }
-          />
-          <div className="space-y-2">
-            <div className="text-secondary">
-              {item.photo ? (
-                <span className="text-success font-medium">
-                  Selected: {item.photo.name}
-                </span>
-              ) : (
-                "Click to upload product image"
-              )}
-            </div>
-            <p className="text-xs text-muted">PNG, JPG up to 5MB</p>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
+          <div>
+            <label htmlFor="seller-sizes" className={labelClass}>{t("sellerSizesLabel")}</label>
+            <input
+              id="seller-sizes"
+              className={inputClass}
+              type="text"
+              placeholder={t("sellerSizesPlaceholder")}
+              value={item.size}
+              onChange={(event) => handleChange("size", event.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="seller-colors" className={labelClass}>{t("sellerColorsLabel")}</label>
+            <input
+              id="seller-colors"
+              className={inputClass}
+              type="text"
+              placeholder={t("sellerColorsPlaceholder")}
+              value={item.colors}
+              onChange={(event) => handleChange("colors", event.target.value)}
+            />
           </div>
         </div>
 
+        <div>
+          <label htmlFor="seller-photo" className={labelClass}>{t("adminUploadImagesLabel")}</label>
+          <label
+            htmlFor="seller-photo"
+            className="flex min-h-28 cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-border-strong bg-surface-subtle px-4 py-5 text-center transition-colors hover:bg-surface-muted focus-within:ring-2 focus-within:ring-focus/30"
+          >
+            {item.photo ? <CheckCircle2 size={22} className="text-success" /> : <ImagePlus size={22} className="text-muted" />}
+            <span className="text-sm font-semibold text-primary">
+              {item.photo
+                ? t("sellerSelectedPhoto").replace("{name}", item.photo.name)
+                : t("sellerUploadPhoto")}
+            </span>
+            <span className="text-xs text-muted">{t("sellerImageTypes")}</span>
+          </label>
+          <input
+            id="seller-photo"
+            type="file"
+            accept="image/png,image/jpeg"
+            onChange={handlePhotoChange}
+            className="sr-only"
+          />
+          {item.photo && (
+            <button
+              type="button"
+              className="mt-2 text-xs font-semibold text-danger underline-offset-4 hover:underline"
+              onClick={() => handleChange("photo", null)}
+            >
+              {t("adminRemoveImage")}
+            </button>
+          )}
+        </div>
+
         {error && (
-          <p className="text-danger text-sm font-medium text-center">{error}</p>
+          <p role="alert" className="rounded-xl border border-danger/20 bg-danger/5 px-3.5 py-3 text-sm font-medium text-danger">
+            {error}
+          </p>
         )}
 
         <button
+          type="submit"
           disabled={loading}
-          className="w-full bg-action text-on-action py-4 rounded-xl font-bold text-lg hover:bg-action-hover transition-all active:scale-[0.98] disabled:bg-surface-hover"
+          className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-action px-5 py-3 text-sm font-bold text-on-action transition-colors hover:bg-action-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          {loading ? "Processing..." : "Add Product to Store"}
+          {loading ? <LoaderCircle size={17} className="animate-spin" /> : <PackagePlus size={17} />}
+          {loading ? t("sellerProcessing") : t("sellerAddToStore")}
         </button>
       </form>
-    </div>
+    </section>
   );
 };
-/* Tailwind Custom Styles (يمكن وضعها في globals.css) */
-/*
-      <style jsx>{`
-        .input-style {
-          @apply w-full px-4 py-3 rounded-lg border border-border outline-none focus:border-primary focus:ring-1 focus:ring-focus transition-all placeholder:text-subtle text-secondary;
-        }
-      `}</style>
-*/

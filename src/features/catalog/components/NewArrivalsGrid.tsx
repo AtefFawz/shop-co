@@ -16,8 +16,10 @@ import { Product } from "@/types";
 import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton";
 import useData from "@/hooks/getData";
 import SpecularButton from "@/shared/components/motion/SpecularButton";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function NewArrivalsGrid() {
+  const { t } = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword") || "";
@@ -92,18 +94,18 @@ export default function NewArrivalsGrid() {
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3.5 py-1 shadow-2xs">
             <Sparkles size={12} className="text-primary" />
             <span className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">
-              SEASON ARCHIVE · FRESH DROPS
+              {t("newSeason")}
             </span>
           </div>
 
-          <Heading title="NEW ARRIVALS" />
+          <Heading title={t("newArrivals")} />
 
           {/* Interactive Filter Pills */}
           <div className="mt-2 inline-flex flex-wrap items-center justify-center gap-1.5 rounded-2xl border border-border/80 bg-surface-subtle p-1.5 shadow-2xs">
             {[
-              { id: "all", label: `All Drops (${rawProducts.length})` },
-              { id: "promo", label: "Featured & Promo" },
-              { id: "under150", label: "Essentials ≤ $150" },
+              { id: "all", label: `${t("allDrops")} (${rawProducts.length})` },
+              { id: "promo", label: t("featuredPromo") },
+              { id: "under150", label: t("essentialsUnder") },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -124,7 +126,7 @@ export default function NewArrivalsGrid() {
         {/* ── 3D Architectural Product Grid ── */}
         <div
           style={{ perspective: "1200px" }}
-          className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4"
         >
           {displayedProducts.map((item: Product, idx: number) => (
             <div
@@ -138,7 +140,7 @@ export default function NewArrivalsGrid() {
                 </span>
                 {(item as any).isSale && (
                   <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-success">
-                    <Flame size={10} /> Hot
+                    <Flame size={10} /> {t("hot")}
                   </span>
                 )}
               </div>
@@ -168,7 +170,7 @@ export default function NewArrivalsGrid() {
             className="min-w-[220px] cursor-pointer px-10 py-3.5 text-xs font-black uppercase tracking-[0.18em] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md **:bg-transparent! **:font-black!"
             onClick={handelClick}
           >
-            Explore Full Archive ↗
+            {t("exploreArchive")} ↗
           </SpecularButton>
         </div>
 

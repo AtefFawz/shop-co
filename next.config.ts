@@ -1,9 +1,15 @@
 import type { NextConfig } from "next";
 
+const configuredApiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+const apiBaseUrl = (configuredApiUrl || "http://localhost:4000/api/").replace(
+  /\/+$/,
+  "",
+);
+
 const nextConfig: NextConfig = {
-  /* config options here */
   images: {
     unoptimized: true,
+    qualities: [75, 85, 90, 95],
     remotePatterns: [
       {
         protocol: "http",
@@ -13,7 +19,12 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "https://shop-co-jfqp.vercel.app",
+        hostname: "shop-co-1fqm.vercel.app",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "shop-co-jfqp.vercel.app",
         pathname: "/**",
       },
       {
@@ -23,12 +34,11 @@ const nextConfig: NextConfig = {
       },
     ],
   },
-
   async rewrites() {
     return [
       {
         source: "/api/backend/:path*",
-        destination: `${process.env.NEXT_PUBLIC_API_URL}:path*`,
+        destination: `${apiBaseUrl}/:path*`,
       },
     ];
   },

@@ -4,10 +4,13 @@ import React from "react";
 import { Receipt, Sparkles } from "lucide-react";
 import { calculateFinalPrice } from "@/lib/logicPricing";
 import { Product } from "@/types";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 const FREE_SHIPPING_THRESHOLD = 200;
 
 export const CartOrderSummary = ({ product }: { product: Product[] }) => {
+  const { t, locale } = useLocale();
   const { total, subtotal } = product.reduce(
     (acc, item) => {
       const qty = Number(item.count ?? 1);
@@ -36,17 +39,17 @@ export const CartOrderSummary = ({ product }: { product: Product[] }) => {
           </div>
           <div>
             <h2 className="text-sm font-black uppercase tracking-tight text-primary">
-              Order Summary
+              {t("orderSummary")}
             </h2>
             <p className="text-[10px] font-semibold text-muted">
-              Live bag valuation
+              {t("liveBagValue")}
             </p>
           </div>
         </div>
 
         {discountAmount > 0 && (
           <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-2.5 py-1 font-mono text-[9px] font-black uppercase tracking-wider text-success">
-            <Sparkles size={10} /> You Save ${discountAmount.toFixed(2)}
+            <Sparkles size={10} /> {t("youSave")} {formatCurrency(discountAmount, locale)}
           </span>
         )}
       </div>
@@ -55,33 +58,33 @@ export const CartOrderSummary = ({ product }: { product: Product[] }) => {
       <div className="space-y-3 text-xs">
         <div className="flex items-center justify-between">
           <span className="font-semibold text-muted">
-            Original Subtotal
+            {t("originalSubtotal")}
           </span>
           <span className="font-mono font-bold text-primary">
-            ${subtotal.toFixed(2)}
+            {formatCurrency(subtotal, locale)}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="font-semibold text-muted">
-            Atelier Markdowns
+            {t("discounts")}
           </span>
           <span className="font-mono font-black text-danger">
-            -${discountAmount.toFixed(2)}
+            -{formatCurrency(discountAmount, locale)}
           </span>
         </div>
 
         <div className="flex items-center justify-between">
           <span className="font-semibold text-muted">
-            Courier Dispatch
+            {t("delivery")}
           </span>
           {delivery === 0 && total > 0 ? (
             <span className="rounded bg-success-soft px-2 py-0.5 font-mono text-[10px] font-black uppercase text-success">
-              FREE VIP
+              {t("free")}
             </span>
           ) : (
             <span className="font-mono font-bold text-primary">
-              ${delivery.toFixed(2)}
+              {formatCurrency(delivery, locale)}
             </span>
           )}
         </div>
@@ -91,15 +94,15 @@ export const CartOrderSummary = ({ product }: { product: Product[] }) => {
       <div className="flex items-end justify-between rounded-2xl bg-surface-subtle p-4">
         <div>
           <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-            Estimated Total
+            {t("estimatedTotal")}
           </span>
           <span className="text-xs font-extrabold uppercase text-primary">
-            Taxes Included
+            {t("taxesIncluded")}
           </span>
         </div>
 
         <span className="font-mono text-2xl font-black leading-none tracking-tight text-primary">
-          ${grandTotal.toFixed(2)}
+          {formatCurrency(grandTotal, locale)}
         </span>
       </div>
     </div>

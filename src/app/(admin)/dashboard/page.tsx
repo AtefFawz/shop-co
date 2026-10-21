@@ -4,8 +4,8 @@ import AdminDashboardPage from "@/features/admin/dashboard/pages/AdminDashboardP
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Command Center · Dashboard",
-  description: "SHOP.CO real-time executive telemetry on revenue, live orders, and catalog stock health.",
+  title: "SHOP.CO™ · Dashboard",
+  description: "SHOP.CO store management dashboard.",
 };
 
 export default AdminDashboardPage;

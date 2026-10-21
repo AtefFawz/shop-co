@@ -13,6 +13,8 @@ import Link from "next/link";
 import api from "@/lib/api";
 import { toast } from "react-hot-toast";
 import HoldToConfirmButton from "@/shared/components/motion/HoldToConfirmButton";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface Order {
   _id: string;
@@ -40,6 +42,7 @@ export default function CustomerOrderCard({
   order: Order;
   onReviewSuccess: () => void;
 }) {
+  const { t, locale, direction } = useLocale();
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [ratings, setRatings] = useState<{ [key: string]: number }>({});
   const [comments, setComments] = useState<{ [key: string]: string }>({});
@@ -47,6 +50,13 @@ export default function CustomerOrderCard({
 
   const shortId = (order._id || "").slice(-6).toUpperCase();
   const isDelivered = (order.status || "").toLowerCase() === "delivered";
+
+  const statusLabel = (status: string) => ({
+    Pending: t("statusPending"),
+    Shipped: t("statusShipped"),
+    Delivered: t("statusDelivered"),
+    Cancelled: t("statusCancelled"),
+  }[status] || status);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -65,11 +75,11 @@ export default function CustomerOrderCard({
 
   const handleSubmitReview = async (productId: string) => {
     if (!ratings[productId]) {
-      toast.error("Please select a star rating first");
+      toast.error(t("pleaseSelectRating"));
       return;
     }
     if (!comments[productId]?.trim()) {
-      toast.error("Please enter a brief written comment");
+      toast.error(t("pleaseComment"));
       return;
     }
 
@@ -81,7 +91,7 @@ export default function CustomerOrderCard({
         comment: comments[productId],
       });
 
-      toast.success("Catalog review posted successfully!");
+      toast.success(t("reviewPosted"));
       if (onReviewSuccess) onReviewSuccess();
       setRatings((prev) => {
         const next = { ...prev };
@@ -95,7 +105,7 @@ export default function CustomerOrderCard({
       });
     } catch (error: any) {
       console.error(error);
-      toast.error(error.response?.data?.message || "Failed to submit review");
+      toast.error(error.response?.data?.message || t("reviewSubmitError"));
     } finally {
       setLoading(null);
     }
@@ -104,14 +114,14 @@ export default function CustomerOrderCard({
   const deleteOrders = async (id: string) => {
     try {
       await api.delete(`order/${id}`);
-      toast.success("Order record cancelled / removed");
+      toast.success(t("orderCancelledRemoved"));
       if (onReviewSuccess) onReviewSuccess();
     } catch (err: any) {
       if (err.response?.status === 404) {
-        toast.error("Order not found or already archived");
+        toast.error(t("orderNotFound"));
         return;
       }
-      toast.error("Failed to delete order record");
+      toast.error(t("orderDeleteError"));
     }
   };
 
@@ -119,7 +129,7 @@ export default function CustomerOrderCard({
   const remainingCount = order.orderItems.length - 4;
 
   return (
-    <div className="group relative overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-[0_12px_36px_-12px_rgba(var(--shadow-rgb),0.06)] transition-all duration-300 hover:border-border hover:shadow-[0_20px_45px_-12px_rgba(var(--shadow-rgb),0.1)] sm:p-7">
+    <div dir={direction} className="group relative overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-[0_12px_36px_-12px_rgba(var(--shadow-rgb),0.06)] transition-all duration-300 hover:border-border hover:shadow-[0_20px_45px_-12px_rgba(var(--shadow-rgb),0.1)] sm:p-7">
       {/* ================================================================== */}
       {/* 1. TOP HEADER: ID, TIMESTAMP & STATUS BADGE                        */}
       {/* ================================================================== */}
@@ -131,24 +141,24 @@ export default function CustomerOrderCard({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-mono text-sm font-black uppercase tracking-tight text-primary sm:text-base">
-                ORDER #{shortId}
+                {t("orderLabel").toUpperCase()} #{shortId}
               </h3>
             </div>
 
             <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-bold text-muted">
               <span>
                 {order.createdAt
-                  ? new Date(order.createdAt).toLocaleDateString("en-GB", {
+                  ? new Date(order.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-EG", {
                       day: "numeric",
                       month: "short",
                       year: "numeric",
                     })
-                  : "Recent"}
+                  : t("recent")}
               </span>
               <span>•</span>
               <span>
                 {order.orderItems.length}{" "}
-                {order.orderItems.length === 1 ? "Garment" : "Garments"}
+                {order.orderItems.length === 1 ? t("garment") : t("garments")}
               </span>
             </div>
           </div>
@@ -161,7 +171,7 @@ export default function CustomerOrderCard({
           )}`}
         >
           <span className="h-1.5 w-1.5 rounded-full bg-current" />
-          {order.status}
+          {statusLabel(order.status)}
         </span>
       </div>
 
@@ -189,12 +199,12 @@ export default function CustomerOrderCard({
           )}
         </div>
 
-        <div className="text-right font-mono">
+        <div className="text-end font-mono">
           <span className="block text-[9px] font-black uppercase tracking-widest text-muted">
-            Total Settlement
+            {t("totalSettlement")}
           </span>
           <span className="text-xl font-black tracking-tight text-primary sm:text-2xl">
-            ${Number(order.totalPrice || 0).toLocaleString()}
+            {formatCurrency(Number(order.totalPrice || 0), locale)}
           </span>
         </div>
       </div>
@@ -206,7 +216,7 @@ export default function CustomerOrderCard({
         {/* Left: Hold to Delete */}
         <div className="w-full sm:w-auto [&>*]:w-full sm:[&>*]:w-auto">
           <HoldToConfirmButton
-            doneLabel="Archived"
+            doneLabel={t("archived")}
             backgroundColor="var(--surface-subtle)"
             fillColor="var(--danger)"
             textColor="var(--danger)"
@@ -227,7 +237,7 @@ export default function CustomerOrderCard({
               onReviewSuccess && onReviewSuccess();
             }}
           >
-            Hold to delete order
+            {t("holdDeleteOrder")}
           </HoldToConfirmButton>
         </div>
 
@@ -237,7 +247,7 @@ export default function CustomerOrderCard({
             href={`/shop/orders/${order._id}`}
             className="inline-flex flex-1 sm:flex-initial items-center justify-center gap-1.5 rounded-xl border border-border/90 bg-surface-subtle px-4 py-2.5 text-[10px] font-black uppercase tracking-wider text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
           >
-            <span>Track Dossier</span>
+            <span>{t("trackOrder")}</span>
             <ChevronRight size={13} />
           </Link>
 
@@ -255,7 +265,7 @@ export default function CustomerOrderCard({
                     : "fill-rating text-rating"
                 }
               />
-              <span>{isReviewOpen ? "Close Reviews" : "Rate Garments"}</span>
+              <span>{isReviewOpen ? t("closeReviews") : t("rateGarments")}</span>
             </button>
           )}
         </div>
@@ -269,7 +279,7 @@ export default function CustomerOrderCard({
           <div className="flex items-center gap-1.5">
             <Sparkles size={13} className="text-primary" />
             <span className="text-[10px] font-black uppercase tracking-widest text-muted">
-              Submit Verified Feedback
+              {t("submitVerifiedFeedback")}
             </span>
           </div>
 
@@ -307,7 +317,7 @@ export default function CustomerOrderCard({
                       setRatings({ ...ratings, [item.product]: num })
                     }
                     className="cursor-pointer p-1 transition-transform hover:scale-110 active:scale-95"
-                    aria-label={`Rate ${num} stars`}
+                    aria-label={`${t("rateGarments")} ${num}`}
                   >
                     <Star
                       size={17}
@@ -324,7 +334,7 @@ export default function CustomerOrderCard({
               {/* Review Textarea */}
               <div className="relative">
                 <textarea
-                  placeholder="Share your feedback on fit, fabric weight, and craftsmanship..."
+                  placeholder={t("pleaseComment")}
                   className="w-full resize-none rounded-xl border border-border/90 bg-surface p-3.5 pb-14 text-xs font-medium text-secondary shadow-2xs outline-none transition-all placeholder:text-muted focus:border-primary focus:ring-1 focus:ring-focus"
                   rows={2}
                   value={comments[item.product] || ""}
@@ -344,13 +354,13 @@ export default function CustomerOrderCard({
                     loading === item.product ||
                     !comments[item.product]?.trim()
                   }
-                  className="absolute bottom-2.5 right-2.5 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-action px-4 py-2 text-[10px] font-black uppercase tracking-widest text-on-action shadow-sm transition-all hover:bg-action-hover disabled:opacity-25"
+                  className="absolute bottom-2.5 end-2.5 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-action px-4 py-2 text-[10px] font-black uppercase tracking-widest text-on-action shadow-sm transition-all hover:bg-action-hover disabled:opacity-25"
                 >
                   {loading === item.product ? (
-                    "Publishing..."
+                    t("publishReview")
                   ) : (
                     <>
-                      <span>Post Review</span>
+                      <span>{t("postReview")}</span>
                       <Send size={11} />
                     </>
                   )}

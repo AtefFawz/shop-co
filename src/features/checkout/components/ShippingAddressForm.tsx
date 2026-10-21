@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 import {
   ArrowRight,
   MapPin,
@@ -21,6 +22,7 @@ interface DataType {
 const POPULAR_CITIES = ["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"];
 
 export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
+  const { t, locale, direction } = useLocale();
   const [formData, setFormData] = useState({
     address: "",
     city: "",
@@ -31,11 +33,11 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onSubmit(formData);
+    onSubmit({ ...formData, paymentMethod });
   };
 
   return (
-    <div className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-8">
+    <div dir={direction} className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-8">
       {/* Header */}
       <div className="mb-6 flex items-center gap-3.5 border-b border-border-subtle pb-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-action text-on-action shadow-xs">
@@ -43,10 +45,10 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
         </div>
         <div>
           <h3 className="text-lg font-black uppercase tracking-tight text-primary">
-            Dispatch Coordinates
+            {t("shippingAddress")}
           </h3>
           <p className="text-xs font-medium text-muted">
-            Enter your street address and contact number for courier delivery
+            {t("shippingAddressHint")}
           </p>
         </div>
       </div>
@@ -55,7 +57,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
         {/* 1. Street Address */}
         <div className="space-y-2">
           <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-            Detailed Street Address
+            {t("streetAddress")}
           </label>
           <div
             className={`relative flex items-center rounded-2xl border bg-surface-subtle transition-all duration-300 ${
@@ -65,7 +67,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
             }`}
           >
             <span
-              className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+              className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
                 focused === "address"
                   ? "bg-action text-on-action"
                   : "bg-surface text-muted shadow-2xs"
@@ -80,11 +82,11 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
               value={formData.address}
               onFocus={() => setFocused("address")}
               onBlur={() => setFocused(null)}
-              placeholder="Building number, Street name, Apartment..."
+              placeholder={t("addressPlaceholder")}
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
               }
-              className="w-full bg-transparent py-3.5 pl-14 pr-4 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+              className="w-full bg-transparent py-3.5 ps-14 pe-4 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
             />
           </div>
         </div>
@@ -94,7 +96,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
           {/* City */}
           <div className="space-y-2">
             <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-              City / Governorate
+              {t("city")}
             </label>
             <div
               className={`relative flex items-center rounded-2xl border bg-surface-subtle transition-all duration-300 ${
@@ -104,7 +106,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
               }`}
             >
               <span
-                className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+                className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
                   focused === "city"
                     ? "bg-action text-on-action"
                     : "bg-surface text-muted shadow-2xs"
@@ -119,11 +121,11 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                 value={formData.city}
                 onFocus={() => setFocused("city")}
                 onBlur={() => setFocused(null)}
-                placeholder="e.g. Cairo"
+                placeholder={t("cityPlaceholder")}
                 onChange={(e) =>
                   setFormData({ ...formData, city: e.target.value })
                 }
-                className="w-full bg-transparent py-3.5 pl-14 pr-4 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+                className="w-full bg-transparent py-3.5 ps-14 pe-4 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
               />
             </div>
 
@@ -140,7 +142,9 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                       : "border-border bg-surface-subtle text-muted hover:border-border-strong hover:text-primary"
                   }`}
                 >
-                  {c}
+                  {locale === "ar"
+                    ? ({ Cairo: t("cityCairo"), Alexandria: t("cityAlexandria"), Giza: t("cityGiza"), Mansoura: t("cityMansoura"), Tanta: t("cityTanta") } as Record<string, string>)[c]
+                    : c}
                 </button>
               ))}
             </div>
@@ -149,7 +153,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
           {/* Phone Number */}
           <div className="space-y-2">
             <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-              Recipient Phone Number
+              {t("phone")}
             </label>
             <div
               className={`relative flex items-center rounded-2xl border bg-surface-subtle transition-all duration-300 ${
@@ -159,7 +163,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
               }`}
             >
               <span
-                className={`pointer-events-none absolute left-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
+                className={`pointer-events-none absolute start-3.5 flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${
                   focused === "phone"
                     ? "bg-action text-on-action"
                     : "bg-surface text-muted shadow-2xs"
@@ -178,23 +182,23 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className="w-full bg-transparent py-3.5 pl-14 pr-4 font-mono text-xs font-bold text-primary placeholder:font-sans placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+                className="w-full bg-transparent py-3.5 ps-14 pe-4 font-mono text-xs font-bold text-primary placeholder:font-sans placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
               />
             </div>
           </div>
         </div>
 
-        {/* 3. Interactive Settlement Method Selector */}
+        {/* 3. Interactive {t("paymentMethod")} Selector */}
         <div className="space-y-2.5 border-t border-border-subtle pt-5">
           <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-            Settlement Method
+            {t("paymentMethod")}
           </label>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <button
               type="button"
               onClick={() => setPaymentMethod("cod")}
-              className={`flex cursor-pointer items-center justify-between rounded-2xl border p-3.5 text-left transition-all ${
+              className={`flex cursor-pointer items-center justify-between rounded-2xl border p-3.5 text-start transition-all ${
                 paymentMethod === "cod"
                   ? "border-border bg-action text-on-action shadow-md"
                   : "border-border bg-surface-subtle text-primary hover:border-border-strong"
@@ -204,7 +208,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                 <Banknote size={18} />
                 <div>
                   <span className="block text-xs font-black uppercase">
-                    Cash on Delivery
+                    {t("cashOnDelivery")}
                   </span>
                   <span
                     className={`block text-[10px] ${
@@ -213,7 +217,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                         : "text-muted"
                     }`}
                   >
-                    Pay upon receiving package
+                    {t("payOnArrival")}
                   </span>
                 </div>
               </div>
@@ -225,7 +229,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
             <button
               type="button"
               onClick={() => setPaymentMethod("card")}
-              className={`flex cursor-pointer items-center justify-between rounded-2xl border p-3.5 text-left transition-all ${
+              className={`flex cursor-pointer items-center justify-between rounded-2xl border p-3.5 text-start transition-all ${
                 paymentMethod === "card"
                   ? "border-border bg-action text-on-action shadow-md"
                   : "border-border bg-surface-subtle text-primary hover:border-border-strong"
@@ -235,7 +239,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                 <CreditCard size={18} />
                 <div>
                   <span className="block text-xs font-black uppercase">
-                    POS Card on Delivery
+                    {t("cardOnDelivery")}
                   </span>
                   <span
                     className={`block text-[10px] ${
@@ -244,7 +248,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                         : "text-muted"
                     }`}
                   >
-                    Visa / Mastercard terminal
+                    {t("cardTerminal")}
                   </span>
                 </div>
               </div>
@@ -267,13 +271,13 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
             {state ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
-                <span>Authorizing Dispatch…</span>
+                <span>{t("placingOrder")}</span>
               </>
             ) : (
               <>
-                <span>Confirm &amp; Place Order</span>
+                <span>{t("placeOrder")}</span>
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-surface group-hover:text-primary">
-                  <ArrowRight size={13} />
+                  <ArrowRight size={13} className={direction === "rtl" ? "rotate-180" : undefined} />
                 </span>
               </>
             )}
@@ -282,7 +286,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
           <p className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">
             <ShieldCheck size={13} className="text-success" />
             <span>
-              30-Day Complimentary Returns &amp; Full Transit Insurance
+              {t("returnsProtection")}
             </span>
           </p>
         </div>

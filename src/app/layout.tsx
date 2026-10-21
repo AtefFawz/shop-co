@@ -1,12 +1,16 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 // @ts-ignore: CSS import side-effect type declarations missing
 import "./globals.css";
 import { AuthWatcher } from "@/lib/AuthWatcher";
 import { Toaster } from "react-hot-toast";
 import NotificationListener from "@/features/notifications/components/NotificationListener";
 import { ThemeProvider } from "@/shared/theme/ThemeProvider";
+import { LocaleProvider } from "@/shared/i18n/LocaleProvider";
+import type { Locale } from "@/shared/i18n/messages";
+import ToastSoundListener from "@/shared/components/feedback/ToastSoundListener";
 
 /* -------------------------------------------------------------------------- */
 /*                                FONTS SETUP                                 */
@@ -45,11 +49,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "SHOP.CO™ | Find Clothes That Match Your Style",
-    template: "%s — SHOP.CO™ Studio",
+    default: "SHOP.CO™ | أزياء تعبّر عن أسلوبك",
+    template: "%s — SHOP.CO™",
   },
   description:
-    "Discover meticulously crafted garments from 200+ international luxury houses. Curated streetwear, minimalist tailoring, and contemporary essentials.",
+    "اكتشف تشكيلة منتقاة من الأزياء العصرية والقطع الأساسية من علامات تجارية عالمية، مع تجربة تسوق سهلة وآمنة.",
   applicationName: "SHOP.CO",
   authors: [{ name: "SHOP.CO Atelier", url: SITE_URL }],
   generator: "Next.js",
@@ -74,12 +78,12 @@ export const metadata: Metadata = {
   // How the link looks on WhatsApp, Facebook, LinkedIn, Discord, Telegram
   openGraph: {
     type: "website",
-    locale: "en_US",
+    locale: "ar_EG",
     url: SITE_URL,
     siteName: "SHOP.CO™ — Official Online Flagship",
-    title: "SHOP.CO™ | Find Clothes That Match Your Style",
+    title: "SHOP.CO™ | أزياء تعبّر عن أسلوبك",
     description:
-      "Explore 2,000+ high-quality pieces from 200+ global luxury brands. Free express shipping & verified authenticity.",
+      "تسوّق أحدث صيحات الموضة والقطع الأساسية المختارة بعناية من SHOP.CO.",
   },
 
   // How the link looks on X (Twitter)
@@ -119,6 +123,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const savedLocale = cookieStore.get("shopco-language")?.value;
+  const initialLocale: Locale = savedLocale === "en" ? "en" : "ar";
+
   // Structured Data (JSON-LD) for Google Rich Results
   const jsonLd = {
     "@context": "https://schema.org",
@@ -132,12 +140,18 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
+    <html
+      lang={initialLocale}
+      dir={initialLocale === "ar" ? "rtl" : "ltr"}
+      data-locale={initialLocale}
+      className="scroll-smooth"
+      suppressHydrationWarning
+    >
       <head>
         {/* Apply the saved/system theme before the first paint to avoid a flash. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `var savedTheme = null; try { savedTheme = localStorage.getItem('shopco-theme'); } catch (_) {} var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; var initialTheme = savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark) ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', initialTheme === 'dark'); document.documentElement.dataset.theme = initialTheme; document.documentElement.style.colorScheme = initialTheme;`,
+            __html: `var savedTheme = null; try { savedTheme = localStorage.getItem('shopco-theme'); } catch (_) {} var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; var initialTheme = savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark) ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', initialTheme === 'dark'); document.documentElement.dataset.theme = initialTheme; document.documentElement.style.colorScheme = initialTheme; `,
           }}
         />
       </head>
@@ -145,55 +159,58 @@ export default async function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen font-sans antialiased overflow-x-clip `}
       >
         <ThemeProvider>
-          {/* Google Rich Snippet Schema */}
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
+          <LocaleProvider initialLocale={initialLocale}>
+            {/* Google Rich Snippet Schema */}
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
 
-          {/* Global App Listeners */}
-          <NotificationListener />
-          <AuthWatcher />
+            {/* Global App Listeners */}
+            <ToastSoundListener />
+            <NotificationListener />
+            <AuthWatcher />
 
-          {/* Main Content */}
-          {children}
+            {/* Main Content */}
+            {children}
 
-          {/* Application toast notifications */}
-          <Toaster
-            position="top-center"
-            gutter={10}
-            containerStyle={{ top: 24 }}
-            toastOptions={{
-              duration: 3500,
-              style: {
-                background:
-                  "color-mix(in srgb, var(--surface-raised) 94%, transparent)",
-                color: "var(--text-primary)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid var(--border)",
-                borderRadius: "9999px",
-                padding: "12px 22px",
-                fontSize: "12px",
-                fontWeight: 700,
-                letterSpacing: "0.06em",
-                textTransform: "uppercase",
-                boxShadow: "var(--shadow-floating)",
-              },
-              success: {
-                iconTheme: {
-                  primary: "var(--success)",
-                  secondary: "var(--surface)",
+            {/* Application toast notifications */}
+            <Toaster
+              position="top-center"
+              gutter={10}
+              containerStyle={{ top: 24 }}
+              toastOptions={{
+                duration: 3500,
+                style: {
+                  background:
+                    "color-mix(in srgb, var(--surface-raised) 94%, transparent)",
+                  color: "var(--text-primary)",
+                  backdropFilter: "blur(16px)",
+                  WebkitBackdropFilter: "blur(16px)",
+                  border: "1px solid var(--border)",
+                  borderRadius: "9999px",
+                  padding: "12px 22px",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  letterSpacing: "0.06em",
+                  textTransform: "uppercase",
+                  boxShadow: "var(--shadow-floating)",
                 },
-              },
-              error: {
-                iconTheme: {
-                  primary: "var(--danger)",
-                  secondary: "var(--surface)",
+                success: {
+                  iconTheme: {
+                    primary: "var(--success)",
+                    secondary: "var(--surface)",
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  iconTheme: {
+                    primary: "var(--danger)",
+                    secondary: "var(--surface)",
+                  },
+                },
+              }}
+            />
+          </LocaleProvider>
         </ThemeProvider>
       </body>
     </html>

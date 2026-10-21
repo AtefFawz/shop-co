@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface RoleSelectorProps {
   userId: string;
@@ -49,8 +50,9 @@ export default function UserRoleSelector({
   initialRole,
 }: RoleSelectorProps) {
   const router = useRouter();
+  const { t, direction } = useLocale();
   const [role, setRole] = useState<RoleType>(
-    (initialRole?.toUpperCase() as RoleType) || "USER",
+    (initialRole?.toUpperCase().replace("MANGER", "MANAGER") as RoleType) || "USER",
   );
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -69,7 +71,7 @@ export default function UserRoleSelector({
     const rect = triggerRef.current.getBoundingClientRect();
     setCoords({
       top: rect.bottom + 8,
-      left: Math.max(12, rect.left),
+      left: Math.max(12, Math.min(direction === "rtl" ? rect.right - 240 : rect.left, window.innerWidth - 240)),
     });
   };
 
@@ -120,11 +122,11 @@ export default function UserRoleSelector({
 
     try {
       await api.patch(`/admin/users/${userId}`, { role: newRole });
-      toast.success(`Clearance updated to ${newRole}`);
+      toast.success(t("usersRoleUpdatedToast"));
       router.refresh();
     } catch (error: any) {
       console.error("Role update failed:", error);
-      toast.error(error.response?.data?.message || "Failed to update role");
+      toast.error(error.response?.data?.message || t("usersRoleFailedToast"));
       setRole(prevRole);
     } finally {
       setLoading(false);
@@ -132,6 +134,12 @@ export default function UserRoleSelector({
   };
 
   const currentConfig = ROLE_CONFIG[role] || ROLE_CONFIG.USER;
+  const translatedRole =
+    role === "ADMIN"
+      ? t("usersRoleAdmin")
+      : role === "MANAGER"
+        ? t("usersRoleManager")
+        : t("usersRoleMember");
   const CurrentIcon = currentConfig.icon;
 
   return (
@@ -149,7 +157,7 @@ export default function UserRoleSelector({
         ) : (
           <CurrentIcon size={13} />
         )}
-        <span>{role}</span>
+        <span>{translatedRole}</span>
         <ChevronDown
           size={12}
           className={`transition-transform duration-300 ${
@@ -164,6 +172,7 @@ export default function UserRoleSelector({
         createPortal(
           <div
             ref={menuRef}
+            dir={direction}
             style={{
               position: "fixed",
               top: coords.top,
@@ -175,7 +184,7 @@ export default function UserRoleSelector({
             <div className="mb-1 flex items-center gap-1 border-b border-border-subtle px-3 py-1.5">
               <Sparkles size={11} className="text-primary" />
               <span className="text-[9px] font-black uppercase tracking-wider text-muted">
-                Access Level
+                {t("adminUserRole")}
               </span>
             </div>
 
@@ -189,7 +198,7 @@ export default function UserRoleSelector({
                   key={r}
                   type="button"
                   onClick={() => handleUpdateRole(r)}
-                  className={`group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-left text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-start text-[10px] font-black uppercase tracking-widest transition-all ${
                     isSelected
                       ? "bg-action text-on-action shadow-2xs"
                       : "hover:bg-surface-subtle text-secondary"
@@ -197,7 +206,13 @@ export default function UserRoleSelector({
                 >
                   <span className="flex items-center gap-2.5">
                     <Icon size={13} className="opacity-80" />
-                    <span>{item.label}</span>
+                    <span>
+                      {r === "ADMIN"
+                        ? t("usersRoleAdmin")
+                        : r === "MANAGER"
+                          ? t("usersRoleManager")
+                          : t("usersRoleMember")}
+                    </span>
                   </span>
 
                   {isSelected && <Check size={12} strokeWidth={3} />}

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import type { FilterTab } from "./NotificationDropdown";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type NotificationHeaderProps = {
   unreadCount: number;
@@ -36,6 +37,7 @@ export default function NotificationHeader({
   onMarkAllAsRead,
   onClose,
 }: NotificationHeaderProps) {
+  const { locale, t } = useLocale();
   const [searchOpen, setSearchOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
   const reduceMotion = useReducedMotion();
@@ -70,9 +72,9 @@ export default function NotificationHeader({
     totalCount > 0 ? Math.round((readCount / totalCount) * 100) : 100;
 
   const tabs: { id: FilterTab; label: string; count?: number }[] = [
-    { id: "all", label: "All", count: totalCount },
-    { id: "unread", label: "Unread", count: unreadCount },
-    { id: "orders", label: "Orders" },
+    { id: "all", label: t("notifTabAll"), count: totalCount },
+    { id: "unread", label: t("notifTabUnread"), count: unreadCount },
+    { id: "orders", label: t("notifTabOrders") },
   ];
 
   return (
@@ -104,13 +106,13 @@ export default function NotificationHeader({
 
           <div className="min-w-0">
             <h3 className="truncate text-xs font-extrabold tracking-wide text-neutral-900 dark:text-neutral-100 sm:text-sm">
-              Notifications
+              {t("notifTitle")}
             </h3>
 
             <p className="mt-0.5 text-[10px] text-neutral-500 dark:text-neutral-400">
               {unreadCount > 0
-                ? `${unreadCount} unread`
-                : "You’re all caught up"}
+                ? `${new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-US").format(unreadCount)} ${t("notifUnreadLabel")}`
+                : t("notifCaughtUp")}
             </p>
           </div>
         </div>
@@ -119,7 +121,7 @@ export default function NotificationHeader({
           {onSearchChange && (
             <button
               type="button"
-              aria-label={searchOpen ? "Close search" : "Search notifications"}
+              aria-label={searchOpen ? t("navCloseSearch") : t("notifSearchAction")}
               aria-expanded={searchOpen}
               onClick={toggleSearch}
               className={`
@@ -143,8 +145,8 @@ export default function NotificationHeader({
             type="button"
             aria-label={
               soundEnabled
-                ? "Mute notification sound"
-                : "Enable notification sound"
+                ? t("notifMuteSound")
+                : t("notifEnableSound")
             }
             aria-pressed={soundEnabled}
             onClick={toggleSound}
@@ -189,7 +191,7 @@ export default function NotificationHeader({
               "
             >
               <CheckCheck size={13} />
-              <span className="hidden sm:inline">Read all</span>
+              <span className="hidden sm:inline">{t("notifReadAll")}</span>
             </button>
           )}
 
@@ -197,7 +199,7 @@ export default function NotificationHeader({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Close notifications"
+              aria-label={t("notifClose")}
               className="
                 flex h-8 w-8 cursor-pointer items-center justify-center
                 rounded-xl border border-neutral-200 bg-neutral-50
@@ -230,7 +232,7 @@ export default function NotificationHeader({
               <Search
                 size={14}
                 aria-hidden="true"
-                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400"
+                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-neutral-400"
               />
 
               <input
@@ -238,11 +240,11 @@ export default function NotificationHeader({
                 autoFocus
                 value={searchQuery}
                 onChange={(event) => onSearchChange(event.target.value)}
-                placeholder="Search title, message or order…"
-                aria-label="Search notifications"
+                placeholder={t("notifSearchPlaceholder")}
+                aria-label={t("notifSearchAction")}
                 className="
                   min-h-10 w-full rounded-xl border
-                  border-neutral-200 bg-neutral-50 py-2 pl-9 pr-9
+                  border-neutral-200 bg-neutral-50 py-2 ps-9 pe-9
                   text-xs text-neutral-900 placeholder:text-neutral-400
                   outline-none transition-colors
                   focus:border-neutral-400 focus:bg-white
@@ -255,9 +257,9 @@ export default function NotificationHeader({
               {searchQuery && (
                 <button
                   type="button"
-                  aria-label="Clear search"
+                  aria-label={t("notifClearSearch")}
                   onClick={() => onSearchChange("")}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-white"
+                  className="absolute end-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-white"
                 >
                   <X size={13} />
                 </button>
@@ -271,7 +273,7 @@ export default function NotificationHeader({
       {onTabChange && (
         <div
           role="tablist"
-          aria-label="Filter notifications"
+          aria-label={t("notifTitle")}
           className="relative z-10 mt-3.5 flex items-center gap-1 rounded-xl border border-neutral-200 bg-neutral-100/80 p-1 dark:border-neutral-700 dark:bg-neutral-800"
         >
           {tabs.map((tab) => {
@@ -338,7 +340,7 @@ export default function NotificationHeader({
       <div className="relative z-10 mt-3 flex items-center gap-2">
         <div
           role="progressbar"
-          aria-label="Read notifications"
+          aria-label={t("notifReadProgress").replace("{percent}", String(readPercentage))}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={readPercentage}
@@ -353,7 +355,7 @@ export default function NotificationHeader({
         </div>
 
         <span className="font-mono text-[9px] font-medium text-neutral-500 dark:text-neutral-400">
-          {readPercentage}% read
+          {t("notifReadProgress").replace("{percent}", String(readPercentage))}
         </span>
       </div>
     </header>

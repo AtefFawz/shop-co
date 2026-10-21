@@ -21,10 +21,13 @@ import { CartOrderSummary } from "@/features/cart/components/CartOrderSummary";
 import { EmptyCartState } from "@/features/cart/components/EmptyCartState";
 import { CartLineItem } from "@/features/cart/components/CartLineItem";
 import { PromoCodeForm } from "@/features/cart/components/PromoCodeForm";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 const FREE_SHIPPING_THRESHOLD = 200;
 
 export const ShoppingCartView = () => {
+  const { t, locale } = useLocale();
   const Stack = useProduct((e) => e.stack);
   const clearCart = useProduct((e: any) => e.clearCart);
 
@@ -56,7 +59,7 @@ export const ShoppingCartView = () => {
   const handleClearBag = () => {
     if (clearCart) {
       clearCart();
-      toast.error("Atelier bag cleared");
+      toast.error(t("clearBag"));
     }
   };
 
@@ -83,7 +86,7 @@ export const ShoppingCartView = () => {
                   size={12}
                   className="transition-transform group-hover:-translate-x-0.5"
                 />
-                <span>Continue Shopping</span>
+                <span>{t("continueShopping")}</span>
               </Link>
 
               <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
@@ -94,16 +97,15 @@ export const ShoppingCartView = () => {
 
             <div className="flex flex-wrap items-baseline gap-3 pt-1">
               <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-                Your Shopping Bag
+                {t("yourBag")}
               </h1>
               <span className="rounded-full bg-surface-subtle px-3 py-0.5 font-mono text-xs font-black text-secondary">
-                {Stack.length} SKU{Stack.length !== 1 ? "s" : ""} · {totalUnits}{" "}
-                Unit{totalUnits !== 1 ? "s" : ""}
+                {Stack.length} {t("products")} · {totalUnits} {t("units")}
               </span>
             </div>
           </div>
 
-          {/* Right Controls: Clear Bag */}
+          {/* Clear saved cart lines */}
           {clearCart && (
             <button
               type="button"
@@ -111,7 +113,7 @@ export const ShoppingCartView = () => {
               className="inline-flex w-fit cursor-pointer items-center gap-1.5 self-end rounded-2xl border border-danger-border bg-danger-soft/60 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-danger transition-all hover:border-danger-border hover:bg-danger hover:text-on-danger lg:self-auto"
             >
               <Trash2 size={13} />
-              <span>Clear Bag</span>
+              <span>{t("clearBag")}</span>
             </button>
           )}
         </header>
@@ -138,21 +140,13 @@ export const ShoppingCartView = () => {
 
               {unlockedFreeShipping ? (
                 <p className="font-bold tracking-wide text-on-action">
-                  Complimentary{" "}
-                  <span className="font-black text-success">
-                    VIP Express Shipping
-                  </span>{" "}
-                  unlocked for your order!
+                  {t("freeShipping")}
                 </p>
               ) : (
                 <p className="font-medium text-on-action/85">
-                  Add{" "}
+                  {t("freeShippingFrom")} {" "}
                   <strong className="font-mono font-black text-rating">
-                    ${amountRemaining.toFixed(2)}
-                  </strong>{" "}
-                  more to unlock{" "}
-                  <strong className="font-black text-on-action">
-                    Free Express Dispatch
+                    {formatCurrency(amountRemaining, locale)}
                   </strong>
                 </p>
               )}
@@ -199,7 +193,7 @@ export const ShoppingCartView = () => {
             {/* Buyer Guarantee Footer */}
             <div className="flex items-center justify-center gap-2 border-t border-border-subtle bg-surface-subtle px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted">
               <ShieldCheck size={14} className="text-success" />
-              <span>Authenticated &amp; Insured Checkout</span>
+              <span>{t("securedCheckout")}</span>
             </div>
           </aside>
         </div>

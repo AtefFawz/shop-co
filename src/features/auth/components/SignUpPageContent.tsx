@@ -13,8 +13,12 @@ import {
 } from "lucide-react";
 import Signup from "@/assets/shop/signup.png";
 import { SignUpForm } from "@/features/auth/components/SignUpForm";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
+import ThemeToggle from "@/shared/theme/ThemeToggle";
 
 export default function SignUpPageContent() {
+  const { t, direction } = useLocale();
   const stageRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
@@ -35,7 +39,7 @@ export default function SignUpPageContent() {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full overflow-hidden bg-surface-subtle text-primary selection:bg-action selection:text-on-action">
+    <div dir={direction} className="relative flex min-h-screen w-full overflow-hidden bg-surface-subtle text-primary selection:bg-action selection:text-on-action">
       {/* ================================================================== */}
       {/* LEFT — 3D VIP CLUB SHOWCASE STAGE (DESKTOP ONLY)                   */}
       {/* ================================================================== */}
@@ -70,11 +74,11 @@ export default function SignUpPageContent() {
               size={13}
               className="transition-transform duration-300 group-hover:-translate-x-1"
             />
-            <span>Back to Flagship</span>
+            <span>{t("authBackToFlagship")}</span>
           </Link>
 
           <span className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-on-action/80 backdrop-blur-md">
-            VIP CLUB // 2026
+            {t("authArchive2026")}
           </span>
         </div>
 
@@ -98,31 +102,31 @@ export default function SignUpPageContent() {
               </div>
 
               <span className="inline-flex items-center gap-1 rounded-full bg-warning-soft px-2.5 py-1 font-mono text-[9px] font-black uppercase tracking-widest text-warning">
-                <Crown size={11} /> Founder Tier
+                <Crown size={11} /> {t("authFounderTier")}
               </span>
             </div>
 
             <div className="my-6 space-y-1">
               <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-on-action/50">
-                Member Privileges Unlocked
+                {t("authMemberPrivileges")}
               </p>
               <p className="text-2xl font-black uppercase tracking-tight text-on-action">
-                All-Access Atelier Pass
+                {t("authAtelierPass")}
               </p>
             </div>
 
             <div className="space-y-2 border-t border-white/15 pt-4 text-xs font-semibold text-on-action/85">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-success-bright" />
-                <span>Early access to limited season drops</span>
+                <span>{t("authEarlyAccess")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-success-bright" />
-                <span>Complimentary priority express dispatch</span>
+                <span>{t("authPriorityDispatch")}</span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={14} className="text-success-bright" />
-                <span>Private member-only archive pricing</span>
+                <span>{t("authArchivePricing")}</span>
               </div>
             </div>
           </div>
@@ -131,13 +135,12 @@ export default function SignUpPageContent() {
         {/* 3. Bottom Editorial Headline */}
         <div className="relative z-20 space-y-2">
           <h2 className="text-4xl font-black uppercase leading-[0.92] tracking-[-0.05em] text-on-action lg:text-5xl">
-            Join The
+            {t("authJoinHeadline")}
             <br />
-            <span className="text-on-action/50">Atelier Club.</span>
+            <span className="text-on-action/50">{t("authAtelierClub")}</span>
           </h2>
           <p className="max-w-sm text-xs font-medium leading-relaxed text-on-action/65">
-            Join 30,000+ style enthusiasts curating their wardrobe from over 200
-            international luxury houses.
+            {t("authWelcomeMembers")}
           </p>
         </div>
       </div>
@@ -153,11 +156,16 @@ export default function SignUpPageContent() {
             className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary shadow-2xs"
           >
             <ArrowLeft size={13} />
-            <span>Store</span>
+            <span>{t("catalogFlagship")}</span>
           </Link>
           <span className="text-xs font-black tracking-[-0.04em] text-primary">
             SHOP.CO™
           </span>
+        </div>
+
+        <div className="mx-auto mb-4 flex w-full max-w-[450px] items-center justify-end gap-2" aria-label={t("authLanguageAndTheme")}>
+          <LocaleSwitcher compact />
+          <ThemeToggle compact />
         </div>
 
         {/* Form Card Container */}
@@ -167,15 +175,15 @@ export default function SignUpPageContent() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
               <Sparkles size={11} className="text-primary" />
               <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-                VIP ONBOARDING · FREE MEMBERSHIP
+                {t("authOnboarding")}
               </span>
             </div>
 
             <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-              Create Account
+              {t("authCreateAccountHeading")}
             </h1>
             <p className="text-xs font-medium text-muted">
-              Complete your profile below to mint your personal SHOP.CO pass.
+              {t("authProfileHint")}
             </p>
           </div>
 
@@ -189,13 +197,13 @@ export default function SignUpPageContent() {
             </div>
             <div className="relative flex justify-center">
               <span className="bg-surface px-4 text-[9px] font-black uppercase tracking-[0.22em] text-muted">
-                Or Instant Registration With
+                {t("authRegistrationDivider")}
               </span>
             </div>
           </div>
 
           {/* Social OAuth Buttons */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <SocialButton label="Google" onClick={handleGoogleLogin}>
               <svg
                 width="16"
@@ -221,29 +229,17 @@ export default function SignUpPageContent() {
                 />
               </svg>
             </SocialButton>
-
-            <SocialButton label="Apple" onClick={handleGoogleLogin}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-              >
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-              </svg>
-            </SocialButton>
           </div>
 
           {/* Switch to Sign In */}
           <div className="mt-6 border-t border-border-subtle pt-4 text-center">
             <p className="text-xs font-medium text-muted">
-              Already a registered member?{" "}
+              {t("authExistingMember")}{" "}
               <Link
                 href="/auth/signin"
                 className="inline-flex items-center gap-1 font-black uppercase tracking-wider text-primary underline decoration-border-strong underline-offset-4 transition-colors hover:decoration-primary"
               >
-                <span>Log In</span>
+                <span>{t("authLoginLink")}</span>
                 <ArrowUpRight size={13} />
               </Link>
             </p>

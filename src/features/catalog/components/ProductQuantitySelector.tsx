@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Minus, Plus } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function ProductQuantitySelector({
   quantity,
@@ -9,17 +10,18 @@ export default function ProductQuantitySelector({
   logicQuantity,
   maxStock = 99,
 }: any) {
+  const { t, direction } = useLocale();
   const isMin = quantity <= 1;
   const isMax = Boolean(logicQuantity) || quantity >= maxStock;
 
   return (
-    <article className="h-full w-full">
+    <article dir={direction} className="h-full w-full">
       <div className="flex h-full min-h-[50px] w-full items-center justify-between rounded-full border border-border/90 bg-surface-subtle px-2 py-1.5 shadow-inner">
         <button
           type="button"
           disabled={isMin}
           onClick={() => setQuantity(Math.max(1, quantity - 1))}
-          aria-label="Decrease quantity"
+          aria-label={t("productQuantityDecrease")}
           className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface text-primary shadow-2xs transition-all duration-200 active:scale-90 ${
             isMin
               ? "cursor-not-allowed opacity-35"
@@ -37,7 +39,7 @@ export default function ProductQuantitySelector({
           type="button"
           disabled={isMax}
           onClick={() => setQuantity(quantity + 1)}
-          aria-label="Increase quantity"
+          aria-label={t("productQuantityIncrease")}
           className={`flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-surface text-primary shadow-2xs transition-all duration-200 active:scale-90 ${
             isMax
               ? "cursor-not-allowed opacity-30"

@@ -16,6 +16,7 @@ import {
   ArrowUpRight,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface UsersTableProps {
   users: User[];
@@ -27,6 +28,7 @@ export default function AdminUsersTable({
   viewMode = "table",
 }: UsersTableProps) {
   const router = useRouter();
+  const { t, locale, direction } = useLocale();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [brokenAvatars, setBrokenAvatars] = useState<Record<string, boolean>>(
     {},
@@ -45,7 +47,7 @@ export default function AdminUsersTable({
     e.stopPropagation();
     navigator.clipboard?.writeText(text);
     setCopiedKey(key);
-    toast.success(`${label} copied to clipboard`);
+    toast.success(`${label}: ${t("usersCopied")}`);
     setTimeout(() => setCopiedKey(null), 1800);
   };
 
@@ -63,7 +65,7 @@ export default function AdminUsersTable({
     const r = (rawRole || "USER").toUpperCase();
     if (r === "ADMIN") {
       return {
-        label: "ADMIN",
+        label: t("usersRoleAdmin"),
         icon: Crown,
         className:
           "border-border-strong bg-action text-on-action shadow-[0_6px_16px_-4px_rgba(var(--shadow-rgb),0.4)]",
@@ -72,14 +74,14 @@ export default function AdminUsersTable({
     }
     if (r === "MANAGER" || r === "MANGER") {
       return {
-        label: "MANAGER",
+        label: t("usersRoleManager"),
         icon: Shield,
         className: "border-info-border bg-info-soft text-info",
         dotClass: "bg-info",
       };
     }
     return {
-      label: "MEMBER",
+      label: t("usersRoleMember"),
       icon: UserCheck,
       className: "border-border/80 bg-surface-subtle text-secondary",
       dotClass: "bg-surface-hover",
@@ -93,6 +95,7 @@ export default function AdminUsersTable({
     return (
       <div
         style={{ perspective: "1200px" }}
+        dir={direction}
         className="hidden grid-cols-1 gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       >
         {users.map((user: any) => {
@@ -141,7 +144,7 @@ export default function AdminUsersTable({
                   {hasAvatar ? (
                     <img
                       src={user.avatar}
-                      alt={user.fullName || "User"}
+                      alt={user.fullName || t("usersUnnamed")}
                       onError={() =>
                         setBrokenAvatars((prev) => ({
                           ...prev,
@@ -162,13 +165,13 @@ export default function AdminUsersTable({
                 </div>
 
                 <h3 className="max-w-full truncate text-sm font-black uppercase tracking-tight text-primary">
-                  {user.fullName || "Unnamed User"}
+                  {user.fullName || t("usersUnnamed")}
                 </h3>
 
                 <button
                   type="button"
                   onClick={(e) =>
-                    handleCopy(e, user.email || "", "Email", `mail-${user._id}`)
+                    handleCopy(e, user.email || "", t("usersCopyEmail"), `mail-${user._id}`)
                   }
                   className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-[11px] font-medium text-muted hover:text-primary"
                 >
@@ -184,7 +187,7 @@ export default function AdminUsersTable({
                 <span className="inline-flex items-center gap-1">
                   <Calendar size={11} />
                   {user.createdAt
-                    ? new Date(user.createdAt).toLocaleDateString("en-GB", {
+                    ? new Date(user.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
                         day: "2-digit",
                         month: "short",
                         year: "numeric",
@@ -193,7 +196,7 @@ export default function AdminUsersTable({
                 </span>
 
                 <span className="inline-flex items-center gap-1 font-black uppercase tracking-wider text-primary group-hover:underline">
-                  Inspect
+                  {t("usersInspect")}
                   <ArrowUpRight
                     size={12}
                     className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -211,16 +214,16 @@ export default function AdminUsersTable({
   /* MODE A: EDITORIAL DIRECTORY TABLE (DEFAULT DESKTOP VIEW)               */
   /* ====================================================================== */
   return (
-    <div className="hidden w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] md:block">
+    <div dir={direction} className="hidden w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] md:block">
       <div className="w-full overflow-x-auto">
-        <table className="w-full border-collapse text-left">
+        <table className="w-full border-collapse text-start">
           <thead>
             <tr className="border-b border-border-subtle bg-surface-subtle/70 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-              <th className="py-4 px-5">Account ID</th>
-              <th className="py-4 px-4">Member Profile</th>
-              <th className="py-4 px-4">Access Clearance</th>
-              <th className="py-4 px-4">Onboarding Date</th>
-              <th className="py-4 px-5 text-right">Dossier</th>
+              <th className="py-4 px-5">{t("usersAccountId")}</th>
+              <th className="py-4 px-4">{t("usersProfile")}</th>
+              <th className="py-4 px-4">{t("adminUserRole")}</th>
+              <th className="py-4 px-4">{t("usersJoinedDate")}</th>
+              <th className="py-4 px-5 text-end">{t("usersProfile")}</th>
             </tr>
           </thead>
 
@@ -245,11 +248,11 @@ export default function AdminUsersTable({
                         handleCopy(
                           e,
                           user._id,
-                          `User ID #${shortId}`,
+                          `${t("usersCopyId")} #${shortId}`,
                           `id-${user._id}`,
                         )
                       }
-                      title="Click to copy full User ID"
+                      title={t("usersCopyId")}
                       className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border/80 bg-surface-muted px-2.5 py-1 font-mono text-xs font-black text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
                     >
                       <span>#{shortId}</span>
@@ -268,7 +271,7 @@ export default function AdminUsersTable({
                         {hasAvatar ? (
                           <img
                             src={user.avatar}
-                            alt={user.fullName || "User"}
+                            alt={user.fullName || t("usersUnnamed")}
                             onError={() =>
                               setBrokenAvatars((prev) => ({
                                 ...prev,
@@ -289,7 +292,7 @@ export default function AdminUsersTable({
 
                       <div className="min-w-0 max-w-[220px] xl:max-w-[280px]">
                         <p className="truncate text-xs font-black text-primary sm:text-sm">
-                          {user.fullName || "Unnamed User"}
+                          {user.fullName || t("usersUnnamed")}
                         </p>
 
                         <button
@@ -298,11 +301,11 @@ export default function AdminUsersTable({
                             handleCopy(
                               e,
                               user.email || "",
-                              "Email address",
+                              t("usersCopyEmail"),
                               `mail-${user._id}`,
                             )
                           }
-                          title="Click to copy email"
+                          title={t("usersCopyEmail")}
                           className="mt-0.5 inline-flex max-w-full cursor-pointer items-center gap-1.5 truncate text-[11px] font-medium text-muted transition-colors hover:text-primary"
                         >
                           <Mail size={10} className="shrink-0" />
@@ -333,7 +336,7 @@ export default function AdminUsersTable({
                     <span className="inline-flex items-center gap-1.5 text-xs font-bold text-secondary">
                       <Calendar size={12} className="text-muted" />
                       {user.createdAt
-                        ? new Date(user.createdAt).toLocaleDateString("en-GB", {
+                        ? new Date(user.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
                             day: "2-digit",
                             month: "short",
                             year: "numeric",
@@ -343,9 +346,9 @@ export default function AdminUsersTable({
                   </td>
 
                   {/* 5. Action Indicator */}
-                  <td className="py-4 px-5 text-right align-middle">
+                  <td className="py-4 px-5 text-end align-middle">
                     <span className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary shadow-2xs transition-all duration-200 group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action">
-                      <span>Profile</span>
+                      <span>{t("usersProfile")}</span>
                       <ChevronRight
                         size={13}
                         className="transition-transform duration-200 group-hover:translate-x-0.5"

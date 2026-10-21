@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useMemo } from "react";
+import React, { useState, useRef, useMemo, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -40,41 +40,44 @@ import OverviewContent from "@/features/account/components/AccountOverviewPanel"
 import { MobileAdminNavigation } from "@/shared/components/navigation/MobileAdminNavigation";
 import { AdminDesktopSidebar } from "@/shared/components/navigation/AdminDesktopSidebar";
 import useData from "@/hooks/getData";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
+import ThemeToggle from "@/shared/theme/ThemeToggle";
+import toast from "react-hot-toast";
 
 const NAV = [
-  { id: "overview", label: "Home", icon: Activity },
-  { id: "orders", label: "Orders", icon: Package },
-  { id: "reviews", label: "Reviews", icon: Star },
-  { id: "settings", label: "Settings", icon: Settings },
-];
+  { id: "overview", labelKey: "accountNavHome", icon: Activity },
+  { id: "orders", labelKey: "accountNavOrders", icon: Package },
+  { id: "reviews", labelKey: "accountNavReviews", icon: Star },
+  { id: "settings", labelKey: "accountNavSettings", icon: Settings },
+] as const;
 
-const TAB_META: Record<
-  string,
-  { title: string; badge: string; description: string }
-> = {
+const TAB_META = {
   overview: {
-    title: "Executive Overview",
-    badge: "Live Telemetry",
-    description: "Real-time summary of your orders, spending, and activity.",
+    titleKey: "accountExecutiveOverview",
+    badgeKey: "accountLiveTelemetry",
+    descriptionKey: "accountSummaryDescription",
   },
   orders: {
-    title: "Order Archive",
-    badge: "Purchases",
-    description: "Track shipments, inspect invoices, and rate delivered items.",
+    titleKey: "accountOrderArchive",
+    badgeKey: "accountPurchases",
+    descriptionKey: "accountOrdersDescription",
   },
   reviews: {
-    title: "Product Reviews",
-    badge: "Feedback",
-    description: "Manage your published ratings and community contributions.",
+    titleKey: "accountProductReviews",
+    badgeKey: "accountFeedback",
+    descriptionKey: "accountReviewDescription",
   },
   settings: {
-    title: "Atelier Preferences",
-    badge: "Configuration",
-    description: "Manage your personal identity, notifications, and security.",
+    titleKey: "accountPreferencesTitle",
+    badgeKey: "accountConfiguration",
+    descriptionKey: "accountPreferencesDescription",
   },
-};
+} as const;
 
 export function AccountProfileClient() {
+  const { locale, t, direction } = useLocale();
   // ── 1. ALL HOOKS MUST BE CALLED UNCONDITIONALLY AT THE TOP ──
   const {
     data: userData,
@@ -98,6 +101,34 @@ export function AccountProfileClient() {
     dropAlerts: true,
     privateProfile: false,
   });
+  const [prefsLoaded, setPrefsLoaded] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem("shopco-profile-prefs");
+      if (saved) {
+        const parsed = JSON.parse(saved) as Partial<typeof prefs>;
+        setPrefs((current) => ({
+          orderSms: typeof parsed.orderSms === "boolean" ? parsed.orderSms : current.orderSms,
+          dropAlerts: typeof parsed.dropAlerts === "boolean" ? parsed.dropAlerts : current.dropAlerts,
+          privateProfile: typeof parsed.privateProfile === "boolean" ? parsed.privateProfile : current.privateProfile,
+        }));
+      }
+    } catch {
+      // Ignore malformed or unavailable browser storage; retain safe defaults.
+    } finally {
+      setPrefsLoaded(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!prefsLoaded) return;
+    try {
+      window.localStorage.setItem("shopco-profile-prefs", JSON.stringify(prefs));
+    } catch {
+      // Preferences remain interactive for the current session if storage is unavailable.
+    }
+  }, [prefs, prefsLoaded]);
 
   const [heroTilt, setHeroTilt] = useState({ x: 0, y: 0 });
 
@@ -154,7 +185,7 @@ export function AccountProfileClient() {
           <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/25 border-t-white" />
         </div>
         <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-muted">
-          Initializing Atelier Portal...
+          {t("accountInitializingPortal")}
         </p>
       </div>
     );
@@ -163,7 +194,7 @@ export function AccountProfileClient() {
   // ── 4. DERIVED USER & TELEMETRY DATA ──
   const user = userData?.data?.user || userData?.user || {};
   const {
-    fullName = "User",
+    fullName = t("accountDefaultUser"),
     email = userData?.data?.email || "",
     avatar = "",
     role = "USER",
@@ -200,14 +231,20 @@ export function AccountProfileClient() {
     Math.max(18, totalOrdersCount * 15 + totalReviewsCount * 10),
   );
 
-  const checkRole = role === "ADMIN" || role === "MANAGER";
+  const normalizedRole = String(role || "USER").toUpperCase();
+  const checkRole = normalizedRole === "ADMIN" || normalizedRole === "MANAGER";
+  const roleLabel = normalizedRole === "ADMIN"
+    ? t("accountRoleAdmin")
+    : normalizedRole === "MANAGER"
+      ? t("accountRoleManager")
+      : t("accountRoleCustomer");
   const membershipTier = checkRole
-    ? "Executive Admin"
+    ? t("accountExecutiveAdminTier")
     : totalOrdersCount >= 5
-      ? "Black VIP Member"
+      ? t("accountBlackVipTier")
       : totalOrdersCount >= 1
-        ? "Plus Member"
-        : "Verified Member";
+        ? t("accountPlusTier")
+        : t("accountVerifiedTier");
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -217,17 +254,28 @@ export function AccountProfileClient() {
     setTimeout(() => setIsRefreshing(false), 450);
   };
 
-  const handleCopyEmail = () => {
+  const handleCopyEmail = async () => {
     if (!email) return;
-    navigator.clipboard.writeText(email);
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
+    if (!navigator.clipboard?.writeText) {
+      toast.error(t("accountCopyFailed"));
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(email);
+      setCopiedEmail(true);
+      toast.success(t("accountEmailCopied"));
+      window.setTimeout(() => setCopiedEmail(false), 2000);
+    } catch {
+      toast.error(t("accountCopyFailed"));
+    }
   };
 
   const NAV_LINKS = checkRole
     ? [
         ...NAV.map((item) => ({
-          ...item,
+          id: item.id,
+          label: t(item.labelKey),
+          icon: item.icon,
           badge:
             item.id === "orders"
               ? totalOrdersCount || undefined
@@ -235,10 +283,12 @@ export function AccountProfileClient() {
                 ? totalReviewsCount || undefined
                 : undefined,
         })),
-        { id: "dashboard", label: "Dashboard", icon: UserCog },
+        { id: "dashboard", label: t("accountNavDashboard"), icon: UserCog },
       ]
     : NAV.map((item) => ({
-        ...item,
+        id: item.id,
+        label: t(item.labelKey),
+        icon: item.icon,
         badge:
           item.id === "orders"
             ? totalOrdersCount || undefined
@@ -256,13 +306,13 @@ export function AccountProfileClient() {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const currentMeta = TAB_META[active] || TAB_META.overview;
+  const currentMeta = TAB_META[active as keyof typeof TAB_META] || TAB_META.overview;
 
   return (
-    <div className="fixed inset-0 z-40 flex h-screen w-full overflow-hidden bg-surface-subtle text-primary antialiased selection:bg-action selection:text-on-action">
+    <div dir={direction} className="fixed inset-0 z-40 flex h-screen h-dvh w-full overflow-hidden bg-surface-subtle text-primary antialiased selection:bg-action selection:text-on-action">
       {/* ── 1. MOBILE ONLY: Bottom Floating Navigation ── */}
-      <div className="fixed bottom-4 left-1/2 z-50 block w-[94%] max-w-md -translate-x-1/2 lg:hidden">
-        <MobileAdminNavigation arrayOfData={NAV_LINKS} active={active} goTo={goTo} />
+      <div className={`fixed bottom-4 start-1/2 z-50 block w-[94%] max-w-md lg:hidden ${direction === "rtl" ? "translate-x-1/2" : "-translate-x-1/2"}`}>
+        <MobileAdminNavigation arrayOfData={NAV_LINKS} active={active} goTo={goTo} showAppearanceControls />
       </div>
 
       {/* ── 2. DESKTOP SIDEBAR ── */}
@@ -270,7 +320,7 @@ export function AccountProfileClient() {
         active={active}
         arrayOfData={NAV_LINKS}
         goTo={goTo}
-        navTitle="Client Workspace"
+        navTitle={t("uiWorkspaceTitle")}
         headerContent={
           <div className="flex items-center gap-3 py-0.5">
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-action font-mono text-xs font-black text-on-action shadow-sm ring-2 ring-focus/25">
@@ -286,7 +336,7 @@ export function AccountProfileClient() {
                 <span>{initials || "U"}</span>
               )}
             </div>
-            <div className="min-w-0 text-left">
+            <div className="min-w-0 text-start">
               <div className="flex items-center gap-1.5">
                 <p className="truncate text-xs font-black uppercase tracking-tight text-primary">
                   {fullName}
@@ -300,15 +350,43 @@ export function AccountProfileClient() {
           </div>
         }
         extraFooterLinks={
-          <Link
-            href="/"
-            className="group flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-2 text-xs font-black uppercase tracking-wider text-muted transition-all hover:bg-surface-muted hover:text-primary"
-          >
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-secondary transition-colors group-hover:bg-action group-hover:text-on-action">
-              <Store size={15} />
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
+              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+                {t("uiLanguagePreference")}
+              </span>
+              <LocaleSwitcher compact />
             </div>
-            <span>Back to Store</span>
-          </Link>
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
+              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+                {t("uiThemePreference")}
+              </span>
+              <ThemeToggle compact />
+            </div>
+            <Link
+              href="/"
+              className="group flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-2 text-xs font-black uppercase tracking-wider text-muted transition-all hover:bg-surface-muted hover:text-primary"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-secondary transition-colors group-hover:bg-action group-hover:text-on-action">
+                <Store size={15} />
+              </div>
+              <span>{t("backToStorefront")}</span>
+            </Link>
+          </div>
+        }
+        collapsedFooterLinks={
+          <div className="flex flex-col items-center gap-2">
+            <LocaleSwitcher compact className="h-10 w-10 px-0 [&>span]:hidden" />
+            <ThemeToggle compact className="h-10 w-10" />
+            <Link
+              href="/"
+              aria-label={t("backToStorefront")}
+              title={t("backToStorefront")}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-muted hover:text-primary"
+            >
+              <Store size={16} aria-hidden="true" />
+            </Link>
+          </div>
         }
       />
 
@@ -333,16 +411,16 @@ export function AccountProfileClient() {
               <span className="text-subtle lg:hidden">/</span>
 
               <div className="hidden items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-muted lg:flex">
-                <span>Portal</span>
+                <span>{t("navProfile")}</span>
                 <ChevronRight size={12} className="text-subtle" />
               </div>
 
               <div className="flex min-w-0 items-center gap-2.5">
                 <h2 className="truncate text-xs font-black uppercase tracking-[0.08em] text-primary sm:text-sm">
-                  {currentMeta.title}
+                  {t(currentMeta.titleKey)}
                 </h2>
                 <span className="hidden rounded-md border border-border bg-surface-muted px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider text-secondary sm:inline-block">
-                  {currentMeta.badge}
+                  {t(currentMeta.badgeKey)}
                 </span>
               </div>
             </div>
@@ -383,7 +461,7 @@ export function AccountProfileClient() {
                     )}
                     <span className="relative z-10 flex items-center gap-1.5">
                       <TabIcon size={12} />
-                      <span>{tab.label}</span>
+                      <span>{t(tab.labelKey)}</span>
                       {count !== null && count > 0 && (
                         <span
                           className={`rounded-full px-1.5 py-0.2 font-mono text-[9px] ${
@@ -406,7 +484,7 @@ export function AccountProfileClient() {
               <button
                 type="button"
                 onClick={handleRefresh}
-                title="Sync Account Data"
+                title={t("accountRefreshTooltip")}
                 className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl border border-border bg-surface text-secondary transition hover:border-border-strong hover:text-primary active:scale-95"
               >
                 <RefreshCw
@@ -420,7 +498,7 @@ export function AccountProfileClient() {
                 className="hidden h-9 items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 text-[10.5px] font-black uppercase tracking-[0.12em] text-primary transition hover:border-border-strong hover:bg-surface-subtle sm:inline-flex"
               >
                 <Store size={13} />
-                <span>Showroom</span>
+                <span>{t("accountShowroom")}</span>
                 <ArrowUpRight size={12} className="text-muted" />
               </Link>
 
@@ -430,7 +508,7 @@ export function AccountProfileClient() {
                 className="flex h-9 cursor-pointer items-center gap-1.5 rounded-xl bg-action px-3.5 text-[10.5px] font-black uppercase tracking-[0.12em] text-on-action shadow-xs transition hover:bg-action-hover active:scale-95 sm:px-4"
               >
                 <Edit3 size={12} />
-                <span>Edit Profile</span>
+                <span>{t("uiEditProfileAction")}</span>
               </button>
             </div>
           </header>
@@ -438,7 +516,7 @@ export function AccountProfileClient() {
           {/* ── Scrollable Main Canvas ── */}
           <main
             ref={mainScrollRef}
-            className="relative z-10 flex-1  overflow-y-auto Responsive py-5"
+            className="relative z-10 flex-1 overflow-y-auto Responsive py-5 pb-28 lg:pb-5"
           >
             <div className=" space-y-6">
               <div
@@ -493,14 +571,14 @@ export function AccountProfileClient() {
                     </span>
 
                     {/* === TOP SECTION === */}
-                    <div className="relative z-10 flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:text-left">
+                    <div className="relative z-10 flex flex-col items-center gap-5 text-center sm:flex-row sm:items-center sm:text-start">
                       {/* Avatar with Rotating Ring */}
                       <div className="relative shrink-0">
                         <div className="absolute -inset-2 animate-[spin_14s_linear_infinite] rounded-full border border-dashed border-white/25 opacity-70" />
                         <button
                           type="button"
                           onClick={() => setIsEditOpen(true)}
-                          title="Change Portrait"
+                          title={t("uiProfileChangePhoto")}
                           className="group/avatar relative flex h-26 w-26 cursor-pointer items-center justify-center overflow-hidden rounded-[22px] border border-white/20 bg-white/10 font-mono text-2xl font-black text-on-action shadow-[0_0_30px_rgba(255,255,255,0.08)] sm:h-28 sm:w-28 sm:text-3xl"
                         >
                           {hasValidAvatar ? (
@@ -525,7 +603,7 @@ export function AccountProfileClient() {
                         <div className="flex flex-wrap items-center justify-center gap-1.5 sm:justify-start">
                           <span className="inline-flex items-center gap-1 rounded-md bg-surface px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.16em] text-primary shadow-sm">
                             <ShieldCheck size={10} />
-                            {role}
+                            {roleLabel}
                           </span>
                           <span className="inline-flex items-center gap-1 rounded-md border border-warning-border bg-warning-soft px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-rating">
                             <Sparkles size={9} />
@@ -543,7 +621,7 @@ export function AccountProfileClient() {
                               type="button"
                               onClick={handleCopyEmail}
                               whileTap={{ scale: 0.96 }}
-                              title="Click to copy email address"
+                              title={t("uiCopyEmailHint")}
                               className={`group/copy inline-flex max-w-full cursor-pointer items-center gap-2 rounded-xl border px-3 py-1.5 font-mono text-[11.5px] transition-all duration-200 ${
                                 copiedEmail
                                   ? "border-success-border bg-success-soft text-success"
@@ -581,7 +659,7 @@ export function AccountProfileClient() {
                       <div className="flex flex-col justify-center rounded-2xl border border-white/5 bg-action/40 px-4 py-3">
                         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-on-action-muted">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-success-bright" />
-                          <span>Tier Readiness</span>
+                          <span>{t("uiTierReadiness")}</span>
                         </div>
                         <div className="mt-2.5 flex items-center gap-3">
                           <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-white/10">
@@ -605,10 +683,10 @@ export function AccountProfileClient() {
                       <button
                         type="button"
                         onClick={() => goTo("orders")}
-                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left transition hover:border-white/25 hover:bg-white/[0.08]"
+                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/[0.08]"
                       >
                         <p className="text-[9.5px] font-black uppercase tracking-[0.16em] text-on-action-muted">
-                          Total Orders
+                          {t("accountTotalOrdersMetric")}
                         </p>
                         <div className="mt-1 flex items-baseline justify-between gap-2">
                           <span className="font-mono text-xl font-black text-on-action">
@@ -624,10 +702,10 @@ export function AccountProfileClient() {
                       <button
                         type="button"
                         onClick={() => goTo("reviews")}
-                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-left transition hover:border-white/25 hover:bg-white/[0.08]"
+                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/[0.08]"
                       >
                         <p className="text-[9.5px] font-black uppercase tracking-[0.16em] text-on-action-muted">
-                          Published Reviews
+                          {t("accountPublishedReviewsMetric")}
                         </p>
                         <div className="mt-1 flex items-baseline justify-between gap-2">
                           <span className="font-mono text-xl font-black text-on-action">
@@ -648,10 +726,10 @@ export function AccountProfileClient() {
                   <div className="flex items-start justify-between gap-3">
                     <div>
                       <p className="text-[9.5px] font-black uppercase tracking-[0.18em] text-muted">
-                        SHOP.CO™ PASS
+                        {t("uiShopCoPass")}
                       </p>
                       <h3 className="mt-1.5 text-lg font-black uppercase tracking-tight text-primary">
-                        {checkRole ? "Admin Command" : "Member Privileges"}
+                        {checkRole ? t("accountAdminCommandTitle") : t("accountMemberPrivilegesTitle")}
                       </h3>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-action text-on-action shadow-md">
@@ -661,17 +739,17 @@ export function AccountProfileClient() {
 
                   <p className="text-xs font-medium leading-relaxed text-muted">
                     {checkRole
-                      ? "You hold elevated administrative privileges. Access the global store control center or manage personal activities below."
-                      : "Enjoy priority courier processing, verified buyer badges, and complimentary 30-day atelier returns."}
+                      ? t("accountAdminPrivilegeDescription")
+                      : t("accountMemberBenefitsDescription")}
                   </p>
 
                   {/* Cumulative Spend Pill */}
                   <div className="flex items-center justify-between rounded-2xl bg-surface-subtle px-4 py-3">
                     <span className="text-[10px] font-black uppercase tracking-wider text-muted">
-                      Lifetime Spend
+                      {t("accountLifetimeSpend")}
                     </span>
                     <span className="font-mono text-base font-black text-primary">
-                      ${computedExpenses.toLocaleString()}
+                      {formatCurrency(computedExpenses, locale)}
                     </span>
                   </div>
 
@@ -683,8 +761,8 @@ export function AccountProfileClient() {
                         className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action text-[11px] font-black uppercase tracking-[0.14em] text-on-action shadow-md transition hover:bg-action-hover active:scale-95"
                       >
                         <UserCog size={14} />
-                        <span>Open Command Center</span>
-                        <ArrowUpRight size={13} className="ml-1 opacity-60" />
+                        <span>{t("accountOpenCommandCenter")}</span>
+                        <ArrowUpRight size={13} className={`ms-1 opacity-60 ${direction === "rtl" ? "-scale-x-100" : ""}`} />
                       </button>
                     ) : (
                       <Link
@@ -692,8 +770,8 @@ export function AccountProfileClient() {
                         className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-action text-[11px] font-black uppercase tracking-[0.14em] text-on-action shadow-md transition hover:bg-action-hover active:scale-95"
                       >
                         <Store size={14} />
-                        <span>Explore Flagship Archive</span>
-                        <ArrowUpRight size={13} className="ml-1 opacity-60" />
+                        <span>{t("accountExploreArchive")}</span>
+                        <ArrowUpRight size={13} className={`ms-1 opacity-60 ${direction === "rtl" ? "-scale-x-100" : ""}`} />
                       </Link>
                     )}
                   </div>
@@ -735,23 +813,23 @@ export function AccountProfileClient() {
                               </div>
                               <div>
                                 <h3 className="text-sm font-black uppercase tracking-tight text-primary">
-                                  Identity &amp; Portrait
+                                  {t("accountIdentityPortrait")}
                                 </h3>
                                 <p className="text-[11px] font-medium text-muted">
-                                  Update your public patron profile
+                                  {t("accountPublicProfileUpdate")}
                                 </p>
                               </div>
                             </div>
 
                             <span className="rounded-full bg-success-soft px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-success">
-                              Verified
+                              {t("accountVerified")}
                             </span>
                           </div>
 
                           <div className="space-y-3 text-xs">
                             <div className="flex items-center justify-between rounded-2xl bg-surface-subtle p-3.5">
                               <span className="font-bold text-muted">
-                                Display Name
+                                {t("accountDisplayName")}
                               </span>
                               <span className="font-black uppercase text-primary">
                                 {fullName}
@@ -760,7 +838,7 @@ export function AccountProfileClient() {
 
                             <div className="flex items-center justify-between rounded-2xl bg-surface-subtle p-3.5">
                               <span className="font-bold text-muted">
-                                Registered Email
+                                {t("accountRegisteredEmail")}
                               </span>
                               <span className="font-mono font-bold text-primary">
                                 {email}
@@ -769,7 +847,7 @@ export function AccountProfileClient() {
 
                             <div className="flex items-center justify-between rounded-2xl bg-surface-subtle p-3.5">
                               <span className="font-bold text-muted">
-                                Access Tier
+                                {t("accountAccessTier")}
                               </span>
                               <span className="font-black uppercase text-primary">
                                 {membershipTier}
@@ -784,7 +862,7 @@ export function AccountProfileClient() {
                           className="mt-6 flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action py-3.5 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition hover:bg-action-hover"
                         >
                           <Edit3 size={14} />
-                          <span>Modify Profile Details</span>
+                          <span>{t("accountModifyProfile")}</span>
                         </button>
                       </div>
 
@@ -797,10 +875,10 @@ export function AccountProfileClient() {
                             </div>
                             <div>
                               <h3 className="text-sm font-black uppercase tracking-tight text-primary">
-                                Dispatch &amp; Drop Alerts
+                                {t("accountAlertsTitle")}
                               </h3>
                               <p className="text-[11px] font-medium text-muted">
-                                Control how SHOP.CO Atelier contacts you
+                                {t("accountAlertsDescription")}
                               </p>
                             </div>
                           </div>
@@ -809,20 +887,20 @@ export function AccountProfileClient() {
                             {[
                               {
                                 key: "orderSms" as const,
-                                title: "Courier Dispatch Updates",
-                                sub: "Real-time notifications when your order ships",
+                                title: t("accountCourierUpdates"),
+                                sub: t("accountCourierUpdatesHint"),
                                 icon: Smartphone,
                               },
                               {
                                 key: "dropAlerts" as const,
-                                title: "2026 Limited Drop Priority",
-                                sub: "Early access alerts before collections sell out",
+                                title: t("accountLimitedCollectionAlerts"),
+                                sub: t("accountLimitedCollectionAlertsHint"),
                                 icon: Sparkles,
                               },
                               {
                                 key: "privateProfile" as const,
-                                title: "Incognito Patron Mode",
-                                sub: "Hide your full name on public product reviews",
+                                title: t("accountPrivacyPreference"),
+                                sub: t("accountPrivacyPreferenceHint"),
                                 icon: Lock,
                               },
                             ].map((item) => {
@@ -831,6 +909,16 @@ export function AccountProfileClient() {
                               return (
                                 <div
                                   key={item.key}
+                                  role="switch"
+                                  tabIndex={0}
+                                  aria-checked={isOn}
+                                  aria-label={item.title}
+                                  onKeyDown={(event) => {
+                                    if (event.key === "Enter" || event.key === " ") {
+                                      event.preventDefault();
+                                      setPrefs((current) => ({ ...current, [item.key]: !current[item.key] }));
+                                    }
+                                  }}
                                   onClick={() =>
                                     setPrefs((p) => ({
                                       ...p,
@@ -872,8 +960,7 @@ export function AccountProfileClient() {
 
                         <div className="mt-6 flex items-center justify-between rounded-2xl bg-success-soft px-4 py-3 text-[11px] font-bold text-success">
                           <span className="inline-flex items-center gap-1.5">
-                            <CheckCircle2 size={14} /> Session Encrypted &amp;
-                            Active
+                            <CheckCircle2 size={14} /> {t("accountSessionEncryptedActive")}
                           </span>
                           <span className="font-mono text-[10px] uppercase">
                             TLS 1.3

@@ -13,6 +13,8 @@ import {
 } from "lucide-react";
 import OrderCard from "@/features/orders/components/CustomerOrderCard";
 import { AccountSectionHeader } from "@/features/account/components/AccountSectionHeader";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type DataType = {
   orders: any[];
@@ -31,7 +33,8 @@ export default function AccountOverviewPanel({
   goTo,
   pagination,
 }: DataType) {
-  // Safe calculation of total expenses so it never renders "$undefined"
+  const { t, locale, direction } = useLocale();
+  // Safe calculation of total expenses so it never renders an invalid amount
   const safeExpenses =
     typeof pagination?.paginationOrders?.totalExpenses === "number"
       ? pagination.paginationOrders.totalExpenses
@@ -41,7 +44,7 @@ export default function AccountOverviewPanel({
   const totalReviews = pagination?.paginationReviews?.total ?? 0;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div dir={direction} className="space-y-8 animate-in fade-in duration-500">
       <style>{`
         .overview-3d-card {
           transform-style: preserve-3d;
@@ -61,25 +64,25 @@ export default function AccountOverviewPanel({
         className="grid grid-cols-1 gap-4 sm:grid-cols-3"
       >
         <StatCard
-          label="Cumulative Spend"
-          value={`$${safeExpenses.toLocaleString()}`}
-          sub="Verified lifetime value"
+          label={t("accountCumulativeSpend")}
+          value={formatCurrency(safeExpenses, locale)}
+          sub={t("accountLifetimeVerified")}
           icon={CreditCard}
           accent="emerald"
           onClick={() => goTo("orders")}
         />
         <StatCard
-          label="Total Orders"
+          label={t("accountTotalOrders")}
           value={totalOrders}
-          sub="Dispatched & queued"
+          sub={t("accountDispatchesQueued")}
           icon={Package}
           accent="black"
           onClick={() => goTo("orders")}
         />
         <StatCard
-          label="Published Reviews"
+          label={t("accountPublishedReviews")}
           value={totalReviews}
-          sub="Verified patron feedback"
+          sub={t("accountVerifiedFeedback")}
           icon={Star}
           accent="amber"
           onClick={() => goTo("reviews")}
@@ -90,7 +93,7 @@ export default function AccountOverviewPanel({
       <section className="space-y-5">
         <AccountSectionHeader
           icon={ShoppingBag}
-          title="Recent Order Activity"
+          title={t("accountRecentOrderActivity")}
           count={totalOrders}
         />
 
@@ -100,18 +103,17 @@ export default function AccountOverviewPanel({
               <ShoppingBag size={24} />
             </div>
             <h3 className="text-sm font-black uppercase tracking-wider text-primary">
-              No Recent Orders Recorded
+              {t("accountNoRecentOrders")}
             </h3>
             <p className="mt-1 max-w-xs text-xs text-muted">
-              Your latest purchases and live shipment telemetry will appear here
-              automatically.
+              {t("accountOrderHistoryHint")}
             </p>
             <Link
               href="/shop"
               className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-action px-6 py-3 text-[10px] font-black uppercase tracking-widest text-on-action shadow-md transition hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <Store size={13} />
-              <span>Explore Flagship Archive</span>
+              <span>{t("accountExploreShop")}</span>
             </Link>
           </div>
         ) : (
@@ -130,7 +132,7 @@ export default function AccountOverviewPanel({
                 onClick={() => goTo("orders")}
                 className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-border-strong bg-surface/60 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-secondary transition-all hover:border-border hover:bg-action hover:text-on-action"
               >
-                <span>Inspect All {totalOrders} Orders</span>
+                <span>{t("accountInspectAllOrders").replace("{count}", String(totalOrders))}</span>
                 <ArrowUpRight
                   size={14}
                   className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -177,7 +179,7 @@ function StatCard({
           <Icon size={22} />
         </div>
 
-        <div className="min-w-0 text-left">
+        <div className="min-w-0 text-start">
           <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">
             {label}
           </p>

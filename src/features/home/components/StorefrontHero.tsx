@@ -41,12 +41,29 @@ import { Headline3DLine } from "@/features/home/components/hero/Headline3DLine";
 import { RotatingEditorialStamp } from "@/features/home/components/hero/RotatingEditorialStamp";
 import { FeaturedBrandTicker } from "@/features/home/components/hero/FeaturedBrandTicker";
 import Screen from "@/assets/shop/screenShop.webp";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 /* -------------------------------------------------------------------------- */
 /*                                MAIN COMPONENT                              */
 /* -------------------------------------------------------------------------- */
 
 export default function StorefrontHero() {
+  const { t, locale } = useLocale();
+  const dynamicWords = [t("heroWord1"), t("heroWord2"), t("heroWord3")];
+  const quickTags = locale === "ar"
+    ? [t("newArrivals"), t("tagStreetwear"), t("tagMinimalist"), t("tagWinter")]
+    : QUICK_TAGS;
+  const statLabels = [t("statBrands"), t("statProducts"), t("statCustomers")];
+  const localizedLookbook = locale === "ar"
+    ? LOOKBOOK_EDITS.map((edit, index) => ({
+        ...edit,
+        tag: ["مختارات ستريت لوكس", "استوديو البساطة", "أساسيات الموسم"][index],
+        title: ["إطلالة أحادية واسعة", "معطف حضري بتصميم متقن", "طبقات يومية عصرية"][index],
+        subtitle: ["قطن ثقيل · قصة كتف منسدلة", "نسيج مقاوم للعوامل · تصميم انسيابي", "خامة فاخرة تسمح بالتهوية · قصة مريحة"][index],
+        badge: ["الأكثر رواجًا", "اختيار المحررين", "كمية محدودة"][index],
+        fabric: ["تيري عضوي 480 GSM", "نسيج تقني ياباني", "مزيج سوبيما ممشّط"][index],
+      }))
+    : LOOKBOOK_EDITS;
   const reduceMotion = useReducedMotion();
   const [activeSlide, setActiveSlide] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
@@ -117,7 +134,7 @@ export default function StorefrontHero() {
     };
   }, [reduceMotion]);
 
-  const currentEdit = LOOKBOOK_EDITS[activeSlide];
+  const currentEdit = localizedLookbook[activeSlide];
 
   return (
     <>
@@ -169,7 +186,7 @@ export default function StorefrontHero() {
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-action" />
                 </span>
                 <span className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-primary sm:text-[11px]">
-                  New Collection · 2026
+                  {t("heroCollection")}
                 </span>
                 <span className="h-3 w-px bg-surface-hover" />
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold text-secondary">
@@ -177,19 +194,19 @@ export default function StorefrontHero() {
                     size={12}
                     className="text-primary transition-transform duration-500 group-hover:rotate-180"
                   />
-                  3D Lookbook
+                  {t("heroLookbook")}
                 </span>
               </motion.div>
 
               {/* 3D Kinetic Display Headline */}
               <h1 className="w-full text-[clamp(2.4rem,5vw,4.85rem)] font-black uppercase leading-[0.94] tracking-[-0.055em]">
                 <Headline3DLine
-                  text="Find clothes"
+                  text={t("heroLine1")}
                   delay={0.05}
                   reduceMotion={reduceMotion}
                 />
                 <Headline3DLine
-                  text="that match"
+                  text={t("heroLine2")}
                   delay={0.14}
                   reduceMotion={reduceMotion}
                 />
@@ -199,7 +216,7 @@ export default function StorefrontHero() {
                   <div className="relative h-[1.08em] overflow-hidden [perspective:900px]">
                     <AnimatePresence mode="wait">
                       <motion.span
-                        key={DYNAMIC_WORDS[wordIndex]}
+                        key={dynamicWords[wordIndex]}
                         initial={
                           reduceMotion
                             ? false
@@ -228,7 +245,7 @@ export default function StorefrontHero() {
                         }}
                         className="block origin-center bg-linear-to-r from-primary via-secondary to-muted bg-clip-text text-transparent will-change-transform"
                       >
-                        {DYNAMIC_WORDS[wordIndex]}
+                        {dynamicWords[wordIndex]}
                       </motion.span>
                     </AnimatePresence>
                   </div>
@@ -254,7 +271,7 @@ export default function StorefrontHero() {
                 transition={{ duration: 0.8, delay: 0.25, ease: EASE_OUT_EXPO }}
                 className="mt-5 max-w-[52ch] text-pretty text-sm leading-[1.75] text-secondary sm:text-[15px] sm:leading-[1.8]"
               >
-                {storefrontHeroContent.description}
+                {t("heroDescription")}
               </motion.p>
 
               {/* Interactive Quick Filter Pills */}
@@ -265,9 +282,9 @@ export default function StorefrontHero() {
                 className="mt-4 flex flex-wrap items-center gap-2"
               >
                 <span className="mr-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
-                  Curated:
+                  {t("curated")}
                 </span>
-                {QUICK_TAGS.map((tag) => (
+                {quickTags.map((tag) => (
                   <Link
                     key={tag}
                     href="/shop"
@@ -296,7 +313,7 @@ export default function StorefrontHero() {
                     {/* Animated light sweep */}
                     <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
                     <span className="relative z-10">
-                      {storefrontHeroContent.btnText}
+                      {t("shopNow")}
                     </span>
                     <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 transition-all duration-300 group-hover:rotate-45 group-hover:scale-110 group-hover:bg-surface group-hover:text-primary">
                       <ArrowUpRight size={15} />
@@ -312,7 +329,7 @@ export default function StorefrontHero() {
                     href="/shop"
                     className="group inline-flex min-h-[52px] items-center gap-3 rounded-full border border-border-strong/90 bg-surface/80 px-6 py-3.5 text-xs font-extrabold uppercase tracking-[0.14em] text-primary shadow-xs backdrop-blur-md transition-all duration-300 hover:border-border-strong hover:bg-surface hover:shadow-md sm:min-h-[56px]"
                   >
-                    <span>Explore Lookbook</span>
+                    <span>{t("heroExplore")}</span>
                     <MoveUpRight
                       size={15}
                       className="text-muted transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
@@ -352,13 +369,13 @@ export default function StorefrontHero() {
                   </div>
                   <span className="font-extrabold text-primary">4.9/5</span>
                   <span className="text-[11px] text-muted">
-                    (12.4k+ reviews)
+                    ({t("reviewCount")})
                   </span>
                 </div>
 
                 <div className="flex items-center gap-1.5 font-semibold text-secondary">
                   <ShieldCheck size={16} className="text-primary" />
-                  <span>100% Authentic Luxury</span>
+                  <span>{t("heroAuthentic")}</span>
                 </div>
               </motion.div>
 
@@ -383,7 +400,7 @@ export default function StorefrontHero() {
                       <AnimatedStatValue rawValue={item.title} />
                     </p>
                     <p className="mt-1.5 text-[9px] font-bold uppercase leading-snug tracking-[0.1em] text-muted sm:text-[11px]">
-                      {item.description}
+                      {statLabels[index]}
                     </p>
                   </div>
                 ))}
@@ -466,7 +483,7 @@ export default function StorefrontHero() {
                       SHOP.CO
                     </span>
                     <span className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.45em] text-primary/20">
-                      ARCHIVE // 2026
+                      {locale === "ar" ? "مختارات الموسم · ٢٠٢٦" : "ARCHIVE // 2026"}
                     </span>
                   </motion.div>
 
@@ -529,7 +546,7 @@ export default function StorefrontHero() {
                       <button
                         type="button"
                         onClick={() => setHotspotOpen((prev) => !prev)}
-                        aria-label="Toggle outfit hotspot details"
+                        aria-label={t("heroToggleHotspots")}
                         className="group relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-action text-on-action shadow-[0_8px_20px_rgba(var(--shadow-rgb),0.35)] transition-transform duration-300 hover:scale-110"
                       >
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-action opacity-60" />
@@ -746,14 +763,14 @@ export default function StorefrontHero() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {LOOKBOOK_EDITS.map((edit, index) => {
+                  {localizedLookbook.map((edit, index) => {
                     const isActive = activeSlide === index;
                     return (
                       <button
                         key={edit.id}
                         type="button"
                         onClick={() => setActiveSlide(index)}
-                        aria-label={`Select lookbook ${edit.title}`}
+                        aria-label={`${t("heroLookbook")}: ${edit.title}`}
                         aria-current={isActive}
                         className={`group relative h-2 overflow-hidden rounded-full transition-all duration-300 ${
                           isActive

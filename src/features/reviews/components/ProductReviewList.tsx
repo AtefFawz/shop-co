@@ -7,6 +7,7 @@ import { Star, MessageSquareQuote, ShieldCheck, Sparkles } from "lucide-react";
 import { Product } from "@/types";
 import StarRating from "@/shared/components/feedback/StarRating";
 import Heading from "@/shared/components/ui/SectionHeading";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface RawReview {
   user?: {
@@ -26,6 +27,7 @@ interface Review {
 }
 
 export const ProductReviewList = ({ item }: { item: Product }) => {
+  const { t, direction } = useLocale();
   const [filterStars, setFilterStars] = useState<"all" | "5" | "4+">("all");
   const [brokenAvatars, setBrokenAvatars] = useState<Record<number, boolean>>(
     {},
@@ -34,15 +36,15 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
   const reviewsList: Review[] = useMemo(() => {
     return (
       item?.reviews?.map((e: RawReview) => ({
-        fullName: e.user?.fullName || "Verified Client",
+        fullName: e.user?.fullName || t("reviewVerifiedClient"),
         rating: Number(e.rating) || 5,
         comment:
           e.comment ||
-          "Impeccable fit and heavyweight fabric quality. Highly recommended.",
+          t("reviewSampleComment"),
         avatar: e.user?.avatar || "",
       })) || []
     );
-  }, [item?.reviews]);
+  }, [item?.reviews, t]);
 
   const filteredReviews = useMemo(() => {
     if (filterStars === "5") {
@@ -69,17 +71,17 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
       .toUpperCase();
 
   return (
-    <div className="space-y-8">
+    <div dir={direction} className="space-y-8">
       {/* ── Top Header & Sentiment Filter Bar ── */}
       <div className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface p-5 shadow-[0_12px_34px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-7 lg:flex-row lg:items-center">
         <div>
           <div className="mb-1.5 inline-flex items-center gap-2 rounded-full bg-surface-subtle px-3 py-1">
             <ShieldCheck size={12} className="text-success" />
             <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-              VERIFIED PATRON FEEDBACK
+              {t("reviewVerifiedPatronFeedback")}
             </span>
           </div>
-          <Heading title="CUSTOMER REVIEWS" styling="!text-start !my-0" />
+          <Heading title={t("reviewTitle")} styling="!text-start !my-0" />
         </div>
 
         {/* Right Aggregate Score & Filter Pills */}
@@ -90,16 +92,16 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
             </span>
             <Star size={15} className="fill-rating text-rating" />
             <span className="text-[11px] font-bold text-muted">
-              ({reviewsList.length} verified)
+              ({reviewsList.length} {t("reviewVerifiedCount")})
             </span>
           </div>
 
           {reviewsList.length > 0 && (
             <div className="inline-flex rounded-xl border border-border/80 bg-surface-subtle p-1">
               {[
-                { id: "all", label: "All" },
-                { id: "5", label: "5 ★ Only" },
-                { id: "4+", label: "4+ ★" },
+                { id: "all", label: t("reviewFilterAll") },
+                { id: "5", label: t("reviewFilterFiveOnly") },
+                { id: "4+", label: t("reviewFilterFourPlus") },
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -179,7 +181,7 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
                         <VerifiedRoundedIcon className="!text-sm text-success" />
                       </div>
                       <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
-                        Verified Buyer
+                        {t("reviewVerifiedClient")}
                       </span>
                     </div>
                   </div>
@@ -194,11 +196,10 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
             <Sparkles size={24} />
           </div>
           <h4 className="text-sm font-black uppercase tracking-wider text-primary">
-            No Client Reviews Recorded Yet
+            {t("reviewNoProductReviews")}
           </h4>
           <p className="mt-1 max-w-xs text-xs text-muted">
-            Be the first patron to acquire this archive piece and share your
-            impressions.
+            {t("reviewNoProductReviewsHint")}
           </p>
         </div>
       )}

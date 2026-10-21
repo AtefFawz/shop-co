@@ -15,6 +15,7 @@ import {
 import toast from "react-hot-toast";
 import OrderStatusUpdater from "@/features/admin/orders/components/OrderStatusUpdater";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export type DesktopOrderProps = {
   orders: any[];
@@ -39,13 +40,18 @@ export const AdminDesktopOrdersTable = ({
   total,
   onOrderDeleted,
 }: DesktopOrderProps) => {
+  const { t, locale, direction } = useLocale();
+  const currencyFormatter = new Intl.NumberFormat(
+    locale === "ar" ? "ar-EG" : "en-EG",
+    { style: "currency", currency: "EGP", maximumFractionDigits: 0 },
+  );
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const handleCopyId = (id: string) => {
     navigator.clipboard?.writeText(id);
     setCopiedId(id);
-    toast.success(`Order #${id.slice(-6).toUpperCase()} copied`);
+    toast.success(`${t("orderIdCopied")}: #${id.slice(-6).toUpperCase()}`);
     setTimeout(() => setCopiedId(null), 1800);
   };
 
@@ -56,18 +62,18 @@ export const AdminDesktopOrdersTable = ({
   if (total <= 0) return null;
 
   return (
-    <div className="hidden md:block">
+    <div dir={direction} className="hidden md:block">
       <div className="w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)]">
         <div className="w-full overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+          <table className="w-full border-collapse text-start">
             <thead>
               <tr className="border-b border-border-subtle bg-surface-subtle/70 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                <th className="py-4 px-5">Order / Timestamp</th>
-                <th className="py-4 px-4">Customer Profile</th>
-                <th className="py-4 px-4">Manifest (Items)</th>
-                <th className="py-4 px-4">Total Value</th>
-                <th className="py-4 px-4">Fulfillment Status</th>
-                <th className="py-4 px-5 text-right">Inspect</th>
+                <th className="py-4 px-5">{t("adminOrderTimestamp")}</th>
+                <th className="py-4 px-4">{t("adminCustomer")}</th>
+                <th className="py-4 px-4">{t("adminManifestItems")}</th>
+                <th className="py-4 px-4">{t("adminTotalValue")}</th>
+                <th className="py-4 px-4">{t("adminFulfillmentStatus")}</th>
+                <th className="py-4 px-5 text-end">{t("ordersInspect")}</th>
               </tr>
             </thead>
 
@@ -80,7 +86,7 @@ export const AdminDesktopOrdersTable = ({
                   (acc, it) => acc + (Number(it.quantity || it.qty) || 1),
                   0,
                 );
-                const initials = (order.user?.fullName || "Guest")
+                const initials = (order.user?.fullName || t("ordersGuestClient"))
                   .split(" ")
                   .map((n: string) => n[0])
                   .join("")
@@ -100,7 +106,7 @@ export const AdminDesktopOrdersTable = ({
                           <button
                             type="button"
                             onClick={() => handleCopyId(order._id)}
-                            title="Click to copy full Order ID"
+                            title={t("ordersCopyOrderId")}
                             className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border/80 bg-surface-muted px-2.5 py-1 font-mono text-xs font-black text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
                           >
                             <span>#{shortId}</span>
@@ -115,14 +121,14 @@ export const AdminDesktopOrdersTable = ({
                             <Calendar size={10} />
                             {order.createdAt
                               ? new Date(order.createdAt).toLocaleDateString(
-                                  "en-US",
+                                  locale === "ar" ? "ar-EG" : "en-GB",
                                   {
                                     month: "short",
                                     day: "2-digit",
                                     year: "numeric",
                                   },
                                 )
-                              : "Recent"}
+                              : t("ordersRecent")}
                           </span>
                         </div>
                       </td>
@@ -135,12 +141,12 @@ export const AdminDesktopOrdersTable = ({
                           </div>
                           <div className="min-w-0 max-w-[190px] xl:max-w-[240px]">
                             <p className="truncate text-xs font-extrabold text-primary sm:text-sm">
-                              {order.user?.fullName || "Guest Client"}
+                              {order.user?.fullName || t("ordersGuestClient")}
                             </p>
                             <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] font-medium text-muted">
                               <Mail size={10} className="shrink-0" />
                               <span className="truncate">
-                                {order.user?.email || "No email provided"}
+                                {order.user?.email || t("ordersNoEmail")}
                               </span>
                             </p>
                           </div>
@@ -153,7 +159,7 @@ export const AdminDesktopOrdersTable = ({
                           <div
                             onClick={() => toggleExpand(order._id)}
                             className="flex cursor-pointer -space-x-2.5 transition-all duration-300 hover:space-x-1"
-                            title="Click to inspect manifest items"
+                            title={t("ordersInspectItems")}
                           >
                             {itemsList
                               .slice(0, 4)
@@ -161,7 +167,7 @@ export const AdminDesktopOrdersTable = ({
                                 <img
                                   key={idx}
                                   src={getItemImageUrl(item.image)}
-                                  alt={item.product?.name || "Garment"}
+                                  alt={item.product?.name || t("adminProductDetails")}
                                   title={item.product?.name}
                                   className="h-9 w-9 rounded-xl border-2 border-surface bg-surface-muted object-cover shadow-xs transition-transform duration-300 hover:z-10 hover:scale-115"
                                 />
@@ -174,7 +180,7 @@ export const AdminDesktopOrdersTable = ({
                           </div>
 
                           <span className="hidden rounded-lg bg-surface-muted px-2 py-1 font-mono text-[10px] font-bold text-secondary xl:inline-block">
-                            {totalUnits} unit{totalUnits !== 1 ? "s" : ""}
+                            {totalUnits} {t(totalUnits === 1 ? "ordersUnitSingular" : "ordersUnitPlural")}
                           </span>
                         </div>
                       </td>
@@ -182,7 +188,7 @@ export const AdminDesktopOrdersTable = ({
                       {/* 4. Total Price */}
                       <td className="py-4 px-4 align-middle">
                         <span className="font-mono text-sm font-black text-primary sm:text-base">
-                          ${Number(order.totalPrice || 0).toLocaleString()}
+                          {currencyFormatter.format(Number(order.totalPrice || 0))}
                         </span>
                       </td>
 
@@ -196,7 +202,7 @@ export const AdminDesktopOrdersTable = ({
                       </td>
 
                       {/* 6. Expand Manifest Button */}
-                      <td className="py-4 px-5 text-right align-middle">
+                      <td className="py-4 px-5 text-end align-middle">
                         <button
                           type="button"
                           onClick={() => toggleExpand(order._id)}
@@ -206,7 +212,7 @@ export const AdminDesktopOrdersTable = ({
                               : "border-border bg-surface text-secondary hover:border-border-strong hover:text-primary"
                           }`}
                         >
-                          <span>{isExpanded ? "Close" : "Inspect"}</span>
+                          <span>{isExpanded ? t("ordersHideManifest") : t("ordersInspectManifest")}</span>
                           <ChevronDown
                             size={13}
                             className={`transition-transform duration-300 ${
@@ -231,7 +237,7 @@ export const AdminDesktopOrdersTable = ({
                                   className="text-primary"
                                 />
                                 <span className="text-[11px] font-black uppercase tracking-[0.16em] text-primary">
-                                  Order Manifest · #{order._id}
+                                  {t("ordersInspectManifest")} · #{order._id}
                                 </span>
                               </div>
 
@@ -268,20 +274,20 @@ export const AdminDesktopOrdersTable = ({
                                   >
                                     <img
                                       src={getItemImageUrl(item.image)}
-                                      alt={item.product?.name || "Item"}
+                                      alt={item.product?.name || t("userDetailProduct")}
                                       className="h-12 w-12 shrink-0 rounded-lg border border-surface bg-surface object-cover shadow-2xs"
                                     />
                                     <div className="min-w-0 flex-1">
                                       <p className="truncate text-xs font-extrabold text-primary">
                                         {item.product?.name ||
                                           item.name ||
-                                          "Catalog Garment"}
+                                          t("userDetailCatalogGarment")}
                                       </p>
                                       <div className="mt-1 flex items-center justify-between font-mono text-[10px] font-bold text-muted">
-                                        <span>Qty: {qty}</span>
+                                        <span>{t("qty")}: {qty}</span>
                                         {unitPrice > 0 && (
                                           <span className="text-primary">
-                                            ${unitPrice.toLocaleString()}
+                                            {currencyFormatter.format(unitPrice)}
                                           </span>
                                         )}
                                       </div>
@@ -306,9 +312,10 @@ export const AdminDesktopOrdersTable = ({
           <div className="flex items-center gap-2 text-xs font-bold text-muted">
             <Layers size={14} className="text-primary" />
             <span>
-              Page <strong className="text-primary">{page}</strong> of{" "}
-              <strong className="text-primary">{totalPages}</strong> ({total}{" "}
-              total orders)
+              {t("ordersPaginationSummary")
+                .replace("{page}", String(page))
+                .replace("{pages}", String(totalPages))
+                .replace("{total}", String(total))}
             </span>
           </div>
 

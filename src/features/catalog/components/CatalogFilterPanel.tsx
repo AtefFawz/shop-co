@@ -8,10 +8,12 @@ import PriceRangeFilter from "@/features/catalog/components/PriceRangeFilter";
 import { ProductColorFilter } from "@/features/catalog/components/ProductColorFilter";
 import { ProductSizeFilter } from "@/features/catalog/components/ProductSizeFilter";
 import { StyleFilterSection } from "@/features/catalog/components/StyleFilterSection";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const PRODUCT_CATEGORIES = ["T-SHIRT", "SHIRT", "PANTS", "JEANS"];
 
 export const CatalogFilterPanel = () => {
+  const { t } = useLocale();
   const { resetFilter, currentSection, currentStyle, currentType } =
     useFilterStore((s) => s);
 
@@ -30,7 +32,7 @@ export const CatalogFilterPanel = () => {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-black uppercase tracking-tight text-primary">
-                Atelier Filters
+                {t("catalogFiltersTitle")}
               </span>
               {activeCount > 0 && (
                 <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success font-mono text-[9px] font-black text-on-success">
@@ -39,7 +41,7 @@ export const CatalogFilterPanel = () => {
               )}
             </div>
             <span className="block text-[9px] font-bold uppercase tracking-widest text-muted">
-              Refine Lookbook
+              {t("catalogRefine")}
             </span>
           </div>
         </div>
@@ -50,7 +52,7 @@ export const CatalogFilterPanel = () => {
           className="inline-flex cursor-pointer items-center gap-1 rounded-xl border border-border/80 bg-surface px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted transition-all hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
         >
           <RotateCcw size={11} />
-          <span>Reset</span>
+          <span>{t("reset")}</span>
         </button>
       </div>
 
@@ -59,7 +61,7 @@ export const CatalogFilterPanel = () => {
         <div className="py-4">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-              Garment Category
+              {t("catalogCategory")}
             </p>
             <Sparkles size={11} className="text-subtle" />
           </div>

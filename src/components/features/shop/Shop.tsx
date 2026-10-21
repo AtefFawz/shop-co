@@ -265,7 +265,7 @@ export const Shop = () => {
             {loading && (
               <div
                 aria-label="Loading products"
-                className={`grid grid-cols-2 gap-3.5 sm:gap-5 lg:grid-cols-3 ${
+                className={`grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 ${
                   gridCols === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3"
                 }`}
               >
@@ -278,7 +278,7 @@ export const Shop = () => {
             {/* Products Grid */}
             {!loading && hasProducts && (
               <div
-                className={`grid grid-cols-2 gap-3.5 sm:gap-5 lg:grid-cols-3 ${
+                className={`grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 ${
                   gridCols === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3"
                 }`}
               >

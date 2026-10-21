@@ -8,8 +8,14 @@ import Card from "@/features/catalog/components/ProductCard";
 import Heading from "@/shared/components/ui/SectionHeading";
 import useData from "@/hooks/getData";
 import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-export const RelatedProductsSection = ({ productItem }: { productItem: Product }) => {
+export const RelatedProductsSection = ({
+  productItem,
+}: {
+  productItem: Product;
+}) => {
+  const { t, direction } = useLocale();
   const { data, loading } = useData("/product");
   const allProducts: Product[] = data?.data?.Products ?? [];
 
@@ -36,7 +42,7 @@ export const RelatedProductsSection = ({ productItem }: { productItem: Product }
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <ProductGridSkeleton key={i} />
         ))}
@@ -47,24 +53,27 @@ export const RelatedProductsSection = ({ productItem }: { productItem: Product }
   if (recommendations.length === 0) return null;
 
   return (
-    <div className="space-y-8">
+    <div dir={direction} className="space-y-8">
       {/* Header */}
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
           <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3 py-1 shadow-2xs">
             <Sparkles size={11} className="text-primary" />
             <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-              CURATED RECOMMENDATIONS
+              {t("relatedCuratedRecommendations")}
             </span>
           </div>
-          <Heading title="YOU MIGHT ALSO LIKE" styling="!text-start !my-0" />
+          <Heading
+            title={t("relatedYouMightAlsoLike")}
+            styling="!text-start !my-0"
+          />
         </div>
 
         <Link
           href="/shop"
           className="group inline-flex w-fit items-center gap-2 rounded-full border border-border-strong bg-surface px-5 py-2.5 text-xs font-black uppercase tracking-widest text-primary shadow-2xs transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
         >
-          <span>Explore Archive</span>
+          <span>{t("relatedExploreArchive")}</span>
           <ArrowUpRight
             size={14}
             className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -73,7 +82,7 @@ export const RelatedProductsSection = ({ productItem }: { productItem: Product }
       </div>
 
       {/* 4-Column Responsive Grid */}
-      <div className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
         {recommendations.map((item: Product) => (
           <Card key={item._id} product={item} />
         ))}

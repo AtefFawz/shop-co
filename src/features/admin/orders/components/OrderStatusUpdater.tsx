@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import api from "@/lib/api";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 import {
   Clock,
   Truck,
@@ -24,7 +25,7 @@ interface Props {
   deletedOrderSuccess?: () => void;
 }
 
-type StatusKey = "Pending" | "Shipped" | "Delivered" | "Cancelled";
+type StatusKey = "Pending" | "Processing" | "Shipped" | "Delivered" | "Cancelled";
 
 const STATUS_CONFIG: Record<
   StatusKey,
@@ -41,6 +42,16 @@ const STATUS_CONFIG: Record<
   Pending: {
     label: "Pending",
     sub: "Awaiting warehouse dispatch",
+    step: 1,
+    icon: Clock,
+    pillClass:
+      "border-warning-border bg-warning-soft text-warning hover:border-warning-border hover:bg-warning-soft",
+    dotClass: "bg-warning",
+    iconBgClass: "bg-warning-soft text-warning",
+  },
+  Processing: {
+    label: "Processing",
+    sub: "The order is being prepared",
     step: 1,
     icon: Clock,
     pillClass:
@@ -82,7 +93,8 @@ const STATUS_CONFIG: Record<
 
 const normalizeStatus = (raw?: string): StatusKey => {
   const s = (raw || "").trim().toLowerCase();
-  if (s === "shipped") return "Shipped";
+  if (s === "processing" || s === "in progress") return "Processing";
+  if (s === "shipped" || s === "in transit" || s === "out for delivery") return "Shipped";
   if (s === "delivered") return "Delivered";
   if (s === "cancelled" || s === "canceled") return "Cancelled";
   return "Pending";
@@ -94,6 +106,25 @@ export default function OrderStatusUpdater({
   deletedOrderSuccess,
 }: Props) {
   const router = useRouter();
+  const { t, direction } = useLocale();
+  const getStatusLabel = (value: StatusKey) => {
+    switch (value) {
+      case "Pending": return t("statusPending");
+      case "Processing": return t("statusProcessing");
+      case "Shipped": return t("statusShipped");
+      case "Delivered": return t("statusDelivered");
+      case "Cancelled": return t("statusCancelled");
+    }
+  };
+  const getStatusDescription = (value: StatusKey) => {
+    switch (value) {
+      case "Pending": return t("orderStatusDescriptionPending");
+      case "Processing": return t("orderStatusDescriptionProcessing");
+      case "Shipped": return t("orderStatusDescriptionShipped");
+      case "Delivered": return t("orderStatusDescriptionDelivered");
+      case "Cancelled": return t("orderStatusDescriptionCancelled");
+    }
+  };
   const [status, setStatus] = useState<StatusKey>(() =>
     normalizeStatus(currentStatus),
   );
@@ -202,11 +233,11 @@ export default function OrderStatusUpdater({
 
     try {
       await api.patch(`/order/${orderId}`, { status: newStatus });
-      toast.success(`Order #${orderId.slice(-6).toUpperCase()} → ${newStatus}`);
+      toast.success(`${t("ordersUpdatedStatus")}: #${orderId.slice(-6).toUpperCase()} · ${getStatusLabel(newStatus)}`);
       router.refresh();
     } catch (err: any) {
       console.error("Update failed:", err);
-      toast.error(err.response?.data?.message || "Failed to update status");
+      toast.error(err.response?.data?.message || t("ordersUpdateStatusFailed"));
       setStatus(previousStatus);
     } finally {
       setLoading(false);
@@ -221,12 +252,12 @@ export default function OrderStatusUpdater({
 
     try {
       await api.delete(`/order/${orderId}`);
-      toast.success(`Order #${orderId.slice(-6).toUpperCase()} deleted`);
+      toast.success(`${t("ordersDeleted")}: #${orderId.slice(-6).toUpperCase()}`);
       if (deletedOrderSuccess) deletedOrderSuccess();
       router.refresh();
     } catch (err: any) {
       console.error("Delete failed:", err);
-      toast.error(err.response?.data?.message || "Failed to delete order");
+      toast.error(err.response?.data?.message || t("ordersDeleteFailed"));
     } finally {
       setLoading(false);
       setConfirmDelete(false);
@@ -257,7 +288,7 @@ export default function OrderStatusUpdater({
             <Loader2 size={13} className="animate-spin text-current" />
           ) : (
             <span className="relative flex h-2 w-2 shrink-0">
-              {status === "Pending" || status === "Shipped" ? (
+              {status === "Pending" || status === "Processing" || status === "Shipped" ? (
                 <span
                   className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-75 ${activeConfig.dotClass}`}
                 />
@@ -269,7 +300,7 @@ export default function OrderStatusUpdater({
           )}
 
           <ActiveIcon size={12} className="shrink-0 opacity-80" />
-          <span>{activeConfig.label}</span>
+          <span>{getStatusLabel(status)}</span>
         </span>
 
         {/* Right Chevron + Mini 3-Step Dots */}
@@ -305,6 +336,7 @@ export default function OrderStatusUpdater({
         isOpen &&
         createPortal(
           <div
+            dir={direction}
             ref={menuRef}
             style={{
               position: "fixed",
@@ -322,7 +354,7 @@ export default function OrderStatusUpdater({
               <div className="flex items-center gap-1.5">
                 <Sparkles size={11} className="text-primary" />
                 <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-                  Dispatch Control
+                  {t("ordersDispatchControl")}
                 </span>
               </div>
               <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[9px] font-bold text-secondary">
@@ -342,7 +374,7 @@ export default function OrderStatusUpdater({
                     key={key}
                     type="button"
                     onClick={() => handleStatusChange(key)}
-                    className={`group flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-2xl px-2.5 py-2 text-left transition-all duration-200 ${
+                    className={`group flex w-full cursor-pointer items-center justify-between gap-2.5 rounded-2xl px-2.5 py-2 text-start transition-all duration-200 ${
                       isSelected
                         ? "bg-action text-on-action shadow-xs"
                         : "hover:bg-surface-subtle text-primary"
@@ -361,14 +393,14 @@ export default function OrderStatusUpdater({
 
                       <div className="min-w-0">
                         <p className="text-[11px] font-black uppercase tracking-wider leading-none">
-                          {item.label}
+                          {getStatusLabel(key)}
                         </p>
                         <p
                           className={`mt-1 truncate text-[9px] font-medium ${
                             isSelected ? "text-on-action/65" : "text-muted"
                           }`}
                         >
-                          {item.sub}
+                          {getStatusDescription(key)}
                         </p>
                       </div>
                     </div>
@@ -389,7 +421,7 @@ export default function OrderStatusUpdater({
                 <button
                   type="button"
                   onClick={() => setConfirmDelete(true)}
-                  className="flex w-full cursor-pointer items-center justify-between rounded-2xl px-2.5 py-2 text-left text-danger transition-colors hover:bg-danger-soft"
+                  className="flex w-full cursor-pointer items-center justify-between rounded-2xl px-2.5 py-2 text-start text-danger transition-colors hover:bg-danger-soft"
                 >
                   <span className="flex items-center gap-2.5">
                     <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-danger-soft text-danger">
@@ -397,10 +429,10 @@ export default function OrderStatusUpdater({
                     </span>
                     <span>
                       <span className="block text-[11px] font-black uppercase tracking-wider leading-none">
-                        Delete Order
+                        {t("ordersDeleteAction")}
                       </span>
                       <span className="mt-1 block text-[9px] font-medium text-danger">
-                        Remove permanently
+                        {t("ordersDeletePermanent")}
                       </span>
                     </span>
                   </span>
@@ -409,7 +441,7 @@ export default function OrderStatusUpdater({
                 <div className="rounded-2xl border border-danger-border bg-danger-soft p-2 animate-in fade-in duration-150">
                   <div className="mb-2 flex items-center gap-1.5 px-1 text-[10px] font-black uppercase tracking-wider text-danger">
                     <AlertTriangle size={12} />
-                    <span>Confirm Permanent Delete?</span>
+                    <span>{t("ordersConfirmDelete")}</span>
                   </div>
                   <div className="flex gap-1.5">
                     <button
@@ -417,14 +449,14 @@ export default function OrderStatusUpdater({
                       onClick={() => setConfirmDelete(false)}
                       className="flex-1 cursor-pointer rounded-xl border border-border bg-surface py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary hover:bg-surface-subtle"
                     >
-                      Cancel
+                      {t("orderCancel")}
                     </button>
                     <button
                       type="button"
                       onClick={handleDeleteOrder}
                       className="flex-1 cursor-pointer rounded-xl bg-danger py-1.5 text-[10px] font-black uppercase tracking-wider text-on-danger shadow-xs hover:bg-danger"
                     >
-                      Yes, Delete
+                      {t("ordersYesDelete")}
                     </button>
                   </div>
                 </div>

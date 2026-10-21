@@ -12,6 +12,7 @@ import api from "@/lib/api";
 import { ShippingAddressForm } from "@/features/checkout/components/ShippingAddressForm";
 import { OrderSummary } from "@/features/checkout/components/OrderSummary";
 import { EmptyCartState } from "@/features/cart/components/EmptyCartState";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface Typing {
   name: string;
@@ -27,6 +28,7 @@ const FREE_SHIPPING_THRESHOLD = 200;
 
 export default function CheckoutPage() {
   const router = useRouter();
+  const { t } = useLocale();
   const [loading, setLoading] = useState(false);
   const { stack, clearCart } = useProduct();
 
@@ -72,17 +74,18 @@ export default function CheckoutPage() {
           phone: shippingData.phone,
         },
         totalPrice: finalOrderTotal,
+        paymentMethod: shippingData.paymentMethod || "cod",
       };
 
       await api.post("order", payload);
 
-      toast.success("Order confirmed! Preparing your atelier dispatch.");
+      toast.success(t("orderSuccessText"));
       clearCart();
       router.push("/order-success");
     } catch (err: any) {
       const msg =
         err.response?.data?.message ||
-        "Order submission failed, please verify your details and try again.";
+        t("placeOrderError");
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -112,17 +115,17 @@ export default function CheckoutPage() {
                   size={12}
                   className="transition-transform group-hover:-translate-x-0.5"
                 />
-                <span>Back to Bag</span>
+                <span>{t("backToBag")}</span>
               </Link>
 
               <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
                 <Lock size={10} className="text-success" />
-                ENCRYPTED CHECKOUT
+                {t("encryptedCheckout")}
               </span>
             </div>
 
             <h1 className="pt-1 text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-              Executive Checkout
+              {t("checkoutTitle")}
             </h1>
           </div>
 
@@ -132,7 +135,7 @@ export default function CheckoutPage() {
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-success text-on-success">
                 <Check size={11} strokeWidth={3} />
               </span>
-              <span>01. Bag</span>
+              <span>01. {t("bagStep")}</span>
             </div>
 
             <span className="h-px w-4 bg-surface-hover" />
@@ -141,14 +144,14 @@ export default function CheckoutPage() {
               <span className="flex h-5 w-5 items-center justify-center rounded-full bg-surface font-mono text-[10px] font-black text-primary">
                 02
               </span>
-              <span>Dispatch Details</span>
+              <span>{t("dispatchDetails")}</span>
             </div>
 
             <span className="hidden h-px w-4 bg-surface-hover sm:block" />
 
             <div className="hidden items-center gap-2 rounded-2xl border border-border bg-surface px-3 py-2 text-[10px] font-black uppercase tracking-wider text-muted sm:flex">
               <span className="font-mono">03.</span>
-              <span>Confirmation</span>
+              <span>{t("confirmation")}</span>
             </div>
           </div>
         </header>

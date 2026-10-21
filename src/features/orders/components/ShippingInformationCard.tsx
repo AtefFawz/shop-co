@@ -13,6 +13,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type ShippingAddress = {
   address: string;
@@ -33,16 +34,28 @@ interface ShippingInformationProps {
 export default function ShippingInformationCard({
   shippingAddress,
   customer,
-  paymentMethod = "Cash on Delivery / Card",
+  paymentMethod = "cod",
 }: ShippingInformationProps) {
+  const { t } = useLocale();
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const normalizedPayment = String(paymentMethod || "").trim().toLowerCase().replace(/[ _-]+/g, " ");
+  const paymentLabel = ["cod", "cash on delivery"].includes(normalizedPayment)
+    ? t("cashOnDelivery")
+    : ["card", "card on delivery"].includes(normalizedPayment)
+      ? t("cardOnDelivery")
+      : paymentMethod || t("paymentMethod");
 
-  const handleCopy = (text: string, label: string, key: string) => {
+  const handleCopy = (text: string, key: string) => {
     if (!text) return;
-    navigator.clipboard?.writeText(text);
-    setCopiedKey(key);
-    toast.success(`${label} copied`);
-    setTimeout(() => setCopiedKey(null), 1800);
+    if (!navigator.clipboard?.writeText) {
+      toast.error(t("copyFailed"));
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedKey(key);
+      toast.success(t("copySuccess"));
+      window.setTimeout(() => setCopiedKey(null), 1800);
+    }).catch(() => toast.error(t("copyFailed")));
   };
 
   const fullAddressQuery = encodeURIComponent(
@@ -61,10 +74,10 @@ export default function ShippingInformationCard({
             </div>
             <div>
               <h2 className="text-base font-black uppercase tracking-tight text-primary">
-                Dispatch Destination
+                {t("dispatchDestination")}
               </h2>
               <p className="text-xs font-semibold text-muted">
-                Verified courier coordinates
+                {t("verifiedCourierCoordinates")}
               </p>
             </div>
           </div>
@@ -91,21 +104,21 @@ export default function ShippingInformationCard({
 
         {/* Shipping Telemetry Rows */}
         <div className="space-y-3">
-          {/* Street Address */}
+          {/* Street address */}
           <div className="group rounded-2xl border border-border/70 bg-surface-subtle/80 p-3.5 transition-colors hover:border-border hover:bg-surface">
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
                 <MapPin size={12} className="text-primary" />
-                Street Address
+                {t("streetAddress")}
               </span>
 
               <button
                 type="button"
                 onClick={() =>
-                  handleCopy(shippingAddress?.address, "Address", "addr")
+                  handleCopy(shippingAddress?.address, "addr")
                 }
                 className="cursor-pointer text-muted hover:text-primary"
-                title="Copy address"
+                title={t("copyAddress")}
               >
                 {copiedKey === "addr" ? (
                   <Check size={13} className="text-success" />
@@ -116,7 +129,7 @@ export default function ShippingInformationCard({
             </div>
 
             <p className="mt-1.5 break-words text-xs font-extrabold leading-relaxed text-primary sm:text-sm">
-              {shippingAddress?.address || "No street address specified"}
+              {shippingAddress?.address || t("noAddress")}
             </p>
           </div>
 
@@ -124,7 +137,7 @@ export default function ShippingInformationCard({
           <div className="rounded-2xl border border-border/70 bg-surface-subtle/80 p-3.5">
             <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
               <Truck size={12} className="text-primary" />
-              Destination City
+              {t("city")}
             </span>
             <p className="mt-1.5 text-xs font-extrabold uppercase tracking-wider text-primary sm:text-sm">
               {shippingAddress?.city || "—"}
@@ -136,7 +149,7 @@ export default function ShippingInformationCard({
             <div className="flex items-center justify-between">
               <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
                 <Phone size={12} className="text-primary" />
-                Recipient Phone
+                {t("recipientPhone")}
               </span>
 
               <div className="flex items-center gap-2">
@@ -145,16 +158,16 @@ export default function ShippingInformationCard({
                     href={`tel:${shippingAddress.phone}`}
                     className="rounded-lg bg-action px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-on-action hover:bg-action-hover"
                   >
-                    Call
+                    {t("call")}
                   </a>
                 )}
                 <button
                   type="button"
                   onClick={() =>
-                    handleCopy(shippingAddress?.phone, "Phone number", "phone")
+                    handleCopy(shippingAddress?.phone, "phone")
                   }
                   className="cursor-pointer text-muted hover:text-primary"
-                  title="Copy phone"
+                  title={t("copyPhone")}
                 >
                   {copiedKey === "phone" ? (
                     <Check size={13} className="text-success" />
@@ -174,10 +187,10 @@ export default function ShippingInformationCard({
           <div className="rounded-2xl border border-border/70 bg-surface-subtle/80 p-3.5">
             <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
               <CreditCard size={12} className="text-primary" />
-              Settlement Method
+              {t("settlementMethod")}
             </span>
             <p className="mt-1.5 text-xs font-extrabold uppercase tracking-wider text-primary">
-              {paymentMethod}
+              {paymentLabel}
             </p>
           </div>
         </div>
@@ -190,7 +203,7 @@ export default function ShippingInformationCard({
             rel="noopener noreferrer"
             className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface py-3 text-xs font-black uppercase tracking-widest text-primary shadow-2xs transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
           >
-            <span>Locate on Google Maps</span>
+            <span>{t("locateMaps")}</span>
             <ExternalLink size={13} />
           </a>
         )}
@@ -204,11 +217,10 @@ export default function ShippingInformationCard({
           </div>
           <div>
             <h3 className="text-xs font-black uppercase tracking-wider text-primary">
-              SHOP.CO™ Authenticity Guarantee
+              {t("authenticityGuarantee")}
             </h3>
             <p className="mt-1 text-[11px] leading-relaxed text-muted">
-              Every garment is inspected, sealed with a security tag, and
-              insured during courier transit until signed delivery.
+              {t("authenticityDescription")}
             </p>
           </div>
         </div>

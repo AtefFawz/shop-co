@@ -9,6 +9,7 @@ import {
 } from "framer-motion";
 import { BadgeCheck, Quote, ChevronDown, Sparkles } from "lucide-react";
 import StarRating from "@/shared/components/feedback/StarRating";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface Review {
   fullName: string;
@@ -18,6 +19,7 @@ interface Review {
 }
 
 export default function CustomerReviewsSection({ items }: { items: Review }) {
+  const { t, direction } = useLocale();
   const [mounted, setMounted] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -65,7 +67,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
     );
   }
 
-  const fullName = items?.fullName || "Anonymous";
+  const fullName = items?.fullName || t("reviewAnonymous");
   const comment = items?.comment || "";
   const rating = Number(items?.rating || 5);
   const isLongText = comment.length > 115;
@@ -81,6 +83,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
 
   return (
     <motion.div
+      dir={direction}
       layout
       onMouseMove={handleMouseMove}
       transition={{ type: "spring", stiffness: 360, damping: 30 }}
@@ -103,12 +106,12 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
         aria-hidden="true"
         size={64}
         strokeWidth={1.5}
-        className="pointer-events-none absolute -top-2 -right-2 rotate-12 text-primary/3 transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 group-hover:text-primary/6"
+        className="pointer-events-none absolute -top-2 end-2 rotate-12 text-primary/3 transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 group-hover:text-primary/6"
       />
 
       <div className="relative z-10 flex flex-col gap-4">
         <div className="flex items-center justify-between gap-2">
-          <div className="scale-95 origin-left transition-transform duration-300 group-hover:scale-100">
+          <div className="scale-95 origin-start transition-transform duration-300 group-hover:scale-100">
             <StarRating rating={rating} />
           </div>
 
@@ -151,7 +154,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
             </div>
 
             <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-muted">
-              Verified Buyer
+              {t("reviewVerifiedClient")}
             </span>
           </div>
         </div>
@@ -171,7 +174,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
               onClick={() => setIsExpanded(!isExpanded)}
               className="mt-3 inline-flex cursor-pointer items-center gap-1 rounded-full border border-border/80 bg-surface-subtle px-3 py-1 text-[10.5px] font-black uppercase tracking-widest text-primary transition-all duration-200 hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
             >
-              <span>{isExpanded ? "Show Less" : "Read More"}</span>
+              <span>{isExpanded ? t("reviewShowLess") : t("reviewReadMore")}</span>
               <motion.span
                 animate={{ rotate: isExpanded ? 180 : 0 }}
                 transition={{ type: "spring", stiffness: 400, damping: 25 }}

@@ -3,14 +3,17 @@
 import React from "react";
 import Link from "next/link";
 import { ShoppingBag, Sparkles, ArrowUpRight } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const QUICK_LINKS = [
-  { label: "New Arrivals", href: "/shop" },
-  { label: "Archive Sale", href: "/selling" },
-  { label: "Street Luxe", href: "/shop" },
+  { labelKey: "newArrivals" as const, href: "/shop" },
+  { labelKey: "navSale" as const, href: "/selling" },
+  { labelKey: "browseStyles" as const, href: "/category" },
 ];
 
-export const EmptyCartState = () => (
+export const EmptyCartState = () => {
+  const { t } = useLocale();
+  return (
   <section className="relative isolate flex min-h-[75vh] items-center justify-center overflow-hidden bg-surface-subtle px-4 py-16 text-primary">
     {/* Architectural Studio Grid */}
     <div
@@ -28,16 +31,15 @@ export const EmptyCartState = () => (
       </div>
 
       <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-subtle px-3 py-1 text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-        <Sparkles size={10} /> ATELIER BAG STATUS
+        <Sparkles size={10} /> {t("yourBag")}
       </span>
 
       <h2 className="mt-3 text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-        Your Bag Is Empty
+        {t("emptyCartTitle")}
       </h2>
 
       <p className="mt-2 text-xs font-medium leading-relaxed text-muted">
-        You haven&apos;t curated any pieces into your bag yet. Explore our 2026
-        flagship archive to discover your signature look.
+        {t("emptyCartText")}
       </p>
 
       {/* Primary CTA */}
@@ -46,7 +48,7 @@ export const EmptyCartState = () => (
         className="group mt-7 inline-flex w-full items-center justify-center gap-2.5 rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.4)] transition-all hover:-translate-y-0.5 hover:bg-action-hover"
       >
         <ShoppingBag size={14} />
-        <span>Explore The Archive</span>
+        <span>{t("exploreProducts")}</span>
         <ArrowUpRight
           size={14}
           className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -56,16 +58,16 @@ export const EmptyCartState = () => (
       {/* Quick Category Pills */}
       <div className="mt-6 border-t border-border-subtle pt-5">
         <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-          Popular Destinations
+          {t("navCategory")}
         </span>
         <div className="mt-2.5 flex flex-wrap justify-center gap-2">
           {QUICK_LINKS.map((item) => (
             <Link
-              key={item.label}
+              key={item.labelKey}
               href={item.href}
               className="rounded-full border border-border bg-surface-subtle px-3 py-1 text-[10px] font-bold text-secondary transition-colors hover:border-border-strong hover:bg-action hover:text-on-action"
             >
-              {item.label}
+              {t(item.labelKey)}
             </Link>
           ))}
         </div>
@@ -73,3 +75,4 @@ export const EmptyCartState = () => (
     </div>
   </section>
 );
+};

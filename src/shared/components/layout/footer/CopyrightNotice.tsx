@@ -4,8 +4,10 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { paymentMethods } from "@/shared/data/paymentMethods";
 import { ArrowUp, ShieldCheck } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export const CopyrightNotice = () => {
+  const { t } = useLocale();
   const scrollToTop = () => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -17,14 +19,14 @@ export const CopyrightNotice = () => {
       {/* حقوق الملكية + شارة الأمان */}
       <div className="flex flex-wrap items-center justify-center gap-3 text-center md:justify-start">
         <p className="text-xs font-medium text-muted sm:text-sm">
-          Shop.co &copy; 2000-{new Date().getFullYear()}, All Rights Reserved
+          Shop.co &copy; 2000-{new Date().getFullYear()}, {t("allRightsReserved")}
         </p>
 
         <span className="hidden h-3.5 w-px bg-surface-hover sm:inline-block" />
 
         <span className="inline-flex items-center gap-1 rounded-md border border-border-strong/70 bg-surface/80 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-secondary shadow-2xs">
           <ShieldCheck size={12} className="text-success" />
-          <span>SSL Verified</span>
+          <span>{t("verifiedSecure")}</span>
         </span>
       </div>
 
@@ -57,10 +59,10 @@ export const CopyrightNotice = () => {
           onClick={scrollToTop}
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.92 }}
-          title="Back to top"
+          title={t("backToTop")}
           className="group flex h-8.5 cursor-pointer items-center gap-1.5 rounded-lg border border-border-strong/90 bg-surface px-3 font-mono text-[10px] font-black uppercase tracking-wider text-primary shadow-xs transition-colors hover:border-border-strong hover:bg-action hover:text-on-action"
         >
-          <span>Top</span>
+          <span>{t("backToTop")}</span>
           <ArrowUp
             size={12}
             className="transition-transform duration-200 group-hover:-translate-y-0.5"

@@ -2,11 +2,12 @@
 
 import api from "@/lib/api";
 import { useState, useEffect } from "react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { useRouter } from "next/navigation";
 import {
   Tag,
   AlignLeft,
-  DollarSign,
+  Banknote,
   Percent,
   Layers,
   Ruler,
@@ -24,6 +25,7 @@ import {
 
 export default function AdminProductCreatePage() {
   const router = useRouter();
+  const { t, direction } = useLocale();
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -102,7 +104,7 @@ export default function AdminProductCreatePage() {
     e.preventDefault();
 
     if (images.length === 0) {
-      setError("Please upload at least one product image.");
+      setError(t("adminImageRequired"));
       return;
     }
 
@@ -131,7 +133,7 @@ export default function AdminProductCreatePage() {
       setError(
         err?.response?.data?.message ||
           err?.message ||
-          "Something went wrong while publishing the product.",
+          t("adminCreateProductFailed"),
       );
     } finally {
       setLoading(false);
@@ -139,24 +141,24 @@ export default function AdminProductCreatePage() {
   };
 
   return (
-    <main className="min-h-screen bg-surface-subtle ">
+    <main dir={direction} className="min-h-screen bg-surface-subtle">
       <div className="Responsive w-full py-10">
         {/* Header */}
         <header className="mb-6 sm:mb-8 flex items-center gap-4">
           <button
             type="button"
             onClick={() => router.back()}
-            aria-label="Go back"
+            aria-label={t("adminBackLabel")}
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface text-secondary shadow-xs transition-all hover:bg-surface-subtle active:scale-95 cursor-pointer"
           >
             <ArrowLeft size={18} />
           </button>
           <div>
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tight text-primary leading-tight">
-              Add New Product
+              {t("adminAddProductHeading")}
             </h1>
             <p className="text-xs text-muted font-medium mt-0.5">
-              Fill in the technical and catalog details to list a new item.
+              {t("adminAddProductIntro")}
             </p>
           </div>
         </header>
@@ -167,10 +169,10 @@ export default function AdminProductCreatePage() {
             <CheckCircle2 size={18} className="shrink-0" />
             <div>
               <p className="text-xs sm:text-sm font-bold">
-                Product published successfully!
+                {t("adminProductPublished")}
               </p>
               <p className="text-[11px] text-success">
-                The item is now live in your catalog.
+                {t("adminProductPublishedDescription")}
               </p>
             </div>
           </div>
@@ -185,23 +187,23 @@ export default function AdminProductCreatePage() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Section 01: Identification */}
-          <FormSection label="Product Identification" number="01">
+          <FormSection label={t("adminProductIdentification")} number="01">
             <div className="space-y-4">
-              <Field label="Product Name" icon={<Tag size={13} />} required>
+              <Field label={t("adminProductNameField")} icon={<Tag size={13} />} required>
                 <input
                   className="input-base"
                   type="text"
-                  placeholder="e.g. Graphic Relaxed T-Shirt"
+                  placeholder={t("adminProductNamePlaceholder")}
                   value={item.name}
                   onChange={(e) => handleChange("name", e.target.value)}
                   required
                 />
               </Field>
 
-              <Field label="Description" icon={<AlignLeft size={13} />}>
+              <Field label={t("adminProductDescriptionLabel")} icon={<AlignLeft size={13} />}>
                 <textarea
                   className="input-base min-h-24 resize-none py-3 leading-relaxed"
-                  placeholder="Describe cuts, fabric compositions, and specific measurements..."
+                  placeholder={t("adminProductDescriptionPlaceholder")}
                   value={item.description}
                   onChange={(e) => handleChange("description", e.target.value)}
                 />
@@ -210,32 +212,32 @@ export default function AdminProductCreatePage() {
           </FormSection>
 
           {/* Section 02: Categorization */}
-          <FormSection label="Categorization & Target" number="02">
+          <FormSection label={t("adminCategorizationTarget")} number="02">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Field label="Target Gender" icon={<Users size={13} />} required>
+              <Field label={t("adminTargetGender")} icon={<Users size={13} />} required>
                 <select
                   className="input-base cursor-pointer"
                   value={item.gender}
                   onChange={(e) => handleChange("gender", e.target.value)}
                 >
-                  <option value="MEN">Men</option>
-                  <option value="WOMEN">Women</option>
-                  <option value="KIDS">Kids</option>
-                  <option value="UNISEX">Unisex</option>
+                  <option value="MEN">{t("adminProductGenderMen")}</option>
+                  <option value="WOMEN">{t("adminProductGenderWomen")}</option>
+                  <option value="KIDS">{t("adminGenderKids")}</option>
+                  <option value="UNISEX">{t("adminProductGenderUnisex")}</option>
                 </select>
               </Field>
 
-              <Field label="Main Category" icon={<Layers size={13} />}>
+              <Field label={t("adminMainCategory")} icon={<Layers size={13} />}>
                 <input
                   className="input-base"
                   type="text"
-                  placeholder="e.g. CLOTHING"
+                  placeholder={t("adminMainCategoryPlaceholder")}
                   value={item.category}
                   onChange={(e) => handleChange("category", e.target.value)}
                 />
               </Field>
 
-              <Field label="Section (Subcategory)" icon={<Tag size={13} />}>
+              <Field label={t("adminProductSectionLabel")} icon={<Tag size={13} />}>
                 <select
                   className="input-base cursor-pointer"
                   value={item.section}
@@ -244,34 +246,34 @@ export default function AdminProductCreatePage() {
                     handleChange("type", e.target.value);
                   }}
                 >
-                  <option value="T-SHIRT">T-SHIRT</option>
-                  <option value="SHIRT">SHIRT</option>
-                  <option value="PANTS">PANTS</option>
-                  <option value="JEANS">JEANS</option>
+                  <option value="T-SHIRT">{t("adminSectionTShirt")}</option>
+                  <option value="SHIRT">{t("adminSectionShirt")}</option>
+                  <option value="PANTS">{t("adminSectionPants")}</option>
+                  <option value="JEANS">{t("adminSectionJeans")}</option>
                 </select>
               </Field>
 
-              <Field label="Dress Style" icon={<Sparkles size={13} />}>
+              <Field label={t("adminDressStyle")} icon={<Sparkles size={13} />}>
                 <select
                   className="input-base cursor-pointer"
                   value={item.style}
                   onChange={(e) => handleChange("style", e.target.value)}
                 >
-                  <option value="Casual">Casual</option>
-                  <option value="Formal">Formal</option>
-                  <option value="Party">Party</option>
-                  <option value="Gym">Gym</option>
+                  <option value="Casual">{t("casual")}</option>
+                  <option value="Formal">{t("formal")}</option>
+                  <option value="Party">{t("party")}</option>
+                  <option value="Gym">{t("gym")}</option>
                 </select>
               </Field>
             </div>
           </FormSection>
 
           {/* Section 03: Pricing & Inventory */}
-          <FormSection label="Pricing & Inventory" number="03">
+          <FormSection label={t("adminPricingInventory")} number="03">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <Field
-                label="Base Price ($)"
-                icon={<DollarSign size={13} />}
+                label={t("adminBasePrice")}
+                icon={<Banknote size={13} />}
                 required
               >
                 <input
@@ -286,7 +288,7 @@ export default function AdminProductCreatePage() {
                 />
               </Field>
 
-              <Field label="Discount (%)" icon={<Percent size={13} />}>
+              <Field label={t("adminDiscountLabel")} icon={<Percent size={13} />}>
                 <input
                   className="input-base"
                   type="number"
@@ -298,18 +300,18 @@ export default function AdminProductCreatePage() {
                 />
               </Field>
 
-              <Field label="On Sale?" icon={<Tag size={13} />}>
+              <Field label={t("adminOnSaleLabel")} icon={<Tag size={13} />}>
                 <select
                   className="input-base cursor-pointer"
                   value={item.isSale}
                   onChange={(e) => handleChange("isSale", e.target.value)}
                 >
-                  <option value="false">No</option>
-                  <option value="true">Yes</option>
+                  <option value="false">{t("adminNoOption")}</option>
+                  <option value="true">{t("adminYesOption")}</option>
                 </select>
               </Field>
 
-              <Field label="Units in Stock" icon={<Boxes size={13} />} required>
+              <Field label={t("adminStockUnitsLabel")} icon={<Boxes size={13} />} required>
                 <input
                   className="input-base"
                   type="number"
@@ -324,31 +326,31 @@ export default function AdminProductCreatePage() {
           </FormSection>
 
           {/* Section 04: Variants */}
-          <FormSection label="Product Variants" number="04">
+          <FormSection label={t("adminProductVariants")} number="04">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <Field label="Available Sizes" icon={<Ruler size={13} />}>
+              <Field label={t("adminProductSizes")} icon={<Ruler size={13} />}>
                 <input
                   className="input-base"
                   type="text"
-                  placeholder="S, M, L, XL, XXL"
+                  placeholder={t("adminSizePlaceholder")}
                   value={item.size}
                   onChange={(e) => handleChange("size", e.target.value)}
                 />
                 <p className="text-[10px] text-muted">
-                  Separate options with commas.
+                  {t("adminSeparateWithCommas")}
                 </p>
               </Field>
 
-              <Field label="Available Colors" icon={<Palette size={13} />}>
+              <Field label={t("adminProductColors")} icon={<Palette size={13} />}>
                 <input
                   className="input-base"
                   type="text"
-                  placeholder="Red, Blue, Black"
+                  placeholder={t("adminColorsPlaceholder")}
                   value={item.colors}
                   onChange={(e) => handleChange("colors", e.target.value)}
                 />
                 <p className="text-[10px] text-muted">
-                  Separate color names or hexes with commas.
+                  {t("adminSeparateColorsWithCommas")}
                 </p>
               </Field>
             </div>
@@ -356,9 +358,9 @@ export default function AdminProductCreatePage() {
 
           {/* Section 05: Media & Gallery */}
           <FormSection
-            label="Media & Gallery"
+            label={t("adminMediaGallery")}
             number="05"
-            description="Max 5 images"
+            description={t("adminMaxFiveImages")}
           >
             <div className="space-y-4">
               <label className="group relative flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-surface-subtle/50 p-6 text-center transition-all hover:border-border-strong hover:bg-surface-subtle">
@@ -377,11 +379,10 @@ export default function AdminProductCreatePage() {
                 </div>
                 <div className="mt-3">
                   <p className="text-xs font-black uppercase tracking-wider text-secondary">
-                    Upload product imagery
+                    {t("adminUploadImagesLabel")}
                   </p>
                   <p className="text-[10px] text-muted mt-0.5">
-                    PNG, JPG or WEBP · First image will be assigned as primary
-                    Cover
+                    {t("adminImageFormatHint")}
                   </p>
                 </div>
               </label>
@@ -395,19 +396,19 @@ export default function AdminProductCreatePage() {
                     >
                       <img
                         src={src}
-                        alt="Preview"
+                        alt={t("adminPreviewImageAlt")}
                         className="h-full w-full object-cover"
                       />
                       <button
                         type="button"
                         onClick={() => handleRemoveImage(index)}
-                        className="absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-action/75 text-on-action shadow-md backdrop-blur-xs transition-all hover:scale-110 hover:bg-danger hover:text-on-danger cursor-pointer"
+                        className="absolute end-2 top-2 flex h-6 w-6 items-center justify-center rounded-full bg-action/75 text-on-action shadow-md backdrop-blur-xs transition-all hover:scale-110 hover:bg-danger hover:text-on-danger cursor-pointer"
                       >
                         <X size={12} />
                       </button>
                       {index === 0 && (
-                        <span className="absolute bottom-2 left-2 rounded-md bg-action/85 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-on-action backdrop-blur-xs">
-                          Cover
+                        <span className="absolute bottom-2 start-2 rounded-md bg-action/85 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-on-action backdrop-blur-xs">
+                          {t("adminCoverImage")}
                         </span>
                       )}
                     </div>
@@ -425,7 +426,7 @@ export default function AdminProductCreatePage() {
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-action px-5 py-4 text-xs font-black uppercase tracking-widest text-on-action shadow-[0_10px_28px_-8px_rgba(var(--shadow-rgb),0.1)] transition-all hover:bg-action-hover active:scale-[0.99] disabled:bg-surface-hover disabled:cursor-not-allowed cursor-pointer"
             >
               <PackagePlus size={16} />
-              <span>{loading ? "Publishing..." : "Publish Product"}</span>
+              <span>{loading ? t("adminProductLoadingSave") : t("adminProductAddTitle")}</span>
             </button>
           </div>
         </form>

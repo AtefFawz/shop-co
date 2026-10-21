@@ -8,6 +8,8 @@ import { Trash2, Minus, Plus, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useProduct } from "@/store/cartStore";
 import { calculateFinalPrice } from "@/lib/logicPricing";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 import { Product } from "@/types";
 
 const getImageUrl = (raw?: string) => {
@@ -17,6 +19,7 @@ const getImageUrl = (raw?: string) => {
 };
 
 export const CartLineItem = ({ productItem }: { productItem: Product }) => {
+  const { t, locale } = useLocale();
   const remove = useProduct((e) => e.delete);
   const update = useProduct((e) => e.update);
   const router = useRouter();
@@ -63,11 +66,11 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
       >
         <img
           src={getImageUrl(rawImg)}
-          alt={productItem.name || "Garment"}
+          alt={productItem.name || t("productImageAlt")}
           className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-108"
         />
         {discount > 0 && (
-          <span className="absolute left-1.5 top-1.5 rounded-full bg-action/90 px-2 py-0.5 font-mono text-[8px] font-black uppercase text-on-action backdrop-blur-md">
+          <span className="absolute start-1.5 top-1.5 rounded-full bg-action/90 px-2 py-0.5 font-mono text-[8px] font-black uppercase text-on-action backdrop-blur-md">
             -{discount}%
           </span>
         )}
@@ -87,7 +90,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
               {productItem.size && (
                 <span className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-surface-subtle px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-secondary">
-                  Size:{" "}
+                  {t("size")}:{" "}
                   <strong className="text-primary">{productItem.size}</strong>
                 </span>
               )}
@@ -113,9 +116,9 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
             onClick={() => {
               remove(productItem);
               router.refresh();
-              toast.error(`${productItem.name || "Garment"} removed from bag`);
+              toast.error(`${productItem.name || t("products")} — ${t("removeItem")}`);
             }}
-            title="Remove item"
+            title={t("removeItem")}
             className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-danger-border/70 bg-danger-soft text-danger transition-all hover:border-danger-border hover:bg-danger hover:text-on-danger"
           >
             <Trash2 size={14} />
@@ -127,17 +130,17 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
           <div>
             <div className="flex items-baseline gap-2">
               <span className="font-mono text-base font-black text-primary sm:text-lg">
-                ${finalPrice.toFixed(2)}
+                {formatCurrency(finalPrice, locale)}
               </span>
 
               {discount > 0 && (
                 <span className="font-mono text-xs font-bold text-muted line-through">
-                  ${originalTotal.toFixed(2)}
+                  {formatCurrency(originalTotal, locale)}
                 </span>
               )}
             </div>
             <span className="block font-mono text-[9px] font-bold uppercase tracking-widest text-muted">
-              ${Number(productItem.price || 0).toFixed(2)} / unit
+              {formatCurrency(Number(productItem.price || 0), locale)} / {t("perUnit")}
             </span>
           </div>
 
@@ -148,7 +151,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
               disabled={qty <= 1}
               onClick={() => handleQuantityChange(qty - 1)}
               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-surface text-primary shadow-2xs transition-all hover:bg-action hover:text-on-action disabled:cursor-not-allowed disabled:opacity-35"
-              aria-label="Decrease quantity"
+              aria-label={t("decreaseQuantity")}
             >
               <Minus size={12} strokeWidth={2.5} />
             </button>
@@ -162,7 +165,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
               disabled={qty >= maxStock}
               onClick={() => handleQuantityChange(qty + 1)}
               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-surface text-primary shadow-2xs transition-all hover:bg-action hover:text-on-action disabled:cursor-not-allowed disabled:opacity-35"
-              aria-label="Increase quantity"
+              aria-label={t("increaseQuantity")}
             >
               <Plus size={12} strokeWidth={2.5} />
             </button>

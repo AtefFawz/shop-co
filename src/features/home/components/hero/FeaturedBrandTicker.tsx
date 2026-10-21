@@ -1,14 +1,17 @@
 "use client";
 
 import { featuredBrandNames } from "@/features/home/data/storefrontContent";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export function FeaturedBrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
+  const { t, direction } = useLocale();
   const list = featuredBrandNames.filter(Boolean);
   if (!list.length) return null;
 
   return (
     <div
-      aria-label="Featured luxury partners"
+      dir={direction}
+      aria-label={t("brandTickerAria")}
       className="relative z-20 overflow-hidden border-y border-white/10 bg-action py-4 text-on-action"
     >
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-action via-action/85 to-transparent sm:w-32" />
@@ -21,7 +24,7 @@ export function FeaturedBrandTicker({ reduceMotion }: { reduceMotion: boolean | 
             <span className="relative inline-flex h-2 w-2 rounded-full bg-success-bright" />
           </span>
           <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-on-action/80">
-            Verified Houses
+            {t("brandTickerVerified")}
           </span>
         </div>
 

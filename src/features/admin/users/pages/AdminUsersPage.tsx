@@ -21,8 +21,10 @@ import UsersTable from "@/features/admin/users/components/AdminUsersTable";
 import UsersMobile from "@/features/admin/users/components/AdminUsersMobileList";
 import EmptyState from "@/features/admin/users/components/UsersEmptyState";
 import useData from "@/hooks/getData";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function AdminUsersPage() {
+  const { t, direction } = useLocale();
   const { loading, data, refetch } = useData("admin/users");
 
   // Interactive Studio States
@@ -37,8 +39,8 @@ export default function AdminUsersPage() {
 
   // Update Browser Tab Title
   useEffect(() => {
-    document.title = "Identity Directory · Users | SHOP.CO™";
-  }, []);
+    document.title = `${t("usersDirectoryTitle")} | SHOP.CO™`;
+  }, [t]);
 
   const users: any[] = useMemo(() => {
     return data?.data?.users ?? [];
@@ -137,7 +139,7 @@ export default function AdminUsersPage() {
   };
 
   return (
-    <div className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8">
+    <div dir={direction} className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8">
       {/* ================================================================== */}
       {/* GPU 3D ANIMATIONS & ENTRANCE KEYFRAMES                             */}
       {/* ================================================================== */}
@@ -186,22 +188,21 @@ export default function AdminUsersPage() {
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
               </span>
               <span className="md:text-[10px] text-[8px] text-nowrap font-black uppercase tracking-[0.22em] text-secondary">
-                ADMIN PANEL · IDENTITY &amp; ACCESS DIRECTORY
+                {t("usersPanelTitle")}
               </span>
             </div>
 
             <div className="flex flex-wrap items-baseline gap-3">
               <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-                All Users
+                {t("usersDirectoryTitle")}
               </h1>
               <span className="rounded-full bg-surface-muted px-2.5 py-0.5 font-mono text-[11px] font-black text-secondary">
-                {countUsers} Account{countUsers !== 1 ? "s" : ""}
+                {countUsers} {t("usersAccounts")}
               </span>
             </div>
 
             <p className="text-xs font-medium text-muted">
-              Manage registered clientele, administrative privileges, and
-              membership telemetry.
+              {t("usersManageDescription")}
             </p>
           </div>
 
@@ -212,7 +213,7 @@ export default function AdminUsersPage() {
               className="group inline-flex items-center gap-2 rounded-2xl border border-border/90 bg-surface px-4 py-2.5 text-xs font-extrabold uppercase tracking-wider text-secondary transition-all duration-200 hover:border-border-strong hover:bg-surface-subtle"
             >
               <Store size={14} />
-              <span className="hidden sm:inline">Command Center</span>
+              <span className="hidden sm:inline">{t("usersCommandCenter")}</span>
               <ArrowUpRight
                 size={13}
                 className="text-muted transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
@@ -233,7 +234,7 @@ export default function AdminUsersPage() {
                     : "transition-transform duration-500 group-hover:rotate-180"
                 }
               />
-              <span>{loading ? "Syncing..." : "Sync Directory"}</span>
+              <span>{loading ? t("usersSyncing") : t("usersSyncDirectory")}</span>
             </button>
           </div>
         </header>
@@ -249,12 +250,11 @@ export default function AdminUsersPage() {
               </span>
               <div>
                 <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/50">
-                  Security &amp; Membership Pulse
+                  {t("usersMembershipPulse")}
                 </p>
                 <p className="text-xs font-extrabold tracking-wide text-on-action">
-                  {telemetry.customerRatio}% Storefront Clientele ·{" "}
-                  {telemetry.privilegedCount} Privileged Staff Account
-                  {telemetry.privilegedCount === 1 ? "" : "s"}
+                  {telemetry.customerRatio}% {t("usersClientele")} ·{" "}
+                  {telemetry.privilegedCount} {t("usersCommandStaff")}
                 </p>
               </div>
             </div>
@@ -262,10 +262,10 @@ export default function AdminUsersPage() {
             <div className="flex flex-wrap items-center gap-6 sm:gap-8">
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  System Admins
+                  {t("usersSystemAdmins")}
                 </span>
                 <span className="font-mono text-sm font-black text-on-action">
-                  {telemetry.admins} Root
+                  {telemetry.admins} {t("usersRoot")}
                 </span>
               </div>
 
@@ -273,10 +273,10 @@ export default function AdminUsersPage() {
 
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  Store Managers
+                  {t("usersStoreManagers")}
                 </span>
                 <span className="font-mono text-sm font-black text-info">
-                  {telemetry.managers} Active
+                  {telemetry.managers} {t("usersActive")}
                 </span>
               </div>
 
@@ -284,10 +284,10 @@ export default function AdminUsersPage() {
 
               <div>
                 <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                  New This Month
+                  {t("usersNewThisMonth")}
                 </span>
                 <span className="font-mono text-sm font-black text-success">
-                  +{telemetry.joinedThisMonth} Joined
+                  +{telemetry.joinedThisMonth} {t("usersJoinedSuffix")}
                 </span>
               </div>
             </div>
@@ -305,13 +305,13 @@ export default function AdminUsersPage() {
           <div className="user-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Total Directory
+                {t("usersTotalDirectory")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-primary sm:text-2xl">
                 {countUsers}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                Registered Profiles
+                {t("usersRegisteredProfiles")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-surface-subtle text-primary transition-colors group-hover:bg-action group-hover:text-on-action">
@@ -323,13 +323,13 @@ export default function AdminUsersPage() {
           <div className="user-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Storefront Clients
+                {t("usersClientele")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-primary sm:text-2xl">
                 {telemetry.customers}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                Standard Members
+                {t("usersStandardMembers")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-success-soft text-success">
@@ -341,13 +341,13 @@ export default function AdminUsersPage() {
           <div className="user-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Command Staff
+                {t("usersCommandStaff")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-primary sm:text-2xl">
                 {telemetry.privilegedCount}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                Admins &amp; Managers
+                {t("usersAdminsAndManagers")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-action text-on-action">
@@ -359,13 +359,13 @@ export default function AdminUsersPage() {
           <div className="user-3d-card group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                Recent Onboarding
+                {t("usersRecentOnboarding")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-success sm:text-2xl">
                 +{telemetry.joinedThisMonth}
               </p>
               <p className="mt-0.5 text-[10px] font-semibold text-muted">
-                Joined This Month
+                {t("usersJoinedThisMonth")}
               </p>
             </div>
             <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-surface-muted text-secondary transition-colors group-hover:bg-action group-hover:text-on-action">
@@ -383,14 +383,14 @@ export default function AdminUsersPage() {
             <div className="relative min-w-[230px] flex-1 sm:w-64 sm:flex-initial">
               <Search
                 size={14}
-                className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
+                className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted"
               />
               <input
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search name, email, or #ID..."
-                className="w-full rounded-xl border border-border/90 bg-surface-subtle py-2 pl-9 pr-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
+                placeholder={t("usersSearchPlaceholder")}
+                className="w-full rounded-xl border border-border/90 bg-surface-subtle py-2 ps-9 pe-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
               />
             </div>
 
@@ -398,10 +398,10 @@ export default function AdminUsersPage() {
             <div className="inline-flex flex-wrap rounded-xl border border-border/90 bg-surface-subtle p-1">
               {(
                 [
-                  { id: "all", label: `All (${users.length})` },
-                  { id: "admin", label: `Admins (${telemetry.admins})` },
-                  { id: "manager", label: `Managers (${telemetry.managers})` },
-                  { id: "user", label: `Members (${telemetry.customers})` },
+                  { id: "all", label: `${t("usersFilterAll")} (${users.length})` },
+                  { id: "admin", label: `${t("usersFilterAdmins")} (${telemetry.admins})` },
+                  { id: "manager", label: `${t("usersFilterManagers")} (${telemetry.managers})` },
+                  { id: "user", label: `${t("usersFilterMembers")} (${telemetry.customers})` },
                 ] as const
               ).map((tab) => (
                 <button
@@ -425,17 +425,17 @@ export default function AdminUsersPage() {
             <div className="relative inline-flex items-center">
               <ArrowUpDown
                 size={12}
-                className="pointer-events-none absolute left-3 text-muted"
+                className="pointer-events-none absolute start-3 text-muted"
               />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                aria-label="Sort users"
-                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 pl-8 pr-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:bg-surface focus:outline-none"
+                aria-label={t("usersSortLabel")}
+                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:bg-surface focus:outline-none"
               >
-                <option value="newest">Sort: Newest Joined</option>
-                <option value="oldest">Sort: Oldest Joined</option>
-                <option value="name-asc">Sort: Name (A → Z)</option>
+                <option value="newest">{t("usersSortNewest")}</option>
+                <option value="oldest">{t("usersSortOldest")}</option>
+                <option value="name-asc">{t("usersSortName")}</option>
               </select>
             </div>
 
@@ -451,7 +451,7 @@ export default function AdminUsersPage() {
                 }`}
               >
                 <List size={13} />
-                <span>Table</span>
+                <span>{t("usersTableView")}</span>
               </button>
               <button
                 type="button"
@@ -463,7 +463,7 @@ export default function AdminUsersPage() {
                 }`}
               >
                 <LayoutGrid size={13} />
-                <span>3D Badges</span>
+                <span>{t("usersCardsView")}</span>
               </button>
             </div>
           </div>

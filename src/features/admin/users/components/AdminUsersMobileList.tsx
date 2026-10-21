@@ -14,6 +14,7 @@ import {
   Mail,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface Props {
   users: User[];
@@ -21,6 +22,7 @@ interface Props {
 
 export default function AdminUsersMobileList({ users }: Props) {
   const router = useRouter();
+  const { t, locale, direction } = useLocale();
   const [brokenAvatars, setBrokenAvatars] = useState<Record<string, boolean>>(
     {},
   );
@@ -34,7 +36,7 @@ export default function AdminUsersMobileList({ users }: Props) {
     e.stopPropagation();
     navigator.clipboard?.writeText(id);
     setCopiedId(id);
-    toast.success(`ID #${id.slice(-6).toUpperCase()} copied`);
+    toast.success(`${t("usersCopyId")}: #${id.slice(-6).toUpperCase()} · ${t("usersCopied")}`);
     setTimeout(() => setCopiedId(null), 1800);
   };
 
@@ -52,7 +54,7 @@ export default function AdminUsersMobileList({ users }: Props) {
     const r = (rawRole || "USER").toUpperCase();
     if (r === "ADMIN") {
       return {
-        label: "ADMIN",
+        label: t("usersRoleAdmin"),
         icon: Crown,
         className: "border-border-strong bg-action text-on-action",
         dotClass: "bg-success",
@@ -60,14 +62,14 @@ export default function AdminUsersMobileList({ users }: Props) {
     }
     if (r === "MANAGER" || r === "MANGER") {
       return {
-        label: "MANAGER",
+        label: t("usersRoleManager"),
         icon: Shield,
         className: "border-info-border bg-info-soft text-info",
         dotClass: "bg-info",
       };
     }
     return {
-      label: "MEMBER",
+      label: t("usersRoleMember"),
       icon: UserCheck,
       className: "border-border bg-surface-muted text-secondary",
       dotClass: "bg-surface-hover",
@@ -75,7 +77,7 @@ export default function AdminUsersMobileList({ users }: Props) {
   };
 
   return (
-    <div className="space-y-3.5 md:hidden">
+    <div dir={direction} className="space-y-3.5 md:hidden">
       {users.map((user: any) => {
         const shortId = (user._id || "").slice(-6).toUpperCase();
         const roleInfo = getRoleBadge(user.role);
@@ -96,7 +98,7 @@ export default function AdminUsersMobileList({ users }: Props) {
                   {hasAvatar ? (
                     <img
                       src={user.avatar}
-                      alt={user.fullName || "User"}
+                      alt={user.fullName || t("usersUnnamed")}
                       loading="lazy"
                       onError={() =>
                         setBrokenAvatars((prev) => ({
@@ -120,7 +122,7 @@ export default function AdminUsersMobileList({ users }: Props) {
                 {/* User Info */}
                 <div className="min-w-0">
                   <h3 className="truncate text-sm font-black uppercase tracking-tight text-primary">
-                    {user.fullName || "Unnamed User"}
+                    {user.fullName || t("usersUnnamed")}
                   </h3>
                   <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] font-medium text-muted">
                     <Mail size={10} className="shrink-0" />
@@ -159,7 +161,7 @@ export default function AdminUsersMobileList({ users }: Props) {
                 {user.createdAt && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-muted">
                     <Calendar size={10} />
-                    {new Date(user.createdAt).toLocaleDateString("en-GB", {
+                    {new Date(user.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
                       day: "2-digit",
                       month: "short",
                       year: "numeric",
@@ -169,7 +171,7 @@ export default function AdminUsersMobileList({ users }: Props) {
               </div>
 
               <span className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-primary shadow-2xs">
-                <span>Profile</span>
+                <span>{t("usersProfile")}</span>
                 <ChevronRight size={12} />
               </span>
             </div>

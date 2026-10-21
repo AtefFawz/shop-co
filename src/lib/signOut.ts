@@ -14,8 +14,9 @@ const signOut = async () => {
 
   Cookies.remove("token", { path: "/" });
   Cookies.remove("role", { path: "/" });
-
-  localStorage.clear();
+  // Authentication is cookie-based in this app. Do not clear all browser
+  // storage on sign-out: that would also erase the user's language, theme,
+  // cart, wishlist, notification preferences, and other non-sensitive data.
 
   window.location.href = "/auth/signin";
 };

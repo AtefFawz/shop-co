@@ -25,8 +25,10 @@ import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton"
 import { useFilterStore } from "@/store/filterStore";
 import { Product } from "@/types";
 import useData from "@/hooks/getData";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export const ShopCatalogView = () => {
+  const { t, direction } = useLocale();
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword")?.trim() || "";
 
@@ -77,9 +79,36 @@ export const ShopCatalogView = () => {
   const hasActiveFilters = Boolean(
     currentType || currentSection || currentStyle || sortBy !== "featured",
   );
+  const localizedFilterLabel = (value?: string | null) => {
+    if (!value) return "";
+    const labels: Record<string, string> = {
+      MEN: t("adminProductGenderMen"),
+      WOMEN: t("adminProductGenderWomen"),
+      KIDS: t("adminGenderKids"),
+      UNISEX: t("adminProductGenderUnisex"),
+      "T-SHIRT": t("adminSectionTShirt"),
+      SHIRT: t("adminSectionShirt"),
+      PANTS: t("adminSectionPants"),
+      JEANS: t("adminSectionJeans"),
+      CASUAL: t("casual"),
+      FORMAL: t("formal"),
+      PARTY: t("party"),
+      GYM: t("gym"),
+    };
+    return labels[value.toUpperCase()] || value;
+  };
+  const localizedSortLabel: Record<string, string> = {
+    featured: t("catalogSortFeatured"),
+    "price-asc": t("catalogSortPriceLow"),
+    "price-desc": t("catalogSortPriceHigh"),
+    "rating-desc": t("catalogSortRating"),
+  };
 
   return (
-    <section className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-10">
+    <section
+      dir={direction}
+      className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-10"
+    >
       {/* Subtle Studio Grid Backdrop */}
       <div
         aria-hidden="true"
@@ -94,27 +123,30 @@ export const ShopCatalogView = () => {
           <div className="space-y-2">
             {/* Breadcrumb */}
             <nav
-              aria-label="Breadcrumb"
+              aria-label={t("productBreadcrumb")}
               className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted"
             >
               <Link href="/" className="hover:text-primary transition-colors">
-                Flagship
+                {t("catalogFlagship")}
               </Link>
               <span>/</span>
               <span className="text-primary">
-                {currentType || "All Collections"}
+                {localizedFilterLabel(currentType) ||
+                  t("catalogAllCollections")}
               </span>
               {currentStyle && (
                 <>
                   <span>/</span>
-                  <span className="text-primary">{currentStyle}</span>
+                  <span className="text-primary">
+                    {localizedFilterLabel(currentStyle)}
+                  </span>
                 </>
               )}
               {currentSection && (
                 <>
                   <span>/</span>
                   <span className="rounded-md bg-action px-2 py-0.5 text-on-action">
-                    {currentSection}
+                    {localizedFilterLabel(currentSection)}
                   </span>
                 </>
               )}
@@ -122,11 +154,14 @@ export const ShopCatalogView = () => {
 
             <div className="flex flex-wrap items-baseline gap-3">
               <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-                {currentSection || currentStyle || currentType || "The Archive"}
+                {localizedFilterLabel(currentSection) ||
+                  localizedFilterLabel(currentStyle) ||
+                  localizedFilterLabel(currentType) ||
+                  t("catalogAllCollections")}
               </h1>
               {!loading && (
                 <span className="rounded-full bg-surface-subtle px-3 py-0.5 font-mono text-xs font-black text-secondary">
-                  {sortedProducts.length} Showing
+                  {sortedProducts.length} {t("catalogShowing")}
                 </span>
               )}
             </div>
@@ -137,7 +172,7 @@ export const ShopCatalogView = () => {
             {keyword && (
               <div className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface-subtle px-3 py-2 text-xs font-bold text-secondary">
                 <Search size={12} className="text-primary" />
-                <span>Query:</span>
+                <span>{t("catalogQuery")}</span>
                 <strong className="text-primary">
                   &ldquo;{keyword}&rdquo;
                 </strong>
@@ -148,18 +183,18 @@ export const ShopCatalogView = () => {
             <div className="relative inline-flex items-center">
               <ArrowUpDown
                 size={12}
-                className="pointer-events-none absolute left-3 text-muted"
+                className="pointer-events-none absolute start-3 text-muted"
               />
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as any)}
-                aria-label="Sort showroom products"
-                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 pl-8 pr-7 text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:border-border-strong focus:border-primary focus:bg-surface focus:outline-none"
+                aria-label={t("catalogSort")}
+                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:border-border-strong focus:border-primary focus:bg-surface focus:outline-none"
               >
-                <option value="featured">Sort: Featured Edit</option>
-                <option value="price-asc">Price: Low → High</option>
-                <option value="price-desc">Price: High → Low</option>
-                <option value="rating-desc">Rating: Highest First</option>
+                <option value="featured">{t("catalogSortFeatured")}</option>
+                <option value="price-asc">{t("catalogSortPriceLow")}</option>
+                <option value="price-desc">{t("catalogSortPriceHigh")}</option>
+                <option value="rating-desc">{t("catalogSortRating")}</option>
               </select>
             </div>
 
@@ -168,7 +203,7 @@ export const ShopCatalogView = () => {
               <button
                 type="button"
                 onClick={() => setGridCols(3)}
-                title="3-Column Editorial View"
+                title={t("catalogThreeColumns")}
                 className={`cursor-pointer rounded-lg p-1.5 transition-all ${
                   gridCols === 3
                     ? "bg-action text-on-action shadow-2xs"
@@ -180,7 +215,7 @@ export const ShopCatalogView = () => {
               <button
                 type="button"
                 onClick={() => setGridCols(4)}
-                title="4-Column Compact View"
+                title={t("catalogFourColumns")}
                 className={`cursor-pointer rounded-lg p-1.5 transition-all ${
                   gridCols === 4
                     ? "bg-action text-on-action shadow-2xs"
@@ -200,30 +235,30 @@ export const ShopCatalogView = () => {
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border-subtle bg-surface/80 px-4 py-2.5 backdrop-blur-md">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[10px] font-black uppercase tracking-widest text-muted">
-                Active Filters:
+                {t("catalogActiveFilters")}
               </span>
 
               {currentType && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-[10px] font-black uppercase tracking-wider text-on-action">
-                  Dept: {currentType}
+                  {t("catalogDepartment")} {localizedFilterLabel(currentType)}
                 </span>
               )}
 
               {currentSection && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-[10px] font-black uppercase tracking-wider text-on-action">
-                  Type: {currentSection}
+                  {t("catalogType")} {localizedFilterLabel(currentSection)}
                 </span>
               )}
 
               {currentStyle && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-[10px] font-black uppercase tracking-wider text-on-action">
-                  Style: {currentStyle}
+                  {t("catalogStyle")} {localizedFilterLabel(currentStyle)}
                 </span>
               )}
 
               {sortBy !== "featured" && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-border-strong bg-surface px-3 py-1 text-[10px] font-black uppercase tracking-wider text-primary">
-                  Sorted: {sortBy}
+                  {t("catalogSorted")} {localizedSortLabel[sortBy] || sortBy}
                 </span>
               )}
             </div>
@@ -237,7 +272,7 @@ export const ShopCatalogView = () => {
               className="inline-flex cursor-pointer items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-danger hover:underline"
             >
               <RotateCcw size={11} />
-              <span>Clear All</span>
+              <span>{t("catalogResetAll")}</span>
             </button>
           </div>
         )}
@@ -248,7 +283,7 @@ export const ShopCatalogView = () => {
         <div className="flex items-start gap-5 lg:gap-7">
           {/* Desktop Sidebar */}
           <aside
-            aria-label="Product filters"
+            aria-label={t("filters")}
             className="sticky top-24 hidden h-fit w-[250px] shrink-0 self-start md:block xl:w-[285px]"
           >
             <CatalogFilterPanel />
@@ -264,8 +299,8 @@ export const ShopCatalogView = () => {
             {/* Loading Skeleton Grid */}
             {loading && (
               <div
-                aria-label="Loading products"
-                className={`grid grid-cols-2 gap-3.5 sm:gap-5 lg:grid-cols-3 ${
+                aria-label={t("catalogLoading")}
+                className={`grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 ${
                   gridCols === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3"
                 }`}
               >
@@ -278,7 +313,7 @@ export const ShopCatalogView = () => {
             {/* Products Grid */}
             {!loading && hasProducts && (
               <div
-                className={`grid grid-cols-2 gap-3.5 sm:gap-5 lg:grid-cols-3 ${
+                className={`grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 ${
                   gridCols === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3"
                 }`}
               >
@@ -296,12 +331,11 @@ export const ShopCatalogView = () => {
                 </div>
 
                 <h3 className="text-sm font-black uppercase tracking-wider text-primary">
-                  No Matching Garments Found
+                  {t("productSearchEmptyTitle")}
                 </h3>
 
                 <p className="mt-1.5 max-w-xs text-xs leading-relaxed text-muted">
-                  No pieces in our current archive match your selected filter
-                  combination.
+                  {t("productSearchEmptyDescription")}
                 </p>
 
                 <button
@@ -313,7 +347,7 @@ export const ShopCatalogView = () => {
                   className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-2xl bg-action px-5 py-3 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition-all hover:-translate-y-0.5 hover:bg-action-hover"
                 >
                   <RotateCcw size={13} />
-                  <span>Reset All Filters</span>
+                  <span>{t("resetAllFilters")}</span>
                 </button>
               </div>
             )}
@@ -324,10 +358,12 @@ export const ShopCatalogView = () => {
                 <div className="flex items-center gap-2 text-xs font-bold text-muted">
                   <Layers size={14} className="text-primary" />
                   <span>
-                    Page <strong className="text-primary">{page}</strong> of{" "}
+                    {t("catalogPage")}{" "}
+                    <strong className="text-primary">{page}</strong>{" "}
+                    {t("catalogOf")}{" "}
                     <strong className="text-primary">{totalPages}</strong> (
-                    {data?.pagination?.total ?? sortedProducts.length} total
-                    items)
+                    {data?.pagination?.total ?? sortedProducts.length}{" "}
+                    {t("catalogTotalItems")})
                   </span>
                 </div>
 

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   Check,
-  Package,
   ShoppingBag,
   ArrowUpRight,
   Copy,
@@ -14,28 +13,35 @@ import {
   Truck,
 } from "lucide-react";
 import toast from "react-hot-toast";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function OrderConfirmationPage() {
+  const { t, direction } = useLocale();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("id") || "";
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    document.title = "Order Confirmed · Atelier Dispatch | SHOP.CO™";
-  }, []);
+    document.title = t("orderConfirmPageTitle");
+  }, [t]);
 
-  const handleCopyId = () => {
+  const handleCopyId = async () => {
     if (!orderId) return;
-    navigator.clipboard?.writeText(orderId);
-    setCopied(true);
-    toast.success(`Order Number #${orderId.slice(-6).toUpperCase()} copied`);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      if (!navigator.clipboard?.writeText) throw new Error("Clipboard unavailable");
+      await navigator.clipboard.writeText(orderId);
+      setCopied(true);
+      toast.success(t("orderConfirmCopyToast").replace("{id}", orderId.slice(-6).toUpperCase()));
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error(t("orderConfirmCopyFailed"));
+    }
   };
 
   const shortId = orderId ? orderId.slice(-6).toUpperCase() : "ATELIER";
 
   return (
-    <section className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-12 text-primary sm:py-20">
+    <section dir={direction} className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-12 text-primary sm:py-20">
       {/* Subtle Studio Grid Backdrop */}
       <div
         aria-hidden="true"
@@ -52,24 +58,23 @@ export default function OrderConfirmationPage() {
           </div>
 
           <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-subtle px-3.5 py-1 text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-            <Sparkles size={11} className="text-primary" /> DISPATCH QUEUED
+            <Sparkles size={11} className="text-primary" /> {t("orderConfirmDispatchQueued")}
           </span>
 
           <h1 className="mt-3 text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-            Your Order Is Confirmed!
+            {t("orderConfirmHeading")}
           </h1>
 
           <p className="mt-2 text-xs font-medium leading-relaxed text-muted sm:text-sm">
-            Thank you for curating with SHOP.CO Atelier. Your items are being
-            inspected and securely packaged for express dispatch.
+            {t("orderConfirmDescription")}
           </p>
 
           {/* Order ID Pill */}
           {orderId && (
             <div className="my-6 flex items-center justify-between gap-3 rounded-2xl border border-dashed border-border-strong bg-surface-subtle p-4">
-              <div className="text-left">
+              <div className="text-start">
                 <span className="block text-[9px] font-black uppercase tracking-widest text-muted">
-                  Official Tracking Reference
+                  {t("orderConfirmTrackingRef")}
                 </span>
                 <span className="font-mono text-sm font-black text-primary">
                   #{shortId}
@@ -81,7 +86,7 @@ export default function OrderConfirmationPage() {
                 onClick={handleCopyId}
                 className="inline-flex cursor-pointer items-center gap-1 rounded-xl bg-surface px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-primary shadow-2xs transition-all hover:bg-action hover:text-on-action"
               >
-                <span>{copied ? "Copied" : "Copy ID"}</span>
+                <span>{copied ? t("copied") : t("orderConfirmCopyId")}</span>
                 <Copy size={12} />
               </button>
             </div>
@@ -94,10 +99,10 @@ export default function OrderConfirmationPage() {
               className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-action px-7 py-4 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.4)] transition-all hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <ShoppingBag size={14} />
-              <span>Continue Shopping</span>
+              <span>{t("orderConfirmContinueShopping")}</span>
               <ArrowUpRight
                 size={14}
-                className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                className={`transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${direction === "rtl" ? "rotate-180" : ""}`}
               />
             </Link>
 
@@ -106,14 +111,14 @@ export default function OrderConfirmationPage() {
               className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-surface px-7 py-4 text-xs font-black uppercase tracking-[0.18em] text-secondary shadow-2xs transition-all hover:border-border-strong hover:bg-surface-subtle"
             >
               <Truck size={14} />
-              <span>Track Orders</span>
+              <span>{t("orderConfirmTrackOrders")}</span>
             </Link>
           </div>
 
           {/* Security Guarantee Footer */}
           <div className="mt-7 flex items-center justify-center gap-1.5 border-t border-border-subtle pt-5 text-[10px] font-bold uppercase tracking-widest text-muted">
             <ShieldCheck size={14} className="text-success" />
-            <span>Insured Dispatch &amp; Real-Time SMS Updates</span>
+            <span>{t("orderConfirmSecurityNote")}</span>
           </div>
         </div>
       </div>

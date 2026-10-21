@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const SIZES = [
   { label: "XX-Small", short: "XXS" },
@@ -16,11 +17,12 @@ const SIZES = [
 ];
 
 export const ProductSizeFilter = () => {
+  const { t, locale, direction } = useLocale();
   const [active, setActive] = useState(true);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   return (
-    <div className="w-full py-1">
+    <div dir={direction} className="w-full py-1">
       <button
         type="button"
         onClick={() => setActive((p) => !p)}
@@ -28,7 +30,7 @@ export const ProductSizeFilter = () => {
       >
         <div className="flex items-center gap-2">
           <span className="text-[11px] font-black uppercase tracking-[0.16em] text-secondary">
-            Garment Size
+            {t("garmentSize")}
           </span>
           {selectedSize && (
             <span className="rounded-md bg-action px-2 py-0.5 font-mono text-[9px] font-black text-on-action">
@@ -53,6 +55,9 @@ export const ProductSizeFilter = () => {
           <div className="grid grid-cols-3 gap-2 pb-4 pt-1">
             {SIZES.map((s) => {
               const isSelected = selectedSize === s.label;
+              const displayLabel = locale === "ar"
+                ? (({ XXS: t("sizeXXS"), XS: t("sizeXS"), S: t("sizeSmall"), M: t("sizeMedium"), L: t("sizeLarge"), XL: t("sizeXL"), "2XL": t("size2XL"), "3XL": t("size3XL"), "4XL": t("size4XL") } as Record<string, string>)[s.short] || s.label)
+                : s.label;
               return (
                 <button
                   key={s.label}
@@ -62,7 +67,7 @@ export const ProductSizeFilter = () => {
                       prev === s.label ? null : s.label,
                     )
                   }
-                  title={s.label}
+                  title={displayLabel}
                   className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border py-2 px-2 transition-all duration-200 active:scale-95 ${
                     isSelected
                       ? "border-border-strong bg-action text-on-action shadow-sm"
@@ -77,7 +82,7 @@ export const ProductSizeFilter = () => {
                       isSelected ? "text-on-action/65" : "text-muted"
                     }`}
                   >
-                    {s.label}
+                    {displayLabel}
                   </span>
                 </button>
               );

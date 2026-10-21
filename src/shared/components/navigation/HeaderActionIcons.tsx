@@ -10,6 +10,7 @@ export interface NavIconItem {
   label?: string;
   action?: () => void;
   isFound?: boolean;
+  badgeCount?: number;
 }
 
 interface NavIconsProps {
@@ -23,15 +24,17 @@ export default function HeaderActionIcons({
   containerClass = "flex items-center gap-2",
   iconClass = "p-2",
 }: NavIconsProps) {
-  const cartItemsCount = useProduct((state) => state.stack).filter(
-    (item) => item.isChose === true,
-  ).length;
+  const cartItemsCount = useProduct((state) => state.stack).reduce(
+    (total, item) => total + (item.isChose === true ? Math.max(1, Number(item.count) || 1) : 0),
+    0,
+  );
 
   return (
     <div className={containerClass}>
       {items.map((item) => {
         const Icon = item.Icon;
         const label = item.label ?? item.key;
+        const badgeCount = item.badgeCount ?? (item.isFound ? cartItemsCount : 0);
 
         return (
           <button
@@ -53,9 +56,9 @@ export default function HeaderActionIcons({
               <Icon className="h-[19px] w-[19px] shrink-0 transition-transform duration-200 group-hover:scale-105" />
             )}
 
-            {item.isFound && cartItemsCount > 0 && (
+            {badgeCount > 0 && (
               <span className="absolute -right-1 -top-1 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-extrabold leading-none text-on-danger shadow-sm ring-2 ring-surface md:h-5 md:min-w-5 md:text-[11px]">
-                {cartItemsCount > 99 ? "99+" : cartItemsCount}
+                {badgeCount > 99 ? "99+" : badgeCount}
               </span>
             )}
           </button>

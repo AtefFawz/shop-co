@@ -36,7 +36,7 @@ export const AlsoLike = ({ productItem }: { productItem: Product }) => {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <ProductSkeleton key={i} />
         ))}
@@ -73,7 +73,7 @@ export const AlsoLike = ({ productItem }: { productItem: Product }) => {
       </div>
 
       {/* 4-Column Responsive Grid */}
-      <div className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
         {recommendations.map((item: Product) => (
           <Card key={item._id} product={item} />
         ))}

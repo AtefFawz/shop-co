@@ -81,10 +81,10 @@ export default function NotificationListener() {
             : Bell;
 
       toast.custom(
-        (t) => (
+        (toastItem) => (
           <div
             className={`${
-              t.visible ? "animate-enter" : "animate-leave"
+              toastItem.visible ? "animate-enter" : "animate-leave"
             } pointer-events-auto relative flex w-full max-w-sm flex-col overflow-hidden rounded-3xl border border-white/20 bg-[#111111]/95 p-4 text-white shadow-[0_28px_70px_rgba(0,0,0,0.5)] backdrop-blur-2xl`}
           >
             <div className="flex items-start gap-3.5">
@@ -113,7 +113,7 @@ export default function NotificationListener() {
                   <button
                     type="button"
                     onClick={() => {
-                      toast.dismiss(t.id);
+                      toast.dismiss(toastItem.id);
                       router.push(`/shop/orders/${notification.order}`);
                     }}
                     className="mt-3 inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-white px-3 py-1.5 font-mono text-[10px] font-black uppercase tracking-wider text-[#111111] shadow-xs transition hover:bg-emerald-400"
@@ -129,7 +129,7 @@ export default function NotificationListener() {
 
               <button
                 type="button"
-                onClick={() => toast.dismiss(t.id)}
+                onClick={() => toast.dismiss(toastItem.id)}
                 className="flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full bg-white/10 text-neutral-400 transition hover:bg-white/20 hover:text-white"
               >
                 <X size={13} />

@@ -15,6 +15,7 @@ import {
   ChevronRight,
   LogIn,
   Sparkles,
+  Heart,
 } from "lucide-react";
 
 import { NAV_LINKS } from "@/shared/config/storefrontNavigation";
@@ -24,10 +25,23 @@ import SearchBar from "@/features/catalog/components/ProductSearchBar";
 import NotificationDropdown from "@/features/notifications/components/NotificationDropdown";
 import StrokeText from "@/shared/components/motion/StrokeText";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
+import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { useWishlistStore } from "@/store/wishlistStore";
 
 export default function MobileStorefrontNavbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const { t, direction } = useLocale();
+  const wishlistCount = useWishlistStore((state) => state.items.length);
+
+  const navLabel = (path: string) => {
+    if (path === "/") return t("navHome");
+    if (path === "/selling") return t("navSale");
+    if (path === "/category") return t("navCategory");
+    if (path === "/brand") return t("navBrands");
+    return path;
+  };
   const reduceMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
 
@@ -112,20 +126,27 @@ export default function MobileStorefrontNavbar() {
     {
       Icon: Search,
       key: "search",
-      label: "Search products",
+      label: t("navSearch"),
       action: toggleSearch,
     },
     {
       Icon: ShoppingBag,
       isFound: true,
       key: "cart",
-      label: "Shopping cart",
+      label: t("navCart"),
       action: () => router.push("/shop/details/cart/"),
+    },
+    {
+      Icon: Heart,
+      key: "wishlist",
+      label: t("wishlist"),
+      badgeCount: wishlistCount,
+      action: () => router.push("/wishlist"),
     },
     {
       Icon: UserRound,
       key: "profile",
-      label: "Profile",
+      label: t("navProfile"),
       photo,
       action: () => router.push("/user/profile"),
     },
@@ -136,10 +157,10 @@ export default function MobileStorefrontNavbar() {
     : { type: "spring" as const, stiffness: 340, damping: 30 };
 
   return (
-    <header className="relative z-40 block md:hidden">
+    <header className="relative z-40 block xl:hidden">
       {/* ==================== HEADER ==================== */}
       <nav
-        aria-label="Mobile header"
+        aria-label={t("navMainHeader")}
         className="
           relative flex min-h-[76px] items-center justify-between
           gap-2  bg-surface px-1
@@ -150,7 +171,7 @@ export default function MobileStorefrontNavbar() {
         <div className="flex min-w-0 items-center gap-3 sm:gap-4">
           <motion.button
             type="button"
-            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            aria-label={isMenuOpen ? t("navCloseMenu") : t("navOpenMenu")}
             aria-expanded={isMenuOpen}
             aria-controls="mobile-navigation-drawer"
             onClick={() => {
@@ -183,7 +204,7 @@ export default function MobileStorefrontNavbar() {
 
           <Link
             href="/"
-            aria-label="SHOP.CO home"
+            aria-label={t("navHome")}
             onClick={closeMenu}
             className="flex min-w-0 items-center"
           >
@@ -224,7 +245,7 @@ export default function MobileStorefrontNavbar() {
           <>
             <motion.button
               type="button"
-              aria-label="Close search"
+              aria-label={t("navCloseSearch")}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -234,7 +255,7 @@ export default function MobileStorefrontNavbar() {
             />
 
             <motion.section
-              aria-label="Product search"
+              aria-label={t("navSearch")}
               initial={
                 reduceMotion ? false : { opacity: 0, y: -12, scale: 0.98 }
               }
@@ -256,16 +277,16 @@ export default function MobileStorefrontNavbar() {
               <div className="mb-3 flex items-center justify-between px-1">
                 <div>
                   <p className="text-sm font-bold text-primary">
-                    Find your style
+                    {t("navFindStyle")}
                   </p>
                   <p className="mt-0.5 text-xs text-muted">
-                    Search products and collections
+                    {t("navSearchDescription")}
                   </p>
                 </div>
 
                 <button
                   type="button"
-                  aria-label="Close search"
+                  aria-label={t("navCloseSearch")}
                   onClick={closeSearch}
                   className="
                     flex h-8 w-8 items-center justify-center
@@ -290,7 +311,7 @@ export default function MobileStorefrontNavbar() {
 
               <div className="mt-3 flex items-center gap-2 px-1 text-[11px] text-muted">
                 <Search size={13} />
-                <span>Discover something you love</span>
+                <span>{t("navDiscover")}</span>
               </div>
             </motion.section>
           </>
@@ -306,7 +327,7 @@ export default function MobileStorefrontNavbar() {
           <>
             <motion.button
               type="button"
-              aria-label="Close navigation menu"
+              aria-label={t("navCloseMenu")}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -319,20 +340,23 @@ export default function MobileStorefrontNavbar() {
               id="mobile-navigation-drawer"
               role="dialog"
               aria-modal="true"
-              aria-label="Mobile navigation menu"
-              initial={reduceMotion ? false : { x: "-100%", opacity: 0.7 }}
+              aria-label={t("navMainMenu")}
+              initial={reduceMotion ? false : { x: direction === "rtl" ? "100%" : "-100%", opacity: 0.7 }}
               animate={{ x: 0, opacity: 1 }}
               exit={
-                reduceMotion ? { opacity: 0 } : { x: "-100%", opacity: 0.7 }
+                reduceMotion
+                  ? { opacity: 0 }
+                  : { x: direction === "rtl" ? "100%" : "-100%", opacity: 0.7 }
               }
               transition={transition}
-              className="
-                fixed inset-y-0 left-0 z-[9999]
+              className={`
+                fixed inset-y-0 z-[9999]
                 flex w-[min(88vw,370px)] flex-col
                 overflow-y-auto overscroll-contain
-                border-r border-border bg-surface
+                border-border bg-surface
                 shadow-[20px_0_60px_rgba(var(--shadow-rgb),0.12)]
-              "
+                ${direction === "rtl" ? "right-0 border-s" : "left-0 border-e"}
+              `}
             >
               {/* Drawer header */}
               <div
@@ -350,10 +374,11 @@ export default function MobileStorefrontNavbar() {
                 </Link>
 
                 <div className="flex items-center gap-2">
+                  <LocaleSwitcher compact />
                   <ThemeToggle compact />
                   <button
                     type="button"
-                    aria-label="Close menu"
+                    aria-label={t("navCloseMenu")}
                     onClick={closeMenu}
                     className="
                       flex h-10 w-10 items-center justify-center
@@ -381,7 +406,7 @@ export default function MobileStorefrontNavbar() {
                     // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={photo}
-                      alt="Profile"
+                      alt={t("navProfile")}
                       className="h-11 w-11 rounded-full border border-border object-cover"
                     />
                   ) : (
@@ -398,10 +423,10 @@ export default function MobileStorefrontNavbar() {
 
                   <span className="min-w-0 flex-1">
                     <span className="block text-sm font-bold text-primary">
-                      Your account
+                      {t("navProfile")}
                     </span>
                     <span className="mt-0.5 block text-xs text-muted">
-                      View profile and settings
+                      {t("profileSettings")}
                     </span>
                   </span>
 
@@ -420,10 +445,10 @@ export default function MobileStorefrontNavbar() {
                   tracking-[0.2em] text-muted
                 "
                 >
-                  Explore
+                  {t("navCategory")}
                 </p>
 
-                <nav aria-label="Main menu">
+                <nav aria-label={t("navMainMenu")}>
                   <div className="flex flex-col gap-1">
                     {NAV_LINKS.map((item, index) => {
                       const isActive =
@@ -493,7 +518,7 @@ export default function MobileStorefrontNavbar() {
                               sm:text-[15px]
                             "
                             >
-                              {item.name}
+                              {navLabel(item.path)}
                             </span>
 
                             <ChevronRight
@@ -532,7 +557,7 @@ export default function MobileStorefrontNavbar() {
                   "
                 >
                   <LogIn size={17} />
-                  Log In
+                  {t("signIn")}
                 </Link>
 
                 <Link
@@ -546,7 +571,7 @@ export default function MobileStorefrontNavbar() {
                   "
                 >
                   <Sparkles size={16} />
-                  Start For Free
+                  {t("signUp")}
                   <ArrowUpRight size={16} />
                 </Link>
 

@@ -14,8 +14,12 @@ import {
 } from "lucide-react";
 import Login from "@/assets/shop/screenShop.webp";
 import { SignInForm } from "@/features/auth/components/SignInForm";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
+import ThemeToggle from "@/shared/theme/ThemeToggle";
 
 export default function SignInPageContent() {
+  const { t, direction } = useLocale();
   const stageRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
@@ -36,7 +40,7 @@ export default function SignInPageContent() {
   };
 
   return (
-    <div className="relative flex min-h-screen w-full overflow-hidden bg-surface-subtle text-primary selection:bg-action selection:text-on-action">
+    <div dir={direction} className="relative flex min-h-screen w-full overflow-hidden bg-surface-subtle text-primary selection:bg-action selection:text-on-action">
       {/* ================================================================== */}
       {/* LEFT — 3D INTERACTIVE EDITORIAL SHOWCASE (DESKTOP ONLY)            */}
       {/* ================================================================== */}
@@ -82,11 +86,11 @@ export default function SignInPageContent() {
               size={13}
               className="transition-transform duration-300 group-hover:-translate-x-1"
             />
-            <span>Back to Flagship</span>
+            <span>{t("authBackToFlagship")}</span>
           </Link>
 
           <span className="rounded-full border border-border-subtle bg-surface/80 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-secondary backdrop-blur-md">
-            ARCHIVE // 2026
+            {t("authArchive2026")}
           </span>
         </div>
 
@@ -114,10 +118,10 @@ export default function SignInPageContent() {
               {/* Bottom Editorial Copy Inside Frame */}
               <div className="absolute inset-x-6 bottom-6 z-20 text-on-action">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action backdrop-blur-md">
-                  <Sparkles size={10} /> Member Portal
+                  <Sparkles size={10} /> {t("authMemberPortal")}
                 </span>
                 <h2 className="mt-2 text-3xl font-black uppercase leading-[0.92] tracking-[-0.04em] lg:text-4xl">
-                  Welcome Back To The Studio.
+                  {t("authWelcomeBack")}
                 </h2>
               </div>
             </div>
@@ -132,10 +136,10 @@ export default function SignInPageContent() {
               </div>
               <div>
                 <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted">
-                  Curated Catalog
+                  {t("authCuratedCatalog")}
                 </p>
                 <p className="text-[11px] font-black text-primary">
-                  200+ Luxury Houses
+                  {t("authLuxuryHouses")}
                 </p>
               </div>
             </div>
@@ -151,15 +155,15 @@ export default function SignInPageContent() {
                 ))}
               </div>
               <span className="font-mono text-xs font-black">4.9/5</span>
-              <span className="text-[10px] text-on-action/60">VIP Rating</span>
+              <span className="text-[10px] text-on-action/60">{t("authVipRating")}</span>
             </div>
           </div>
         </div>
 
         {/* 3. Bottom Telemetry Footer */}
         <div className="relative z-30 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
-          <span>OFFICIAL ONLINE FLAGSHIP</span>
-          <span>VERIFIED AUTHENTICITY</span>
+          <span>{t("authOfficialFlagship")}</span>
+          <span>{t("authVerifiedAuthenticity")}</span>
         </div>
       </div>
 
@@ -174,11 +178,16 @@ export default function SignInPageContent() {
             className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary shadow-2xs"
           >
             <ArrowLeft size={13} />
-            <span>Store</span>
+            <span>{t("catalogFlagship")}</span>
           </Link>
           <span className="text-xs font-black tracking-[-0.04em] text-primary">
             SHOP.CO™
           </span>
+        </div>
+
+        <div className="mx-auto mb-4 flex w-full max-w-[450px] items-center justify-end gap-2" aria-label={t("authLanguageAndTheme")}>
+          <LocaleSwitcher compact />
+          <ThemeToggle compact />
         </div>
 
         {/* Form Card Container */}
@@ -188,16 +197,15 @@ export default function SignInPageContent() {
             <div className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-success" />
               <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
-                CLIENT PORTAL · SIGN IN
+                {t("authLoginPanelLabel")}
               </span>
             </div>
 
             <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
-              Log In To Account
+              {t("authLoginHeading")}
             </h1>
             <p className="text-xs font-medium leading-relaxed text-muted">
-              Enter your credentials below to access your personal lookbook,
-              saved garments, and live order tracking.
+              {t("authLoginDescription")}
             </p>
           </div>
 
@@ -211,13 +219,13 @@ export default function SignInPageContent() {
             </div>
             <div className="relative flex justify-center">
               <span className="bg-surface px-4 text-[9px] font-black uppercase tracking-[0.22em] text-muted">
-                Or Instant Access With
+                {t("authSocialDivider")}
               </span>
             </div>
           </div>
 
           {/* Social OAuth Buttons */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3">
             <SocialButton label="Google" onClick={handleGoogleLogin}>
               <svg
                 width="16"
@@ -243,29 +251,17 @@ export default function SignInPageContent() {
                 />
               </svg>
             </SocialButton>
-
-            <SocialButton label="Apple" onClick={handleGoogleLogin}>
-              <svg
-                width="16"
-                height="16"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-              >
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
-              </svg>
-            </SocialButton>
           </div>
 
           {/* Switch to Sign Up */}
           <div className="mt-7 border-t border-border-subtle pt-5 text-center">
             <p className="text-xs font-medium text-muted">
-              New to SHOP.CO Atelier?{" "}
+              {t("authNewToStore")}{" "}
               <Link
                 href="/auth/signup"
                 className="inline-flex items-center gap-1 font-black uppercase tracking-wider text-primary underline decoration-border-strong underline-offset-4 transition-colors hover:decoration-primary"
               >
-                <span>Create VIP Account</span>
+                <span>{t("authCreateAccountLink")}</span>
                 <ArrowUpRight size={13} />
               </Link>
             </p>

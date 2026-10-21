@@ -17,7 +17,7 @@ import { Product } from "../../types/index";
 const CLOUDINARY_BASE = "https://res.cloudinary.com/dudit0nty/image/upload/";
 
 const getImageUrl = (url?: string): string => {
-  if (!url) return "";
+  if (!url?.trim()) return "";
   return url.startsWith("http") ? url : `${CLOUDINARY_BASE}${url}`;
 };
 
@@ -36,7 +36,9 @@ export default function Card({ product }: { product: Product }) {
   // 2. Normalized Image List
   const images = useMemo<string[]>(() => {
     if (Array.isArray(product.images) && product.images.length > 0) {
-      return product.images.filter(Boolean);
+      return product.images.filter(
+        (image): image is string => typeof image === "string" && image.trim().length > 0,
+      );
     }
     return product.photo ? [product.photo] : [];
   }, [product.images, product.photo]);

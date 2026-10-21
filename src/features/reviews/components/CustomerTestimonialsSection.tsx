@@ -1,10 +1,17 @@
 import React from "react";
+import { cookies } from "next/headers";
+import { messages, type Locale } from "@/shared/i18n/messages";
 import { Star, ShieldCheck, Sparkles, MoveRight } from "lucide-react";
 import CustomerReviewsSection from "@/features/reviews/components/CustomerReviewsSection";
 import Heading from "@/shared/components/ui/SectionHeading";
 import { serverApi } from "@/lib/serverApi";
 
 export default async function CustomerTestimonialsSection() {
+  const cookieStore = await cookies();
+  const locale: Locale = cookieStore.get("shopco-language")?.value === "en" ? "en" : "ar";
+  const t = messages[locale];
+  const direction = locale === "ar" ? "rtl" : "ltr";
+
   interface Review {
     fullName: string;
     rating: number;
@@ -30,11 +37,11 @@ export default async function CustomerTestimonialsSection() {
   }
 
   const result: Review[] = rawReviews.map((e: RawReview) => ({
-    fullName: e.user?.fullName || "Verified Client",
+    fullName: e.user?.fullName || t.reviewVerifiedClient,
     rating: Number(e.rating) || 5,
     comment:
       e.comment ||
-      "Exceptional tailoring and fabric weight. Exceeded expectations.",
+      t.reviewSampleComment,
     avatar: e.user?.avatar || "",
   }));
 
@@ -49,7 +56,7 @@ export default async function CustomerTestimonialsSection() {
       : "4.9";
 
   return (
-    <div className="relative isolate overflow-hidden py-12 sm:py-16">
+    <div dir={direction} className="relative isolate overflow-hidden py-12 sm:py-16">
       <div className="Responsive space-y-8">
         {/* ── Editorial Header + Live Aggregate Sentiment Badge ── */}
         <div className="flex flex-col items-center justify-between gap-4 text-center md:flex-row md:items-end md:text-left">
@@ -57,11 +64,11 @@ export default async function CustomerTestimonialsSection() {
             <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3.5 py-1">
               <ShieldCheck size={12} className="text-success" />
               <span className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">
-                100% VERIFIED CLIENTELE REVIEWS
+                {t.reviewAuthenticatedBadge}
               </span>
             </div>
 
-            <Heading title="OUR HAPPY CUSTOMERS" />
+            <Heading title={t.reviewOurHappyCustomers} />
           </div>
 
           {/* Aggregate Score Pill */}
@@ -72,12 +79,12 @@ export default async function CustomerTestimonialsSection() {
               ))}
             </div>
             <div className="h-4 w-px bg-surface-hover" />
-            <div className="text-left">
+            <div className="text-start">
               <span className="font-mono text-sm font-black text-primary">
                 {avgRating} / 5.0
               </span>
               <span className="ml-2 text-[10px] font-bold uppercase tracking-wider text-muted">
-                ({totalReviews > 0 ? `${totalReviews} Verified` : "12.4k+"})
+                ({totalReviews > 0 ? `${totalReviews} ${t.reviewVerifiedCount}` : "12.4k+"})
               </span>
             </div>
           </div>
@@ -86,7 +93,7 @@ export default async function CustomerTestimonialsSection() {
         {/* ── Horizontal 3D Testimonial Carousel Stage ── */}
         {result.length === 0 ? (
           <div className="rounded-3xl border border-border/70 bg-surface-subtle p-12 text-center text-xs font-bold uppercase tracking-widest text-muted">
-            Client reviews are syncing with the studio archive...
+            {t.reviewSyncing}
           </div>
         ) : (
           <div className="relative">
@@ -107,9 +114,9 @@ export default async function CustomerTestimonialsSection() {
 
             {/* Bottom Swipe Cue */}
             <div className="mt-2 flex items-center justify-between px-1 text-[10px] font-black uppercase tracking-[0.2em] text-muted">
-              <span>AUTHENTICATED BUYER FEEDBACK</span>
+              <span>{t.reviewVerifiedPatronFeedback}</span>
               <span className="inline-flex items-center gap-1.5 text-primary">
-                <span>Swipe to explore</span>
+                <span>{t.reviewSwipeToExplore}</span>
                 <MoveRight size={13} />
               </span>
             </div>

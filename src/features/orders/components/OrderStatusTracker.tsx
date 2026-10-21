@@ -10,6 +10,7 @@ import {
   Clock,
   RotateCcw,
 } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type OrderStatus = "Pending" | "Shipped" | "Delivered" | "Cancelled";
 
@@ -28,20 +29,21 @@ export default function OrderStatusTracker({
   updating = false,
   onSelectStatus,
 }: OrderStatusTrackerProps) {
+  const { t, locale, direction } = useLocale();
   // Calculate Estimated Delivery Window (Created Date + 4 Days)
   const estDelivery = React.useMemo(() => {
     const base = createdAt ? new Date(createdAt) : new Date();
     const target = new Date(base.getTime() + 4 * 24 * 60 * 60 * 1000);
-    return target.toLocaleDateString("en-US", {
+    return target.toLocaleDateString(locale === "ar" ? "ar-EG" : "en-EG", {
       month: "short",
       day: "numeric",
       year: "numeric",
     });
-  }, [createdAt]);
+  }, [createdAt, locale]);
 
   if (status === "Cancelled") {
     return (
-      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-danger-border bg-danger-soft p-5 sm:flex-row sm:items-center sm:p-6">
+      <div dir={direction} className="flex flex-col justify-between gap-4 rounded-3xl border border-danger-border bg-danger-soft p-5 sm:flex-row sm:items-center sm:p-6">
         <div className="flex items-center gap-4">
           <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-2xl bg-danger text-on-danger shadow-[0_10px_24px_-6px_rgba(var(--danger-rgb),0.5)]">
             <XCircle size={24} />
@@ -49,14 +51,13 @@ export default function OrderStatusTracker({
 
           <div>
             <span className="inline-block rounded-full bg-danger-soft px-2.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-danger">
-              DISPATCH HALTED
+              {t("dispatchHalted")}
             </span>
             <p className="mt-1 text-base font-black uppercase tracking-tight text-danger">
-              Order Cancelled
+              {t("orderCancelledTitle")}
             </p>
             <p className="mt-0.5 text-xs font-medium text-danger/90">
-              This order was voided and removed from the active fulfillment
-              queue.
+              {t("cancelledOrderDescription")}
             </p>
           </div>
         </div>
@@ -69,7 +70,7 @@ export default function OrderStatusTracker({
             className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-2xl bg-action px-4 py-3 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition-all hover:bg-action-hover disabled:opacity-50"
           >
             <RotateCcw size={14} />
-            <span>Restore to Pending</span>
+            <span>{t("restorePending")}</span>
           </button>
         )}
       </div>
@@ -85,26 +86,26 @@ export default function OrderStatusTracker({
   }[] = [
     {
       key: "Pending",
-      code: "STAGE // 01",
-      label: "Order Confirmed & Queued",
-      desc: "Quality inspection & luxury packaging at SHOP.CO Atelier",
+      code: "01",
+      label: t("orderStageConfirmed"),
+      desc: t("orderStagePackageInspection"),
       icon: Package,
     },
     {
       key: "Shipped",
-      code: "STAGE // 02",
-      label: "Dispatched With Courier",
-      desc: "Handed over to express logistics partner for transit",
+      code: "02",
+      label: t("orderStageShipped"),
+      desc: t("orderStageCourierTransit"),
       icon: Truck,
     },
     {
       key: "Delivered",
-      code: "STAGE // 03",
-      label: "Delivered To Destination",
+      code: "03",
+      label: t("orderStageDelivered"),
       desc:
         status === "Delivered"
-          ? "Package signed and received by client"
-          : `Estimated arrival by ${estDelivery}`,
+          ? t("orderStageDeliveredDescription")
+          : `${t("orderStageArrival")}: ${estDelivery}`,
       icon: CheckCircle2,
     },
   ];
@@ -116,7 +117,7 @@ export default function OrderStatusTracker({
   const progressPercentage = (currentIndex / (steps.length - 1)) * 100;
 
   return (
-    <div className="space-y-6">
+    <div dir={direction} className="space-y-6">
       {/* Desktop & Mobile 3D Pipeline */}
       <div className="relative pt-2">
         {/* Background Rail (Desktop) */}
@@ -126,7 +127,7 @@ export default function OrderStatusTracker({
         <div className="pointer-events-none absolute left-[16%] right-[16%] top-9 hidden h-1.5 overflow-hidden rounded-full md:block">
           <div
             style={{ width: `${progressPercentage}%` }}
-            className="h-full rounded-full bg-action transition-all duration-700 ease-out"
+            className={`absolute inset-y-0 rounded-full bg-action transition-all duration-700 ease-out ${direction === "rtl" ? "right-0" : "left-0"}`}
           />
         </div>
 
@@ -183,8 +184,8 @@ export default function OrderStatusTracker({
                     </span>
 
                     {isCurrent && (
-                      <span className="rounded-full bg-success-soft px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-success">
-                        Active
+                      <span className="rounded-full bg-success-soft px-2 py-0.5 text-[8px] font-black tracking-wider text-success">
+                        {t("statusActive")}
                       </span>
                     )}
                   </div>
@@ -213,13 +214,13 @@ export default function OrderStatusTracker({
           <Clock size={14} className="text-primary" />
           <span>
             {status === "Delivered"
-              ? "Fulfillment cycle completed."
-              : `Estimated Delivery Window: ${estDelivery}`}
+              ? t("completedCycle")
+              : `${t("estimatedDeliveryWindow")}: ${estDelivery}`}
           </span>
         </div>
 
         <span className="font-mono text-[10px] font-black uppercase tracking-widest text-primary">
-          PROGRESS // {Math.round(((currentIndex + 1) / steps.length) * 100)}%
+          {t("progress")} · {Math.round(((currentIndex + 1) / steps.length) * 100)}%
         </span>
       </div>
     </div>

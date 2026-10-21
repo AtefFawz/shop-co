@@ -48,14 +48,22 @@ const useData = <T = any, R = T>(
         setTotalPages(responseData?.pagination?.totalPages || 1);
         setTotal(responseData?.pagination?.total || 1);
       } catch (error: any) {
-        if (error.name !== "CanceledError" && error.code !== "ERR_CANCELED") {
+        const wasCancelled =
+          signal?.aborted ||
+          error?.name === "CanceledError" ||
+          error?.code === "ERR_CANCELED";
+
+        // Navigation and rapid filter changes intentionally cancel stale requests.
+        // They are not application errors and should not clutter the console.
+        if (!wasCancelled) {
           console.error(
             "Fetch Error:",
-            error?.response?.data?.message || error.message,
+            error?.response?.data?.message || error?.message || "Unknown error",
           );
         }
       } finally {
-        setLoading(false);
+        // An aborted request must not switch off the loading state of its successor.
+        if (!signal?.aborted) setLoading(false);
       }
     },
     [URL, page, limit, serializedParams, refreshKey],

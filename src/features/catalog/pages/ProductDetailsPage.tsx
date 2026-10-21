@@ -12,6 +12,7 @@ import { RelatedProductsSection } from "@/features/catalog/components/RelatedPro
 import Heading from "@/shared/components/ui/SectionHeading";
 import ProductDetailsClient from "@/features/catalog/components/ProductDetailsClient";
 import api from "@/lib/api";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 import toast from "react-hot-toast";
 import {
   CheckCircle2,
@@ -34,7 +35,7 @@ import {
 } from "lucide-react";
 
 const getImageUrl = (url?: string) => {
-  if (!url) return "";
+  if (!url?.trim()) return "";
   if (url.startsWith("http")) return url;
   return `https://res.cloudinary.com/dudit0nty/image/upload/${url}`;
 };
@@ -46,6 +47,7 @@ export default function ProductDetailsPage({
 }) {
   const { id } = use(params);
   const router = useRouter();
+  const { t, locale, direction } = useLocale();
 
   const [productItem, setProductItem] = useState<Product | null>(null);
   const [activeIdx, setActiveIdx] = useState<number>(0);
@@ -68,9 +70,6 @@ export default function ProductDetailsPage({
         const pro = await api.get(`product/${id}`);
         const data = pro.data?.data?.product || pro.data?.product || pro.data;
         setProductItem(data);
-        if (data?.name) {
-          document.title = `${data.name} · Atelier Piece | SHOP.CO™`;
-        }
       } catch (error) {
         console.error("Error fetching product data:", error);
       } finally {
@@ -83,11 +82,17 @@ export default function ProductDetailsPage({
     }
   }, [id]);
 
+  useEffect(() => {
+    if (productItem?.name) {
+      document.title = `${productItem.name} · ${locale === "ar" ? "تفاصيل المنتج" : "Product details"} | SHOP.CO™`;
+    }
+  }, [productItem?.name, locale]);
+
   const imageGallery: string[] =
     productItem?.images && productItem.images.length > 0
-      ? productItem.images.filter(Boolean)
-      : productItem?.photo
-        ? [productItem.photo]
+      ? productItem.images.filter((image): image is string => typeof image === "string" && image.trim().length > 0)
+      : productItem?.photo?.trim()
+        ? [productItem.photo.trim()]
         : [];
 
   useEffect(() => {
@@ -113,10 +118,16 @@ export default function ProductDetailsPage({
     setIsPaused(false);
   };
 
-  const handleShare = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard?.writeText(window.location.href);
-      toast.success("Garment link copied to clipboard");
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+    try {
+      if (!navigator.clipboard?.writeText) {
+        throw new Error("Clipboard API is unavailable");
+      }
+      await navigator.clipboard.writeText(window.location.href);
+      toast.success(t("productLinkCopied"));
+    } catch {
+      toast.error(t("productLinkCopyError"));
     }
   };
 
@@ -164,7 +175,7 @@ export default function ProductDetailsPage({
   const shortSku = (productItem._id || "").slice(-6).toUpperCase();
 
   return (
-    <section className="relative isolate min-h-screen overflow-hidden bg-surface-subtle pt-22 pb-16 text-primary sm:pt-26">
+    <section dir={direction} className="relative isolate min-h-screen overflow-hidden bg-surface-subtle pt-22 pb-16 text-primary sm:pt-26">
       {/* Subtle Studio Grid Backdrop */}
       <div
         aria-hidden="true"
@@ -179,7 +190,7 @@ export default function ProductDetailsPage({
           <button
             type="button"
             onClick={() => setZoomOpen(false)}
-            className="absolute right-6 top-6 z-20 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-on-action transition-colors hover:bg-surface hover:text-primary"
+            className="absolute end-6 top-6 z-20 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-on-action transition-colors hover:bg-surface hover:text-primary"
           >
             <X size={20} />
           </button>
@@ -209,22 +220,22 @@ export default function ProductDetailsPage({
               className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-surface-subtle px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary transition-colors hover:bg-action hover:text-on-action"
             >
               <ArrowLeft size={13} />
-              <span>Back</span>
+              <span>{t("back")}</span>
             </button>
 
             <nav
-              aria-label="Breadcrumb"
+              aria-label={t("productBreadcrumb")}
               className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted sm:text-xs"
             >
               <Link href="/" className="hover:text-primary transition-colors">
-                Flagship
+                {t("catalogFlagship")}
               </Link>
               <span>/</span>
               <Link
                 href="/shop"
                 className="hover:text-primary transition-colors"
               >
-                Shop
+                {t("catalogAllCollections")}
               </Link>
               {productItem.category && (
                 <>
@@ -249,11 +260,11 @@ export default function ProductDetailsPage({
             <button
               type="button"
               onClick={handleShare}
-              title="Copy product link"
+              title={t("productShare")}
               className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border/90 bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
             >
               <Share2 size={12} />
-              <span className="hidden sm:inline">Share</span>
+              <span className="hidden sm:inline">{t("productShare")}</span>
             </button>
           </div>
         </div>
@@ -299,23 +310,23 @@ export default function ProductDetailsPage({
                     <div className="flex h-full w-full flex-col items-center justify-center text-muted">
                       <Sparkles size={28} />
                       <span className="mt-2 font-mono text-xs font-black uppercase tracking-widest">
-                        No Image Available
+                        {t("productNoImage")}
                       </span>
                     </div>
                   )}
 
                   {/* Top-Left Status & Sale Badges */}
-                  <div className="absolute left-4 top-4 z-20 flex flex-col items-start gap-1.5">
+                  <div className="absolute start-4 top-4 z-20 flex flex-col items-start gap-1.5">
                     {isOutOfStock ? (
                       <span className="rounded-full bg-danger px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-on-danger shadow-md backdrop-blur-md">
-                        Sold Out
+                        {t("soldOut")}
                       </span>
                     ) : (
                       <>
                         {productItem.isSale && (
                           <span className="inline-flex items-center gap-1.5 rounded-full bg-action/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-on-action shadow-md backdrop-blur-md">
                             <Sparkles size={11} className="text-rating" />
-                            <span>Seasonal Markdown</span>
+                            <span>{t("productSeasonalSale")}</span>
                           </span>
                         )}
                         {isLowStock && (
@@ -324,7 +335,7 @@ export default function ProductDetailsPage({
                               size={11}
                               className="fill-rating text-warning"
                             />
-                            Only {stock} Left in Atelier
+                            {t("productStockLeft")} · {stock}
                           </span>
                         )}
                       </>
@@ -336,8 +347,8 @@ export default function ProductDetailsPage({
                     <button
                       type="button"
                       onClick={() => setZoomOpen(true)}
-                      title="Inspect high-resolution image"
-                      className="absolute right-4 top-4 z-20 flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl border border-border-subtle bg-surface/85 text-primary shadow-md backdrop-blur-md transition-all hover:scale-105 hover:bg-action hover:text-on-action"
+                      title={t("productInspectImage")}
+                      className="absolute end-4 top-4 z-20 flex h-10 w-10 cursor-pointer items-center justify-center rounded-2xl border border-border-subtle bg-surface/85 text-primary shadow-md backdrop-blur-md transition-all hover:scale-105 hover:bg-action hover:text-on-action"
                     >
                       <Maximize2 size={15} />
                     </button>
@@ -347,7 +358,7 @@ export default function ProductDetailsPage({
                   {imageGallery.length > 1 && (
                     <div className="absolute inset-x-4 bottom-4 z-20 flex items-center justify-between">
                       <span className="rounded-full border border-white/40 bg-action/55 px-3 py-1 font-mono text-[10px] font-black uppercase tracking-widest text-on-action backdrop-blur-md">
-                        ANGLE 0{activeIdx + 1} / 0{imageGallery.length}
+                        {t("productViewAngle")} 0{activeIdx + 1} / 0{imageGallery.length}
                       </span>
 
                       <div className="flex items-center gap-1.5">
@@ -360,7 +371,7 @@ export default function ProductDetailsPage({
                                 imageGallery.length,
                             )
                           }
-                          aria-label="Previous image"
+                          aria-label={t("productPreviousImage")}
                           className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl bg-surface/90 text-primary shadow-md backdrop-blur-md transition-all hover:bg-action hover:text-on-action"
                         >
                           <ChevronLeft size={16} />
@@ -372,7 +383,7 @@ export default function ProductDetailsPage({
                               (prev) => (prev + 1) % imageGallery.length,
                             )
                           }
-                          aria-label="Next image"
+                          aria-label={t("productNextImage")}
                           className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-xl bg-surface/90 text-primary shadow-md backdrop-blur-md transition-all hover:bg-action hover:text-on-action"
                         >
                           <ChevronRight size={16} />
@@ -402,7 +413,7 @@ export default function ProductDetailsPage({
                       >
                         <Image
                           src={getImageUrl(imgUrl)}
-                          alt={`${productItem.name} view ${idx + 1}`}
+                          alt={`${productItem.name} · ${t("productViewAngle")} ${idx + 1}`}
                           fill
                           sizes="88px"
                           className="object-cover object-top"
@@ -421,7 +432,7 @@ export default function ProductDetailsPage({
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
-                      {productItem.category || "Atelier Garment"}
+                      {productItem.category || t("productAtelierGarment")}
                     </span>
                     {(productItem as any).style && (
                       <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-secondary">
@@ -433,15 +444,15 @@ export default function ProductDetailsPage({
                   {/* Stock Badge */}
                   {stock > 5 ? (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-success-border bg-success-soft px-3 py-1 text-[10px] font-black uppercase tracking-wider text-success">
-                      <CheckCircle2 size={12} /> In Stock ({stock} Ready)
+                      <CheckCircle2 size={12} /> {t("productInStock")} ({stock} {t("productReadyStock")})
                     </span>
                   ) : stock > 0 ? (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-warning-border bg-warning-soft px-3 py-1 text-[10px] font-black uppercase tracking-wider text-warning">
-                      <AlertTriangle size={12} /> Low Stock ({stock} Left)
+                      <AlertTriangle size={12} /> {t("productLowStock")} ({stock} {t("productStockRemaining")})
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-border bg-danger-soft px-3 py-1 text-[10px] font-black uppercase tracking-wider text-danger">
-                      <XCircle size={12} /> Out of Stock
+                      <XCircle size={12} /> {t("outOfStock")}
                     </span>
                   )}
                 </div>
@@ -453,11 +464,11 @@ export default function ProductDetailsPage({
 
                 {/* Rating & Price Row */}
                 <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border-subtle bg-surface-subtle px-4 py-3">
-                  <div className=" ${isOutOfStock ? 'opacity-60' : ''}">
+                  <div className={isOutOfStock ? "opacity-60" : ""}>
                     <Pricing product={productItem} />
                   </div>
 
-                  <div className="flex items-center gap-2 border-l border-border/80 pl-4">
+                  <div className="flex items-center gap-2 border-s border-border/80 ps-4">
                     <StarRating rating={Math.round(averageRating)} />
                     <span className="font-mono text-xs font-black text-primary">
                       {averageRating.toFixed(1)}
@@ -466,7 +477,7 @@ export default function ProductDetailsPage({
                       </span>
                     </span>
                     <span className="text-[11px] font-bold text-muted">
-                      ({reviews.length} reviews)
+                      ({reviews.length} {t("productReviewCount")})
                     </span>
                   </div>
                 </div>
@@ -474,7 +485,7 @@ export default function ProductDetailsPage({
                 {/* Short Editorial Excerpt */}
                 <p className="text-xs font-medium leading-relaxed text-muted sm:text-[13px]">
                   {productItem.description ||
-                    "Meticulously tailored from heavyweight luxury fibers. Engineered for an elevated silhouette, lasting comfort, and timeless street-to-studio versatility."}
+                    t("productShortDescriptionFallback")}
                 </p>
               </div>
 
@@ -484,11 +495,10 @@ export default function ProductDetailsPage({
                   <div className="space-y-3.5">
                     <div className="rounded-2xl border border-danger-border bg-danger-soft p-4">
                       <p className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-danger">
-                        <XCircle size={14} /> Currently Depleted in Warehouse
+                        <XCircle size={14} /> {t("productSoldOutNotice")}
                       </p>
                       <p className="mt-1 text-xs leading-relaxed text-muted">
-                        This archive piece is temporarily sold out. Register
-                        your email below for priority restock dispatch alerts.
+                        {t("productRestockDescription")}
                       </p>
                     </div>
 
@@ -496,8 +506,7 @@ export default function ProductDetailsPage({
                       <div className="flex items-center gap-2.5 rounded-2xl border border-success-border bg-success-soft p-4 text-xs font-bold text-success">
                         <CheckCircle2 size={16} className="shrink-0" />
                         <span>
-                          Priority alert registered! We will notify you the
-                          moment this piece returns.
+                          {t("productRestockConfirmed")}
                         </span>
                       </div>
                     ) : (
@@ -505,13 +514,13 @@ export default function ProductDetailsPage({
                         onSubmit={(e) => {
                           e.preventDefault();
                           setIsNotified(true);
-                          toast.success("Restock alert activated!");
+                          toast.success(t("productRestockActivated"));
                         }}
                         className="flex flex-col gap-2.5 sm:flex-row"
                       >
                         <input
                           type="email"
-                          placeholder="Enter your email for restock priority..."
+                          placeholder={t("productRestockPlaceholder")}
                           required
                           className="flex-1 rounded-2xl border border-border bg-surface-subtle px-4 py-3.5 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
                         />
@@ -520,7 +529,7 @@ export default function ProductDetailsPage({
                           className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action px-6 py-3.5 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition-all hover:bg-action-hover active:scale-95"
                         >
                           <Bell size={14} />
-                          <span>Notify Me</span>
+                          <span>{t("productNotifyMe")}</span>
                         </button>
                       </form>
                     )}
@@ -535,13 +544,13 @@ export default function ProductDetailsPage({
                 <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-surface-subtle p-3 text-center sm:flex-row sm:gap-2">
                   <Truck size={15} className="shrink-0 text-primary" />
                   <span className="text-[9px] font-black uppercase tracking-wider text-secondary sm:text-[10px]">
-                    Express Dispatch
+                    {t("productExpressDispatch")}
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-surface-subtle p-3 text-center sm:flex-row sm:gap-2">
                   <RotateCcw size={15} className="shrink-0 text-primary" />
                   <span className="text-[9px] font-black uppercase tracking-wider text-secondary sm:text-[10px]">
-                    30-Day Returns
+                    {t("productReturns30Days")}
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-surface-subtle p-3 text-center sm:flex-row sm:gap-2">
@@ -550,7 +559,7 @@ export default function ProductDetailsPage({
                     className="shrink-0 text-success"
                   />
                   <span className="text-[9px] font-black uppercase tracking-wider text-secondary sm:text-[10px]">
-                    100% Authentic
+                    {t("productAuthentic")}
                   </span>
                 </div>
               </div>
@@ -569,16 +578,16 @@ export default function ProductDetailsPage({
                 <div className="flex items-center gap-2">
                   <Scissors size={16} className="text-primary" />
                   <h3 className="text-sm font-black uppercase tracking-wider text-primary sm:text-base">
-                    Garment Dossier &amp; Craftsmanship
+                    {t("productDossier")}
                   </h3>
                 </div>
 
                 {/* Tab Switcher */}
                 <div className="inline-flex rounded-xl border border-border/80 bg-surface-subtle p-1">
                   {[
-                    { id: "story", label: "Design Notes" },
-                    { id: "care", label: "Fabric & Care" },
-                    { id: "specs", label: "Shipping Policy" },
+                    { id: "story", label: t("productDesignNotes") },
+                    { id: "care", label: t("productFabricCare") },
+                    { id: "specs", label: t("productShippingPolicy") },
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -601,11 +610,10 @@ export default function ProductDetailsPage({
                   <div className="space-y-3 text-xs leading-relaxed text-secondary sm:text-sm">
                     <p>
                       {productItem.description ||
-                        "Crafted in our 2026 studio archive, this piece combines architectural proportions with breathable luxury fibers for effortless everyday wear."}
+                        t("productStoryFallback")}
                     </p>
                     <p className="text-muted">
-                      Every seam is reinforced with high-density stitching to
-                      preserve its tailored silhouette across seasons.
+                      {t("productCraftsmanshipNote")}
                     </p>
                   </div>
                 )}
@@ -614,19 +622,19 @@ export default function ProductDetailsPage({
                   <ul className="grid grid-cols-1 gap-2.5 text-xs font-semibold text-secondary sm:grid-cols-2">
                     <li className="flex items-center gap-2 rounded-xl bg-surface-subtle p-3">
                       <CheckCircle2 size={14} className="text-primary" />
-                      <span>Cold gentle machine wash (30°C max)</span>
+                      <span>{t("productWashCold")}</span>
                     </li>
                     <li className="flex items-center gap-2 rounded-xl bg-surface-subtle p-3">
                       <CheckCircle2 size={14} className="text-primary" />
-                      <span>Wash inside out with similar tones</span>
+                      <span>{t("productWashInsideOut")}</span>
                     </li>
                     <li className="flex items-center gap-2 rounded-xl bg-surface-subtle p-3">
                       <CheckCircle2 size={14} className="text-primary" />
-                      <span>Do not bleach or tumble dry high</span>
+                      <span>{t("productNoBleach")}</span>
                     </li>
                     <li className="flex items-center gap-2 rounded-xl bg-surface-subtle p-3">
                       <CheckCircle2 size={14} className="text-primary" />
-                      <span>Low steam iron on reverse side</span>
+                      <span>{t("productIronLow")}</span>
                     </li>
                   </ul>
                 )}
@@ -634,12 +642,10 @@ export default function ProductDetailsPage({
                 {activeSpecTab === "specs" && (
                   <div className="space-y-2 text-xs leading-relaxed text-secondary sm:text-sm">
                     <p>
-                      All orders are dispatched within 24–48 hours in sealed
-                      SHOP.CO™ archival packaging with full courier tracking.
+                      {t("productShippingDescription")}
                     </p>
                     <p className="text-muted">
-                      Complimentary 30-day exchanges and returns on all unworn
-                      garments with original security tags attached.
+                      {t("productReturnsDescription")}
                     </p>
                   </div>
                 )}
@@ -652,7 +658,7 @@ export default function ProductDetailsPage({
             <div>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary">
-                  Technical Specs
+                  {t("productTechnicalSpecs")}
                 </h3>
                 <Layers size={15} className="text-muted" />
               </div>
@@ -660,36 +666,30 @@ export default function ProductDetailsPage({
               <div className="divide-y divide-border-subtle text-xs">
                 <div className="flex items-center justify-between py-2.5">
                   <span className="font-semibold text-muted">
-                    Archive SKU
+                    {t("productArchiveSku")}
                   </span>
                   <span className="font-mono font-black text-primary">
                     #{shortSku}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2.5">
-                  <span className="font-semibold text-muted">
-                    Category
-                  </span>
+                  <span className="font-semibold text-muted">{t("productCategory")}</span>
                   <span className="font-black uppercase text-primary">
-                    {productItem.category || "General"}
+                    {productItem.category || t("productGeneral")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2.5">
-                  <span className="font-semibold text-muted">
-                    Aesthetic Style
-                  </span>
+                  <span className="font-semibold text-muted">{t("productStyle")}</span>
                   <span className="font-black uppercase text-primary">
-                    {(productItem as any).style || "Contemporary"}
+                    {(productItem as any).style || t("productContemporary")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2.5">
-                  <span className="font-semibold text-muted">
-                    Department
-                  </span>
+                  <span className="font-semibold text-muted">{t("productDepartment")}</span>
                   <span className="font-black uppercase text-primary">
                     {productItem.section ||
                       (productItem as any).gender ||
-                      "Unisex"}
+                      t("productUnisex")}
                   </span>
                 </div>
               </div>

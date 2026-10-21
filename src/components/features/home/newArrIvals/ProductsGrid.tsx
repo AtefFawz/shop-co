@@ -124,7 +124,7 @@ export default function NewArrivals() {
         {/* ── 3D Architectural Product Grid ── */}
         <div
           style={{ perspective: "1200px" }}
-          className="grid grid-cols-2 gap-3.5 sm:gap-5 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4"
         >
           {displayedProducts.map((item: Product, idx: number) => (
             <div

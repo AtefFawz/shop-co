@@ -5,35 +5,26 @@ import Newsletter from "@/shared/components/layout/footer/FooterNewsletterForm";
 import { FooterBenefits } from "@/shared/components/layout/footer/FooterBenefits";
 import { FooterSocialLinks } from "@/shared/components/layout/footer/FooterSocialLinks";
 import { CopyrightNotice } from "@/shared/components/layout/footer/CopyrightNotice";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const footerGroups = [
   {
-    title: "COMPANY",
-    items: ["About", "Features", "Works", "Career"],
+    titleKey: "footerCompany",
+    itemKeys: ["footerAbout", "footerFeatures", "footerWorks", "footerCareers"],
   },
   {
-    title: "HELP",
-    items: [
-      "Customer Support",
-      "Delivery Details",
-      "Terms & Conditions",
-      "Privacy Policy",
-    ],
+    titleKey: "footerHelp",
+    itemKeys: ["footerSupport", "footerDelivery", "footerTerms", "footerPrivacy"],
   },
   {
-    title: "FAQ",
-    items: ["Account", "Manage Deliveries", "Orders", "Payments"],
+    titleKey: "footerFaq",
+    itemKeys: ["account", "footerManageDeliveries", "footerOrders", "footerPayments"],
   },
   {
-    title: "RESOURCES",
-    items: [
-      "Free eBooks",
-      "Development Tutorial",
-      "How to - Blog",
-      "Youtube Playlist",
-    ],
+    titleKey: "footerResources",
+    itemKeys: ["footerFreeEbooks", "footerDevelopmentTutorial", "footerBlog", "footerYoutube"],
   },
-];
+] as const;
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -56,6 +47,7 @@ const columnVariants: Variants = {
 };
 
 export default function StorefrontFooter() {
+  const { t } = useLocale();
   return (
     <footer className="relative mt-6  w-full select-none overflow-hidden sm:mt-16">
       <div className="relative w-full">
@@ -100,7 +92,7 @@ export default function StorefrontFooter() {
                 variants={columnVariants}
                 className="col-span-1 sm:col-span-1 lg:col-span-2"
               >
-                <FooterBenefits title={item.title} feature={item.items} />
+                <FooterBenefits title={t(item.titleKey)} feature={item.itemKeys.map((key) => t(key))} />
               </motion.div>
             ))}
           </motion.div>

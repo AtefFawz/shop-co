@@ -1,90 +1,180 @@
 import { create } from "zustand";
-import { Product } from "@/types";
-import { persist, createJSONStorage } from "zustand/middleware";
-interface Products {
-  stack: Product[];
+import { createJSONStorage, persist } from "zustand/middleware";
+import type { Product } from "@/types";
+
+/** A cart line is still a Product; selected variants are stored as one-item arrays. */
+export type CartProduct = Product;
+type CartInput = Partial<Product> & Pick<Product, "_id">;
+type CartIdentity = Pick<Product, "_id"> &
+  Partial<Pick<Product, "colors" | "size">>;
+
+interface CartStore {
+  stack: CartProduct[];
   clearCart: () => void;
-  toggle: (newState: any) => void;
-  update: (newValue: any) => void;
-  delete: (newValue: any) => void;
-  up: (product: any) => void;
-  down: (product: any) => void;
-  setColor: (color: any, obg: any) => void;
-  setSize: (color: any, size: any) => void;
+  /** Adds a line only when the same product and selected variants are absent. */
+  toggle: (product: CartInput) => void;
+  /** Sets a line's quantity, creating the line when it does not exist. */
+  update: (product: CartInput) => void;
+  /** Adds quantity to a matching variant or creates a separate variant line. */
+  addItem: (product: CartInput) => void;
+  delete: (product: CartIdentity) => void;
+  up: (product: CartIdentity) => void;
+  down: (product: CartIdentity) => void;
+  setColor: (product: CartIdentity, color: string) => void;
+  setSize: (product: CartIdentity, size: string) => void;
 }
 
-export const useProduct = create<Products>()(
+function asOptions(value: unknown): string[] {
+  if (Array.isArray(value)) {
+    return value.filter((item): item is string => typeof item === "string");
+  }
+  return typeof value === "string" && value.trim() ? [value] : [];
+}
+
+function optionKey(value: unknown): string {
+  return asOptions(value)[0]?.trim().toLocaleLowerCase() ?? "";
+}
+
+function hasVariant(value: CartIdentity): boolean {
+  return Boolean(asOptions(value.colors).length || asOptions(value.size).length);
+}
+
+function matchesLine(item: CartProduct, product: CartIdentity): boolean {
+  if (item._id !== product._id) return false;
+  if (asOptions(product.colors).length && optionKey(item.colors) !== optionKey(product.colors)) {
+    return false;
+  }
+  if (asOptions(product.size).length && optionKey(item.size) !== optionKey(product.size)) {
+    return false;
+  }
+  return true;
+}
+
+function normalizeItem(product: CartInput, fallbackCount = 1): CartProduct {
+  const count = Number(product.count ?? fallbackCount);
+  const normalized = {
+    ...product,
+    colors: asOptions((product as { colors?: unknown }).colors).slice(0, 1),
+    size: asOptions((product as { size?: unknown }).size).slice(0, 1),
+    count: Number.isFinite(count) ? Math.max(1, Math.floor(count)) : 1,
+    isChose: product.isChose ?? true,
+  };
+  return normalized as CartProduct;
+}
+
+export const useProduct = create<CartStore>()(
   persist(
     (set, get) => ({
       stack: [],
-      toggle: (newState) => {
-        const { stack } = get();
-        const exist = stack.some((e) => e._id === newState._id);
-        if (!exist) {
-          set({ stack: [...stack, newState] });
-        }
+
+      toggle: (product) => {
+        if (get().stack.some((item) => matchesLine(item, product))) return;
+        set((state) => ({ stack: [...state.stack, normalizeItem(product)] }));
       },
+
       clearCart: () => set({ stack: [] }),
-      // Up Counter
-      up: (product: any) => {
-        const { stack } = get();
-        // بنشوف هو موجود ولا لأ
-        const exist = stack.find((item) => item._id === product._id);
-        if (exist) {
-          // لو موجود زود العدد
-          set({
-            stack: stack.map((item) =>
-              item._id === product._id
-                ? { ...item, count: (item.count || 0) + 1 }
-                : item,
+
+      update: (product) => {
+        set((state) => {
+          const index = state.stack.findIndex((item) => matchesLine(item, product));
+          if (index === -1) {
+            return { stack: [...state.stack, normalizeItem(product)] };
+          }
+
+          const existing = state.stack[index];
+          const incoming = normalizeItem(product, existing.count);
+          const stack = [...state.stack];
+          stack[index] = {
+            ...existing,
+            ...incoming,
+            count: Math.max(
+              1,
+              Math.floor(Number(product.count ?? existing.count) || 1),
             ),
-          });
-        } else {
-          // 👇 لو مش موجود، ضيفه وابدأ العد بـ 1
-          set({ stack: [...stack, { ...product, count: 2 }] });
-        }
+          };
+          return { stack };
+        });
       },
-      // Down Counter
-      down: (product) => {
+
+      addItem: (product) => {
+        set((state) => {
+          const index = state.stack.findIndex((item) => matchesLine(item, product));
+          if (index === -1) {
+            return { stack: [...state.stack, normalizeItem(product)] };
+          }
+
+          const existing = state.stack[index];
+          const incoming = normalizeItem(product);
+          const requestedQuantity = Math.max(1, Number(incoming.count) || 1);
+          const stack = [...state.stack];
+          stack[index] = {
+            ...existing,
+            ...incoming,
+            count: Math.max(1, Number(existing.count) || 1) + requestedQuantity,
+            isChose: true,
+          };
+          return { stack };
+        });
+      },
+
+      up: (product) => {
         set((state) => ({
           stack: state.stack.map((item) =>
-            item._id === product._id
-              ? { ...item, count: Math.max(1, (item.count || 1) - 1) }
+            matchesLine(item, product)
+              ? { ...item, count: Math.max(1, Number(item.count) || 1) + 1 }
               : item,
           ),
         }));
       },
-      // Add Item To Card
-      update: (newState) => {
-        const { stack } = get();
-        const exist = stack.some((e) => e._id === newState._id);
-        if (!exist) {
-          set({ stack: [...stack, newState] });
-        }
+
+      down: (product) => {
+        set((state) => ({
+          stack: state.stack.map((item) =>
+            matchesLine(item, product)
+              ? { ...item, count: Math.max(1, (Number(item.count) || 1) - 1) }
+              : item,
+          ),
+        }));
       },
 
-      // Delete Item From Card
-      delete: (product) => {
+      delete: (product) =>
         set((state) => ({
-          stack: state.stack.filter((item) => item._id !== product._id),
-        }));
-      },
-      setColor: (product, obg) => {
-        // const { stack } = get();
-        set((newState: any) => ({
-          stack: newState.stack.map((item: any) =>
-            item._id === product._id ? { ...item, colors: obg } : item,
+          stack: state.stack.filter((item) => {
+            if (item._id !== product._id) return true;
+            if (!hasVariant(product)) return false;
+            return !matchesLine(item, product);
+          }),
+        })),
+
+      setColor: (product, color) =>
+        set((state) => ({
+          stack: state.stack.map((item) =>
+            matchesLine(item, product)
+              ? { ...item, colors: [color] }
+              : item,
           ),
-        }));
-      },
-      setSize: (product, size) => {
-        set((newState: any) => ({
-          stack: newState.stack.map((item: any) =>
-            item._id === product._id ? { ...item, size: size } : item,
+        })),
+
+      setSize: (product, size) =>
+        set((state) => ({
+          stack: state.stack.map((item) =>
+            matchesLine(item, product) ? { ...item, size: [size] } : item,
           ),
-        }));
-      },
+        })),
     }),
-    { name: "product", storage: createJSONStorage(() => localStorage) },
+    {
+      name: "product",
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({ stack: state.stack }) as CartStore,
+      version: 2,
+      migrate: (persistedState) => {
+        const persisted = persistedState as { stack?: unknown } | undefined;
+        return {
+          stack: Array.isArray(persisted?.stack)
+            ? persisted.stack.map((item) => normalizeItem(item as CartInput, 1))
+            : [],
+        } as CartStore;
+      },
+    },
   ),
 );

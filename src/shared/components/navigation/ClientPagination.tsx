@@ -1,5 +1,6 @@
 "use client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 type ClientPaginationProps = {
   page: number;
@@ -43,6 +44,7 @@ const getPageNumbers = (current: number, total: number, isMobile: boolean) => {
 };
 
 export const ClientPagination = ({ page, totalPages, goToPage }: ClientPaginationProps) => {
+  const { t, direction } = useLocale();
   if (totalPages <= 1) return null;
 
   const desktopPages = getPageNumbers(page, totalPages, false);
@@ -77,15 +79,15 @@ export const ClientPagination = ({ page, totalPages, goToPage }: ClientPaginatio
     });
 
   return (
-    <div className="flex items-center justify-between border-t border-border p-4 sm:pt-6 mt-6 sm:mt-8 w-full gap-2">
+    <div dir={direction} className="flex w-full items-center justify-between gap-2 border-t border-border p-4 mt-6 sm:mt-8 sm:pt-6">
       {/* Previous Button */}
       <button
         disabled={page <= 1}
         onClick={() => goToPage(page - 1)}
         className="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface text-xs font-bold text-secondary hover:bg-surface-subtle active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none shrink-0 shadow-2xs"
       >
-        <ChevronLeft size={16} />
-        <span className="hidden sm:inline">Previous</span>
+        {direction === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        <span className="hidden sm:inline">{t("paginationPrevious")}</span>
       </button>
 
       {/* Mobile Page Numbers */}
@@ -104,8 +106,8 @@ export const ClientPagination = ({ page, totalPages, goToPage }: ClientPaginatio
         onClick={() => goToPage(page + 1)}
         className="w-9 h-9 sm:w-auto sm:px-3.5 sm:py-2 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-surface text-xs font-bold text-secondary hover:bg-surface-subtle active:scale-95 transition-all disabled:opacity-30 disabled:pointer-events-none shrink-0 shadow-2xs"
       >
-        <span className="hidden sm:inline">Next</span>
-        <ChevronRight size={16} />
+        <span className="hidden sm:inline">{t("paginationNext")}</span>
+        {direction === "rtl" ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
       </button>
     </div>
   );

@@ -14,17 +14,20 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 export const LowStockProductList = ({
   lowStockProducts = [],
 }: {
   lowStockProducts: any[];
 }) => {
+  const { t, locale, direction } = useLocale();
   const [filterMode, setFilterMode] = useState<"all" | "out" | "urgent">("all");
   const [searchQuery, setSearchQuery] = useState("");
 
   const getImageUrl = (url?: string) => {
-    if (!url) return "/placeholder.png";
+    if (!url?.trim()) return "/placeholder.png";
     if (url.startsWith("http")) return url;
     return `https://res.cloudinary.com/dudit0nty/image/upload/${url}`;
   };
@@ -62,7 +65,10 @@ export const LowStockProductList = ({
   }, [safeList, filterMode, searchQuery]);
 
   return (
-    <div className="overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)]">
+    <div
+      dir={direction}
+      className="overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)]"
+    >
       {/* ================================================================== */}
       {/* 1. WATCHLIST COMMAND HEADER & LIVE FILTER TABS                     */}
       {/* ================================================================== */}
@@ -80,15 +86,14 @@ export const LowStockProductList = ({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm font-black uppercase tracking-tight text-primary sm:text-base">
-                Critical Inventory Watchlist
+                {t("dashboardCriticalInventoryWatchlist")}
               </h3>
               <span className="hidden rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-warning sm:inline-block">
-                Restock Priority
+                {t("dashboardRestockPriority")}
               </span>
             </div>
             <p className="mt-0.5 text-xs font-medium text-muted">
-              SKUs with ≤ 5 units remaining requiring immediate warehouse
-              replenishment.
+              {t("dashboardLowStockDescription")}
             </p>
           </div>
         </div>
@@ -99,14 +104,14 @@ export const LowStockProductList = ({
           <div className="relative flex-1 sm:w-48 sm:flex-initial">
             <Search
               size={13}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+              className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-muted"
             />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Filter SKU or category..."
-              className="w-full rounded-xl border border-border bg-surface py-1.5 pl-8 pr-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:outline-none"
+              placeholder={t("dashboardFilterPlaceholder")}
+              className="w-full rounded-xl border border-border bg-surface py-1.5 ps-8 pe-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:outline-none"
             />
           </div>
 
@@ -121,7 +126,7 @@ export const LowStockProductList = ({
                   : "text-muted hover:text-primary"
               }`}
             >
-              All ({safeList.length})
+              {t("dashboardFilterAll")} ({safeList.length})
             </button>
             <button
               type="button"
@@ -132,7 +137,7 @@ export const LowStockProductList = ({
                   : "text-muted hover:text-warning"
               }`}
             >
-              Low ({urgentCount})
+              {t("dashboardFilterLow")} ({urgentCount})
             </button>
             <button
               type="button"
@@ -143,7 +148,7 @@ export const LowStockProductList = ({
                   : "text-muted hover:text-danger"
               }`}
             >
-              Zero ({depletedCount})
+              {t("dashboardFilterZero")} ({depletedCount})
             </button>
           </div>
 
@@ -151,7 +156,7 @@ export const LowStockProductList = ({
             href="/dashboard/products"
             className="group inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
           >
-            <span>Manage All</span>
+            <span>{t("dashboardManageAll")}</span>
             <ArrowUpRight
               size={13}
               className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
@@ -170,25 +175,25 @@ export const LowStockProductList = ({
           </div>
           <p className="text-sm font-black uppercase tracking-wider text-primary">
             {safeList.length === 0
-              ? "All Catalog Stock Levels Optimal"
-              : "No Matching SKUs Found"}
+              ? t("dashboardAllStockOptimal")
+              : t("dashboardNoMatchingProducts")}
           </p>
           <p className="mt-1 text-xs text-muted">
             {safeList.length === 0
-              ? "Every listed garment currently has more than 5 units in warehouse stock."
-              : "Try clearing your search filter or switching stock tabs above."}
+              ? t("dashboardAllStockOkayDescription")
+              : t("dashboardTryOtherFilters")}
           </p>
         </div>
       ) : (
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+          <table className="w-full border-collapse text-start">
             <thead>
               <tr className="border-b border-border-subtle bg-surface-subtle/50 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                <th className="py-3.5 px-5 sm:px-6">Garment / SKU</th>
-                <th className="py-3.5 px-4">Category</th>
-                <th className="py-3.5 px-4">Unit Price</th>
-                <th className="py-3.5 px-4">Stock Telemetry (5-Unit Scale)</th>
-                <th className="py-3.5 px-5 text-right sm:px-6">Replenish</th>
+                <th className="px-5 py-3.5 sm:px-6">{t("dashboardProductSku")}</th>
+                <th className="px-4 py-3.5">{t("dashboardCategory")}</th>
+                <th className="px-4 py-3.5">{t("dashboardUnitPrice")}</th>
+                <th className="px-4 py-3.5">{t("dashboardStockTelemetry")}</th>
+                <th className="px-5 py-3.5 text-end sm:px-6">{t("dashboardRestock")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle text-xs">
@@ -207,7 +212,7 @@ export const LowStockProductList = ({
                         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-border bg-surface-muted shadow-2xs transition-transform duration-300 group-hover:scale-105">
                           <Image
                             src={getImageUrl(item.images?.[0] || item.photo)}
-                            alt={item.name || "Product"}
+                            alt={item.name || t("dashboardNoImageAlt")}
                             fill
                             sizes="44px"
                             className="object-cover"
@@ -221,7 +226,7 @@ export const LowStockProductList = ({
                             {item.name}
                           </p>
                           <span className="mt-0.5 block truncate font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">
-                            {item.section || item.style || "STUDIO ARCHIVE"}
+                            {item.section || item.style || t("dashboardCatalogArchive")}
                           </span>
                         </div>
                       </div>
@@ -230,13 +235,13 @@ export const LowStockProductList = ({
                     {/* Category */}
                     <td className="py-3.5 px-4">
                       <span className="inline-flex rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">
-                        {item.category || "General"}
+                        {item.category || t("dashboardGeneralCategory")}
                       </span>
                     </td>
 
                     {/* Price */}
                     <td className="py-3.5 px-4 font-mono text-xs font-black text-primary">
-                      ${Number(item.price || 0).toLocaleString()}
+                      {formatCurrency(item.price || 0, locale)}
                     </td>
 
                     {/* Visual 5-Segment Stock Meter + Badge */}
@@ -264,25 +269,25 @@ export const LowStockProductList = ({
                         {isOut ? (
                           <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-border bg-danger-soft px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-danger">
                             <span className="h-1.5 w-1.5 animate-ping rounded-full bg-danger" />
-                            Depleted (0 left)
+                            {t("dashboardDepletedAt")}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1.5 rounded-full border border-warning-border bg-warning-soft px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-warning">
                             <Flame size={11} className="text-warning" />
-                            Urgent · {stockVal} left
+                            {t("dashboardUrgentUnits").replace("{count}", String(stockVal))}
                           </span>
                         )}
                       </div>
                     </td>
 
                     {/* Action Button */}
-                    <td className="py-3.5 px-5 text-right sm:px-6">
+                    <td className="py-3.5 px-5 text-end sm:px-6">
                       <Link
                         href={`/dashboard/products/edit/${item._id}`}
                         className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:bg-action hover:text-on-action"
                       >
                         <Edit3 size={11} />
-                        <span>Restock</span>
+                        <span>{t("dashboardRestock")}</span>
                       </Link>
                     </td>
                   </tr>

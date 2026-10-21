@@ -5,6 +5,8 @@ import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import { useFilterStore } from "@/store/filterStore";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 const ThemeAwareSlider = styled(Slider)({
   color: "var(--action)",
@@ -31,14 +33,10 @@ const ThemeAwareSlider = styled(Slider)({
   },
 });
 
-const PRESETS = [
-  { label: "≤ $150", val: 150 },
-  { label: "≤ $500", val: 500 },
-  { label: "≤ $1.5k", val: 1500 },
-  { label: "All", val: 5000 },
-];
+const PRESETS = [150, 500, 1500, 5000];
 
 export default function PriceRangeFilter() {
+  const { t, locale, direction } = useLocale();
   const [price, setPrice] = useState<number>(1000);
   const filterPrice = useFilterStore((s) => s.filterPrice);
 
@@ -48,13 +46,13 @@ export default function PriceRangeFilter() {
   };
 
   return (
-    <div className="w-full py-4">
+    <div dir={direction} className="w-full py-4">
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[11px] font-black uppercase tracking-[0.16em] text-secondary">
-          Price Ceiling
+          {t("priceCeiling")}
         </span>
         <span className="rounded-lg bg-action px-2.5 py-0.5 font-mono text-[11px] font-black text-on-action">
-          Up to ${price.toLocaleString()}
+          {t("upTo")} {formatCurrency(price, locale)}
         </span>
       </div>
 
@@ -66,29 +64,29 @@ export default function PriceRangeFilter() {
           onChangeCommitted={(_, v) => filterPrice?.(v as number)}
           min={0}
           max={5000}
-          valueLabelFormat={(v) => `$${v}`}
+          valueLabelFormat={(v) => formatCurrency(v, locale)}
         />
       </Box>
 
       <div className="mt-1 flex justify-between font-mono text-[10px] font-bold text-muted">
-        <span>$0</span>
-        <span>$5,000</span>
+        <span>{formatCurrency(0, locale)}</span>
+        <span>{formatCurrency(5000, locale)}</span>
       </div>
 
       {/* Quick Price Presets */}
       <div className="mt-3 grid grid-cols-4 gap-1.5">
-        {PRESETS.map((p) => (
+        {PRESETS.map((preset) => (
           <button
-            key={p.label}
+            key={preset}
             type="button"
-            onClick={() => applyPreset(p.val)}
+            onClick={() => applyPreset(preset)}
             className={`cursor-pointer rounded-lg border py-1 font-mono text-[9px] font-black uppercase transition-all ${
-              price === p.val
+              price === preset
                 ? "border-border-strong bg-action text-on-action"
                 : "border-border bg-surface-subtle text-secondary hover:border-border-strong"
             }`}
           >
-            {p.label}
+            {preset === 5000 ? t("allPrices") : `${t("upTo")} ${formatCurrency(preset, locale)}`}
           </button>
         ))}
       </div>

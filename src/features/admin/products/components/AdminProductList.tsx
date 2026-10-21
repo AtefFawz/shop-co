@@ -24,6 +24,8 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import toast from "react-hot-toast";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatCurrency } from "@/lib/formatCurrency";
 
 export default function AdminProductList({
   initialProducts = [],
@@ -31,6 +33,7 @@ export default function AdminProductList({
   initialProducts?: Product[];
 }) {
   const router = useRouter();
+  const { t, locale, direction } = useLocale();
   const [productsList, setProductsList] = useState<Product[]>(initialProducts);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmProduct, setConfirmProduct] = useState<Product | null>(null);
@@ -62,7 +65,7 @@ export default function AdminProductList({
   const handleCopyId = (id: string) => {
     navigator.clipboard?.writeText(id);
     setCopiedId(id);
-    toast.success(`SKU #${id.slice(-6).toUpperCase()} copied`);
+    toast.success(`${t("adminSkuCopied")}: #${id.slice(-6).toUpperCase()}`);
     setTimeout(() => setCopiedId(null), 1800);
   };
 
@@ -73,15 +76,15 @@ export default function AdminProductList({
       await api.delete(`product/${id}`);
 
       setProductsList((prev) => prev.filter((p) => p._id !== id));
-      toast.success("Product permanently removed from catalog");
+      toast.success(t("adminProductDeleted"));
       router.refresh();
     } catch (error: any) {
-      const msg =
-        error.response?.data?.message ||
-        error.message ||
-        "Failed to delete product";
-      console.error("Error deleting product:", msg);
-      toast.error(msg);
+      const backendMessage = error?.response?.data?.message;
+      if (backendMessage && locale === "en") {
+        toast.error(String(backendMessage));
+      } else {
+        toast.error(t("adminDeleteFailed"));
+      }
     } finally {
       setDeletingId(null);
       setConfirmProduct(null);
@@ -121,7 +124,7 @@ export default function AdminProductList({
   }, [productsList, searchQuery, stockFilter, sortBy]);
 
   return (
-    <>
+    <div dir={direction} className="min-w-0">
       {/* ================================================================== */}
       {/* 1. 3D INTERACTIVE DELETE CONFIRMATION MODAL                        */}
       {/* ================================================================== */}
@@ -134,11 +137,10 @@ export default function AdminProductList({
             </div>
 
             <h3 className="text-center text-lg font-black uppercase tracking-tight text-primary">
-              Remove From Archive?
+              {t("adminRemoveFromArchive")}
             </h3>
             <p className="mt-1 text-center text-xs leading-relaxed text-muted">
-              This action is permanent and will immediately delist the garment
-              from the live storefront.
+              {t("adminRemoveProductWarning")}
             </p>
 
             {/* Preview Card of the Product Being Deleted */}
@@ -167,7 +169,7 @@ export default function AdminProductList({
                   <span>SKU #{confirmProduct._id.slice(-6).toUpperCase()}</span>
                   <span>•</span>
                   <span className="text-primary">
-                    ${Number(confirmProduct.price).toLocaleString()}
+                    {formatCurrency(confirmProduct.price, locale)}
                   </span>
                 </div>
               </div>
@@ -181,7 +183,7 @@ export default function AdminProductList({
                 onClick={() => setConfirmProduct(null)}
                 className="flex-1 cursor-pointer rounded-2xl border border-border bg-surface py-3 text-xs font-black uppercase tracking-wider text-secondary transition-colors hover:border-border-strong hover:bg-surface-subtle disabled:opacity-50"
               >
-                Cancel
+                {t("adminCancel")}
               </button>
               <button
                 type="button"
@@ -189,7 +191,7 @@ export default function AdminProductList({
                 disabled={!!deletingId}
                 className="flex-1 cursor-pointer rounded-2xl bg-danger py-3 text-xs font-black uppercase tracking-wider text-on-danger shadow-[0_10px_24px_-6px_rgba(var(--danger-rgb),0.5)] transition-all hover:bg-danger disabled:opacity-60"
               >
-                {deletingId ? "Removing..." : "Confirm Delete"}
+                {deletingId ? t("adminDeleting") : t("adminConfirmDeletion")}
               </button>
             </div>
           </div>
@@ -206,14 +208,14 @@ export default function AdminProductList({
           <div className="relative min-w-[220px] flex-1 sm:w-64 sm:flex-initial">
             <Search
               size={14}
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted"
+              className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-muted"
             />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search name, category, or SKU..."
-              className="w-full rounded-xl border border-border/90 bg-surface py-2 pl-9 pr-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:outline-none"
+              placeholder={t("adminSearchNameCategorySku")}
+              className="w-full rounded-xl border border-border/90 bg-surface py-2 ps-9 pe-3 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:outline-none"
             />
           </div>
 
@@ -221,10 +223,10 @@ export default function AdminProductList({
           <div className="inline-flex rounded-xl border border-border/90 bg-surface p-1">
             {(
               [
-                { id: "all", label: "All" },
-                { id: "healthy", label: "In Stock" },
-                { id: "low", label: "Low (≤5)" },
-                { id: "out", label: "Zero" },
+                { id: "all", label: t("dashboardFilterAll") },
+                { id: "healthy", label: t("adminStockHealthy") },
+                { id: "low", label: t("adminStockLow") },
+                { id: "out", label: t("adminStockZero") },
               ] as const
             ).map((tab) => (
               <button
@@ -249,18 +251,18 @@ export default function AdminProductList({
           <div className="relative inline-flex items-center">
             <ArrowUpDown
               size={12}
-              className="pointer-events-none absolute left-3 text-muted"
+              className="pointer-events-none absolute start-3 text-muted"
             />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              aria-label="Sort products"
-              className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface py-2 pl-8 pr-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:outline-none"
+              aria-label={t("sortProducts")}
+              className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface py-2 ps-8 pe-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:outline-none"
             >
-              <option value="default">Sort: Default</option>
-              <option value="price-desc">Price: High → Low</option>
-              <option value="price-asc">Price: Low → High</option>
-              <option value="stock-asc">Stock: Low → High</option>
+              <option value="default">{t("adminSortDefault")}</option>
+              <option value="price-desc">{t("adminSortPriceHigh")}</option>
+              <option value="price-asc">{t("adminSortPriceLow")}</option>
+              <option value="stock-asc">{t("adminSortStockLow")}</option>
             </select>
           </div>
 
@@ -274,10 +276,10 @@ export default function AdminProductList({
                   ? "bg-action text-on-action"
                   : "text-muted hover:text-primary"
               }`}
-              title="Editorial Table View"
+              title={t("adminTableView")}
             >
               <List size={13} />
-              <span className="hidden sm:inline">Table</span>
+              <span className="hidden sm:inline">{t("adminTable")}</span>
             </button>
             <button
               type="button"
@@ -287,10 +289,10 @@ export default function AdminProductList({
                   ? "bg-action text-on-action"
                   : "text-muted hover:text-primary"
               }`}
-              title="3D Showroom Grid View"
+              title={t("admin3dCards")}
             >
               <LayoutGrid size={13} />
-              <span className="hidden sm:inline">3D Cards</span>
+              <span className="hidden sm:inline">{t("admin3dCards")}</span>
             </button>
           </div>
         </div>
@@ -305,12 +307,12 @@ export default function AdminProductList({
             <PackageX size={28} strokeWidth={1.5} />
           </div>
           <p className="text-sm font-black uppercase tracking-wider text-primary">
-            No Matching Garments Found
+            {t("adminNoProducts")}
           </p>
           <p className="mt-1 max-w-xs text-xs text-muted">
             {productsList.length === 0
-              ? "Your catalog archive is currently empty. Add your first product to get started."
-              : "No items match your active search or stock filter criteria."}
+              ? t("adminEmptyCatalogHint")
+              : t("adminNoFilteredProducts")}
           </p>
           {productsList.length > 0 && (
             <button
@@ -322,7 +324,7 @@ export default function AdminProductList({
               }}
               className="mt-4 cursor-pointer rounded-xl bg-action px-4 py-2 text-[10px] font-black uppercase tracking-widest text-on-action hover:bg-action-hover"
             >
-              Reset Filters
+              {t("adminResetFilters")}
             </button>
           )}
         </div>
@@ -331,16 +333,16 @@ export default function AdminProductList({
         /* 4A. EDITORIAL TABLE VIEW                                         */
         /* ================================================================ */
         <div className="w-full overflow-x-auto">
-          <table className="w-full border-collapse text-left">
+          <table className="w-full border-collapse text-start">
             <thead>
               <tr className="border-b border-border-subtle bg-surface-subtle/60 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                <th className="py-3.5 px-5">Garment / SKU</th>
-                <th className="hidden py-3.5 px-4 sm:table-cell">Category</th>
-                <th className="py-3.5 px-4">Unit Price</th>
+                <th className="py-3.5 px-5">{t("adminGarmentSku")}</th>
+                <th className="hidden py-3.5 px-4 sm:table-cell">{t("adminCategory")}</th>
+                <th className="py-3.5 px-4">{t("adminUnitPrice")}</th>
                 <th className="hidden py-3.5 px-4 md:table-cell">
-                  Stock Telemetry
+                  {t("adminStockTelemetry")}
                 </th>
-                <th className="py-3.5 px-5 text-right">Actions</th>
+                <th className="py-3.5 px-5 text-end">{t("adminActions")}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle bg-surface text-xs">
@@ -387,7 +389,7 @@ export default function AdminProductList({
                             <button
                               type="button"
                               onClick={() => handleCopyId(p._id)}
-                              title="Click to copy full SKU ID"
+                              title={t("adminCopyFullSku")}
                               className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-surface-muted px-1.5 py-0.5 font-mono text-[10px] font-bold text-muted transition-colors hover:bg-action hover:text-on-action"
                             >
                               <span>#{shortId}</span>
@@ -412,7 +414,7 @@ export default function AdminProductList({
                     <td className="hidden py-3.5 px-4 align-middle sm:table-cell">
                       <span className="inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface-subtle px-3 py-1 text-[10px] font-black uppercase tracking-wider text-secondary">
                         <Tag size={11} className="text-muted" />
-                        {p.category || "General"}
+                        {p.category || t("dashboardGeneralCategory")}
                       </span>
                     </td>
 
@@ -420,7 +422,7 @@ export default function AdminProductList({
                     <td className="py-3.5 px-4 align-middle">
                       <div className="flex flex-col">
                         <span className="font-mono text-xs font-black text-primary sm:text-sm">
-                          ${Number(p.price || 0).toLocaleString()}
+                          {formatCurrency(p.price || 0, locale)}
                         </span>
                         {Number(p.discount) > 0 && (
                           <span className="mt-0.5 inline-block w-fit rounded bg-success-soft px-1.5 py-0.2 text-[9px] font-black uppercase text-success">
@@ -458,24 +460,24 @@ export default function AdminProductList({
 
                         {isOut ? (
                           <span className="inline-flex items-center gap-1 rounded-full border border-danger-border bg-danger-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-danger">
-                            Depleted (0)
+                            {t("adminZeroUnits")}
                           </span>
                         ) : isLow ? (
                           <span className="inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-warning">
                             <Flame size={10} />
-                            Low ({stock})
+                            {t("adminLowStockCount").replace("{count}", String(stock))}
                           </span>
                         ) : (
                           <span className="inline-flex items-center gap-1 rounded-full border border-success-border bg-success-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-success">
                             <CheckCircle2 size={10} />
-                            {stock} in stock
+                            {t("adminInStockCount").replace("{count}", String(stock))}
                           </span>
                         )}
                       </div>
                     </td>
 
                     {/* 5. Actions */}
-                    <td className="py-3.5 px-5 text-right align-middle">
+                    <td className="py-3.5 px-5 text-end align-middle">
                       <div className="flex items-center justify-end gap-2">
                         <button
                           type="button"
@@ -483,20 +485,20 @@ export default function AdminProductList({
                             router.push(`/dashboard/products/edit/${p._id}`)
                           }
                           className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-action px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-on-action shadow-2xs transition-all hover:-translate-y-0.5 hover:bg-action-hover active:scale-95"
-                          title="Edit Product"
+                          title={t("adminEditProduct")}
                         >
                           <Pencil size={13} />
-                          <span className="hidden lg:inline">Edit</span>
+                          <span className="hidden lg:inline">{t("adminEditProduct")}</span>
                         </button>
 
                         <button
                           type="button"
                           onClick={() => setConfirmProduct(p)}
                           className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-danger-border bg-danger-soft px-3 py-2 text-[10px] font-black uppercase tracking-wider text-danger transition-all hover:-translate-y-0.5 hover:border-danger-border hover:bg-danger hover:text-on-danger active:scale-95"
-                          title="Delete Product"
+                          title={t("adminDeleteProduct")}
                         >
                           <Trash2 size={13} />
-                          <span className="hidden lg:inline">Delete</span>
+                          <span className="hidden lg:inline">{t("adminDeleteProduct")}</span>
                         </button>
                       </div>
                     </td>
@@ -534,14 +536,14 @@ export default function AdminProductList({
                     />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-xs font-black uppercase text-subtle">
-                      No Image
+                      {t("adminNoImage")}
                     </div>
                   )}
 
                   {/* Top Floating Badges */}
                   <div className="absolute inset-x-2.5 top-2.5 flex items-center justify-between gap-2">
                     <span className="rounded-full bg-surface/90 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-primary shadow-2xs backdrop-blur-md">
-                      {p.category || "General"}
+                      {p.category || t("dashboardGeneralCategory")}
                     </span>
 
                     <span
@@ -553,7 +555,7 @@ export default function AdminProductList({
                             : "bg-action/85 text-on-action"
                       }`}
                     >
-                      {isOut ? "Zero Stock" : `${stock} Units`}
+                      {isOut ? t("adminZeroStock") : `${stock} ${t("adminUnits")}`}
                     </span>
                   </div>
                 </div>
@@ -568,13 +570,13 @@ export default function AdminProductList({
                       {p.name}
                     </h4>
                     <span className="font-mono text-sm font-black text-primary">
-                      ${Number(p.price || 0).toLocaleString()}
+                      {formatCurrency(p.price || 0, locale)}
                     </span>
                   </div>
 
                   <div className="flex items-center justify-between text-[10px] font-mono text-muted">
                     <span>SKU #{p._id.slice(-6).toUpperCase()}</span>
-                    <span>{p.section || p.style || "ARCHIVE"}</span>
+                    <span>{p.section || p.style || t("adminArchiveLabel")}</span>
                   </div>
                 </div>
 
@@ -588,14 +590,14 @@ export default function AdminProductList({
                     className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-action py-2.5 text-[10px] font-black uppercase tracking-wider text-on-action transition-all hover:bg-action-hover"
                   >
                     <Pencil size={12} />
-                    <span>Edit SKU</span>
+                    <span>{t("adminEditSku")}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setConfirmProduct(p)}
                     className="flex cursor-pointer items-center justify-center rounded-xl border border-danger-border bg-danger-soft px-3 py-2.5 text-danger transition-all hover:bg-danger hover:text-on-danger"
-                    title="Delete SKU"
+                    title={t("adminDeleteSku")}
                   >
                     <Trash2 size={14} />
                   </button>
@@ -605,6 +607,6 @@ export default function AdminProductList({
           })}
         </div>
       )}
-    </>
+    </div>
   );
 }
