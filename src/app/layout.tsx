@@ -75,7 +75,6 @@ export const metadata: Metadata = {
     canonical: "/",
   },
 
-  // How the link looks on WhatsApp, Facebook, LinkedIn, Discord, Telegram
   openGraph: {
     type: "website",
     locale: "ar_EG",
@@ -86,7 +85,6 @@ export const metadata: Metadata = {
       "تسوّق أحدث صيحات الموضة والقطع الأساسية المختارة بعناية من SHOP.CO.",
   },
 
-  // How the link looks on X (Twitter)
   twitter: {
     card: "summary_large_image",
     title: "SHOP.CO™ | Contemporary Fashion & Street Luxe",
@@ -115,7 +113,7 @@ export const metadata: Metadata = {
 };
 
 /* -------------------------------------------------------------------------- */
-/*                                ROOT LAYOUT                                 */
+/*                                 ROOT LAYOUT                                */
 /* -------------------------------------------------------------------------- */
 
 export default async function RootLayout({
@@ -127,7 +125,6 @@ export default async function RootLayout({
   const savedLocale = cookieStore.get("shopco-language")?.value;
   const initialLocale: Locale = savedLocale === "en" ? "en" : "ar";
 
-  // Structured Data (JSON-LD) for Google Rich Results
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ClothingStore",
@@ -148,19 +145,31 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
-        {/* Apply the saved/system theme before the first paint to avoid a flash. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `var savedTheme = null; try { savedTheme = localStorage.getItem('shopco-theme'); } catch (_) {} var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; var initialTheme = savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark) ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', initialTheme === 'dark'); document.documentElement.dataset.theme = initialTheme; document.documentElement.style.colorScheme = initialTheme; `,
+            __html: `var savedTheme = null; try { savedTheme = localStorage.getItem('shopco-theme'); } catch (_) {} var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; var initialTheme = savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark) ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', initialTheme === 'dark'); document.documentElement.dataset.theme = initialTheme; document.documentElement.style.colorScheme = initialTheme;`,
+          }}
+        />
+
+        <style
+          dangerouslySetInnerHTML={{
+            __html: `
+              .shopco-toast [role="status"] {
+                min-width: 0 !important;
+                flex: 1 1 0% !important;
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+              }
+            `,
           }}
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen font-sans antialiased overflow-x-clip `}
+        className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen overflow-x-clip font-sans antialiased`}
       >
         <ThemeProvider>
           <LocaleProvider initialLocale={initialLocale}>
-            {/* Google Rich Snippet Schema */}
             <script
               type="application/ld+json"
               dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -178,23 +187,37 @@ export default async function RootLayout({
             <Toaster
               position="top-center"
               gutter={10}
-              containerStyle={{ top: 24 }}
+              containerStyle={{
+                top: 16,
+                left: 12,
+                right: 12,
+              }}
               toastOptions={{
+                className: "shopco-toast",
                 duration: 3500,
                 style: {
+                  width: "100%",
+                  maxWidth: "min(410px, calc(100vw - 15px))",
                   background:
-                    "color-mix(in srgb, var(--surface-raised) 94%, transparent)",
+                    "color-mix(in srgb, var(--surface) 30%, transparent)",
                   color: "var(--text-primary)",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
+                  backdropFilter: "blur(20px)",
+                  WebkitBackdropFilter: "blur(20px)",
                   border: "1px solid var(--border)",
-                  borderRadius: "9999px",
-                  padding: "12px 22px",
-                  fontSize: "12px",
+                  borderRadius: "20px",
+                  padding: "10px 12px",
+                  fontSize: "11.5px",
                   fontWeight: 700,
-                  letterSpacing: "0.06em",
+                  letterSpacing: "0.05em",
                   textTransform: "uppercase",
                   boxShadow: "var(--shadow-floating)",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  gap: "12px",
+                  alignItems: "center",
+                  display: "flex",
+                  //   overflow: "hidden",
+                  // overFlow:""
                 },
                 success: {
                   iconTheme: {

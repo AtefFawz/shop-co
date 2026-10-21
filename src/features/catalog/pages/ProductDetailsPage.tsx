@@ -96,6 +96,16 @@ export default function ProductDetailsPage({
         : [];
 
   useEffect(() => {
+    if (!zoomOpen) return;
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setZoomOpen(false);
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [zoomOpen]);
+
+  useEffect(() => {
     if (isPaused || zoomOpen || imageGallery.length <= 1) return;
 
     const timer = setInterval(() => {
@@ -186,16 +196,24 @@ export default function ProductDetailsPage({
       {/* FULLSCREEN LIGHTBOX ZOOM MODAL                                     */}
       {/* ================================================================== */}
       {zoomOpen && currentImage && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-action/90 p-4 backdrop-blur-xl animate-in fade-in duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label={t("productInspectImage")}
+          onClick={() => setZoomOpen(false)}
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/95 p-4 backdrop-blur-xl animate-in fade-in duration-200"
+        >
           <button
             type="button"
             onClick={() => setZoomOpen(false)}
-            className="absolute end-6 top-6 z-20 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full bg-white/15 text-on-action transition-colors hover:bg-surface hover:text-primary"
+            aria-label={locale === "ar" ? "إغلاق الصورة" : "Close image"}
+            title={locale === "ar" ? "إغلاق الصورة (Esc)" : "Close image (Esc)"}
+            className="absolute end-4 top-4 z-20 flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-white/25 bg-black/70 text-white shadow-xl transition-colors hover:border-white/60 hover:bg-white hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:end-6 sm:top-6"
           >
-            <X size={20} />
+            <X size={22} />
           </button>
 
-          <div className="relative h-[82vh] w-full max-w-4xl overflow-hidden rounded-3xl">
+          <div onClick={(event) => event.stopPropagation()} className="relative h-[82vh] w-full max-w-4xl overflow-hidden rounded-3xl">
             <Image
               src={currentImage}
               alt={productItem.name}

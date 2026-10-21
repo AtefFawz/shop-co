@@ -60,6 +60,16 @@ export default function ToastSoundListener() {
     for (const toast of toasts) {
       if (seenIds.current.has(toast.id)) continue;
 
+      // Haptics are independent from audio autoplay restrictions and work on
+      // supported mobile browsers even before sound has been unlocked.
+      if (toast.visible && toast.type !== "loading" && typeof navigator !== "undefined") {
+        try {
+          if (typeof navigator.vibrate === "function") navigator.vibrate([24, 35, 18]);
+        } catch {
+          // Haptics are optional and must never interrupt the notification.
+        }
+      }
+
       if (!toast.visible || toast.type === "loading" || !userEnabledAudio.current) {
         // Do not replay toasts that were already visible before sound was enabled.
         seenIds.current.add(toast.id);
@@ -104,7 +114,7 @@ export default function ToastSoundListener() {
           oscillator.type = "sine";
           oscillator.frequency.setValueAtTime(note.frequency, noteStart);
           gain.gain.setValueAtTime(0.0001, noteStart);
-          gain.gain.exponentialRampToValueAtTime(0.035, noteStart + 0.018);
+          gain.gain.exponentialRampToValueAtTime(0.065, noteStart + 0.018);
           gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + note.duration);
           oscillator.connect(gain);
           gain.connect(context.destination);

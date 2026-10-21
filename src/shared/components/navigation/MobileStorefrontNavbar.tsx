@@ -219,7 +219,7 @@ export default function MobileStorefrontNavbar() {
               ease="power2.out"
               trigger="loop"
               fillMode="wipe"
-              fontSize={27}
+              fontSize={20}
               fontWeight={900}
               letterSpacing={-1.5}
               reverse={false}

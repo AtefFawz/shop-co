@@ -11,18 +11,29 @@ import { useRouter } from "next/navigation";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 
+import Link from "next/link";
 export default function ProductDetailsClient({ product }: { product: any }) {
   const { t, locale, direction } = useLocale();
   const addItem = useProduct((state) => state.addItem);
   const router = useRouter();
 
   // Safely initialize first color/size if array is provided
-  const [selectedColor, setSelectedColor] = useState(() =>
-    Array.isArray(product?.colors) ? product.colors[0] : product?.colors,
-  );
-  const [selectedSize, setSelectedSize] = useState(() =>
-    Array.isArray(product?.size) ? product.size[0] : product?.size,
-  );
+  const [selectedColor, setSelectedColor] = useState<string>(() => {
+    const colors = Array.isArray(product?.colors)
+      ? product.colors
+      : typeof product?.colors === "string"
+        ? product.colors.split(",")
+        : [];
+    return colors[0]?.trim() ?? "";
+  });
+  const [selectedSize, setSelectedSize] = useState<string>(() => {
+    const sizes = Array.isArray(product?.size)
+      ? product.size
+      : typeof product?.size === "string"
+        ? product.size.split(",")
+        : [];
+    return sizes[0]?.trim() ?? "";
+  });
   const [quantity, setQuantity] = useState(1);
   const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
@@ -53,32 +64,31 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     }
 
     toast.success(
-      (toastItem) => (
-        <div className="flex items-center gap-3.5">
-          <div className="min-w-0 flex-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-success">
+      (toastInstance) => (
+        <div className="flex w-full min-w-0 flex-col gap-1.5">
+          <div className="flex w-full min-w-0 items-center justify-between gap-2">
+            <span className="truncate text-[10px] font-black uppercase tracking-[0.14em] text-success">
               {t("productAddedToBag")}
-            </p>
-            <p className="truncate text-xs font-bold text-on-action">
-              {quantity}× {product.name || product.section}
-            </p>
+            </span>
+
+            <Link
+              href="/shop/details/cart"
+              onClick={() => toast.dismiss(toastInstance.id)}
+              className="inline-flex shrink-0 items-center gap-1 rounded-full border border-border bg-surface-subtle px-2.5 py-0.5 text-[9.5px] font-black uppercase tracking-wider text-primary shadow-2xs transition-colors hover:bg-action hover:text-on-action"
+            >
+              <span>{t("productViewBag")}</span>
+            </Link>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              router.push("/shop/details/cart");
-              toast.dismiss(toastItem.id);
-            }}
-            className="shrink-0 cursor-pointer rounded-full bg-surface px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-primary transition-transform hover:scale-105"
-          >
-            {t("productViewBag")} ↗
-          </button>
+
+          <p className="truncate text-[11px] font-extrabold uppercase tracking-tight text-primary">
+            {quantity}×{" "}
+            {product.name.length > 26
+              ? `${product.name.slice(0, 26)}…`
+              : product.name}
+          </p>
         </div>
       ),
-      {
-        duration: 4000,
-        position: "top-center",
-      },
+      { duration: 3500 },
     );
   };
 
@@ -114,25 +124,33 @@ export default function ProductDetailsClient({ product }: { product: any }) {
               </thead>
               <tbody className="divide-y divide-border-subtle font-mono text-xs font-bold">
                 <tr>
-                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeSmall") : "Small (S)"}</td>
+                  <td className="py-2 font-sans font-black">
+                    {locale === "ar" ? t("sizeSmall") : "Small (S)"}
+                  </td>
                   <td className="py-2">92–96</td>
                   <td className="py-2">76–80</td>
                   <td className="py-2">70</td>
                 </tr>
                 <tr>
-                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeMedium") : "Medium (M)"}</td>
+                  <td className="py-2 font-sans font-black">
+                    {locale === "ar" ? t("sizeMedium") : "Medium (M)"}
+                  </td>
                   <td className="py-2">98–102</td>
                   <td className="py-2">82–86</td>
                   <td className="py-2">72</td>
                 </tr>
                 <tr>
-                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeLarge") : "Large (L)"}</td>
+                  <td className="py-2 font-sans font-black">
+                    {locale === "ar" ? t("sizeLarge") : "Large (L)"}
+                  </td>
                   <td className="py-2">104–108</td>
                   <td className="py-2">88–92</td>
                   <td className="py-2">74</td>
                 </tr>
                 <tr>
-                  <td className="py-2 font-sans font-black">{locale === "ar" ? t("sizeXL") : "X-Large (XL)"}</td>
+                  <td className="py-2 font-sans font-black">
+                    {locale === "ar" ? t("sizeXL") : "X-Large (XL)"}
+                  </td>
                   <td className="py-2">110–116</td>
                   <td className="py-2">94–100</td>
                   <td className="py-2">76</td>

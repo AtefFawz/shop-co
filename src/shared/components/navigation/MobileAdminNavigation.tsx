@@ -340,9 +340,9 @@ export const MobileAdminNavigation = ({
                 <div className="grid grid-cols-2 gap-2.5">
                   <div className="flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-border/75 bg-surface-subtle/80 p-3">
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface text-secondary shadow-sm">
+                      {/* <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface text-secondary shadow-sm">
                         <Languages size={17} aria-hidden="true" />
-                      </span>
+                      </span> */}
                       <span className="min-w-0">
                         <span className="block text-xs font-bold text-primary">
                           {t("uiLanguagePreference")}
@@ -360,9 +360,9 @@ export const MobileAdminNavigation = ({
 
                   <div className="flex min-w-0 items-center justify-between gap-2 rounded-2xl border border-border/75 bg-surface-subtle/80 p-3">
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface text-secondary shadow-sm">
-                        <Moon size={17} aria-hidden="true" />
-                      </span>
+                      {/* <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-surface text-secondary shadow-sm">
+                      <Moon size={17} aria-hidden="true" />
+                      </span> */}
                       <span className="min-w-0">
                         <span className="block text-xs font-bold text-primary">
                           {t("uiThemePreference")}

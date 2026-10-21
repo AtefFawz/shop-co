@@ -105,7 +105,7 @@ export default function NotificationListener() {
                   {notification.title || "New Atelier Update"}
                 </p>
 
-                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-300">
+                <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-neutral-600 dark:text-neutral-300">
                   {notification.message}
                 </p>
 
