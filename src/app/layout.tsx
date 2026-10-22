@@ -33,7 +33,7 @@ const geistMono = Geist_Mono({
 /* -------------------------------------------------------------------------- */
 
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL || "https://shop-co-1fqm.vercel.app";
+  process.env.NEXT_PUBLIC_SITE_URL || "https://shop-co-jfqp.vercel.app";
 
 export const viewport: Viewport = {
   themeColor: "#f5f3f0",
@@ -196,16 +196,16 @@ export default async function RootLayout({
                 className: "shopco-toast",
                 duration: 3500,
                 style: {
-                  width: "100%",
+                  minWidth: "fit",
                   maxWidth: "min(410px, calc(100vw - 15px))",
                   background:
-                    "color-mix(in srgb, var(--surface) 30%, transparent)",
+                    "color-mix(in srgb, var(--surface) 50%, transparent)",
                   color: "var(--text-primary)",
                   backdropFilter: "blur(20px)",
                   WebkitBackdropFilter: "blur(20px)",
                   border: "1px solid var(--border)",
-                  borderRadius: "20px",
-                  padding: "10px 12px",
+                  borderRadius: "99999px",
+                  padding: "8px 16px",
                   fontSize: "11.5px",
                   fontWeight: 700,
                   letterSpacing: "0.05em",
@@ -213,11 +213,8 @@ export default async function RootLayout({
                   boxShadow: "var(--shadow-floating)",
                   whiteSpace: "nowrap",
                   overflow: "hidden",
-                  gap: "12px",
-                  alignItems: "center",
                   display: "flex",
-                  //   overflow: "hidden",
-                  // overFlow:""
+                  gap: " 10px",
                 },
                 success: {
                   iconTheme: {

@@ -82,8 +82,8 @@ export default function ProductDetailsClient({ product }: { product: any }) {
 
           <p className="truncate text-[11px] font-extrabold uppercase tracking-tight text-primary">
             {quantity}×{" "}
-            {product.name.length > 26
-              ? `${product.name.slice(0, 26)}…`
+            {product.name.length > 46
+              ? `${product.name.slice(0, 46)}…`
               : product.name}
           </p>
         </div>

@@ -37,7 +37,10 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
   };
 
   return (
-    <div dir={direction} className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-8">
+    <div
+      dir={direction}
+      className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-8"
+    >
       {/* Header */}
       <div className="mb-6 flex items-center gap-3.5 border-b border-border-subtle pb-4">
         <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-action text-on-action shadow-xs">
@@ -86,7 +89,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
               }
-              className="w-full bg-transparent py-3.5 ps-14 pe-4 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+              className="w-full bg-transparent py-3.5 pe-4 ps-14 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
             />
           </div>
         </div>
@@ -125,7 +128,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                 onChange={(e) =>
                   setFormData({ ...formData, city: e.target.value })
                 }
-                className="w-full bg-transparent py-3.5 ps-14 pe-4 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+                className="w-full bg-transparent py-3.5 pe-4 ps-14 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
               />
             </div>
 
@@ -143,7 +146,15 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                   }`}
                 >
                   {locale === "ar"
-                    ? ({ Cairo: t("cityCairo"), Alexandria: t("cityAlexandria"), Giza: t("cityGiza"), Mansoura: t("cityMansoura"), Tanta: t("cityTanta") } as Record<string, string>)[c]
+                    ? (
+                        {
+                          Cairo: t("cityCairo"),
+                          Alexandria: t("cityAlexandria"),
+                          Giza: t("cityGiza"),
+                          Mansoura: t("cityMansoura"),
+                          Tanta: t("cityTanta"),
+                        } as Record<string, string>
+                      )[c]
                     : c}
                 </button>
               ))}
@@ -179,6 +190,10 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
                 onFocus={() => setFocused("phone")}
                 onBlur={() => setFocused(null)}
                 placeholder="+20 100 000 0000"
+                style={{
+                  unicodeBidi: "plaintext",
+                  textAlign: direction === "rtl" ? "right" : "left",
+                }}
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
@@ -188,7 +203,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
           </div>
         </div>
 
-        {/* 3. Interactive {t("paymentMethod")} Selector */}
+        {/* 3. Interactive Payment Method Selector */}
         <div className="space-y-2.5 border-t border-border-subtle pt-5">
           <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
             {t("paymentMethod")}
@@ -277,7 +292,10 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
               <>
                 <span>{t("placeOrder")}</span>
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition-transform duration-300 group-hover:translate-x-1 group-hover:bg-surface group-hover:text-primary">
-                  <ArrowRight size={13} className={direction === "rtl" ? "rotate-180" : undefined} />
+                  <ArrowRight
+                    size={13}
+                    className={direction === "rtl" ? "rotate-180" : undefined}
+                  />
                 </span>
               </>
             )}
@@ -285,9 +303,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
 
           <p className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">
             <ShieldCheck size={13} className="text-success" />
-            <span>
-              {t("returnsProtection")}
-            </span>
+            <span>{t("returnsProtection")}</span>
           </p>
         </div>
       </form>
