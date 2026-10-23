@@ -1,12 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useMotionTemplate,
-} from "framer-motion";
+import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
 import { BadgeCheck, Quote, ChevronDown, Sparkles } from "lucide-react";
 import StarRating from "@/shared/components/feedback/StarRating";
 import { useLocale } from "@/shared/i18n/LocaleProvider";

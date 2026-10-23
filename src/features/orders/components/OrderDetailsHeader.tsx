@@ -1,19 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import {
-  CalendarDays,
-  Package,
-  Copy,
-  Check,
-  Clock,
-  Truck,
-  CheckCircle2,
-  XCircle,
-  Sparkles,
-  ChevronDown,
-  Loader2,
-} from "lucide-react";
+import { CalendarDays, Package, Copy, Check, Clock, Truck, CheckCircle2, XCircle, ChevronDown, Loader2 } from "lucide-react";
 import toast from "react-hot-toast";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
@@ -25,7 +13,7 @@ type Order = {
   status: OrderStatus;
   createdAt: string;
   totalPrice?: number;
-  orderItems?: any[];
+  orderItems?: Array<{ quantity?: number; count?: number }>;
 };
 
 interface OrderHeaderProps {

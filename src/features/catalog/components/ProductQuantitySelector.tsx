@@ -1,15 +1,22 @@
 "use client";
 
-import React from "react";
+
 import { Minus, Plus } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+
+interface ProductQuantitySelectorProps {
+  quantity: number;
+  setQuantity: (quantity: number) => void;
+  logicQuantity?: boolean;
+  maxStock?: number;
+}
 
 export default function ProductQuantitySelector({
   quantity,
   setQuantity,
   logicQuantity,
   maxStock = 99,
-}: any) {
+}: ProductQuantitySelectorProps) {
   const { t, direction } = useLocale();
   const isMin = quantity <= 1;
   const isMax = Boolean(logicQuantity) || quantity >= maxStock;

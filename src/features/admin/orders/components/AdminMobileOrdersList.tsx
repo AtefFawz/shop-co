@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { Copy, Check, ChevronDown, Calendar, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 import OrderStatusUpdater from "@/features/admin/orders/components/OrderStatusUpdater";
@@ -8,6 +8,7 @@ import { DesktopOrderProps } from "@/features/admin/orders/components/AdminDeskt
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import type { AdminOrderRecord } from "@/types/domain";
 const getItemImageUrl = (raw?: string) => {
   if (!raw) return "https://placehold.co/80x80/111111/FFFFFF?text=SKU";
   if (raw.startsWith("http")) return raw;
@@ -40,10 +41,10 @@ const AdminMobileOrdersList = ({
     <div dir={direction} className="space-y-4 md:hidden">
       {orders.length > 0 && (
         <div className="space-y-3.5">
-          {orders.map((order: any) => {
+          {orders.map((order: AdminOrderRecord) => {
             const shortId = (order._id || "").slice(-6).toUpperCase();
             const isExpanded = expandedId === order._id;
-            const itemsList: any[] = order.orderItems || [];
+            const itemsList: AdminOrderRecord["orderItems"] = order.orderItems || [];
             const initials = (order.user?.fullName || t("ordersGuestClient"))
               .split(" ")
               .map((n: string) => n[0])
@@ -111,7 +112,7 @@ const AdminMobileOrdersList = ({
                     </button>
 
                     <div className="flex gap-1">
-                      {itemsList.slice(0, 3).map((item: any, idx: number) => (
+                      {itemsList.slice(0, 3).map((item: AdminOrderRecord["orderItems"][number], idx: number) => (
                         <img
                           key={idx}
                           src={getItemImageUrl(item.image)}
@@ -163,7 +164,7 @@ const AdminMobileOrdersList = ({
 
                   {isExpanded && (
                     <div className="mt-2.5 space-y-2 border-t border-border/60 pt-2.5 pb-1">
-                      {itemsList.map((item: any, idx: number) => (
+                      {itemsList.map((item: AdminOrderRecord["orderItems"][number], idx: number) => (
                         <div
                           key={idx}
                           className="flex items-center gap-2.5 rounded-xl bg-surface p-2 shadow-2xs"

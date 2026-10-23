@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -67,8 +67,8 @@ export default function ProductCard({ product }: { product: Product }) {
   }, [isPaused, images.length]);
 
   const categoryLabel =
-    (product as any).category ||
-    (product as any).section ||
+    product.category ||
+    product.section ||
     t("productAtelierEdit");
   const ratingValue = Number(product?.ratingsAverage || 0);
 

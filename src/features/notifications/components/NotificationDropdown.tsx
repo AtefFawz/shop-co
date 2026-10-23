@@ -50,9 +50,7 @@ export default function NotificationDropdown() {
 
     return notifications.filter((notification) => {
       if (activeTab === "unread" && notification.read) return false;
-
       if (activeTab === "orders" && !notification.order) return false;
-
       if (!query) return true;
 
       return [
@@ -146,22 +144,20 @@ export default function NotificationDropdown() {
         className={`
           group relative flex h-10 w-10 cursor-pointer
           items-center justify-center rounded-2xl border
-          outline-none transition-colors duration-200
-          focus-visible:ring-2 focus-visible:ring-neutral-900
-          focus-visible:ring-offset-2
-          dark:focus-visible:ring-neutral-200
-          dark:focus-visible:ring-offset-neutral-950
+          outline-none transition-all duration-200
+          focus-visible:ring-2 focus-visible:ring-focus
+          focus-visible:ring-offset-2 focus-visible:ring-offset-app
           ${
             open
-              ? "border-neutral-900 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-neutral-100 dark:text-neutral-950"
-              : "border-neutral-200 bg-white text-neutral-700 hover:border-neutral-400 hover:bg-neutral-50 hover:text-neutral-950 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-200 dark:hover:border-neutral-500 dark:hover:bg-neutral-800 dark:hover:text-white"
+              ? "border-action bg-action text-on-action shadow-[0_10px_25px_-6px_var(--focus-ring)]"
+              : "border-border bg-surface-raised text-secondary shadow-[var(--shadow-soft)] hover:border-border-strong hover:bg-surface-subtle hover:text-primary"
           }
         `}
       >
         {unreadCount > 0 && !open && !reduceMotion && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 animate-ping rounded-2xl bg-rose-500/10 [animation-duration:2.5s] dark:bg-rose-400/10"
+            className="pointer-events-none absolute inset-0 animate-ping rounded-2xl bg-danger/15 [animation-duration:2.5s]"
           />
         )}
 
@@ -189,11 +185,12 @@ export default function NotificationDropdown() {
               exit={{ scale: 0.5, opacity: 0 }}
               transition={transition}
               className="
-                absolute -right-1 -top-1 z-20 flex h-5
+                absolute -end-1 -top-1 z-20 flex h-5
                 min-w-5 items-center justify-center rounded-full
-                bg-rose-600 px-1 font-mono text-[9px]
-                font-bold leading-none text-white
-                ring-2 ring-white dark:ring-neutral-950
+                bg-danger px-1 font-mono text-[9.5px]
+                font-extrabold leading-none text-white
+                shadow-[0_4px_12px_rgba(var(--danger-rgb),0.45)]
+                ring-2 ring-surface
               "
             >
               {unreadCount > 99 ? "99+" : unreadCount}
@@ -214,10 +211,8 @@ export default function NotificationDropdown() {
               exit={{ opacity: 0 }}
               transition={{ duration: reduceMotion ? 0 : 0.16 }}
               onClick={closeDropdown}
-              className="
-                fixed inset-0 z-40 cursor-default bg-black/25
-                backdrop-blur-[2px] sm:hidden
-              "
+              style={{ backgroundColor: "var(--overlay)" }}
+              className="fixed inset-0 z-40 cursor-default backdrop-blur-[3px] sm:hidden"
             />
 
             {/* Notification panel */}
@@ -237,21 +232,33 @@ export default function NotificationDropdown() {
               }
               transition={transition}
               dir={direction}
+              style={{
+                transformOrigin: direction === "rtl" ? "top left" : "top right",
+              }}
               className={`
                 fixed inset-x-3 top-19 z-50 mx-auto
                 flex max-h-[min(78dvh,680px)] w-auto
-                max-w-[430px] flex-col overflow-hidden
-                rounded-3xl border border-neutral-200
-                bg-[#F7F6F3] shadow-[0_24px_70px_rgba(0,0,0,0.18)]
-                dark:border-neutral-700 dark:bg-neutral-900
-                dark:shadow-[0_24px_70px_rgba(0,0,0,0.5)]
+                max-w-[435px] flex-col overflow-hidden
+                rounded-3xl border border-border-strong/70
+                bg-surface text-primary
+                shadow-[var(--shadow-floating)]
+                ring-1 ring-white/10
                 sm:absolute sm:inset-x-auto
-                sm:top-[calc(100%+12px)] sm:mx-0 sm:w-[420px]
+                sm:top-[calc(100%+12px)] sm:mx-0 sm:w-[425px]
                 sm:max-h-[min(650px,calc(100dvh-100px))]
-                ${direction === "rtl" ? "sm:left-0 sm:right-auto" : "sm:right-0 sm:left-auto"}
+                ${
+                  direction === "rtl"
+                    ? "sm:left-0 sm:right-auto"
+                    : "sm:right-0 sm:left-auto"
+                }
               `}
-              style={{ transformOrigin: direction === "rtl" ? "top left" : "top right" }}
             >
+              {/* Top Royal Sapphire Specular Glow */}
+              <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-x-10 top-0 z-30 h-px bg-gradient-to-r from-transparent via-accent/60 to-transparent"
+              />
+
               <NotificationHeader
                 unreadCount={unreadCount}
                 totalCount={notifications.length}

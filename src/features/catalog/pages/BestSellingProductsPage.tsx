@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Flame,
@@ -26,10 +26,12 @@ import { ClientPagination } from "@/shared/components/navigation/ClientPaginatio
 import { formatCurrency } from "@/lib/formatCurrency";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+const EMPTY_PRODUCTS: Product[] = [];
+
 export default function BestSellingProductsPage() {
   const { t, locale, direction } = useLocale();
   const { data, loading, page, goToPage, totalPages } = useData("/product");
-  const rawProducts: Product[] = data?.data?.Products ?? [];
+  const rawProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
 
   // Interactive Showroom Controls
   const [activeTab, setActiveTab] = useState<"sale" | "all" | "under150">(
@@ -48,7 +50,7 @@ export default function BestSellingProductsPage() {
   // Live Telemetry from current products batch
   const telemetry = useMemo(() => {
     const saleItems = rawProducts.filter(
-      (p: any) => p.isSale === true || Number(p.discount) > 0,
+      (p: Product) => p.isSale === true || Number(p.discount) > 0,
     );
     const prices = rawProducts
       .map((p) => Number(p.price) || 0)
@@ -74,13 +76,15 @@ export default function BestSellingProductsPage() {
   // Auto-switch to "all" if current page has 0 sale items so page never looks broken
   useEffect(() => {
     if (!loading && rawProducts.length > 0 && telemetry.saleCount === 0) {
+      // Reset a stale filter when refreshed data no longer contains sale products.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab("all");
     }
   }, [loading, rawProducts.length, telemetry.saleCount]);
 
   // Filtered & Sorted Products
   const displayedProducts = useMemo(() => {
-    const list = [...rawProducts].filter((item: any) => {
+    const list = [...rawProducts].filter((item: Product) => {
       if (activeTab === "sale") {
         const isPromo = item.isSale === true || Number(item.discount) > 0;
         if (!isPromo) return false;
@@ -112,12 +116,6 @@ export default function BestSellingProductsPage() {
 
     return list;
   }, [rawProducts, activeTab, searchQuery, sortBy]);
-
-  const resetAll = () => {
-    setActiveTab(telemetry.saleCount > 0 ? "sale" : "all");
-    setSearchQuery("");
-    setSortBy("featured");
-  };
 
   return (
     <section
@@ -287,7 +285,7 @@ export default function BestSellingProductsPage() {
               />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 aria-label={t("catalogSort")}
                 className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-black uppercase tracking-wider text-primary focus:border-primary focus:bg-surface focus:outline-none"
               >

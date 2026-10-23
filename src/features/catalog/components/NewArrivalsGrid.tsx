@@ -1,14 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  Sparkles,
-  Flame,
-  ArrowUpRight,
-  SlidersHorizontal,
-  Layers,
-} from "lucide-react";
+import { Sparkles, Flame } from "lucide-react";
 
 import Card from "@/features/catalog/components/ProductCard";
 import Heading from "@/shared/components/ui/SectionHeading";
@@ -17,6 +11,8 @@ import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton"
 import useData from "@/hooks/getData";
 import SpecularButton from "@/shared/components/motion/SpecularButton";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+
+const EMPTY_PRODUCTS: Product[] = [];
 
 export default function NewArrivalsGrid() {
   const { t } = useLocale();
@@ -31,7 +27,7 @@ export default function NewArrivalsGrid() {
     limit: 8,
   });
 
-  const rawProducts: Product[] = data?.data?.Products ?? [];
+  const rawProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
 
   // Interactive Client Filter & Sort
   const [activeTab, setActiveTab] = useState<"all" | "promo" | "under150">(
@@ -42,12 +38,12 @@ export default function NewArrivalsGrid() {
     const list = [...rawProducts];
     if (activeTab === "promo") {
       const promos = list.filter(
-        (p: any) => p.isSale === true || Number(p.discount) > 0,
+        (p: Product) => p.isSale === true || Number(p.discount) > 0,
       );
       return promos.length > 0 ? promos : list;
     }
     if (activeTab === "under150") {
-      const affordable = list.filter((p: any) => Number(p.price || 0) <= 150);
+      const affordable = list.filter((p: Product) => Number(p.price || 0) <= 150);
       return affordable.length > 0 ? affordable : list;
     }
     return list;
@@ -110,7 +106,7 @@ export default function NewArrivalsGrid() {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as "all" | "promo" | "under150")}
                 className={`cursor-pointer rounded-xl px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${
                   activeTab === tab.id
                     ? "bg-action text-on-action shadow-xs"
@@ -138,7 +134,7 @@ export default function NewArrivalsGrid() {
                 <span className="font-mono text-[9px] font-black uppercase tracking-widest text-muted transition-colors group-hover:text-primary">
                   DROP // 0{idx + 1}
                 </span>
-                {(item as any).isSale && (
+                {item.isSale && (
                   <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-success">
                     <Flame size={10} /> {t("hot")}
                   </span>

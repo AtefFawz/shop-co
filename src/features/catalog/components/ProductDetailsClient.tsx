@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import toast from "react-hot-toast";
-import { ShoppingBag, Ruler, Sparkles, ArrowRight, X } from "lucide-react";
+import { ShoppingBag, Ruler, X } from "lucide-react";
 import ProductColorSelector from "@/features/catalog/components/ProductColorSelector";
 import Sizes from "@/features/catalog/components/ProductSizeSelector";
 import Counter from "@/features/catalog/components/ProductQuantitySelector";
@@ -12,7 +12,13 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 
 import Link from "next/link";
-export default function ProductDetailsClient({ product }: { product: any }) {
+
+import type { Product } from "@/types";
+export default function ProductDetailsClient({
+  product,
+}: {
+  product: Product;
+}) {
   const { t, locale, direction } = useLocale();
   const addItem = useProduct((state) => state.addItem);
   const router = useRouter();
@@ -22,7 +28,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     const colors = Array.isArray(product?.colors)
       ? product.colors
       : typeof product?.colors === "string"
-        ? product.colors.split(",")
+        ? (product.colors as string).split(",")
         : [];
     return colors[0]?.trim() ?? "";
   });
@@ -30,7 +36,7 @@ export default function ProductDetailsClient({ product }: { product: any }) {
     const sizes = Array.isArray(product?.size)
       ? product.size
       : typeof product?.size === "string"
-        ? product.size.split(",")
+        ? (product.size as string).split(",")
         : [];
     return sizes[0]?.trim() ?? "";
   });

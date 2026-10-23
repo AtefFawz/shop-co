@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 
+
 export type Theme = "light" | "dark";
 
 interface ThemeContextValue {
@@ -47,7 +48,7 @@ function applyDocumentTheme(theme: Theme, persist = true) {
   const themeColor = document.querySelector<HTMLMetaElement>(
     'meta[name="theme-color"]',
   );
-  themeColor?.setAttribute("content", theme === "dark" ? "#111214" : "#f5f3f0");
+  themeColor?.setAttribute("content", theme === "dark" ? "#101310" : "#f5f4ef");
 }
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
@@ -58,7 +59,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const root = document.documentElement;
     const initialTheme: Theme = root.classList.contains("dark") ? "dark" : "light";
+    // The DOM class is the hydration-safe source of truth for the initial theme.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setThemeState(initialTheme);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
 
     const media = window.matchMedia("(prefers-color-scheme: dark)");

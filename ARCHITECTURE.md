@@ -7,6 +7,7 @@
 - `src/shared/` contains cross-feature UI primitives, navigation, layout shell/footer, motion primitives, feedback UI, and theme state.
 - `src/features/*/data/` contains feature-owned content, while `src/shared/data/` and `src/shared/config/` hold cross-feature assets and navigation configuration.
 - `src/assets/` contains imported visual assets.
+- Unused legacy `src/components/` and `src/data/` trees were removed after checking that current route adapters, features, shared UI, and app entry points do not import from them; this prevents parallel, stale implementations from being mistaken for active code.
 - `src/hooks/`, `src/lib/`, `src/store/`, `src/types/`, and `src/utils/` retain the existing data/API integration boundary and utilities. API clients and API-specific hooks were intentionally not rewritten or renamed.
 
 ## Naming rules
@@ -47,3 +48,12 @@
 ## API boundary
 
 Existing `src/lib/**`, `src/hooks/**`, `src/proxy.ts`, and `next.config.ts` were kept byte-for-byte identical to the uploaded project. This preserves request behavior, endpoint names, token refresh logic, authentication semantics, backend rewrite configuration, and server-client transport. Feature pages may import these modules, but should not duplicate or bypass their behavior.
+
+
+## Store responsibilities
+
+- `src/store/cartStore.ts` is the canonical Zustand cart store. `useCartStore` is the preferred name for new feature code; `useProduct` remains as a compatibility export for older feature imports.
+- Cart quantity mutations respect known inventory limits, persist through the existing `product` storage key, and migrate persisted data to version 3.
+- `summarizeCart()` is a pure selector/helper for all-line and checkout-selected counts/totals, preventing UI components from implementing subtly different subtotal rules.
+- The cart UI supports line selection, select/deselect all, bulk removal, and checkout restricted to selected lines. API order placement and endpoint names were not changed.
+- `features/home/components/intro/CinematicIntro.tsx` owns the landing-page brand reveal; it is session-scoped, skippable, keyboard dismissible, and disabled for reduced-motion preferences.

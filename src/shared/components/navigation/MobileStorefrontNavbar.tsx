@@ -46,6 +46,8 @@ export default function MobileStorefrontNavbar() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    // Portal rendering must wait until the browser DOM exists.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setMounted(true);
   }, []);
 
@@ -58,7 +60,10 @@ export default function MobileStorefrontNavbar() {
 
   // Close overlays when navigating to another route.
   useEffect(() => {
+    // Navigation invalidates the current overlays.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMenuOpen(false);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveSearch(false);
   }, [pathname]);
 

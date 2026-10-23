@@ -26,7 +26,7 @@ const applyAllFilters = (
   style: string | null,
   maxPrice: number | null,
 ) => {
-  return products.filter((item: any) => {
+  return products.filter((item: Product) => {
     // 1. Filter by Type (Gender)
     if (gender && item.gender?.toUpperCase() !== gender.toUpperCase()) {
       return false;

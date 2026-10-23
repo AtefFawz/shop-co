@@ -14,7 +14,7 @@ import { MobileAdminNavigation } from "@/shared/components/navigation/MobileAdmi
 import ThemeToggle from "@/shared/theme/ThemeToggle";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
-import PageTransition from "@/shared/components/motion/RouteTransition";
+
 import { AdminDesktopSidebar } from "@/shared/components/navigation/AdminDesktopSidebar";
 
 export default function AdminLayout({

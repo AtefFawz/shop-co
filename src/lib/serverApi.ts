@@ -2,6 +2,7 @@ import axios from "axios";
 import { cookies } from "next/headers";
 import https from "https";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 const httpsAgent = new https.Agent({
   rejectUnauthorized: false,
   keepAlive: true,
@@ -14,7 +15,7 @@ export const api = axios.create({
 
 const serverApi = async (url: string) => {
   const cookieStore = await cookies();
-  let token = cookieStore.get("token")?.value;
+  const token = cookieStore.get("token")?.value;
 
   try {
     const res = await api.get(url, {
@@ -23,15 +24,16 @@ const serverApi = async (url: string) => {
       },
     });
     return res.data;
-  } catch (error: any) {
-    if (error.digest?.startsWith("NEXT_REDIRECT")) {
+  } catch (error: unknown) {
+    const details = getApiErrorDetails(error);
+    if (details.digest?.startsWith("NEXT_REDIRECT")) {
       throw error;
     }
 
     if (
-      error.response?.status === 401 ||
-      error.code === "ECONNRESET" ||
-      error.message.includes("socket disconnected")
+      details.response?.status === 401 ||
+      details.code === "ECONNRESET" ||
+      details.message?.includes("socket disconnected")
     ) {
       const refreshToken = cookieStore.get("refreshToken")?.value;
 
@@ -72,8 +74,8 @@ const serverApi = async (url: string) => {
         });
 
         return retryRes.data;
-      } catch (refreshError: any) {
-        if (refreshError.digest?.startsWith("NEXT_REDIRECT")) {
+      } catch (refreshError: unknown) {
+        if (getApiErrorDetails(refreshError).digest?.startsWith("NEXT_REDIRECT")) {
           throw refreshError;
         }
 

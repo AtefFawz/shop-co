@@ -2,7 +2,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
-// @ts-ignore: CSS import side-effect type declarations missing
 import "./globals.css";
 import { AuthWatcher } from "@/lib/AuthWatcher";
 import { Toaster } from "react-hot-toast";
@@ -36,7 +35,7 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://shop-co-jfqp.vercel.app";
 
 export const viewport: Viewport = {
-  themeColor: "#f5f3f0",
+  themeColor: "#f5f4ef",
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,

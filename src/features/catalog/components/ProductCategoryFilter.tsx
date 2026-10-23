@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import { useFilterStore } from "@/store/filterStore";
 import { ChevronRight, Check } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";

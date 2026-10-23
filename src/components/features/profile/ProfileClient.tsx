@@ -161,14 +161,14 @@ export function ProfileClient() {
   }
 
   // ── 4. DERIVED USER & TELEMETRY DATA ──
-  const user = userData?.data?.user || userData?.user || {};
+
+  const user: any = userData?.data?.user || userData?.user || {};
   const {
     fullName = "User",
     email = userData?.data?.email || "",
     avatar = "",
     role = "USER",
   } = user;
-
   const initials = fullName
     .split(" ")
     .filter(Boolean)

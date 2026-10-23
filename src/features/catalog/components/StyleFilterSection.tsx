@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { ProductStyleFilter } from "@/features/catalog/components/ProductStyleFilter";
 import { useLocale } from "@/shared/i18n/LocaleProvider";

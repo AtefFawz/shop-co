@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import {
   RefreshCw,
@@ -23,6 +23,7 @@ import EmptyState from "@/features/admin/users/components/UsersEmptyState";
 import useData from "@/hooks/getData";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import type { AdminUserRecord } from "@/types/domain";
 export default function AdminUsersPage() {
   const { t, direction } = useLocale();
   const { loading, data, refetch } = useData("admin/users");
@@ -42,7 +43,7 @@ export default function AdminUsersPage() {
     document.title = `${t("usersDirectoryTitle")} | SHOP.CO™`;
   }, [t]);
 
-  const users: any[] = useMemo(() => {
+  const users: AdminUserRecord[] = useMemo(() => {
     return data?.data?.users ?? [];
   }, [data]);
 
@@ -59,7 +60,7 @@ export default function AdminUsersPage() {
     let customers = 0;
     let joinedThisMonth = 0;
 
-    users.forEach((u: any) => {
+    users.forEach((u: AdminUserRecord) => {
       const role = (u.role || "USER").toUpperCase();
       if (role === "ADMIN") admins++;
       else if (role === "MANAGER" || role === "MANGER") managers++;
@@ -89,7 +90,7 @@ export default function AdminUsersPage() {
 
   // Filtered & Sorted Users List
   const processedUsers = useMemo(() => {
-    const list = [...users].filter((u: any) => {
+    const list = [...users].filter((u: AdminUserRecord) => {
       const role = (u.role || "USER").toUpperCase();
 
       if (roleFilter === "admin" && role !== "ADMIN") return false;
@@ -429,7 +430,7 @@ export default function AdminUsersPage() {
               />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 aria-label={t("usersSortLabel")}
                 className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:bg-surface focus:outline-none"
               >

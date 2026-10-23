@@ -1,11 +1,11 @@
 "use client";
 
-import React from "react";
+
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
 import { brandCatalogItems } from "@/features/home/data/brandCatalog";
-import { ArrowUpRight, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowUpRight, ShieldCheck } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export const BrandShowcase = () => {

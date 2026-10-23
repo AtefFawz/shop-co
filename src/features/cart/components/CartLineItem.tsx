@@ -1,16 +1,15 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
-import { Trash2, Minus, Plus, Sparkles } from "lucide-react";
+import { Trash2, Minus, Plus, Check, Circle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useProduct } from "@/store/cartStore";
+import { isOutOfStock, useCartStore } from "@/store/cartStore";
 import { calculateFinalPrice } from "@/lib/logicPricing";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
-import { Product } from "@/types";
+import type { Product } from "@/types";
 
 const getImageUrl = (raw?: string) => {
   if (!raw) return "https://placehold.co/160x200/111111/FFFFFF?text=SHOP.CO";
@@ -20,12 +19,16 @@ const getImageUrl = (raw?: string) => {
 
 export const CartLineItem = ({ productItem }: { productItem: Product }) => {
   const { t, locale } = useLocale();
-  const remove = useProduct((e) => e.delete);
-  const update = useProduct((e) => e.update);
+  const remove = useCartStore((e) => e.delete);
+  const update = useCartStore((e) => e.update);
+  const toggleSelected = useCartStore((e) => e.toggleSelected);
   const router = useRouter();
+  const outOfStock = isOutOfStock(productItem);
+  const selected = !outOfStock && productItem.isChose !== false;
 
   const qty = Math.max(1, Number(productItem.count ?? 1));
-  const maxStock = Math.max(1, Number(productItem.countInStock ?? 20));
+  const parsedStock = Number(productItem.countInStock ?? 20);
+  const maxStock = Number.isFinite(parsedStock) ? Math.max(1, parsedStock) : 20;
   const discount = Number(productItem.discount || 0);
 
   const finalPrice = calculateFinalPrice(
@@ -45,7 +48,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
       update({
         ...productItem,
         count: newQty,
-        isChose: true,
+        isChose: selected,
       });
     }
   };
@@ -79,15 +82,33 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
       {/* ── 2. Details & Live Controls ── */}
       <div className="flex min-w-0 flex-1 flex-col justify-between py-0.5">
         <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 space-y-1.5">
-            <Link href={`/shop/details/${productItem._id}`}>
-              <h2 className="truncate text-sm font-black uppercase tracking-tight text-primary transition-colors hover:text-secondary sm:text-base">
-                {productItem.name || productItem.description}
-              </h2>
-            </Link>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <div className="flex min-w-0 items-start gap-2">
+              <button
+                type="button"
+                role="checkbox"
+                aria-checked={selected}
+                aria-label={selected ? t("deselectItemForCheckout") : t("selectItemForCheckout")}
+                onClick={() => toggleSelected(productItem)}
+                disabled={outOfStock}
+                className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-45 ${selected ? "border-action bg-action text-on-action" : "border-border-strong bg-surface text-muted hover:border-focus"}`}
+              >
+                {selected ? <Check size={12} strokeWidth={3} /> : <Circle size={11} />}
+              </button>
+              <Link href={`/shop/details/${productItem._id}`} className="min-w-0 flex-1">
+                <h2 className="truncate text-sm font-black uppercase tracking-tight text-primary transition-colors hover:text-secondary sm:text-base">
+                  {productItem.name || productItem.description}
+                </h2>
+              </Link>
+            </div>
 
-            {/* Size & Color Pills */}
+            {/* Variant and stock context */}
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
+              {outOfStock && (
+                <span className="rounded-lg bg-danger-soft px-2.5 py-0.5 text-[10px] font-bold text-danger">
+                  {t("outOfStock")}
+                </span>
+              )}
               {productItem.size && (
                 <span className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-surface-subtle px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-secondary">
                   {t("size")}:{" "}
@@ -148,7 +169,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
           <div className="inline-flex items-center gap-2 rounded-full border border-border/90 bg-surface-subtle p-1">
             <button
               type="button"
-              disabled={qty <= 1}
+              disabled={qty <= 1 || outOfStock}
               onClick={() => handleQuantityChange(qty - 1)}
               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-surface text-primary shadow-2xs transition-all hover:bg-action hover:text-on-action disabled:cursor-not-allowed disabled:opacity-35"
               aria-label={t("decreaseQuantity")}
@@ -162,7 +183,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
 
             <button
               type="button"
-              disabled={qty >= maxStock}
+              disabled={qty >= maxStock || outOfStock}
               onClick={() => handleQuantityChange(qty + 1)}
               className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-full bg-surface text-primary shadow-2xs transition-all hover:bg-action hover:text-on-action disabled:cursor-not-allowed disabled:opacity-35"
               aria-label={t("increaseQuantity")}

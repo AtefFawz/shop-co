@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+
 import { Receipt, Sparkles } from "lucide-react";
 import { calculateFinalPrice } from "@/lib/logicPricing";
-import { Product } from "@/types";
+import type { Product } from "@/types";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 

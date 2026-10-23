@@ -14,6 +14,7 @@ import {
 import api from "@/lib/api";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 interface UpdateProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -104,8 +105,8 @@ export default function UpdateAccountForm({
           onClose();
         }, 900);
       }
-    } catch (err: any) {
-      const serverMessage = err.response?.data?.message;
+    } catch (err: unknown) {
+      const serverMessage = getApiErrorDetails(err).response?.data?.message;
       const msg = locale === "en" && typeof serverMessage === "string"
         ? serverMessage
         : t("uiProfileUpdateFailed");

@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import { useMemo } from "react";
 type OrderStatus = "Pending" | "Shipped" | "Delivered" | "Cancelled";
 
 interface OrderStatusTrackerProps {

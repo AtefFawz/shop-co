@@ -25,9 +25,14 @@ import { calculateTrend } from "@/utils/formatters";
 import { RevenueTrendChart } from "@/features/admin/dashboard/components/RevenueTrendChart";
 import { LowStockProductList } from "@/features/admin/dashboard/components/LowStockProductList";
 
+import type { AdminDashboardStats } from "@/types/domain";
 type AdminDashboardClientProps = {
-  stats: any;
-  productsResponse: any;
+  stats: AdminDashboardStats;
+  productsResponse: {
+    data?: { Products?: Product[] };
+    pagination?: { total?: number };
+    stats?: { onSaleCount?: number; lowStockCount?: number; outOfStockCount?: number };
+  };
 };
 
 export default function AdminDashboardClient({
@@ -40,7 +45,7 @@ export default function AdminDashboardClient({
   const totalCount = productsResponse?.pagination?.total ?? allProducts.length;
 
   const lowStockProducts = allProducts.filter(
-    (p: any) => (p.countInStock ?? 10) <= 5,
+    (p: Product) => (p.countInStock ?? 10) <= 5,
   );
 
   const {

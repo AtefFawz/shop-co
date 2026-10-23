@@ -49,24 +49,30 @@ export default function AdminProductEditPage({
   const [localError, setLocalError] = useState("");
 
   useEffect(() => {
-    if (id) fetchProduct(id);
-  }, [id]);
+    if (id) void fetchProduct(id);
+  }, [id, fetchProduct]);
+
+  const itemId = item._id;
+  const itemPhoto = item.photo;
+  const itemImages = item.images;
 
   useEffect(() => {
-    if (item && (item.images || item.photo)) {
+    if (itemImages || itemPhoto) {
       const serverImgs =
-        item.images && item.images.length > 0
-          ? item.images
-          : item.photo
-            ? [item.photo]
+        itemImages && itemImages.length > 0
+          ? itemImages
+          : itemPhoto
+            ? [itemPhoto]
             : [];
+      // Sync the image editor with the newly loaded product record.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setExistingImages(
         serverImgs.filter(
           (image): image is string => typeof image === "string",
         ),
       );
     }
-  }, [item._id, item.photo, item.images]);
+  }, [itemPhoto, itemImages]);
   useEffect(() => {
     return () => {
       newPreviews.forEach((url) => URL.revokeObjectURL(url));
@@ -136,7 +142,7 @@ export default function AdminProductEditPage({
         if (Array.isArray(value)) {
           formData.append(key, value.join(", "));
         } else {
-          formData.append(key, value as any);
+          formData.append(key, String(value));
         }
       }
     });

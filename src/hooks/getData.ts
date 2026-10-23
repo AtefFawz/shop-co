@@ -3,13 +3,15 @@
 import api from "@/lib/api";
 import { useEffect, useState, useCallback } from "react";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
+import type { ApiResponse } from "@/types/domain";
 interface UseDataOptions<T, R> {
-  params?: Record<string, any>;
+  params?: Record<string, string | number | boolean | null | undefined>;
   limit?: number;
   transform?: (data: T) => R;
 }
 
-const useData = <T = any, R = T>(
+const useData = <T = ApiResponse, R = T>(
   URL: string,
   options?: UseDataOptions<T, R>,
 ) => {
@@ -22,7 +24,7 @@ const useData = <T = any, R = T>(
 
   const { params, limit = 10, transform } = options || {};
 
-  const serializedParams = JSON.stringify(params);
+  const serializedParams = JSON.stringify(params ?? {});
 
   useEffect(() => {
     setPage(1);
@@ -35,7 +37,7 @@ const useData = <T = any, R = T>(
 
         const response = await api.get(URL, {
           params: {
-            ...params,
+            ...JSON.parse(serializedParams),
             page,
             limit,
           },
@@ -47,18 +49,19 @@ const useData = <T = any, R = T>(
         setData(finalData);
         setTotalPages(responseData?.pagination?.totalPages || 1);
         setTotal(responseData?.pagination?.total || 1);
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const details = getApiErrorDetails(error);
         const wasCancelled =
           signal?.aborted ||
-          error?.name === "CanceledError" ||
-          error?.code === "ERR_CANCELED";
+          details.name === "CanceledError" ||
+          details.code === "ERR_CANCELED";
 
         // Navigation and rapid filter changes intentionally cancel stale requests.
         // They are not application errors and should not clutter the console.
         if (!wasCancelled) {
           console.error(
             "Fetch Error:",
-            error?.response?.data?.message || error?.message || "Unknown error",
+            details.response?.data?.message || details.message || "Unknown error",
           );
         }
       } finally {
@@ -66,7 +69,7 @@ const useData = <T = any, R = T>(
         if (!signal?.aborted) setLoading(false);
       }
     },
-    [URL, page, limit, serializedParams, refreshKey],
+    [URL, page, limit, serializedParams, refreshKey, transform],
   );
 
   useEffect(() => {

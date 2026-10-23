@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,7 @@ import { Trash2, AlertTriangle, Loader2, X, ShieldAlert } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 interface DeleteUserProps {
   userId: string;
   userName?: string;
@@ -20,12 +21,7 @@ export default function DeleteUserButton({
   const { t, direction } = useLocale();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const router = useRouter();
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   // Close on Escape key
   useEffect(() => {
@@ -46,9 +42,9 @@ export default function DeleteUserButton({
 
       router.push("/dashboard/admin/users");
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Delete user failed:", error);
-      toast.error(error.response?.data?.message || t("usersDeleteAccountFailed"));
+      toast.error(getApiErrorDetails(error).response?.data?.message || t("usersDeleteAccountFailed"));
     } finally {
       setLoading(false);
     }
@@ -71,8 +67,8 @@ export default function DeleteUserButton({
       </button>
 
       {/* Fullscreen Portal Modal (Never trapped by parent backdrop-blur/transform) */}
-      {mounted &&
-        isOpen &&
+      {isOpen &&
+        typeof document !== "undefined" &&
         createPortal(
           <div dir={direction} className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
             {/* Backdrop */}

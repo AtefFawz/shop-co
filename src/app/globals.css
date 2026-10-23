@@ -1,125 +1,168 @@
 @import "tailwindcss";
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* --------------------------------------------------------------------------
-   SHOP.CO design system
-   All UI colors originate from these tokens. The tokens change with the
-   document theme; components should prefer semantic classes over fixed colors.
-   -------------------------------------------------------------------------- */
+/* ==========================================================================
+   SHOP.CO — REFINED ROYAL SAPPHIRE & PORCELAIN SILK (V2 HARMONIZED)
+   Light Mode: Porcelain Silk / Pure White / Imperial Navy / Couture Indigo
+   Dark Mode:  Abyssal Midnight / Velvet Sapphire / Balanced Luminous Indigo
+   ========================================================================== */
+
 :root {
   color-scheme: light;
-  --app-bg: #f5f3f0;
+
+  /* 1. Surfaces — Balanced Porcelain Silk (Keeps garment colors 100% true) */
+  --app-bg: #f4f6fb;
   --surface: #ffffff;
   --surface-raised: #ffffff;
-  --surface-subtle: #faf9f7;
-  --surface-muted: #f1efec;
-  --surface-hover: #e7e4e0;
-  --surface-contrast: #242426;
-  --action: #19191c;
-  --action-hover: #303035;
-  --text-primary: #1c1c1f;
-  --text-secondary: #505159;
-  --text-muted: #686b73;
-  --text-subtle: #6b6f78;
+  --surface-subtle: #ebeef7;
+  --surface-muted: #dfe5f2;
+  --surface-hover: #d2d9eb;
+  --surface-contrast: #0d1126;
+
+  /* 2. Actions — Imperial Midnight Navy & Royal Indigo Hover */
+  --action: #12162f;
+  --action-hover: #2b326b;
+
+  /* 3. Typography — Deep Sapphire Ink Hierarchy */
+  --text-primary: #0d1126;
+  --text-secondary: #343c5c;
+  --text-muted: #5b6485;
+  --text-subtle: #848ead;
   --text-on-action: #ffffff;
-  --text-on-action-muted: #b9b9bf;
-  --border: #e2dfdb;
-  --border-subtle: #eeece8;
-  --border-strong: #cfcbc5;
-  --focus: #648176;
-  --accent: #748b80;
-  --focus-ring: rgba(100, 129, 118, 0.22);
-  --brand-soft: #edf3ef;
-  --brand-soft-hover: #dfe9e2;
-  --success: #20764b;
+  --text-on-action-muted: #c7d2fe;
+
+  /* 4. Borders — Soft Architectural Slate */
+  --border: #dce2ef;
+  --border-subtle: #ebeef7;
+  --border-strong: #b8c2d9;
+
+  /* 5. Brand Accents & Focus — Couture Indigo */
+  --focus: #4f46e5;
+  --accent: #4f46e5;
+  --focus-ring: rgba(79, 70, 229, 0.2);
+  --brand-soft: #eef2ff;
+  --brand-soft-hover: #e0e7ff;
+
+  /* 6. Semantic Status Colors (Harmonized saturation) */
+  --success: #0d8a5e;
   --text-on-success: #ffffff;
-  --success-rgb: 32, 118, 75;
-  --success-bright: #299762;
-  --danger-bright: #ff8599;
-  --warning-bright: #f1c86d;
-  --info-bright: #84c9f5;
-  --success-soft: #e9f6ed;
-  --success-border: #b9dfc6;
-  --danger: #b8324b;
+  --success-rgb: 13, 138, 94;
+  --success-bright: #10b981;
+  --success-soft: #e6f7f0;
+  --success-border: #a7e3cb;
+
+  --danger: #dc2649;
   --text-on-danger: #ffffff;
-  --danger-rgb: 184, 50, 75;
-  --danger-soft: #fff0f2;
-  --danger-border: #f0c3cc;
-  --warning: #916119;
+  --danger-rgb: 220, 38, 73;
+  --danger-bright: #f43f5e;
+  --danger-soft: #fdf2f4;
+  --danger-border: #fbcfe8;
+
+  --warning: #cf7610;
   --text-on-warning: #ffffff;
-  --warning-rgb: 145, 97, 25;
-  --warning-soft: #fff6df;
-  --warning-border: #ecd49c;
-  --info: #286b99;
+  --warning-rgb: 207, 118, 16;
+  --warning-bright: #f59e0b;
+  --warning-soft: #fef7ec;
+  --warning-border: #fde68a;
+
+  --info: #0277bd;
   --text-on-info: #ffffff;
-  --info-rgb: 40, 107, 153;
-  --info-soft: #eaf4fc;
-  --info-border: #bfdcf0;
-  --rating: #d49a18;
-  --grid-line: rgba(28, 28, 31, 0.045);
-  --shadow-rgb: 25, 25, 28;
-  --shadow-soft: 0 8px 28px -12px rgba(25, 25, 28, 0.09);
-  --shadow-floating: 0 20px 55px -22px rgba(25, 25, 28, 0.2);
-  --overlay: rgba(20, 20, 22, 0.46);
+  --info-rgb: 2, 119, 189;
+  --info-bright: #38bdf8;
+  --info-soft: #eff8ff;
+  --info-border: #bae6fd;
+
+  /* Ratings — Warm Champagne Amber */
+  --rating: #eda11c;
+
+  /* 7. Atmosphere, Grids & Layered Shadows */
+  --grid-line: rgba(18, 22, 47, 0.038);
+  --shadow-rgb: 13, 17, 38;
+  --shadow-soft: 0 10px 30px -12px rgba(13, 17, 38, 0.06);
+  --shadow-floating: 0 24px 55px -16px rgba(18, 22, 47, 0.14);
+  --overlay: rgba(13, 17, 38, 0.52);
+
+  /* Native controls */
   --control-bg: var(--surface);
   --control-fg: var(--text-primary);
 }
 
 html.dark {
   color-scheme: dark;
-  --app-bg: #111214;
-  --surface: #191a1d;
-  --surface-raised: #202125;
-  --surface-subtle: #1c1d20;
-  --surface-muted: #25262a;
-  --surface-hover: #303137;
-  --surface-contrast: #2b2c31;
-  --action: #27282d;
-  --action-hover: #383940;
-  --text-primary: #f1f0ed;
-  --text-secondary: #c9c7c2;
-  --text-muted: #a1a0a6;
-  --text-subtle: #82838c;
-  --text-on-action: #f8f7f4;
-  --text-on-action-muted: #bec0c8;
-  --border: #38393f;
-  --border-subtle: #2b2c31;
-  --border-strong: #4a4b53;
-  --focus: #a6c8b7;
-  --accent: #a6c8b7;
-  --focus-ring: rgba(166, 200, 183, 0.3);
-  --brand-soft: #22332c;
-  --brand-soft-hover: #2c4238;
-  --success: #67d6a0;
-  --text-on-success: #10261b;
-  --success-rgb: 103, 214, 160;
-  --success-bright: #48bc85;
-  --danger-bright: #ff9cab;
-  --warning-bright: #efc66f;
-  --info-bright: #91c9f0;
-  --success-soft: #193428;
-  --success-border: #2d6b4a;
-  --danger: #ff8195;
-  --text-on-danger: #35131b;
-  --danger-rgb: 255, 129, 149;
-  --danger-soft: #3b2028;
-  --danger-border: #7c3d4a;
-  --warning: #efc66f;
-  --text-on-warning: #2d2410;
-  --warning-rgb: 239, 198, 111;
-  --warning-soft: #382f1e;
-  --warning-border: #715b30;
-  --info: #91c9f0;
-  --text-on-info: #112636;
-  --info-rgb: 145, 201, 240;
-  --info-soft: #1c303f;
-  --info-border: #365b76;
-  --rating: #f0c45b;
-  --grid-line: rgba(241, 240, 237, 0.055);
-  --shadow-rgb: 0, 0, 0;
-  --shadow-soft: 0 8px 28px -12px rgba(0, 0, 0, 0.25);
-  --shadow-floating: 0 20px 55px -22px rgba(0, 0, 0, 0.55);
-  --overlay: rgba(0, 0, 0, 0.62);
+
+  /* 1. Surfaces — Velvet Abyss & Midnight Sapphire */
+  --app-bg: #070a14;
+  --surface: #0e1424;
+  --surface-raised: #151e34;
+  --surface-subtle: #11182b;
+  --surface-muted: #1a243d;
+  --surface-hover: #233050;
+  --surface-contrast: #f8fafc;
+
+  /* 2. Actions — Silky Electric Indigo (Eye-friendly in dark mode) */
+  --action: #585ce5;
+  --action-hover: #6e72f3;
+
+  /* 3. Typography — Crisp Starlight & Muted Periwinkle */
+  --text-primary: #f5f7ff;
+  --text-secondary: #c9d1e8;
+  --text-muted: #8e99b8;
+  --text-subtle: #616c8c;
+  --text-on-action: #ffffff;
+  --text-on-action-muted: #dfe4ff;
+
+  /* 4. Borders — Subtle Sapphire Glow Hairlines */
+  --border: #1e2942;
+  --border-subtle: #151e32;
+  --border-strong: #2f3e63;
+
+  /* 5. Brand Accents & Focus */
+  --focus: #818cf8;
+  --accent: #818cf8;
+  --focus-ring: rgba(129, 140, 248, 0.28);
+  --brand-soft: #191d42;
+  --brand-soft-hover: #252b61;
+
+  /* 6. Semantic Status Colors */
+  --success: #34d399;
+  --text-on-success: #042f2e;
+  --success-rgb: 52, 211, 153;
+  --success-bright: #10b981;
+  --success-soft: #09352b;
+  --success-border: #13614c;
+
+  --danger: #fb7185;
+  --text-on-danger: #4c0519;
+  --danger-rgb: 251, 113, 133;
+  --danger-bright: #f43f5e;
+  --danger-soft: #3b1120;
+  --danger-border: #7d203b;
+
+  --warning: #fbbf24;
+  --text-on-warning: #451a03;
+  --warning-rgb: 251, 191, 36;
+  --warning-bright: #f59e0b;
+  --warning-soft: #38220f;
+  --warning-border: #784919;
+
+  --info: #38bdf8;
+  --text-on-info: #082f49;
+  --info-rgb: 56, 189, 248;
+  --info-bright: #7dd3fc;
+  --info-soft: #0d324d;
+  --info-border: #195985;
+
+  /* Ratings */
+  --rating: #fbbf24;
+
+  /* 7. Atmosphere, Grids & Deep Shadows */
+  --grid-line: rgba(129, 140, 248, 0.048);
+  --shadow-rgb: 2, 5, 15;
+  --shadow-soft: 0 12px 32px -10px rgba(2, 5, 15, 0.55);
+  --shadow-floating: 0 24px 64px -15px rgba(0, 0, 0, 0.78);
+  --overlay: rgba(4, 7, 17, 0.72);
+
+  /* Native controls */
   --control-bg: var(--surface-raised);
   --control-fg: var(--text-primary);
 }
@@ -179,10 +222,17 @@ html {
 }
 
 body {
+  position: relative;
   min-height: 100vh;
   margin: 0;
   overflow-x: clip;
-  background: var(--app-bg);
+  background-color: var(--app-bg);
+  background-image: radial-gradient(
+    ellipse 85% 40% at 50% -8%,
+    color-mix(in srgb, var(--accent) 10%, transparent),
+    transparent 70%
+  );
+  background-attachment: fixed;
   color: var(--text-primary);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   transition:
@@ -199,7 +249,7 @@ body {
   background-image: conic-gradient(
     from 90deg at 50% 50%,
     var(--action) 0%,
-    var(--surface-hover) 50%,
+    var(--accent) 50%,
     var(--action) 100%
   );
 }
@@ -210,19 +260,14 @@ body {
     linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
 }
 
-/* Smooth but short theme transitions. Do not override transform/opacity motion. */
+/* Smooth theme transitions */
 html.theme-transition body,
 html.theme-transition header,
 html.theme-transition footer,
 html.theme-transition main,
 html.theme-transition aside,
 html.theme-transition nav,
-html.theme-transition [data-theme-surface] {
-  transition-property: background-color, color, border-color, box-shadow;
-  transition-duration: 260ms;
-  transition-timing-function: ease;
-}
-
+html.theme-transition [data-theme-surface],
 html.theme-transition [class*="bg-"],
 html.theme-transition [class*="text-"],
 html.theme-transition [class*="border-"] {
@@ -232,16 +277,31 @@ html.theme-transition [class*="border-"] {
 }
 
 ::selection {
-  background: var(--action);
-  color: var(--text-on-action);
+  background: var(--accent);
+  color: #ffffff;
 }
 
 :focus-visible {
   outline-color: var(--focus);
 }
 
-/* Shared layout helpers. Spacing remains owned by individual components. */
+/* --------------------------------------------------------------------------
+   Global Cohesion Bridge (Unifies any hardcoded legacy cards/badges)
+   -------------------------------------------------------------------------- */
+html.dark .bg-white {
+  background-color: var(--surface) !important;
+}
+
+html.dark .bg-\[\#F4F3F4\],
+html.dark .bg-\[\#ECEAEB\],
+html:not(.dark) .bg-\[\#F4F3F4\],
+html:not(.dark) .bg-\[\#ECEAEB\] {
+  background-color: var(--surface-subtle) !important;
+}
+
+/* Shared layout helpers */
 .Responsive {
+  /* max-width: 1600px; */
   @apply mx-auto w-full px-3 lg:px-8 xl:px-12;
 }
 
@@ -255,6 +315,14 @@ html.theme-transition [class*="border-"] {
   color: var(--text-muted);
 }
 
+section {
+  padding-top: 7rem;
+}
+@media (min-width: 1024px) {
+  section {
+    padding-top: 9rem;
+  }
+}
 .input-style {
   @apply w-full rounded-lg border px-4 py-3 outline-none transition-all;
   border-color: var(--border);
@@ -308,7 +376,16 @@ html.theme-transition [class*="border-"] {
   }
 }
 
-/* Third-party component surfaces should participate in the app theme too. */
+/* Toast notification internal layout fix */
+.shopco-toast [role="status"] {
+  min-width: 0 !important;
+  flex: 1 1 0% !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Third-party component surfaces */
 .MuiDrawer-paper,
 .MuiPopover-paper,
 .MuiMenu-paper,
@@ -336,7 +413,6 @@ html.theme-transition [class*="border-"] {
   color: var(--text-on-action);
 }
 
-/* Third-party form controls follow the active theme without overriding component-level utility classes. */
 .MuiInputBase-root,
 .MuiFormLabel-root,
 .MuiFormHelperText-root {
@@ -359,16 +435,12 @@ html.theme-transition [class*="border-"] {
   border-color: var(--focus) !important;
 }
 
-.MuiFormLabel-root {
-  color: var(--text-muted);
-}
-
+.MuiFormLabel-root,
 .MuiCheckbox-root,
 .MuiRadio-root {
   color: var(--text-muted);
 }
 
-/* Native form controls inherit the palette without overriding intentional utility classes. */
 :where(input:not([type="checkbox"]):not([type="radio"]), textarea, select) {
   color-scheme: inherit;
 }
@@ -392,23 +464,40 @@ html.theme-transition [class*="border-"] {
     transition-duration: 0.01ms !important;
   }
 }
-/* Locale-aware typography without requiring a remote font request. */
+
+/* Locale-aware typography & RTL/LTR Directional Fixes */
 html[lang="ar"] body {
-  font-family: Tahoma, Arial, var(--font-geist-sans), sans-serif;
+  font-family:
+    "Noto Sans Arabic", Tahoma, Arial, var(--font-geist-sans), sans-serif;
   letter-spacing: normal;
+  line-height: 1.65;
 }
 
-html[dir="rtl"] input,
+html[dir="rtl"] input:not([type="tel"]),
 html[dir="rtl"] textarea,
 html[dir="rtl"] select {
   text-align: start;
 }
 
+/* Fix phone input alignment & icon spacing in both RTL and LTR */
+html[dir="rtl"] input[type="tel"] {
+  direction: ltr;
+  unicode-bidi: plaintext;
+  text-align: right;
+  padding-right: 3.5rem !important;
+  padding-left: 1rem !important;
+}
+
+html[dir="ltr"] input[type="tel"] {
+  direction: ltr;
+  text-align: left;
+  padding-left: 3.5rem !important;
+  padding-right: 1rem !important;
+}
+
 html[dir="rtl"] .rtl-mirror {
   transform: scaleX(-1);
 }
-
-/* Keep global section styling neutral: individual sections own their spacing. */
 
 html[dir="rtl"] [class*="tracking-"] {
   letter-spacing: normal !important;
@@ -429,19 +518,23 @@ html[dir="rtl"] .search-actions {
   right: auto;
 }
 
-html[dir="rtl"] .text-left {
-  text-align: right;
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-html[dir="rtl"] .text-right {
-  text-align: left;
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
 }
 
-section {
-  padding-top: 6rem;
-}
-@media (min-width: 1280px) {
-  section {
-    padding-top: 8rem;
-  }
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
 }

@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+
 import Image from "next/image";
-import { ArrowUpRight, Sparkles, Layers } from "lucide-react";
+import { ArrowUpRight, Layers } from "lucide-react";
 import { styleCategories } from "@/features/home/data/styleCategories";
 import Heading from "@/shared/components/ui/SectionHeading";
 import { useFilterStore } from "@/store/filterStore";

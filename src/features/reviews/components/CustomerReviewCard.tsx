@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import { Star, CheckCircle2, MessageSquareQuote, Calendar } from "lucide-react";
 import useData from "@/hooks/getData";
 import { AccountSectionHeader } from "@/features/account/components/AccountSectionHeader";
@@ -8,6 +8,7 @@ import { EmptyAccountState } from "@/features/account/components/EmptyAccountSta
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import type { ReviewRecord } from "@/types/domain";
 function CustomerReviewCard({
   rev,
 }: {
@@ -91,7 +92,7 @@ function ReviewsContent() {
     "/profile/my-reviews",
   );
   const { t } = useLocale();
-  const reviews = data?.data?.reviews ?? [];
+  const reviews = (data?.data?.reviews ?? []) as Array<ReviewRecord & { comment: string; product?: { name?: string } }>;
   const total = data?.pagination?.total ?? reviews.length;
 
   if (loading && !data) {
@@ -118,7 +119,7 @@ function ReviewsContent() {
         <EmptyAccountState message={t("uiNoPublishedReviews")} />
       ) : (
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {reviews.map((rev: any) => (
+          {reviews.map((rev) => (
             <CustomerReviewCard key={rev._id} rev={rev} />
           ))}
         </div>

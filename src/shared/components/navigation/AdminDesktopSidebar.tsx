@@ -4,14 +4,9 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { signOut } from "@/lib/signOut";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  LogOut,
-  ChevronRight,
-  PanelLeftClose,
-  PanelLeftOpen,
-  type LucideIcon,
-} from "lucide-react";
+import { LogOut, PanelLeftClose, PanelLeftOpen, type LucideIcon } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+
 
 export interface SidebarItem {
   id: string;

@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Flame, Crown, Sparkles } from "lucide-react";
+import { Flame, Crown } from "lucide-react";
 
 import Card from "@/features/catalog/components/ProductCard";
 import Heading from "@/shared/components/ui/SectionHeading";
@@ -11,6 +11,8 @@ import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton"
 import useData from "@/hooks/getData";
 import SpecularButton from "@/shared/components/motion/SpecularButton";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+
+const EMPTY_PRODUCTS: Product[] = [];
 
 export default function BestSellingProductsSection() {
   const { t } = useLocale();
@@ -25,7 +27,7 @@ export default function BestSellingProductsSection() {
     limit: 8,
   });
 
-  const results: Product[] = data?.data?.Products ?? [];
+  const results: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
 
   const [filterMode, setFilterMode] = useState<"sale" | "all">("sale");
 

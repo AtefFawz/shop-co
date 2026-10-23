@@ -1,12 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
+import { isAxiosError } from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ShieldCheck, Sparkles, Check, Lock } from "lucide-react";
+import { ArrowLeft, Check, Lock, ShoppingBag } from "lucide-react";
 import toast from "react-hot-toast";
 
-import { useProduct } from "@/store/cartStore";
+import { isOutOfStock, useCartStore } from "@/store/cartStore";
+import type { CartProduct } from "@/store/cartStore";
+import type { CheckoutShippingData } from "@/features/checkout/types";
 import { calculateFinalPrice } from "@/lib/logicPricing";
 import api from "@/lib/api";
 import { ShippingAddressForm } from "@/features/checkout/components/ShippingAddressForm";
@@ -14,39 +17,42 @@ import { OrderSummary } from "@/features/checkout/components/OrderSummary";
 import { EmptyCartState } from "@/features/cart/components/EmptyCartState";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-interface Typing {
-  name: string;
-  count: number;
-  photo: string;
-  images?: string[];
-  price: number;
-  discount?: string | number;
-  _id: string;
-}
-
 const FREE_SHIPPING_THRESHOLD = 200;
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { t } = useLocale();
   const [loading, setLoading] = useState(false);
-  const { stack, clearCart } = useProduct();
+  const { stack, clearCart } = useCartStore();
+  const cartItems = stack.filter(
+    (item) => item.isChose !== false && !isOutOfStock(item),
+  );
 
-  // Fallback to all stack items if isChose wasn't explicitly set
-  const cartItems =
-    stack.filter((item: any) => item.isChose).length > 0
-      ? stack.filter((item: any) => item.isChose)
-      : stack;
+  if (stack.length === 0) return <EmptyCartState />;
 
-  if (!cartItems || cartItems.length === 0) {
-    return <EmptyCartState />;
+  if (cartItems.length === 0) {
+    return (
+      <section className="flex min-h-[65svh] items-center justify-center bg-app px-4 py-16 text-primary">
+        <div className="w-full max-w-lg rounded-3xl border border-border bg-surface p-8 text-center shadow-[var(--shadow-soft)] sm:p-10">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-muted text-secondary">
+            <ShoppingBag size={24} />
+          </div>
+          <h1 className="mt-5 text-xl font-black sm:text-2xl">{t("noCheckoutSelection")}</h1>
+          <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-secondary">{t("noCheckoutSelectionHint")}</p>
+          <Link href="/shop/details/cart" className="mt-6 inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-action px-6 py-3 text-sm font-bold text-on-action transition hover:bg-action-hover">
+            <ArrowLeft size={15} />
+            {t("backToBag")}
+          </Link>
+        </div>
+      </section>
+    );
   }
 
-  const handlePlaceOrder = async (shippingData: any) => {
+  const handlePlaceOrder = async (shippingData: CheckoutShippingData) => {
     setLoading(true);
 
     const subtotal = cartItems.reduce(
-      (acc: number, item: any) =>
+      (acc, item) =>
         acc +
         calculateFinalPrice(
           Number(item.price || 0),
@@ -61,7 +67,7 @@ export default function CheckoutPage() {
 
     try {
       const payload = {
-        orderItems: cartItems.map((item: Typing) => ({
+        orderItems: cartItems.map((item: CartProduct) => ({
           name: item.name,
           quantity: Number(item.count ?? 1),
           image: item.photo || item.images?.[0] || "",
@@ -82,11 +88,11 @@ export default function CheckoutPage() {
       toast.success(t("orderSuccessText"));
       clearCart();
       router.push("/order-success");
-    } catch (err: any) {
-      const msg =
-        err.response?.data?.message ||
-        t("placeOrderError");
-      toast.error(msg);
+    } catch (error: unknown) {
+      const serverMessage = isAxiosError<{ message?: string }>(error)
+        ? error.response?.data?.message
+        : undefined;
+      toast.error(serverMessage || t("placeOrderError"));
     } finally {
       setLoading(false);
     }

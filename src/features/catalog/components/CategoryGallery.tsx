@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import Kids from "@/assets/category/kids.png";
 import Men from "@/assets/category/man.png";
 import Women from "@/assets/category/women.png";

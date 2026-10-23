@@ -3,18 +3,7 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import {
-  AlertTriangle,
-  RotateCcw,
-  ShieldCheck,
-  Sparkles,
-  Store,
-  ChevronDown,
-  Copy,
-  Check,
-  RefreshCw,
-  Terminal,
-} from "lucide-react";
+import { AlertTriangle, RotateCcw, ShieldCheck, Store, ChevronDown, Copy, Check, RefreshCw, Terminal } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function Error({

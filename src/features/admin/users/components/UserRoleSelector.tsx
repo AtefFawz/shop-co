@@ -1,22 +1,14 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useCallback, useState, useRef, useEffect } from "react";
 import { createPortal } from "react-dom";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
-import {
-  ShieldCheck,
-  ChevronDown,
-  Loader2,
-  Crown,
-  Shield,
-  UserCheck,
-  Check,
-  Sparkles,
-} from "lucide-react";
+import { ChevronDown, Loader2, Crown, Shield, UserCheck, Check, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 interface RoleSelectorProps {
   userId: string;
   initialRole: string;
@@ -56,24 +48,19 @@ export default function UserRoleSelector({
   );
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [mounted, setMounted] = useState(false);
   const [coords, setCoords] = useState({ top: 0, left: 0 });
 
   const triggerRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const updatePosition = () => {
+  const updatePosition = useCallback(() => {
     if (!triggerRef.current) return;
     const rect = triggerRef.current.getBoundingClientRect();
     setCoords({
       top: rect.bottom + 8,
       left: Math.max(12, Math.min(direction === "rtl" ? rect.right - 240 : rect.left, window.innerWidth - 240)),
     });
-  };
+  }, [direction]);
 
   const toggleOpen = () => {
     if (loading) return;
@@ -107,7 +94,7 @@ export default function UserRoleSelector({
       window.removeEventListener("scroll", handleScroll, true);
       window.removeEventListener("resize", handleScroll);
     };
-  }, [isOpen]);
+  }, [isOpen, updatePosition]);
 
   const handleUpdateRole = async (newRole: RoleType) => {
     if (newRole === role || loading) {
@@ -124,9 +111,9 @@ export default function UserRoleSelector({
       await api.patch(`/admin/users/${userId}`, { role: newRole });
       toast.success(t("usersRoleUpdatedToast"));
       router.refresh();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Role update failed:", error);
-      toast.error(error.response?.data?.message || t("usersRoleFailedToast"));
+      toast.error(getApiErrorDetails(error).response?.data?.message || t("usersRoleFailedToast"));
       setRole(prevRole);
     } finally {
       setLoading(false);
@@ -167,8 +154,8 @@ export default function UserRoleSelector({
       </button>
 
       {/* Floating Portal Menu */}
-      {mounted &&
-        isOpen &&
+      {isOpen &&
+        typeof document !== "undefined" &&
         createPortal(
           <div
             ref={menuRef}

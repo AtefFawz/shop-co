@@ -5,6 +5,8 @@ import { useState } from "react";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 import { useSocketStore } from "@/store/socketStore";
+
+import { getApiErrorDetails } from "@/lib/errorUtils";
 const useLogin = () => {
   const router = useRouter();
   const [user, setUser] = useState({ email: "", password: "" });
@@ -52,12 +54,12 @@ const useLogin = () => {
           router.push("/");
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Signin handle error:", error);
-
+      const details = getApiErrorDetails(error);
       const message =
-        error.response?.data?.message ||
-        error.response?.data?.data ||
+        details.response?.data?.message ||
+        details.response?.data?.data ||
         "An error occurred during signin. Please try again.";
 
       setError(message);

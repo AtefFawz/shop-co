@@ -9,6 +9,7 @@ The storefront and administration UI share a single semantic color system in `sr
 - `ThemeProvider` applies the class before/while the app hydrates, follows the OS preference when the user has no saved preference, and persists an explicit choice in `localStorage` under `shopco-theme`.
 - `ThemeToggle` is the shared accessible switch used by both storefront navigation and the administration layout.
 - The token aliases under `@theme inline` expose the variables to Tailwind utilities.
+- The palette uses warm ivory and ink in light mode, deep green-charcoal surfaces in dark mode, and a restrained sage accent. The action foreground/background pair intentionally changes with the theme to preserve contrast.
 
 ## Preferred semantic classes
 

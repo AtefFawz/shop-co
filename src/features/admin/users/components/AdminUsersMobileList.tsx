@@ -78,7 +78,7 @@ export default function AdminUsersMobileList({ users }: Props) {
 
   return (
     <div dir={direction} className="space-y-3.5 md:hidden">
-      {users.map((user: any) => {
+      {users.map((user: User) => {
         const shortId = (user._id || "").slice(-6).toUpperCase();
         const roleInfo = getRoleBadge(user.role);
         const RoleIcon = roleInfo.icon;

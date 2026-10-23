@@ -1,5 +1,4 @@
 import axios from "axios";
-// @ts-ignore: no declaration file for 'js-cookie'
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 

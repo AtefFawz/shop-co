@@ -9,22 +9,14 @@ import {
   motion,
   useReducedMotion,
 } from "framer-motion";
-import {
-  ArrowUpRight,
-  Ellipsis,
-  Languages,
-  LogOut,
-  Moon,
-  Store,
-  X,
-  type LucideIcon,
-} from "lucide-react";
+import { ArrowUpRight, Ellipsis, LogOut, Store, X, type LucideIcon } from "lucide-react";
 
 import { signOut } from "@/lib/signOut";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
 import { useTheme } from "@/shared/theme/ThemeProvider";
+
 
 export interface NavItem {
   id: string;
@@ -132,6 +124,7 @@ export const MobileAdminNavigation = ({
     if (!isMoreOpen) return;
 
     const previousOverflow = document.body.style.overflow;
+    const moreButton = moreButtonRef.current;
     document.body.style.overflow = "hidden";
 
     const onKeyDown = (event: KeyboardEvent) => {
@@ -167,7 +160,7 @@ export const MobileAdminNavigation = ({
     return () => {
       document.body.style.overflow = previousOverflow;
       window.removeEventListener("keydown", onKeyDown);
-      moreButtonRef.current?.focus();
+      moreButton?.focus();
     };
   }, [isMoreOpen]);
 

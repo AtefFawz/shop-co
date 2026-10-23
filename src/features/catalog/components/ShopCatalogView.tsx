@@ -1,19 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import {
-  PackageSearch,
-  Sparkles,
-  LayoutGrid,
-  Grid3X3,
-  ArrowUpDown,
-  RotateCcw,
-  X,
-  Search,
-  Layers,
-} from "lucide-react";
+import { PackageSearch, LayoutGrid, Grid3X3, ArrowUpDown, RotateCcw, Search, Layers } from "lucide-react";
 
 import Card from "@/features/catalog/components/ProductCard";
 import { CatalogFilterPanel } from "@/features/catalog/components/CatalogFilterPanel";
@@ -187,7 +177,7 @@ export const ShopCatalogView = () => {
               />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 aria-label={t("catalogSort")}
                 className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:border-border-strong focus:border-primary focus:bg-surface focus:outline-none"
               >

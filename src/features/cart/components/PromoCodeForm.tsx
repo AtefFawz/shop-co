@@ -1,18 +1,18 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { Tag, ArrowRight, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-export const PromoCodeForm = () => {
+export const PromoCodeForm = ({ canCheckout = true }: { canCheckout?: boolean }) => {
   const router = useRouter();
   const { t, direction } = useLocale();
   const [code, setCode] = useState("");
   const [appliedCode, setAppliedCode] = useState<string | null>(null);
 
-  const handleApplyPromo = (e: React.FormEvent) => {
+  const handleApplyPromo = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const clean = code.trim().toUpperCase();
     if (!clean) {
@@ -74,10 +74,16 @@ export const PromoCodeForm = () => {
       </form>
 
       {/* Primary 3D Checkout CTA */}
+      {!canCheckout && (
+        <p className="text-center text-[11px] leading-relaxed text-muted">
+          {t("noCheckoutSelectionHint")}
+        </p>
+      )}
       <button
         type="button"
+        disabled={!canCheckout}
         onClick={() => router.push("/shop/details/cart/checkout")}
-        className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-[0_16px_36px_-10px_rgba(var(--shadow-rgb),0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-[0_22px_44px_-10px_rgba(var(--shadow-rgb),0.6)] active:scale-[0.99]"
+        className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-[0_16px_36px_-10px_rgba(var(--shadow-rgb),0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-[0_22px_44px_-10px_rgba(var(--shadow-rgb),0.6)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none"
       >
         <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
         <span className="relative z-10">{t("promoProceedCheckout")}</span>

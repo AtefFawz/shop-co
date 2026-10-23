@@ -2,8 +2,8 @@
 
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
-
+import { useCallback, useState } from "react";
+import { getApiErrorDetails } from "@/lib/errorUtils";
 export interface ProductEditItem {
   _id?: string;
   name: string;
@@ -47,11 +47,11 @@ export const usePatch = () => {
     photo: null,
   });
 
-  const handleChange = (name: string, value: any) => {
+  const handleChange = (name: string, value: string | number | boolean | string[] | File | null) => {
     setItem((prev) => ({ ...prev, [name]: value }));
   };
 
-  const fetchProduct = async (id: string) => {
+  const fetchProduct = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
 
@@ -89,16 +89,17 @@ export const usePatch = () => {
               : [],
         photo: data.photo || null,
       });
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const details = getApiErrorDetails(err);
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
+        details.response?.data?.message ||
+          details.message ||
           "Failed to load product details.",
       );
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const handleUpdate = async (id: string, customFormData?: FormData) => {
     setLoading(true);
@@ -137,10 +138,11 @@ export const usePatch = () => {
       setSuccess(true);
       router.refresh();
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const details = getApiErrorDetails(err);
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
+        details.response?.data?.message ||
+          details.message ||
           "Failed to update product.",
       );
       return false;

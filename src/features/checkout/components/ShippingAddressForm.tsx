@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState, type FormEvent } from "react";
+import type { CheckoutShippingData, PaymentMethod } from "@/features/checkout/types";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import {
   ArrowRight,
@@ -14,24 +15,24 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-interface DataType {
-  onSubmit: (data: any) => void;
+interface ShippingAddressFormProps {
+  onSubmit: (data: CheckoutShippingData) => void;
   state: boolean;
 }
 
 const POPULAR_CITIES = ["Cairo", "Alexandria", "Giza", "Mansoura", "Tanta"];
 
-export const ShippingAddressForm = ({ onSubmit, state }: DataType) => {
+export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProps) => {
   const { t, locale, direction } = useLocale();
   const [formData, setFormData] = useState({
     address: "",
     city: "",
     phone: "",
   });
-  const [paymentMethod, setPaymentMethod] = useState<"cod" | "card">("cod");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [focused, setFocused] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onSubmit({ ...formData, paymentMethod });
   };

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import Link from "next/link";
 import {
   Package,
@@ -14,6 +14,7 @@ import OrderCard from "@/features/orders/components/CustomerOrderCard";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import type { CustomerOrderRecord } from "@/types/domain";
 export default function CustomerOrderHistoryPage() {
   const { t, locale } = useLocale();
   const { data, loading, refetch, page, totalPages, goToPage } =
@@ -23,7 +24,7 @@ export default function CustomerOrderHistoryPage() {
     document.title = `${t("orderHistoryTitle")} · SHOP.CO™`;
   }, [locale, t]);
 
-  const orders: any[] = data?.data?.orders ?? [];
+  const orders: CustomerOrderRecord[] = data?.data?.orders ?? [];
   const total = data?.pagination?.total ?? orders.length;
 
   if (loading && !data) {
@@ -136,7 +137,7 @@ export default function CustomerOrderHistoryPage() {
               loading ? "pointer-events-none opacity-60" : "opacity-100"
             }`}
           >
-            {orders.map((order: any) => (
+            {orders.map((order: CustomerOrderRecord) => (
               <OrderCard
                 key={order._id}
                 order={order}

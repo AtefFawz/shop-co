@@ -1,24 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import {
-  ArrowLeft,
-  XCircle,
-  ShieldCheck,
-  Sparkles,
-  RefreshCw,
-  Crown,
-  Clock,
-  Truck,
-  CheckCircle2,
-  Trash2,
-  AlertTriangle,
-  Loader2,
-  Printer,
-  ShoppingBag,
-} from "lucide-react";
+import { ArrowLeft, XCircle, ShieldCheck, Sparkles, RefreshCw, Crown, Trash2, Loader2, Printer } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
@@ -29,6 +14,7 @@ import OrderItems from "@/features/orders/components/OrderItemsList";
 import ShippingInformation from "@/features/orders/components/ShippingInformationCard";
 import OrderDetailsSkeleton from "@/features/orders/components/OrderDetailsSkeleton";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 export type OrderStatus = "Pending" | "Shipped" | "Delivered" | "Cancelled";
 
 export type Order = {
@@ -145,17 +131,17 @@ export default function OrderDetailsPage() {
             .slice(-6)
             .toUpperCase()} · SHOP.CO™`;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
         setError(
-          err.response?.data?.message || t("orderLoadingFailure"),
+          getApiErrorDetails(err).response?.data?.message || t("orderLoadingFailure"),
         );
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [orderId, locale, t],
+    [orderId, t],
   );
 
   useEffect(() => {
@@ -177,9 +163,9 @@ export default function OrderDetailsPage() {
         `${t("orderUpdateSuccess")}: ${({ Pending: t("orderStatusPending"), Shipped: t("orderStatusShipped"), Delivered: t("orderStatusDelivered"), Cancelled: t("orderStatusCancelled") } as Record<OrderStatus, string>)[newStatus]}`,
       );
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to update status:", err);
-      toast.error(err.response?.data?.message || t("orderUpdateFailure"));
+      toast.error(getApiErrorDetails(err).response?.data?.message || t("orderUpdateFailure"));
       setOrder((prev) => (prev ? { ...prev, status: previousStatus } : prev));
     } finally {
       setUpdatingStatus(false);
@@ -197,9 +183,9 @@ export default function OrderDetailsPage() {
       );
       router.push("/dashboard/orders");
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to delete order:", err);
-      toast.error(err.response?.data?.message || t("orderDeleteFailure"));
+      toast.error(getApiErrorDetails(err).response?.data?.message || t("orderDeleteFailure"));
       setDeleting(false);
       setConfirmDelete(false);
     }

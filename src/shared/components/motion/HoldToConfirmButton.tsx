@@ -8,6 +8,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { Trash } from "lucide-react";
+
 export type HoldToConfirmButtonSize = "sm" | "md" | "lg";
 export type HoldToConfirmButtonDirection = "right" | "up";
 

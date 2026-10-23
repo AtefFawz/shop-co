@@ -1,32 +1,18 @@
 // @/features/admin/products/components/ProductList.tsx
 "use client";
 
-import React, { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { Product } from "@/types";
-import {
-  Pencil,
-  Trash2,
-  AlertTriangle,
-  Tag,
-  PackageX,
-  Search,
-  LayoutGrid,
-  List,
-  ArrowUpDown,
-  Copy,
-  Check,
-  Flame,
-  CheckCircle2,
-  ExternalLink,
-} from "lucide-react";
+import { Pencil, Trash2, AlertTriangle, Tag, PackageX, Search, LayoutGrid, List, ArrowUpDown, Copy, Check, Flame, CheckCircle2 } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
+
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 export default function AdminProductList({
   initialProducts = [],
 }: {
@@ -54,7 +40,7 @@ export default function AdminProductList({
   }, [initialProducts]);
 
   // Unified Image Helper (supports both direct URLs & Cloudinary paths)
-  const getImageUrl = (p: any) => {
+  const getImageUrl = (p: Product) => {
     const raw = p?.photo || p?.images?.[0];
     if (!raw) return null;
     if (typeof raw === "string" && raw.startsWith("http")) return raw;
@@ -78,8 +64,8 @@ export default function AdminProductList({
       setProductsList((prev) => prev.filter((p) => p._id !== id));
       toast.success(t("adminProductDeleted"));
       router.refresh();
-    } catch (error: any) {
-      const backendMessage = error?.response?.data?.message;
+    } catch (error: unknown) {
+      const backendMessage = getApiErrorDetails(error).response?.data?.message;
       if (backendMessage && locale === "en") {
         toast.error(String(backendMessage));
       } else {
@@ -93,7 +79,7 @@ export default function AdminProductList({
 
   // Filter & Sort Logic
   const filteredProducts = useMemo(() => {
-    const list = [...(productsList || [])].filter((p: any) => {
+    const list = [...(productsList || [])].filter((p: Product) => {
       const stock = Number(p.countInStock ?? 10);
       if (stockFilter === "healthy" && stock <= 5) return false;
       if (stockFilter === "low" && (stock === 0 || stock > 5)) return false;
@@ -115,7 +101,7 @@ export default function AdminProductList({
       list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
     } else if (sortBy === "stock-asc") {
       list.sort(
-        (a: any, b: any) =>
+        (a: Product, b: Product) =>
           Number(a.countInStock ?? 10) - Number(b.countInStock ?? 10),
       );
     }
@@ -255,7 +241,7 @@ export default function AdminProductList({
             />
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as any)}
+              onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
               aria-label={t("sortProducts")}
               className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface py-2 ps-8 pe-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:outline-none"
             >
@@ -346,7 +332,7 @@ export default function AdminProductList({
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle bg-surface text-xs">
-              {filteredProducts.map((p: any) => {
+              {filteredProducts.map((p: Product) => {
                 const imgUrl = getImageUrl(p);
                 const stock = Math.max(0, Number(p.countInStock ?? 10));
                 const isOut = stock === 0;
@@ -513,7 +499,7 @@ export default function AdminProductList({
         /* 4B. 3D SHOWROOM CARDS GRID VIEW                                  */
         /* ================================================================ */
         <div className="grid grid-cols-1 gap-4 p-5 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {filteredProducts.map((p: any) => {
+          {filteredProducts.map((p: Product) => {
             const imgUrl = getImageUrl(p);
             const stock = Math.max(0, Number(p.countInStock ?? 10));
             const isOut = stock === 0;

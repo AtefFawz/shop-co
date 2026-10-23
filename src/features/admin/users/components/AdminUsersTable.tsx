@@ -3,18 +3,7 @@
 import React, { useState } from "react";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
-import {
-  Shield,
-  ChevronRight,
-  Copy,
-  Check,
-  Mail,
-  Calendar,
-  Crown,
-  Sparkles,
-  UserCheck,
-  ArrowUpRight,
-} from "lucide-react";
+import { Shield, ChevronRight, Copy, Check, Mail, Calendar, Crown, UserCheck, ArrowUpRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
@@ -98,7 +87,7 @@ export default function AdminUsersTable({
         dir={direction}
         className="hidden grid-cols-1 gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       >
-        {users.map((user: any) => {
+        {users.map((user: User) => {
           const shortId = (user._id || "").slice(-6).toUpperCase();
           const roleInfo = getRoleBadge(user.role);
           const RoleIcon = roleInfo.icon;
@@ -228,7 +217,7 @@ export default function AdminUsersTable({
           </thead>
 
           <tbody className="divide-y divide-border-subtle text-xs">
-            {users.map((user: any) => {
+            {users.map((user: User) => {
               const shortId = (user._id || "").slice(-6).toUpperCase();
               const roleInfo = getRoleBadge(user.role);
               const RoleIcon = roleInfo.icon;

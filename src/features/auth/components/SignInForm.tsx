@@ -2,18 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import {
-  Mail,
-  Lock,
-  ArrowRight,
-  AlertCircle,
-  Eye,
-  EyeOff,
-  CheckCircle2,
-  ShieldCheck,
-  Sparkles,
-  KeyRound,
-} from "lucide-react";
+import { Mail, Lock, ArrowRight, AlertCircle, Eye, EyeOff, CheckCircle2, ShieldCheck } from "lucide-react";
 import { useLogin } from "@/hooks/signIn";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 

@@ -1,4 +1,4 @@
-import React from "react";
+
 import { type LucideIcon } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 

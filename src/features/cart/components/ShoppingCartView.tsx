@@ -1,22 +1,12 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import {
-  ShoppingBag,
-  Sparkles,
-  Truck,
-  CheckCircle2,
-  ArrowLeft,
-  Trash2,
-  ShieldCheck,
-} from "lucide-react";
+import { Sparkles, Truck, CheckCircle2, ArrowLeft, Trash2, ShieldCheck } from "lucide-react";
 import { AnimatePresence } from "framer-motion";
 import toast from "react-hot-toast";
 
-import { useProduct } from "@/store/cartStore";
-import { Product } from "@/types";
-import { calculateFinalPrice } from "@/lib/logicPricing";
+import { isOutOfStock, summarizeCart, useCartStore } from "@/store/cartStore";
+import type { Product } from "@/types";
 import { CartOrderSummary } from "@/features/cart/components/CartOrderSummary";
 import { EmptyCartState } from "@/features/cart/components/EmptyCartState";
 import { CartLineItem } from "@/features/cart/components/CartLineItem";
@@ -28,39 +18,45 @@ const FREE_SHIPPING_THRESHOLD = 200;
 
 export const ShoppingCartView = () => {
   const { t, locale } = useLocale();
-  const Stack = useProduct((e) => e.stack);
-  const clearCart = useProduct((e: any) => e.clearCart);
-
-  if (!Stack || Stack.length === 0) return <EmptyCartState />;
-
-  // Calculate total units & current discounted subtotal for Free Shipping progress
-  const totalUnits = Stack.reduce(
-    (sum: number, item: Product) => sum + (Number(item.count) || 1),
-    0,
+  const items = useCartStore((state) => state.stack);
+  const clearCart = useCartStore((state) => state.clearCart);
+  const selectAll = useCartStore((state) => state.selectAll);
+  const removeSelected = useCartStore((state) => state.removeSelected);
+  const selectedItems = items.filter(
+    (item) => item.isChose !== false && !isOutOfStock(item),
   );
+  const cartSummary = summarizeCart(items);
+  const selectedLineCount = cartSummary.selectedLineCount;
+  const selectableLineCount = items.filter(
+    (item) => !isOutOfStock(item),
+  ).length;
+  const isEverythingSelected =
+    selectableLineCount > 0 && selectedLineCount === selectableLineCount;
 
-  const currentSubtotal = Stack.reduce((sum: number, item: Product) => {
-    const qty = Number(item.count) || 1;
-    return (
-      sum + calculateFinalPrice(Number(item.price), Number(item.discount), qty)
-    );
-  }, 0);
+  if (items.length === 0) return <EmptyCartState />;
+
+  const totalBagQuantity = cartSummary.quantityCount;
+  const selectedOrderValue = cartSummary.selectedTotal;
 
   const amountRemaining = Math.max(
     0,
-    FREE_SHIPPING_THRESHOLD - currentSubtotal,
+    FREE_SHIPPING_THRESHOLD - selectedOrderValue,
   );
   const shippingProgress = Math.min(
     100,
-    Math.round((currentSubtotal / FREE_SHIPPING_THRESHOLD) * 100),
+    Math.round((selectedOrderValue / FREE_SHIPPING_THRESHOLD) * 100),
   );
-  const unlockedFreeShipping = currentSubtotal >= FREE_SHIPPING_THRESHOLD;
+  const unlockedFreeShipping = selectedOrderValue >= FREE_SHIPPING_THRESHOLD;
 
   const handleClearBag = () => {
-    if (clearCart) {
-      clearCart();
-      toast.error(t("clearBag"));
-    }
+    clearCart();
+    toast.success(t("clearBag"));
+  };
+
+  const handleRemoveSelected = () => {
+    if (selectedLineCount === 0) return;
+    removeSelected();
+    toast.success(t("removeSelectedItems"));
   };
 
   return (
@@ -100,23 +96,46 @@ export const ShoppingCartView = () => {
                 {t("yourBag")}
               </h1>
               <span className="rounded-full bg-surface-subtle px-3 py-0.5 font-mono text-xs font-black text-secondary">
-                {Stack.length} {t("products")} · {totalUnits} {t("units")}
+                {items.length} {t("products")} · {totalBagQuantity} {t("units")}
               </span>
             </div>
           </div>
 
           {/* Clear saved cart lines */}
-          {clearCart && (
+          <div className="flex w-full flex-wrap items-center gap-2 lg:w-auto">
+            <button
+              type="button"
+              onClick={() => selectAll(!isEverythingSelected)}
+              disabled={selectableLineCount === 0}
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-secondary transition-colors hover:border-border-strong hover:bg-surface-muted hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface"
+            >
+              <CheckCircle2 size={13} />
+              <span>{isEverythingSelected ? t("deselectAllItems") : t("selectAllItems")}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleRemoveSelected}
+              disabled={selectedLineCount === 0}
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-danger-border/80 bg-danger-soft/60 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-danger transition-colors hover:bg-danger hover:text-on-danger disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Trash2 size={13} />
+              <span>{t("removeSelectedItems")}</span>
+            </button>
             <button
               type="button"
               onClick={handleClearBag}
-              className="inline-flex w-fit cursor-pointer items-center gap-1.5 self-end rounded-2xl border border-danger-border bg-danger-soft/60 px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-danger transition-all hover:border-danger-border hover:bg-danger hover:text-on-danger lg:self-auto"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-danger-border/80 bg-danger-soft/60 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-danger transition-colors hover:bg-danger hover:text-on-danger"
             >
               <Trash2 size={13} />
               <span>{t("clearBag")}</span>
             </button>
-          )}
+          </div>
         </header>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border-subtle bg-surface/75 px-4 py-3 text-xs text-secondary">
+          <span>{selectedLineCount} / {items.length} {t("selectedItemsCount")}</span>
+          <span className="font-semibold">{t("selectedSubtotalLabel")}: {formatCurrency(cartSummary.selectedSubtotal, locale)}</span>
+        </div>
 
         {/* ================================================================ */}
         {/* 2. LIVE FREE EXPRESS SHIPPING PROGRESS BAR                       */}
@@ -138,7 +157,11 @@ export const ShoppingCartView = () => {
                 )}
               </span>
 
-              {unlockedFreeShipping ? (
+              {selectedLineCount === 0 ? (
+                <p className="font-bold tracking-wide text-on-action">
+                  {t("noCheckoutSelection")}
+                </p>
+              ) : unlockedFreeShipping ? (
                 <p className="font-bold tracking-wide text-on-action">
                   {t("freeShipping")}
                 </p>
@@ -176,7 +199,7 @@ export const ShoppingCartView = () => {
           {/* Left: Cart Items List */}
           <div className="w-full space-y-3.5 lg:flex-1">
             <AnimatePresence mode="popLayout">
-              {Stack.map((item: Product) => (
+              {items.map((item: Product) => (
                 <CartLineItem
                   productItem={item}
                   key={`${item._id}-${item.size || ""}-${item.colors || ""}`}
@@ -187,8 +210,8 @@ export const ShoppingCartView = () => {
 
           {/* Right: Sticky 3D Receipt & Promo Sidebar */}
           <aside className="sticky top-24 w-full shrink-0 overflow-hidden rounded-[2rem] border border-border bg-surface shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] lg:w-[360px] xl:w-[390px]">
-            <CartOrderSummary product={Stack} />
-            <PromoCodeForm />
+            <CartOrderSummary product={selectedItems} />
+            <PromoCodeForm canCheckout={selectedLineCount > 0} />
 
             {/* Buyer Guarantee Footer */}
             <div className="flex items-center justify-center gap-2 border-t border-border-subtle bg-surface-subtle px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Package,
   Star,
@@ -16,18 +16,9 @@ import HoldToConfirmButton from "@/shared/components/motion/HoldToConfirmButton"
 import { formatCurrency } from "@/lib/formatCurrency";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-interface Order {
-  _id: string;
-  createdAt: string;
-  orderItems: Array<{
-    _id: string;
-    product: string;
-    name: string;
-    image: string;
-  }>;
-  status: string;
-  totalPrice: number;
-}
+import { getApiErrorDetails } from "@/lib/errorUtils";
+import type { CustomerOrderRecord } from "@/types/domain";
+type Order = CustomerOrderRecord;
 
 const getItemImageUrl = (raw?: string) => {
   if (!raw) return "https://placehold.co/80x80/111111/FFFFFF?text=SKU";
@@ -103,9 +94,9 @@ export default function CustomerOrderCard({
         delete next[productId];
         return next;
       });
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(error.response?.data?.message || t("reviewSubmitError"));
+      toast.error(getApiErrorDetails(error).response?.data?.message || t("reviewSubmitError"));
     } finally {
       setLoading(null);
     }
@@ -116,8 +107,8 @@ export default function CustomerOrderCard({
       await api.delete(`order/${id}`);
       toast.success(t("orderCancelledRemoved"));
       if (onReviewSuccess) onReviewSuccess();
-    } catch (err: any) {
-      if (err.response?.status === 404) {
+    } catch (err: unknown) {
+      if (getApiErrorDetails(err).response?.status === 404) {
         toast.error(t("orderNotFound"));
         return;
       }
@@ -234,7 +225,7 @@ export default function CustomerOrderCard({
             className="w-full border border-border text-[10px] font-black uppercase tracking-wider shadow-none transition-all hover:border-danger-border hover:bg-danger-soft sm:w-auto [&_*]:!font-black"
             onHold={() => {
               deleteOrders(order._id);
-              onReviewSuccess && onReviewSuccess();
+              if (onReviewSuccess) onReviewSuccess();
             }}
           >
             {t("holdDeleteOrder")}

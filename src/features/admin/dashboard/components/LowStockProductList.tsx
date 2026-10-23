@@ -1,26 +1,18 @@
 // @/features/admin/dashboard/components/LowStackList.tsx
 "use client";
 
-import React, { useState, useMemo } from "react";
-import {
-  AlertTriangle,
-  ArrowUpRight,
-  Boxes,
-  Edit3,
-  Search,
-  Sparkles,
-  CheckCircle2,
-  Flame,
-} from "lucide-react";
+import { useState, useMemo } from "react";
+import { AlertTriangle, ArrowUpRight, Edit3, Search, CheckCircle2, Flame } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 
+import type { Product } from "@/types";
 export const LowStockProductList = ({
   lowStockProducts = [],
 }: {
-  lowStockProducts: any[];
+  lowStockProducts: Product[];
 }) => {
   const { t, locale, direction } = useLocale();
   const [filterMode, setFilterMode] = useState<"all" | "out" | "urgent">("all");
@@ -197,7 +189,7 @@ export const LowStockProductList = ({
               </tr>
             </thead>
             <tbody className="divide-y divide-border-subtle text-xs">
-              {filteredProducts.map((item: any) => {
+              {filteredProducts.map((item: Product) => {
                 const stockVal = Math.max(0, Number(item.countInStock ?? 0));
                 const isOut = stockVal === 0;
 

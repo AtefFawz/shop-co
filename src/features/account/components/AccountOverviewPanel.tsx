@@ -1,24 +1,18 @@
 "use client";
 
-import React from "react";
+
 import Link from "next/link";
-import {
-  Star,
-  Package,
-  CreditCard,
-  ShoppingBag,
-  ArrowUpRight,
-  Sparkles,
-  Store,
-} from "lucide-react";
+import { Star, Package, CreditCard, ShoppingBag, ArrowUpRight, Store } from "lucide-react";
 import OrderCard from "@/features/orders/components/CustomerOrderCard";
 import { AccountSectionHeader } from "@/features/account/components/AccountSectionHeader";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import type { CustomerOrderRecord, ReviewRecord } from "@/types/domain";
+import type { LucideIcon } from "lucide-react";
 type DataType = {
-  orders: any[];
-  reviews: any[];
+  orders: CustomerOrderRecord[];
+  reviews: ReviewRecord[];
   onRefresh: () => void;
   goTo: (state: string) => void;
   pagination: {
@@ -118,7 +112,7 @@ export default function AccountOverviewPanel({
           </div>
         ) : (
           <div className="space-y-4">
-            {orders.slice(0, 2).map((order: any) => (
+            {orders.slice(0, 2).map((order: CustomerOrderRecord) => (
               <OrderCard
                 key={order._id}
                 order={order}
@@ -157,7 +151,7 @@ function StatCard({
   label: string;
   value: string | number;
   sub: string;
-  icon: any;
+  icon: LucideIcon;
   accent: "emerald" | "black" | "amber";
   onClick?: () => void;
 }) {

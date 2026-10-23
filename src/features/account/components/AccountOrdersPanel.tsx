@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { Package } from "lucide-react";
 import { EmptyAccountState } from "@/features/account/components/EmptyAccountState";
 import { AccountSectionHeader } from "@/features/account/components/AccountSectionHeader";
@@ -9,6 +9,7 @@ import { ClientPagination } from "@/shared/components/navigation/ClientPaginatio
 import useData from "@/hooks/getData";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import type { CustomerOrderRecord } from "@/types/domain";
 export default function AccountOrdersPanel() {
   const { t } = useLocale();
   const { data, loading, page, totalPages, goToPage, refetch } =
@@ -16,7 +17,7 @@ export default function AccountOrdersPanel() {
 
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const orders: any[] = data?.data?.orders ?? [];
+  const orders: CustomerOrderRecord[] = (data?.data?.orders ?? []) as CustomerOrderRecord[];
   const total = data?.pagination?.total ?? orders.length;
 
   const filteredOrders = useMemo(() => {
@@ -73,7 +74,7 @@ export default function AccountOrdersPanel() {
 
       {filteredOrders.length > 0 ? (
         <div className="space-y-4">
-          {filteredOrders.map((order: any) => (
+          {filteredOrders.map((order: CustomerOrderRecord) => (
             <OrderCard
               key={order._id}
               order={order}

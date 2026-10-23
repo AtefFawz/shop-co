@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+
 import { SlidersHorizontal, RotateCcw, Sparkles } from "lucide-react";
 import { useFilterStore } from "@/store/filterStore";
 import { ProductCategoryFilter } from "@/features/catalog/components/ProductCategoryFilter";

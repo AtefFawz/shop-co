@@ -12,6 +12,7 @@ import {
 import { messages, type Locale, type MessageKey } from "@/shared/i18n/messages";
 import { useRouter } from "next/navigation";
 
+
 type LocaleContextValue = {
   locale: Locale;
   direction: "ltr" | "rtl";
@@ -85,6 +86,8 @@ export function LocaleProvider({
     // Keep cookie, localStorage, and the document root synchronized.
     applyLocale(resolvedLocale, true);
     if (resolvedLocale !== locale) {
+      // Synchronize the server-provided locale with persisted client preferences.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocaleState(resolvedLocale);
     }
   }, [initialLocale, locale]);

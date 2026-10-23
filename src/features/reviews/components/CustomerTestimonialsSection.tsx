@@ -1,7 +1,7 @@
-import React from "react";
+
 import { cookies } from "next/headers";
 import { messages, type Locale } from "@/shared/i18n/messages";
-import { Star, ShieldCheck, Sparkles, MoveRight } from "lucide-react";
+import { Star, ShieldCheck, MoveRight } from "lucide-react";
 import CustomerReviewsSection from "@/features/reviews/components/CustomerReviewsSection";
 import Heading from "@/shared/components/ui/SectionHeading";
 import { serverApi } from "@/lib/serverApi";

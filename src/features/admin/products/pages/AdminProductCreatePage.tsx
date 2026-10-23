@@ -23,6 +23,7 @@ import {
   Users,
 } from "lucide-react";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 export default function AdminProductCreatePage() {
   const router = useRouter();
   const { t, direction } = useLocale();
@@ -129,10 +130,11 @@ export default function AdminProductCreatePage() {
       setSuccess(true);
       resetForm();
       setTimeout(() => setSuccess(false), 3500);
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const details = getApiErrorDetails(err);
       setError(
-        err?.response?.data?.message ||
-          err?.message ||
+        details.response?.data?.message ||
+          details.message ||
           t("adminCreateProductFailed"),
       );
     } finally {

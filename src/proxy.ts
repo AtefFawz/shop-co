@@ -17,8 +17,8 @@ export default async function proxy(request: NextRequest) {
   const refreshToken = request.cookies.get("refreshToken")?.value;
   const role = request.cookies.get("role")?.value;
 
-  let currentRole = role;
-  let response = NextResponse.next();
+  const currentRole = role;
+  const response = NextResponse.next();
 
   if (pathname.startsWith("/auth")) {
     return NextResponse.next();

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";

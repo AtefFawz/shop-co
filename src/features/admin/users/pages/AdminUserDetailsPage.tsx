@@ -25,6 +25,7 @@ import RoleSelector from "@/features/admin/users/components/UserRoleSelector";
 import DeleteUserButton from "@/features/admin/users/components/DeleteUserButton";
 import { AdminMetricCard } from "@/features/admin/dashboard/components/AdminMetricCard";
 
+import type { AdminOrderRecord, AdminUserRecord, ReviewRecord } from "@/types/domain";
 /* -------------------------------------------------------------------------- */
 /*                                HELPER UTILS                                */
 /* -------------------------------------------------------------------------- */
@@ -60,23 +61,23 @@ export default async function AdminUserDetailsPage({
     },
   );
 
-  let user = null;
+  let user: AdminUserRecord | null = null;
 
   try {
     const response = await serverApi(`admin/users/${id}`);
-    user = response?.data?.user;
-  } catch (error: any) {
+    user = (response?.data?.user as AdminUserRecord | undefined) ?? null;
+  } catch (error: unknown) {
     console.error("Error loading user in Server Component:", error);
   }
 
   if (!user) return notFound();
 
-  const ordersList: any[] = Array.isArray(user.orders) ? user.orders : [];
-  const reviewsList: any[] = Array.isArray(user.reviews) ? user.reviews : [];
+  const ordersList: AdminOrderRecord[] = Array.isArray(user.orders) ? user.orders : [];
+  const reviewsList: Array<ReviewRecord & { product?: { name?: string } }> = Array.isArray(user.reviews) ? user.reviews as Array<ReviewRecord & { product?: { name?: string } }> : [];
 
   // Financial & Loyalty Telemetry
   const totalSpent = ordersList.reduce(
-    (acc: number, curr: any) => acc + (Number(curr.totalPrice) || 0),
+    (acc: number, curr: AdminOrderRecord) => acc + (Number(curr.totalPrice) || 0),
     0,
   );
   const avgOrderValue =
@@ -90,7 +91,7 @@ export default async function AdminUserDetailsPage({
     reviewsList.length > 0
       ? (
           reviewsList.reduce(
-            (acc: number, r: any) => acc + (Number(r.rating) || 5),
+            (acc: number, r: ReviewRecord) => acc + (Number(r.rating) || 5),
             0,
           ) / reviewsList.length
         ).toFixed(1)
@@ -521,7 +522,7 @@ export default async function AdminUserDetailsPage({
                 </div>
               ) : (
                 <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pe-1">
-                  {ordersList.map((order: any) => {
+                  {ordersList.map((order: AdminOrderRecord) => {
                     const status = (
                       order.status || t.userDetailStatus
                     ).toLowerCase();
@@ -529,7 +530,7 @@ export default async function AdminUserDetailsPage({
                       status === "delivered" || status === "completed";
                     const isShipped =
                       status === "shipped" || status === "transit";
-                    const items: any[] = order.orderItems || [];
+                    const items: AdminOrderRecord["orderItems"] = order.orderItems || [];
 
                     return (
                       <div
@@ -540,7 +541,7 @@ export default async function AdminUserDetailsPage({
                           {/* Order Item Thumbnails Stack */}
                           {items.length > 0 ? (
                             <div className="flex -space-x-2 shrink-0">
-                              {items.slice(0, 3).map((it: any, idx: number) => (
+                              {items.slice(0, 3).map((it: AdminOrderRecord["orderItems"][number], idx: number) => (
                                 <img
                                   key={idx}
                                   src={getItemImageUrl(it.image)}
@@ -647,7 +648,7 @@ export default async function AdminUserDetailsPage({
                 </div>
               ) : (
                 <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pe-1">
-                  {reviewsList.map((review: any) => {
+                  {reviewsList.map((review: ReviewRecord & { product?: { name?: string } }) => {
                     const rating = Number(review.rating) || 5;
                     return (
                       <div

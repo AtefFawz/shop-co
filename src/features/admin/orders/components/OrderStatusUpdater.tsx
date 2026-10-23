@@ -19,6 +19,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 interface Props {
   orderId: string;
   currentStatus: string;
@@ -235,9 +236,9 @@ export default function OrderStatusUpdater({
       await api.patch(`/order/${orderId}`, { status: newStatus });
       toast.success(`${t("ordersUpdatedStatus")}: #${orderId.slice(-6).toUpperCase()} · ${getStatusLabel(newStatus)}`);
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Update failed:", err);
-      toast.error(err.response?.data?.message || t("ordersUpdateStatusFailed"));
+      toast.error(getApiErrorDetails(err).response?.data?.message || t("ordersUpdateStatusFailed"));
       setStatus(previousStatus);
     } finally {
       setLoading(false);
@@ -255,9 +256,9 @@ export default function OrderStatusUpdater({
       toast.success(`${t("ordersDeleted")}: #${orderId.slice(-6).toUpperCase()}`);
       if (deletedOrderSuccess) deletedOrderSuccess();
       router.refresh();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Delete failed:", err);
-      toast.error(err.response?.data?.message || t("ordersDeleteFailed"));
+      toast.error(getApiErrorDetails(err).response?.data?.message || t("ordersDeleteFailed"));
     } finally {
       setLoading(false);
       setConfirmDelete(false);

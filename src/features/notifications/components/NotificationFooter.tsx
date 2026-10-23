@@ -30,8 +30,13 @@ export default function NotificationFooter({
   onClose,
 }: NotificationFooterProps) {
   const { locale, t } = useLocale();
+
+  const formattedCount = new Intl.NumberFormat(
+    locale === "ar" ? "ar-EG" : "en-US",
+  ).format(totalCount);
+
   return (
-    <footer className="shrink-0 border-t border-neutral-200 bg-white p-3 dark:border-neutral-700 dark:bg-neutral-900 sm:px-4">
+    <footer className="shrink-0 border-t border-border bg-surface-raised p-3 sm:px-4">
       {hasMore ? (
         <button
           type="button"
@@ -40,24 +45,22 @@ export default function NotificationFooter({
           className="
             group flex min-h-10 w-full cursor-pointer
             items-center justify-center gap-2 rounded-xl
-            border border-neutral-200 bg-neutral-50 px-3 py-2.5
-            text-[10px] font-bold uppercase tracking-[0.14em]
-            text-neutral-800 transition-colors duration-200
-            hover:border-neutral-900 hover:bg-neutral-900 hover:text-white
+            border border-border bg-surface-subtle px-3 py-2.5
+            text-[10px] font-bold uppercase tracking-[0.12em]
+            text-secondary transition-colors duration-200
+            hover:border-action hover:bg-action hover:text-on-action
             focus-visible:outline-none focus-visible:ring-2
-            focus-visible:ring-neutral-900 focus-visible:ring-offset-2
+            focus-visible:ring-focus focus-visible:ring-offset-2
+            focus-visible:ring-offset-surface-raised
             disabled:cursor-not-allowed disabled:opacity-50
-            dark:border-neutral-700 dark:bg-neutral-800
-            dark:text-neutral-200 dark:hover:border-neutral-500
-            dark:hover:bg-neutral-100 dark:hover:text-neutral-950
-            dark:focus-visible:ring-neutral-200
           "
         >
           {loading ? (
             <>
               <LoaderCircle
                 size={14}
-                className="animate-spin text-emerald-600 dark:text-emerald-400"
+                className="animate-spin text-accent"
+                aria-hidden="true"
               />
               <span>{t("notifLoading")}</span>
             </>
@@ -66,13 +69,24 @@ export default function NotificationFooter({
               <span>{t("notifLoadOlder")}</span>
 
               {currentPage != null && totalPages != null && (
-                <span className="rounded-md bg-neutral-200/70 px-1.5 py-0.5 font-mono text-[9px] tracking-normal text-neutral-600 dark:bg-neutral-700 dark:text-neutral-300">
+                <span
+                  className="
+                    rounded-md border border-border-subtle
+                    bg-surface-muted px-1.5 py-0.5
+                    font-mono text-[9px] tracking-normal
+                    text-secondary
+                    group-hover:border-on-action/20
+                    group-hover:bg-on-action/10
+                    group-hover:text-on-action
+                  "
+                >
                   {currentPage}/{totalPages}
                 </span>
               )}
 
               <ChevronDown
                 size={14}
+                aria-hidden="true"
                 className="transition-transform duration-200 group-hover:translate-y-0.5"
               />
             </>
@@ -80,15 +94,13 @@ export default function NotificationFooter({
         </button>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-2 px-1 py-1">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-neutral-500 dark:text-neutral-400">
+          <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-muted">
             <CheckCircle2
               size={13}
-              className="text-emerald-600 dark:text-emerald-400"
+              className="text-success"
+              aria-hidden="true"
             />
-            {t("notifLoadedCount").replace(
-              "{count}",
-              new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-US").format(totalCount),
-            )}
+            {t("notifLoadedCount").replace("{count}", formattedCount)}
           </span>
 
           <Link
@@ -96,17 +108,15 @@ export default function NotificationFooter({
             onClick={onClose}
             className="
               inline-flex min-h-8 items-center gap-1.5 rounded-lg
-              px-2 text-[10px] font-bold text-neutral-800
-              transition-colors hover:bg-neutral-100 hover:text-neutral-950
+              px-2 text-[10px] font-bold text-secondary
+              transition-colors hover:bg-surface-muted hover:text-primary
               focus-visible:outline-none focus-visible:ring-2
-              focus-visible:ring-neutral-900
-              dark:text-neutral-200 dark:hover:bg-neutral-800
-              dark:hover:text-white dark:focus-visible:ring-neutral-200
+              focus-visible:ring-focus
             "
           >
-            <Package size={13} />
+            <Package size={13} aria-hidden="true" />
             <span>{t("notifOrderHistory")}</span>
-            <ArrowUpRight size={12} />
+            <ArrowUpRight size={12} aria-hidden="true" className="rtl-mirror" />
           </Link>
         </div>
       )}

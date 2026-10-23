@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+
 import Link from "next/link";
-import { Package, ShoppingBag, ShieldCheck, ArrowUpRight } from "lucide-react";
+import { ShoppingBag, ShieldCheck, ArrowUpRight } from "lucide-react";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
@@ -98,7 +98,7 @@ export default function OrderItemsList({
                 {/* Item Title & Unit Breakdown */}
                 <div className="min-w-0 flex-1 space-y-1.5">
                   <span className="inline-block font-mono text-[9px] font-black uppercase tracking-[0.18em] text-muted">
-                    {t("itemLabel")} // 0{idx + 1}
+                    {t("itemLabel")} · 0{idx + 1}
                   </span>
 
                   <h3 className="truncate text-sm font-black uppercase tracking-tight text-primary sm:text-base">

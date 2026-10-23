@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
 import { motion } from "framer-motion";
 import { Star, MessageSquareQuote, ShieldCheck, Sparkles } from "lucide-react";
@@ -106,7 +106,7 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
                 <button
                   key={tab.id}
                   type="button"
-                  onClick={() => setFilterStars(tab.id as any)}
+                  onClick={() => setFilterStars(tab.id as "all" | "5" | "4+")}
                   className={`cursor-pointer rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
                     filterStars === tab.id
                       ? "bg-action text-on-action shadow-2xs"

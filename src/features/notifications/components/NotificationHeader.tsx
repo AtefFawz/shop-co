@@ -2,14 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import {
-  CheckCheck,
-  Sparkles,
-  X,
-  Search,
-  Volume2,
-  VolumeX,
-} from "lucide-react";
+import { CheckCheck, X, Search, Volume2, VolumeX } from "lucide-react";
 
 import type { FilterTab } from "./NotificationDropdown";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
@@ -44,15 +37,15 @@ export default function NotificationHeader({
 
   useEffect(() => {
     try {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSoundEnabled(localStorage.getItem(soundStorageKey) !== "muted");
     } catch {
-      setSoundEnabled(true);
+      // Keep default enabled state when storage is unavailable.
     }
   }, []);
 
   const toggleSound = () => {
     const nextValue = !soundEnabled;
-
     setSoundEnabled(nextValue);
 
     try {
@@ -78,38 +71,54 @@ export default function NotificationHeader({
   ];
 
   return (
-    <header className="relative shrink-0 overflow-hidden border-b border-neutral-200 bg-white px-4 pb-3.5 pt-4! text-neutral-900 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 sm:px-5">
-      {/* Subtle decorative grid */}
+    <header
+      data-theme-surface
+      className="relative shrink-0 overflow-hidden border-b border-border bg-surface-raised px-4 pb-3.5 pt-4 text-primary sm:px-5"
+    >
+      {/* Subtle Royal Sapphire Atmospheric Aura & Grid */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 opacity-[0.035] dark:opacity-[0.07]"
+        className="bg-grid-subtle pointer-events-none absolute inset-0 bg-[size:24px_24px] opacity-70"
+      />
+      <div
+        aria-hidden="true"
         style={{
-          backgroundImage:
-            "linear-gradient(to right, currentColor 1px, transparent 1px), linear-gradient(to bottom, currentColor 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% -20%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 75%)",
         }}
+        className="pointer-events-none absolute inset-0"
       />
 
+      {/* Top row: Status Orb + Title + Action Buttons */}
       <div className="relative z-10 flex items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2.5">
-          <span
-            className={`relative flex h-2.5 w-2.5 shrink-0 rounded-full ${
-              unreadCount > 0
-                ? "bg-amber-500 dark:bg-amber-400"
-                : "bg-emerald-600 dark:bg-emerald-400"
-            }`}
-          >
-            {unreadCount > 0 && !reduceMotion && (
-              <span className="absolute inset-0 animate-ping rounded-full bg-amber-500/40 dark:bg-amber-400/40" />
-            )}
-          </span>
+          <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border-strong/60 bg-brand-soft text-accent shadow-2xs">
+            <span
+              className={`relative flex h-2.5 w-2.5 rounded-full ${
+                unreadCount > 0 ? "bg-warning-bright" : "bg-success-bright"
+              }`}
+            >
+              {unreadCount > 0 && !reduceMotion && (
+                <span className="absolute inset-0 animate-ping rounded-full bg-warning-bright/60" />
+              )}
+            </span>
+          </div>
 
           <div className="min-w-0">
-            <h3 className="truncate text-xs font-extrabold tracking-wide text-neutral-900 dark:text-neutral-100 sm:text-sm">
-              {t("notifTitle")}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="truncate text-xs font-extrabold tracking-wide text-primary sm:text-sm">
+                {t("notifTitle")}
+              </h3>
+              {unreadCount > 0 && (
+                <span className="inline-flex items-center rounded-full border border-border-strong/60 bg-brand-soft px-2 py-0.5 font-mono text-[9.5px] font-bold text-accent">
+                  {new Intl.NumberFormat(
+                    locale === "ar" ? "ar-EG" : "en-US",
+                  ).format(unreadCount)}
+                </span>
+              )}
+            </div>
 
-            <p className="mt-0.5 text-[10px] text-neutral-500 dark:text-neutral-400">
+            <p className="mt-0.5 truncate text-[10.5px] font-medium text-muted">
               {unreadCount > 0
                 ? `${new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-US").format(unreadCount)} ${t("notifUnreadLabel")}`
                 : t("notifCaughtUp")}
@@ -117,23 +126,25 @@ export default function NotificationHeader({
           </div>
         </div>
 
-        <div className="flex shrink-0 items-center gap-1">
+        {/* Right utility actions */}
+        <div className="flex shrink-0 items-center gap-1.5">
           {onSearchChange && (
             <button
               type="button"
-              aria-label={searchOpen ? t("navCloseSearch") : t("notifSearchAction")}
+              aria-label={
+                searchOpen ? t("navCloseSearch") : t("notifSearchAction")
+              }
               aria-expanded={searchOpen}
               onClick={toggleSearch}
               className={`
                 flex h-8 w-8 cursor-pointer items-center justify-center
-                rounded-xl border transition-colors
+                rounded-xl border transition-all duration-200
                 focus-visible:outline-none focus-visible:ring-2
-                focus-visible:ring-neutral-900
-                dark:focus-visible:ring-neutral-200
+                focus-visible:ring-focus
                 ${
                   searchOpen || searchQuery
-                    ? "border-neutral-900 bg-neutral-900 text-white dark:border-neutral-200 dark:bg-neutral-100 dark:text-neutral-950"
-                    : "border-neutral-200 bg-neutral-50 text-neutral-600 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300 dark:hover:bg-neutral-700"
+                    ? "border-action bg-action text-on-action shadow-xs"
+                    : "border-border bg-surface-subtle text-secondary hover:border-border-strong hover:bg-surface-muted hover:text-primary"
                 }
               `}
             >
@@ -144,34 +155,23 @@ export default function NotificationHeader({
           <button
             type="button"
             aria-label={
-              soundEnabled
-                ? t("notifMuteSound")
-                : t("notifEnableSound")
+              soundEnabled ? t("notifMuteSound") : t("notifEnableSound")
             }
             aria-pressed={soundEnabled}
             onClick={toggleSound}
-            className="
+            className={`
               flex h-8 w-8 cursor-pointer items-center justify-center
-              rounded-xl border border-neutral-200 bg-neutral-50
-              text-neutral-600 transition-colors hover:bg-neutral-100
+              rounded-xl border transition-all duration-200
               focus-visible:outline-none focus-visible:ring-2
-              focus-visible:ring-neutral-900
-              dark:border-neutral-700 dark:bg-neutral-800
-              dark:text-neutral-300 dark:hover:bg-neutral-700
-              dark:focus-visible:ring-neutral-200
-            "
+              focus-visible:ring-focus
+              ${
+                soundEnabled
+                  ? "border-success-border bg-success-soft text-success hover:opacity-90"
+                  : "border-border bg-surface-subtle text-muted hover:border-border-strong hover:bg-surface-muted hover:text-primary"
+              }
+            `}
           >
-            {soundEnabled ? (
-              <Volume2
-                size={14}
-                className="text-emerald-600 dark:text-emerald-400"
-              />
-            ) : (
-              <VolumeX
-                size={14}
-                className="text-neutral-500 dark:text-neutral-400"
-              />
-            )}
+            {soundEnabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
           </button>
 
           {unreadCount > 0 && (
@@ -180,14 +180,12 @@ export default function NotificationHeader({
               onClick={onMarkAllAsRead}
               className="
                 inline-flex min-h-8 cursor-pointer items-center gap-1.5
-                rounded-xl border border-neutral-200 bg-neutral-50
-                px-2 text-[9px] font-bold uppercase tracking-wide
-                text-neutral-700 transition-colors hover:bg-neutral-100
+                rounded-xl border border-border-strong/70 bg-brand-soft
+                px-2.5 text-[9.5px] font-bold uppercase tracking-wider
+                text-accent transition-all duration-200
+                hover:border-action hover:bg-action hover:text-on-action
                 focus-visible:outline-none focus-visible:ring-2
-                focus-visible:ring-neutral-900
-                dark:border-neutral-700 dark:bg-neutral-800
-                dark:text-neutral-200 dark:hover:bg-neutral-700
-                dark:focus-visible:ring-neutral-200
+                focus-visible:ring-focus active:scale-95
               "
             >
               <CheckCheck size={13} />
@@ -202,14 +200,11 @@ export default function NotificationHeader({
               aria-label={t("notifClose")}
               className="
                 flex h-8 w-8 cursor-pointer items-center justify-center
-                rounded-xl border border-neutral-200 bg-neutral-50
-                text-neutral-600 transition-colors hover:bg-neutral-100
+                rounded-xl border border-border bg-surface-subtle
+                text-secondary transition-colors hover:border-border-strong
+                hover:bg-surface-muted hover:text-primary
                 focus-visible:outline-none focus-visible:ring-2
-                focus-visible:ring-neutral-900
-                dark:border-neutral-700 dark:bg-neutral-800
-                dark:text-neutral-300 dark:hover:bg-neutral-700
-                dark:focus-visible:ring-neutral-200
-                sm:hidden
+                focus-visible:ring-focus sm:hidden
               "
             >
               <X size={14} />
@@ -218,7 +213,7 @@ export default function NotificationHeader({
         </div>
       </div>
 
-      {/* Expandable search */}
+      {/* Expandable search bar */}
       <AnimatePresence initial={false}>
         {searchOpen && onSearchChange && (
           <motion.div
@@ -232,7 +227,7 @@ export default function NotificationHeader({
               <Search
                 size={14}
                 aria-hidden="true"
-                className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-neutral-400"
+                className="pointer-events-none absolute start-3.5 top-1/2 -translate-y-1/2 text-subtle"
               />
 
               <input
@@ -244,13 +239,11 @@ export default function NotificationHeader({
                 aria-label={t("notifSearchAction")}
                 className="
                   min-h-10 w-full rounded-xl border
-                  border-neutral-200 bg-neutral-50 py-2 ps-9 pe-9
-                  text-xs text-neutral-900 placeholder:text-neutral-400
-                  outline-none transition-colors
-                  focus:border-neutral-400 focus:bg-white
-                  dark:border-neutral-700 dark:bg-neutral-800
-                  dark:text-neutral-100 dark:placeholder:text-neutral-500
-                  dark:focus:border-neutral-500 dark:focus:bg-neutral-800
+                  border-border bg-surface-subtle py-2 ps-9 pe-9
+                  text-xs font-medium text-primary placeholder:text-subtle
+                  outline-none transition-all
+                  focus:border-focus focus:bg-surface
+                  focus:ring-3 focus:ring-[var(--focus-ring)]
                 "
               />
 
@@ -259,7 +252,7 @@ export default function NotificationHeader({
                   type="button"
                   aria-label={t("notifClearSearch")}
                   onClick={() => onSearchChange("")}
-                  className="absolute end-2.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-neutral-500 hover:bg-neutral-200 hover:text-neutral-900 dark:hover:bg-neutral-700 dark:hover:text-white"
+                  className="absolute end-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1 text-muted transition-colors hover:bg-surface-muted hover:text-primary"
                 >
                   <X size={13} />
                 </button>
@@ -269,12 +262,12 @@ export default function NotificationHeader({
         )}
       </AnimatePresence>
 
-      {/* Filter tabs */}
+      {/* Segmented Filter Tabs */}
       {onTabChange && (
         <div
           role="tablist"
           aria-label={t("notifTitle")}
-          className="relative z-10 mt-3.5 flex items-center gap-1 rounded-xl border border-neutral-200 bg-neutral-100/80 p-1 dark:border-neutral-700 dark:bg-neutral-800"
+          className="relative z-10 mt-3.5 flex items-center gap-1 rounded-2xl border border-border bg-surface-subtle p-1"
         >
           {tabs.map((tab) => {
             const selected = activeTab === tab.id;
@@ -289,15 +282,14 @@ export default function NotificationHeader({
                 onClick={() => onTabChange(tab.id)}
                 className={`
                   relative flex min-h-8 flex-1 cursor-pointer
-                  items-center justify-center gap-1.5 rounded-lg
-                  px-1.5 text-[10px] font-bold transition-colors
+                  items-center justify-center gap-1.5 rounded-xl
+                  px-2 text-[10.5px] font-bold transition-colors
                   focus-visible:outline-none focus-visible:ring-2
-                  focus-visible:ring-neutral-900
-                  dark:focus-visible:ring-neutral-200
+                  focus-visible:ring-focus
                   ${
                     selected
-                      ? "text-neutral-900 dark:text-neutral-950"
-                      : "text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100"
+                      ? "text-on-action"
+                      : "text-muted hover:text-primary"
                   }
                 `}
               >
@@ -309,7 +301,7 @@ export default function NotificationHeader({
                         ? { duration: 0 }
                         : { type: "spring", stiffness: 420, damping: 32 }
                     }
-                    className="absolute inset-0 rounded-lg bg-white shadow-sm dark:bg-neutral-100"
+                    className="absolute inset-0 rounded-xl bg-action shadow-[0_4px_14px_-4px_var(--focus-ring)]"
                   />
                 )}
 
@@ -319,11 +311,11 @@ export default function NotificationHeader({
                   <span
                     className={`
                       relative z-10 rounded-full px-1.5 py-0.5
-                      font-mono text-[9px] font-semibold
+                      font-mono text-[9px] font-bold leading-none
                       ${
                         selected
-                          ? "bg-neutral-100 text-neutral-700 dark:bg-neutral-200 dark:text-neutral-800"
-                          : "bg-neutral-200/70 text-neutral-500 dark:bg-neutral-700 dark:text-neutral-300"
+                          ? "bg-white/20 text-on-action"
+                          : "bg-surface-muted text-secondary"
                       }
                     `}
                   >
@@ -336,25 +328,32 @@ export default function NotificationHeader({
         </div>
       )}
 
-      {/* Read progress */}
-      <div className="relative z-10 mt-3 flex items-center gap-2">
+      {/* Read progress telemetry */}
+      <div className="relative z-10 mt-3 flex items-center gap-2.5">
         <div
           role="progressbar"
-          aria-label={t("notifReadProgress").replace("{percent}", String(readPercentage))}
+          aria-label={t("notifReadProgress").replace(
+            "{percent}",
+            String(readPercentage),
+          )}
           aria-valuemin={0}
           aria-valuemax={100}
           aria-valuenow={readPercentage}
-          className="h-1 flex-1 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700"
+          className="h-1.5 flex-1 overflow-hidden rounded-full bg-surface-muted"
         >
           <motion.div
             initial={false}
             animate={{ width: `${readPercentage}%` }}
-            transition={{ duration: reduceMotion ? 0 : 0.35 }}
-            className="h-full rounded-full bg-neutral-800 dark:bg-neutral-200"
+            transition={{ duration: reduceMotion ? 0 : 0.4, ease: "easeOut" }}
+            className={`h-full rounded-full ${
+              readPercentage === 100
+                ? "bg-success-bright"
+                : "bg-gradient-to-r from-action to-accent"
+            }`}
           />
         </div>
 
-        <span className="font-mono text-[9px] font-medium text-neutral-500 dark:text-neutral-400">
+        <span className="font-mono text-[9.5px] font-bold text-muted">
           {t("notifReadProgress").replace("{percent}", String(readPercentage))}
         </span>
       </div>

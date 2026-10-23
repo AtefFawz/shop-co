@@ -4,6 +4,7 @@ import api from "../lib/api";
 import Cookies from "js-cookie";
 import toast from "react-hot-toast";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 const useSignup = () => {
   const router = useRouter();
   const [user, setUser] = useState({
@@ -30,7 +31,8 @@ const useSignup = () => {
 
     const formData = new FormData();
     Object.entries(user).forEach(([key, value]) => {
-      if (value !== null && value !== "") formData.append(key, value as any);
+      if (value instanceof File) formData.append(key, value);
+      else if (value !== null && value !== "") formData.append(key, String(value));
     });
 
     try {
@@ -61,12 +63,12 @@ const useSignup = () => {
         router.push("/");
         router.refresh();
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Signup error:", error);
-
+      const details = getApiErrorDetails(error);
       const message =
-        error.response?.data?.message ||
-        error.response?.data?.data ||
+        details.response?.data?.message ||
+        details.response?.data?.data ||
         "An error occurred during signup. Please try again.";
 
       setError(message);

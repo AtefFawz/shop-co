@@ -4,15 +4,10 @@
 import React, { useState, useRef } from "react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
-import {
-  BarChart3,
-  Activity,
-  Sparkles,
-  TrendingUp,
-  Calendar,
-  Eye,
-} from "lucide-react";
+import { BarChart3, Activity, TrendingUp, Calendar, Eye } from "lucide-react";
 
+import type { AdminDashboardStats, WeeklySalesPoint } from "@/types/domain";
+import type { MessageKey } from "@/shared/i18n/messages";
 const DEFAULT_WEEK = [
   { day: "Mon", revenue: 0 },
   { day: "Tue", revenue: 0 },
@@ -23,9 +18,11 @@ const DEFAULT_WEEK = [
   { day: "Sun", revenue: 0 },
 ];
 
-export const RevenueTrendChart = (props: any) => {
+type RevenueTrendChartProps = { stats?: AdminDashboardStats; weeklySales?: WeeklySalesPoint[] };
+
+export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
   const { t, locale, direction } = useLocale();
-  const dayTranslationKeys: Record<string, string> = {
+  const dayTranslationKeys: Record<string, MessageKey> = {
     mon: "dashboardDayMon",
     tue: "dashboardDayTue",
     wed: "dashboardDayWed",
@@ -37,26 +34,26 @@ export const RevenueTrendChart = (props: any) => {
   const formatDay = (day: string) => {
     const normalized = String(day || "").slice(0, 3).toLowerCase();
     const key = dayTranslationKeys[normalized];
-    return key ? t(key as any) : day;
+    return key ? t(key) : day;
   };
   const formatCompactRevenue = (value: number) =>
     new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-EG", {
       notation: "compact",
       maximumFractionDigits: 1,
     }).format(Number.isFinite(value) ? value : 0);
-  const rawWeekly =
+  const rawWeekly: WeeklySalesPoint[] =
     props?.stats?.weeklySales || props?.weeklySales || DEFAULT_WEEK;
 
-  const weeklySalesData =
+  const weeklySalesData: WeeklySalesPoint[] =
     Array.isArray(rawWeekly) && rawWeekly.length > 0 ? rawWeekly : DEFAULT_WEEK;
 
   // Derived Analytics
   const maxRevenue = Math.max(
-    ...weeklySalesData.map((d: any) => Number(d.revenue) || 0),
+    ...weeklySalesData.map((d: WeeklySalesPoint) => Number(d.revenue) || 0),
     1,
   );
   const totalWeeklyRevenue = weeklySalesData.reduce(
-    (acc: number, curr: any) => acc + (Number(curr.revenue) || 0),
+    (acc: number, curr: WeeklySalesPoint) => acc + (Number(curr.revenue) || 0),
     0,
   );
   const avgDailyRevenue = Math.round(
@@ -68,7 +65,7 @@ export const RevenueTrendChart = (props: any) => {
   );
 
   const peakDay = weeklySalesData.reduce(
-    (max: any, curr: any) =>
+    (max: WeeklySalesPoint, curr: WeeklySalesPoint) =>
       (Number(curr.revenue) || 0) > (Number(max.revenue) || 0) ? curr : max,
     weeklySalesData[0] || { day: "—", revenue: 0 },
   );
@@ -77,7 +74,7 @@ export const RevenueTrendChart = (props: any) => {
   const [chartMode, setChartMode] = useState<"3d-bars" | "area-wave">(
     "3d-bars",
   );
-  const [selectedDay, setSelectedDay] = useState<any | null>(null);
+  const [selectedDay, setSelectedDay] = useState<WeeklySalesPoint | null>(null);
   const [showAvgLine, setShowAvgLine] = useState(true);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
   const stageRef = useRef<HTMLDivElement>(null);
@@ -104,7 +101,7 @@ export const RevenueTrendChart = (props: any) => {
   };
 
   // Build SVG Coordinates for Area Wave Mode
-  const svgPoints = weeklySalesData.map((d: any, idx: number) => {
+  const svgPoints = weeklySalesData.map((d: WeeklySalesPoint, idx: number) => {
     const x =
       weeklySalesData.length > 1
         ? (idx / (weeklySalesData.length - 1)) * 560 + 20
@@ -264,7 +261,7 @@ export const RevenueTrendChart = (props: any) => {
             /* MODE A: 3D VOLUMETRIC COLUMNS                                  */
             /* -------------------------------------------------------------- */
             <div className="relative z-10 flex h-full w-full items-end justify-between gap-1 sm:gap-5">
-              {weeklySalesData.map((bar: any) => {
+              {weeklySalesData.map((bar: WeeklySalesPoint) => {
                 const rev = Number(bar.revenue) || 0;
                 const percentage = Math.round((rev / maxRevenue) * 100);
                 const barHeight =
@@ -383,7 +380,7 @@ export const RevenueTrendChart = (props: any) => {
               </svg>
 
               <div className="flex justify-between px-2 pt-2">
-                {weeklySalesData.map((d: any) => (
+                {weeklySalesData.map((d: WeeklySalesPoint) => (
                   <span
                     key={d.day}
                     onMouseEnter={() => setSelectedDay(d)}

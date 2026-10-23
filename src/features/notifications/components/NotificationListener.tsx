@@ -21,52 +21,79 @@ import {
 } from "@/store/notificationStore";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-function getToastVisuals(title = "", message = "", t: (key: import("@/shared/i18n/messages").MessageKey) => string) {
+function getToastVisuals(
+  title = "",
+  message = "",
+  t: (key: import("@/shared/i18n/messages").MessageKey) => string,
+) {
   const content = `${title} ${message}`.toLocaleLowerCase();
 
   if (
-    ["ship", "deliver", "transit", "courier", "شحن", "توصيل", "وصل", "مندوب"].some((word) =>
-      content.includes(word),
-    )
+    [
+      "ship",
+      "deliver",
+      "transit",
+      "on the way",
+      "courier",
+      "شحن",
+      "توصيل",
+      "وصل",
+      "مندوب",
+    ].some((word) => content.includes(word))
   ) {
     return {
       Icon: Truck,
       label: t("notifShippingCategory"),
-      iconStyle: "bg-sky-100 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300",
+      iconStyle: "border border-info-border bg-info-soft text-info",
     };
   }
 
   if (
-    ["cancel", "fail", "alert", "refund", "issue", "إلغاء", "فشل", "تنبيه", "استرداد", "مشكلة"].some((word) =>
-      content.includes(word),
-    )
+    [
+      "cancel",
+      "fail",
+      "alert",
+      "refund",
+      "issue",
+      "إلغاء",
+      "فشل",
+      "تنبيه",
+      "استرداد",
+      "مشكلة",
+    ].some((word) => content.includes(word))
   ) {
     return {
       Icon: AlertTriangle,
       label: t("notifAttentionCategory"),
-      iconStyle:
-        "bg-rose-100 text-rose-700 dark:bg-rose-400/15 dark:text-rose-300",
+      iconStyle: "border border-danger-border bg-danger-soft text-danger",
     };
   }
 
   if (
-    ["confirm", "complete", "success", "paid", "تأكيد", "تم بنجاح", "دفع", "مؤكد"].some((word) =>
-      content.includes(word),
-    )
+    [
+      "confirm",
+      "complete",
+      "success",
+      "paid",
+      "verified",
+      "تأكيد",
+      "تم بنجاح",
+      "دفع",
+      "موثق",
+      "مؤكد",
+    ].some((word) => content.includes(word))
   ) {
     return {
       Icon: CheckCircle2,
       label: t("notifOrderConfirmed"),
-      iconStyle:
-        "bg-emerald-100 text-emerald-700 dark:bg-emerald-400/15 dark:text-emerald-300",
+      iconStyle: "border border-success-border bg-success-soft text-success",
     };
   }
 
   return {
     Icon: Bell,
     label: t("notifNew"),
-    iconStyle:
-      "bg-neutral-100 text-neutral-800 dark:bg-neutral-700 dark:text-neutral-100",
+    iconStyle: "border border-border bg-brand-soft text-accent",
   };
 }
 
@@ -108,10 +135,10 @@ export default function NotificationListener() {
 
       toast.custom(
         (toastItem) => (
-            <motion.div
+          <motion.div
             role="status"
             aria-live="polite"
-              dir={locale === "ar" ? "rtl" : "ltr"}
+            dir={locale === "ar" ? "rtl" : "ltr"}
             initial={{ opacity: 0, y: 12, scale: 0.98 }}
             animate={{
               opacity: toastItem.visible ? 1 : 0,
@@ -256,7 +283,7 @@ export default function NotificationListener() {
 
       // Socket connection lifecycle remains managed by the shared socket layer.
     };
-  }, [handleIncomingNotification]);
+  }, [handleIncomingNotification, t]);
 
   return null;
 }

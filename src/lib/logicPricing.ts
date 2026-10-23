@@ -14,7 +14,9 @@ const calculateFinalPrice = (
   return price * qty;
 };
 
-const calculateTotalPrice = (items: any[]) => {
+interface PricedItem { price: number; count: number }
+
+const calculateTotalPrice = (items: PricedItem[]) => {
   const subtotal = items.reduce(
     (acc, item) => acc + item.price * item.count,
     0,

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import api from "@/lib/api";
 
+import { getApiErrorDetails } from "@/lib/errorUtils";
 export type ResetStep = 1 | 2 | 3;
 
 export const useForgetPassword = () => {
@@ -71,10 +72,11 @@ export const useForgetPassword = () => {
         });
         router.push("/auth/signin");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
+      const details = getApiErrorDetails(err);
       const backendError =
-        err.response?.data?.errorText ||
-        err.response?.data?.message ||
+        details.response?.data?.errorText ||
+        details.response?.data?.message ||
         "Something went wrong, please try again.";
 
       setError(backendError);

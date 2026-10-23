@@ -101,7 +101,6 @@ export function useThemePalette(): ResolvedThemePalette {
     // The theme class is set synchronously by ThemeProvider before this effect.
     setPalette(readPalette());
     // readPalette only reads the current CSS custom properties.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [theme]);
 
   return palette;

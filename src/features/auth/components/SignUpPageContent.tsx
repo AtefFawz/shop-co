@@ -3,14 +3,7 @@
 import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowLeft,
-  Sparkles,
-  Crown,
-  CheckCircle2,
-  ArrowUpRight,
-  ShieldCheck,
-} from "lucide-react";
+import { ArrowLeft, Sparkles, Crown, CheckCircle2, ArrowUpRight } from "lucide-react";
 import Signup from "@/assets/shop/signup.png";
 import { SignUpForm } from "@/features/auth/components/SignUpForm";
 import { useLocale } from "@/shared/i18n/LocaleProvider";

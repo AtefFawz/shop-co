@@ -1,26 +1,14 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  Package,
-  RefreshCw,
-  Search,
-  Sparkles,
-  Clock,
-  CheckCircle2,
-  Truck,
-  ArrowUpDown,
-  Store,
-  ArrowUpRight,
-  Layers,
-  Filter,
-} from "lucide-react";
+import { Package, RefreshCw, Search, Sparkles, Clock, CheckCircle2, Truck, ArrowUpDown, Store, ArrowUpRight } from "lucide-react";
 import useData from "@/hooks/getData";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { AdminMobileOrdersList } from "@/features/admin/orders/components/AdminMobileOrdersList";
 import { AdminDesktopOrdersTable } from "@/features/admin/orders/components/AdminDesktopOrdersTable";
 
+import type { AdminOrderRecord } from "@/types/domain";
 export default function AdminOrdersPage() {
   const { t, locale, direction } = useLocale();
   const { loading, data, page, totalPages, goToPage, refetch, total } =
@@ -48,10 +36,8 @@ export default function AdminOrdersPage() {
     refetch();
   };
 
-  const orders: any[] = useMemo(() => {
-    return (
-      (data as unknown as { data?: { orders?: any[] } })?.data?.orders ?? []
-    );
+  const orders: AdminOrderRecord[] = useMemo(() => {
+    return (data as unknown as { data?: { orders?: AdminOrderRecord[] } } | null)?.data?.orders ?? [];
   }, [data]);
 
   // Live Telemetry Calculations from current orders batch
@@ -108,7 +94,7 @@ export default function AdminOrdersPage() {
           .toLowerCase()
           .includes(q);
         const emailMatch = (order.user?.email || "").toLowerCase().includes(q);
-        const itemMatch = (order.orderItems || []).some((it: any) =>
+        const itemMatch = (order.orderItems || []).some((it: AdminOrderRecord["orderItems"][number]) =>
           (it.product?.name || it.name || "").toLowerCase().includes(q),
         );
         return idMatch || nameMatch || emailMatch || itemMatch;
@@ -441,7 +427,7 @@ export default function AdminOrdersPage() {
               />
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 aria-label={t("ordersSortLabel")}
                 className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:bg-surface focus:outline-none"
               >

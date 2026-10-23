@@ -1,5 +1,5 @@
 // @/shared/components/ui/ProductGridSkeleton.tsx
-import React from "react";
+
 
 export const ProductGridSkeleton = () => {
   return (

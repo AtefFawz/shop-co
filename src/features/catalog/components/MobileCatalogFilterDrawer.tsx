@@ -11,6 +11,7 @@ import { ProductSizeFilter } from "@/features/catalog/components/ProductSizeFilt
 import { useFilterStore } from "@/store/filterStore";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import { useState } from "react";
 const CATEGORIES = ["T-SHIRT", "SHIRT", "PANTS", "JEANS"];
 const DRESS_STYLES = ["Casual", "Formal", "Party", "Gym"];
 

@@ -17,8 +17,9 @@ import OrderStatusUpdater from "@/features/admin/orders/components/OrderStatusUp
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+import type { AdminOrderRecord } from "@/types/domain";
 export type DesktopOrderProps = {
-  orders: any[];
+  orders: AdminOrderRecord[];
   page: number;
   totalPages: number;
   total: number;
@@ -81,7 +82,7 @@ export const AdminDesktopOrdersTable = ({
               {orders.map((order) => {
                 const shortId = (order._id || "").slice(-6).toUpperCase();
                 const isExpanded = expandedOrderId === order._id;
-                const itemsList: any[] = order.orderItems || [];
+                const itemsList: AdminOrderRecord["orderItems"] = order.orderItems || [];
                 const totalUnits = itemsList.reduce(
                   (acc, it) => acc + (Number(it.quantity || it.qty) || 1),
                   0,
@@ -163,7 +164,7 @@ export const AdminDesktopOrdersTable = ({
                           >
                             {itemsList
                               .slice(0, 4)
-                              .map((item: any, idx: number) => (
+                              .map((item: AdminOrderRecord["orderItems"][number], idx: number) => (
                                 <img
                                   key={idx}
                                   src={getItemImageUrl(item.image)}
@@ -261,7 +262,7 @@ export const AdminDesktopOrdersTable = ({
 
                             {/* Manifest Items Grid */}
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                              {itemsList.map((item: any, idx: number) => {
+                              {itemsList.map((item: AdminOrderRecord["orderItems"][number], idx: number) => {
                                 const qty =
                                   Number(item.quantity || item.qty) || 1;
                                 const unitPrice =

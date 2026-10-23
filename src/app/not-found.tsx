@@ -4,16 +4,7 @@
 import React, { useState, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  Sparkles,
-  ArrowUpRight,
-  Compass,
-  ShoppingBag,
-  Search,
-  ArrowLeft,
-  Tag,
-  Layers,
-} from "lucide-react";
+import { ArrowUpRight, Compass, ShoppingBag, Search, ArrowLeft, Tag } from "lucide-react";
 
 const QUICK_DESTINATIONS = [
   { label: "New Arrivals", href: "/shop" },

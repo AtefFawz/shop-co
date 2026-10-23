@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
-import { ShoppingBag, ShieldCheck, Sparkles, Truck } from "lucide-react";
-import { Product } from "@/types";
+
+import { ShoppingBag, ShieldCheck } from "lucide-react";
+import type { Product } from "@/types";
 import { calculateFinalPrice } from "@/lib/logicPricing";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";

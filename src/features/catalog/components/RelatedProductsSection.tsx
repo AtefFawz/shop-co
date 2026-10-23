@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { Sparkles, ArrowUpRight } from "lucide-react";
 import { Product } from "@/types";
@@ -10,6 +10,8 @@ import useData from "@/hooks/getData";
 import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
+const EMPTY_PRODUCTS: Product[] = [];
+
 export const RelatedProductsSection = ({
   productItem,
 }: {
@@ -17,7 +19,7 @@ export const RelatedProductsSection = ({
 }) => {
   const { t, direction } = useLocale();
   const { data, loading } = useData("/product");
-  const allProducts: Product[] = data?.data?.Products ?? [];
+  const allProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
 
   // Exclude current product & smartly fallback to general products if section has < 4 matches
   const recommendations = useMemo(() => {

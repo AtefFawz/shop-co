@@ -90,7 +90,7 @@ export default function DesktopStorefrontNavbar() {
       // Keep the full navigation for wide screens. At tablet widths its
       // fixed-width groups compete with the search field and were clipping
       // the action icons, so the compact navigation is used until xl.
-      className="hidden xl:block w-full sticky top-0 z-50 xl:py-3"
+      className="hidden xl:block w-full sticky top-0 z-50 "
     >
       <header className="mx-auto flex w-full max-w-full items-center justify-between gap-2 lg:gap-5 xl:gap-8 px-2 py-3">
         <div className="flex items-center gap-2.5 lg:gap-6 xl:gap-10 shrink-0">
@@ -137,13 +137,15 @@ export default function DesktopStorefrontNavbar() {
                     >
                       <Link
                         href={item.path}
-                        className={`relative px-2 py-1.5 lg:px-3 lg:py-2 text-[12.5px] lg:text-[16px] xl:text-[18px] font-bold whitespace-nowrap transition-colors duration-200 rounded-lg ${
+                        className={`relative px-2 py-1.5 2xl:px-3 2xl:py-2 text-[12px] xl:text-[13px] 2xl:text-[14px] font-semibold whitespace-nowrap transition-colors duration-200 rounded-lg ${
                           isActive
                             ? "text-primary"
                             : "text-muted hover:text-primary hover:bg-surface-muted/60"
                         }`}
                       >
-                        <span className="relative z-10">{navLabel(item.path)}</span>
+                        <span className="relative z-10">
+                          {navLabel(item.path)}
+                        </span>
 
                         {isActive && (
                           <motion.span

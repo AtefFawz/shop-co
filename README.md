@@ -8,7 +8,10 @@ A responsive fashion e-commerce frontend built with **Next.js App Router**, **Re
 - Light and dark appearance modes with animated icon transitions, saved preference, and system-preference support.
 - Shared, coordinated light/dark design tokens with accessible focus and semantic color states.
 - Arabic-first interface with a persistent Arabic/English language switch and automatic RTL/LTR direction.
-- Persistent cart with variant-aware line items, plus a saved wishlist accessible from the storefront navigation.
+- Persistent cart with variant-aware line items, stock-aware quantity limits, and a shared cart summary helper.
+- Select individual cart lines for checkout, select/deselect the whole bag, or remove selected lines in one action.
+- A skippable, session-only cinematic intro on the storefront; it respects reduced-motion preferences.
+- Saved wishlist accessible from the storefront navigation.
 - Standardized Egyptian pound (EGP) formatting across the main shopping, checkout, account, and order flows.
 - Mobile navigation and search rendered through portals so they are not trapped by parent stacking contexts.
 - Responsive motion and support for `prefers-reduced-motion`.
@@ -60,7 +63,7 @@ Customer-facing price formatting uses `Intl.NumberFormat` through `src/lib/forma
 
 The appearance toggle is available in the desktop storefront header, mobile navigation drawer, and admin navigation. The selected theme is saved under the `shopco-theme` local-storage key. When there is no saved selection, the app follows the operating-system appearance preference. The initial theme class is applied before hydration to reduce flash on page load.
 
-The shared theme implementation lives in `src/shared/theme/` and the design tokens plus legacy utility mappings are in `src/app/globals.css`.
+The shared theme implementation lives in `src/shared/theme/` and the design tokens plus legacy utility mappings are in `src/app/globals.css`. The refreshed palette pairs warm ivory/ink surfaces in light mode with deep green-charcoal surfaces in dark mode and a sage accent. Shared page containers are capped at 1600px for more controlled widescreen layouts; section spacing is owned by each page instead of an implicit global `section` rule.
 
 ## Project structure
 

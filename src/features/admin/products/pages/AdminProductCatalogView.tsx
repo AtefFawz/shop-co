@@ -9,11 +9,12 @@ import Pagination from "@/shared/components/navigation/LinkPagination";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 
+import type { Product } from "@/types";
 type CatalogPagination = { page: number; totalPages: number; total: number };
 type CatalogViewProps = {
   page: number;
   totalCount: number;
-  productList: any[];
+  productList: Product[];
   pagination: CatalogPagination;
   onSaleCount: number;
   lowStockCount: number;

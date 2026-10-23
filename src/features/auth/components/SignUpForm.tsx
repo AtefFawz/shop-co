@@ -1,20 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import {
-  User,
-  Mail,
-  Lock,
-  ArrowRight,
-  AlertCircle,
-  ImagePlus,
-  Eye,
-  EyeOff,
-  CheckCircle2,
-  Camera,
-  Sparkles,
-  ShieldCheck,
-} from "lucide-react";
+import { User, Mail, Lock, ArrowRight, AlertCircle, ImagePlus, Eye, EyeOff, CheckCircle2, Camera } from "lucide-react";
 import { useSignup } from "@/hooks/signup";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
@@ -26,7 +13,8 @@ const SignUpForm = () => {
   const [focusedField, setFocusedField] = useState<string | null>(null);
   const [avatarPreviewUrl, setAvatarPreviewUrl] = useState<string | null>(null);
 
-  // Generate instant live preview URL when user selects a photo
+  // Generate the preview from the form model and revoke temporary object URLs.
+  /* eslint-disable react-hooks/set-state-in-effect -- This effect synchronizes a local preview with the selected File/URL and must clean up object URLs. */
   useEffect(() => {
     if (!user?.avatar) {
       setAvatarPreviewUrl(null);
@@ -42,6 +30,7 @@ const SignUpForm = () => {
       return () => URL.revokeObjectURL(objectUrl);
     }
   }, [user?.avatar]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Live validation checks
   const isNameValid = (user?.fullName || "").trim().length >= 3;

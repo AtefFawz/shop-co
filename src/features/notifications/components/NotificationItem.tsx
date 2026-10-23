@@ -8,7 +8,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Sparkles,
-  ArrowUpRight,
   Clock,
   Check,
   Copy,
@@ -30,12 +29,14 @@ function formatRelativeTime(dateValue: string | Date, locale: "ar" | "en") {
   const date = new Date(dateValue);
   const now = new Date();
   const diffSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
-  const formatter = new Intl.RelativeTimeFormat(locale === "ar" ? "ar-EG" : "en", {
-    numeric: "auto",
-  });
+  const formatter = new Intl.RelativeTimeFormat(
+    locale === "ar" ? "ar-EG" : "en",
+    { numeric: "auto" },
+  );
 
-  if (Number.isNaN(diffSeconds)) return formatter.format(0, "second");
-  if (diffSeconds < 60) return formatter.format(0, "second");
+  if (Number.isNaN(diffSeconds) || diffSeconds < 60) {
+    return formatter.format(0, "second");
+  }
 
   const minutes = Math.floor(diffSeconds / 60);
   if (minutes < 60) return formatter.format(-minutes, "minute");
@@ -60,62 +61,91 @@ function getNotificationVisuals(
   const text = `${title} ${message}`.toLocaleLowerCase();
 
   if (
-    ["deliver", "ship", "transit", "on the way", "courier", "شحن", "توصيل", "وصل", "مندوب"].some((word) =>
-      text.includes(word),
-    )
+    [
+      "deliver",
+      "ship",
+      "transit",
+      "on the way",
+      "courier",
+      "شحن",
+      "توصيل",
+      "وصل",
+      "مندوب",
+    ].some((word) => text.includes(word))
   ) {
     return {
       Icon: Truck,
       category: t("notifShippingCategory"),
-      iconStyle:
-        "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-400/25 dark:bg-sky-400/10 dark:text-sky-300",
+      iconStyle: "border-info-border bg-info-soft text-info",
     };
   }
 
   if (
-    ["complete", "success", "confirm", "paid", "verified", "تأكيد", "تم بنجاح", "دفع", "موثق", "مؤكد"].some((word) =>
-      text.includes(word),
-    )
+    [
+      "complete",
+      "success",
+      "confirm",
+      "paid",
+      "verified",
+      "تأكيد",
+      "تم بنجاح",
+      "دفع",
+      "موثق",
+      "مؤكد",
+    ].some((word) => text.includes(word))
   ) {
     return {
       Icon: CheckCircle2,
       category: t("notifConfirmedCategory"),
-      iconStyle:
-        "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-300",
+      iconStyle: "border-success-border bg-success-soft text-success",
     };
   }
 
   if (
-    ["cancel", "fail", "alert", "issue", "refund", "إلغاء", "فشل", "تنبيه", "استرداد", "مشكلة"].some((word) =>
-      text.includes(word),
-    )
+    [
+      "cancel",
+      "fail",
+      "alert",
+      "issue",
+      "refund",
+      "إلغاء",
+      "فشل",
+      "تنبيه",
+      "استرداد",
+      "مشكلة",
+    ].some((word) => text.includes(word))
   ) {
     return {
       Icon: AlertTriangle,
       category: t("notifAttentionCategory"),
-      iconStyle:
-        "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-400/25 dark:bg-rose-400/10 dark:text-rose-300",
+      iconStyle: "border-danger-border bg-danger-soft text-danger",
     };
   }
 
   if (
-    ["offer", "welcome", "promo", "discount", "drop", "عرض", "ترحيب", "خصم", "مجموعة"].some((word) =>
-      text.includes(word),
-    )
+    [
+      "offer",
+      "welcome",
+      "promo",
+      "discount",
+      "drop",
+      "عرض",
+      "ترحيب",
+      "خصم",
+      "مجموعة",
+    ].some((word) => text.includes(word))
   ) {
     return {
       Icon: Sparkles,
       category: t("notifOfferCategory"),
-      iconStyle:
-        "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-300",
+      iconStyle: "border-warning-border bg-warning-soft text-warning",
     };
   }
 
   return {
     Icon: Package,
     category: t("notifOrderCategory"),
-    iconStyle:
-      "border-neutral-200 bg-neutral-100 text-neutral-800 dark:border-neutral-600 dark:bg-neutral-800 dark:text-neutral-100",
+    iconStyle: "border-border-strong/60 bg-brand-soft text-accent",
   };
 }
 
@@ -140,7 +170,11 @@ export function NotificationItem({
   const isUnread = !notification.read;
   const message = notification.message || "";
   const title = notification.title || t("notifTitle");
-  const { Icon, category, iconStyle } = getNotificationVisuals(title, message, t);
+  const { Icon, category, iconStyle } = getNotificationVisuals(
+    title,
+    message,
+    t,
+  );
 
   const isLongMessage = message.length > 100;
   const orderId = notification.order ? String(notification.order) : "";
@@ -184,20 +218,22 @@ export function NotificationItem({
 
   return (
     <article
+      data-theme-surface
       className={`
-        group relative mx-2 my-1.5 overflow-hidden rounded-2xl border
-        transition-colors duration-200
+        group relative overflow-hidden rounded-2xl border
+        transition-all duration-200
         ${
           isUnread
-            ? "border-neutral-200 bg-white shadow-sm hover:border-neutral-300 dark:border-neutral-700 dark:bg-neutral-800/90 dark:hover:border-neutral-600"
-            : "border-transparent bg-white/60 hover:border-neutral-200 hover:bg-white dark:bg-neutral-800/45 dark:hover:border-neutral-700 dark:hover:bg-neutral-800"
+            ? "border-border-strong/75 bg-surface-raised shadow-[var(--shadow-soft)] hover:border-focus/60"
+            : "border-border-subtle bg-surface/75 hover:border-border hover:bg-surface-raised"
         }
       `}
     >
+      {/* Active Sapphire Unread Indicator Bar */}
       {isUnread && (
         <span
           aria-hidden="true"
-          className="absolute inset-y-3 start-0 w-[3px] rounded-s-full bg-neutral-900 dark:bg-neutral-200"
+          className="absolute inset-y-3 start-0 w-1 rounded-e-full bg-accent shadow-[0_0_12px_var(--focus-ring)]"
         />
       )}
 
@@ -207,11 +243,10 @@ export function NotificationItem({
         onClick={onClick}
         aria-label={`${t("notifTitle")}: ${title}`}
         className="
-          flex w-full cursor-pointer items-start gap-3 px-3.5 pb-1 pt-3.5
+          flex w-full cursor-pointer items-start gap-3 px-3.5 pb-1.5 pt-3.5
           text-start outline-none
           focus-visible:ring-2 focus-visible:ring-inset
-          focus-visible:ring-neutral-900
-          dark:focus-visible:ring-neutral-200
+          focus-visible:ring-focus
           sm:gap-3.5
         "
       >
@@ -220,7 +255,7 @@ export function NotificationItem({
           className={`
             mt-0.5 flex h-10 w-10 shrink-0 items-center
             justify-center rounded-xl border transition-transform
-            duration-200 group-hover:scale-[1.03]
+            duration-200 group-hover:scale-105
             ${iconStyle}
           `}
         >
@@ -229,13 +264,15 @@ export function NotificationItem({
 
         <span className="min-w-0 flex-1">
           <span className="flex items-center justify-between gap-2">
-            <span className="truncate text-[9px] font-bold uppercase tracking-[0.12em] text-neutral-500 dark:text-neutral-400">
+            <span className="truncate text-[9.5px] font-extrabold uppercase tracking-[0.12em] text-muted">
               {category}
             </span>
 
             <span
-              title={new Date(notification.createdAt).toLocaleString(locale === "ar" ? "ar-EG" : "en-US")}
-              className="inline-flex shrink-0 items-center gap-1 text-[9px] font-medium text-neutral-500 dark:text-neutral-400"
+              title={new Date(notification.createdAt).toLocaleString(
+                locale === "ar" ? "ar-EG" : "en-US",
+              )}
+              className="inline-flex shrink-0 items-center gap-1 font-mono text-[9.5px] font-medium text-subtle"
             >
               <Clock size={10} />
               {formatRelativeTime(notification.createdAt, locale)}
@@ -247,8 +284,8 @@ export function NotificationItem({
               mt-1 block truncate text-xs tracking-tight sm:text-[13px]
               ${
                 isUnread
-                  ? "font-bold text-neutral-950 dark:text-neutral-50"
-                  : "font-semibold text-neutral-700 dark:text-neutral-200"
+                  ? "font-extrabold text-primary"
+                  : "font-semibold text-secondary"
               }
             `}
           >
@@ -257,13 +294,9 @@ export function NotificationItem({
 
           <span
             className={`
-              mt-1 block text-[11px] leading-[1.65] sm:text-xs
+              mt-1 block text-[11.5px] leading-[1.65] sm:text-xs
               ${expanded ? "whitespace-pre-line break-words" : "line-clamp-2"}
-              ${
-                isUnread
-                  ? "text-neutral-700 dark:text-neutral-300"
-                  : "text-neutral-600 dark:text-neutral-400"
-              }
+              ${isUnread ? "text-secondary" : "text-muted"}
             `}
           >
             {message || t("notifNoDetails")}
@@ -274,24 +307,22 @@ export function NotificationItem({
           <span
             aria-label={t("notifUnreadStatus")}
             title={t("notifUnreadStatus")}
-            className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-rose-600 dark:bg-rose-400"
+            className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_8px_var(--focus-ring)]"
           />
         )}
       </button>
 
-      {/* Secondary actions, separate from the main button */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 pb-3 pt-2.5 ps-[4.35rem]">
+      {/* Secondary actions row */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-3.5 pb-3 pt-2 ps-[4.25rem]">
         <div className="flex min-w-0 flex-wrap items-center gap-1.5">
           {orderId && (
             <>
               <span
                 className="
-                inline-flex items-center gap-1 rounded-lg
-                border border-neutral-200 bg-neutral-50 px-2 py-1
-                font-mono text-[9px] font-semibold text-neutral-700
-                dark:border-neutral-700 dark:bg-neutral-900
-                dark:text-neutral-200
-              "
+                  inline-flex items-center gap-1 rounded-lg
+                  border border-border bg-surface-subtle px-2 py-1
+                  font-mono text-[9.5px] font-bold text-secondary
+                "
               >
                 {t("notifOrderReference").replace("{id}", `#${shortOrderId}`)}
               </span>
@@ -301,26 +332,19 @@ export function NotificationItem({
                 onClick={handleCopyOrder}
                 aria-label={`${t("notifCopyOrderId")} ${shortOrderId}`}
                 title={t("notifCopyOrderId")}
-                className="
+                className={`
                   inline-flex h-6 w-6 cursor-pointer items-center
-                  justify-center rounded-lg border border-neutral-200
-                  bg-white text-neutral-500 transition-colors
-                  hover:bg-neutral-100 hover:text-neutral-900
+                  justify-center rounded-lg border transition-colors
                   focus-visible:outline-none focus-visible:ring-2
-                  focus-visible:ring-neutral-900
-                  dark:border-neutral-700 dark:bg-neutral-800
-                  dark:text-neutral-300 dark:hover:bg-neutral-700
-                  dark:hover:text-white dark:focus-visible:ring-neutral-200
-                "
+                  focus-visible:ring-focus
+                  ${
+                    copiedOrder
+                      ? "border-success-border bg-success-soft text-success"
+                      : "border-border bg-surface text-muted hover:border-border-strong hover:bg-surface-muted hover:text-primary"
+                  }
+                `}
               >
-                {copiedOrder ? (
-                  <Check
-                    size={11}
-                    className="text-emerald-600 dark:text-emerald-400"
-                  />
-                ) : (
-                  <Copy size={11} />
-                )}
+                {copiedOrder ? <Check size={11} /> : <Copy size={11} />}
               </button>
             </>
           )}
@@ -332,13 +356,11 @@ export function NotificationItem({
               aria-expanded={expanded}
               className="
                 inline-flex min-h-6 cursor-pointer items-center gap-1
-                rounded-md px-1.5 text-[9px] font-semibold
-                text-neutral-500 transition-colors
-                hover:bg-neutral-100 hover:text-neutral-900
+                rounded-lg px-2 text-[9.5px] font-bold
+                text-accent transition-colors
+                hover:bg-brand-soft
                 focus-visible:outline-none focus-visible:ring-2
-                focus-visible:ring-neutral-900
-                dark:text-neutral-400 dark:hover:bg-neutral-700
-                dark:hover:text-white dark:focus-visible:ring-neutral-200
+                focus-visible:ring-focus
               "
             >
               <span>{expanded ? t("notifShowLess") : t("notifShowMore")}</span>
@@ -358,16 +380,12 @@ export function NotificationItem({
             onClick={handleMarkAsRead}
             className="
               inline-flex min-h-7 cursor-pointer items-center gap-1.5
-              rounded-lg border border-neutral-200 bg-neutral-50
-              px-2 py-1 text-[9px] font-semibold text-neutral-700
-              transition-colors hover:border-neutral-900
-              hover:bg-neutral-900 hover:text-white
+              rounded-lg border border-border-strong/60 bg-brand-soft
+              px-2.5 py-1 text-[9.5px] font-bold text-accent
+              transition-all hover:border-action
+              hover:bg-action hover:text-on-action
               focus-visible:outline-none focus-visible:ring-2
-              focus-visible:ring-neutral-900
-              dark:border-neutral-700 dark:bg-neutral-900
-              dark:text-neutral-300 dark:hover:border-neutral-200
-              dark:hover:bg-neutral-100 dark:hover:text-neutral-950
-              dark:focus-visible:ring-neutral-200
+              focus-visible:ring-focus active:scale-95
             "
           >
             <Check size={11} />

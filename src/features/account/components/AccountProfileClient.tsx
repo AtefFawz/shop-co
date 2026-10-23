@@ -46,6 +46,7 @@ import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
 import toast from "react-hot-toast";
 
+import type { CustomerOrderRecord, ReviewRecord } from "@/types/domain";
 const NAV = [
   { id: "overview", labelKey: "accountNavHome", icon: Activity },
   { id: "orders", labelKey: "accountNavOrders", icon: Package },
@@ -109,9 +110,18 @@ export function AccountProfileClient() {
       if (saved) {
         const parsed = JSON.parse(saved) as Partial<typeof prefs>;
         setPrefs((current) => ({
-          orderSms: typeof parsed.orderSms === "boolean" ? parsed.orderSms : current.orderSms,
-          dropAlerts: typeof parsed.dropAlerts === "boolean" ? parsed.dropAlerts : current.dropAlerts,
-          privateProfile: typeof parsed.privateProfile === "boolean" ? parsed.privateProfile : current.privateProfile,
+          orderSms:
+            typeof parsed.orderSms === "boolean"
+              ? parsed.orderSms
+              : current.orderSms,
+          dropAlerts:
+            typeof parsed.dropAlerts === "boolean"
+              ? parsed.dropAlerts
+              : current.dropAlerts,
+          privateProfile:
+            typeof parsed.privateProfile === "boolean"
+              ? parsed.privateProfile
+              : current.privateProfile,
         }));
       }
     } catch {
@@ -124,7 +134,10 @@ export function AccountProfileClient() {
   useEffect(() => {
     if (!prefsLoaded) return;
     try {
-      window.localStorage.setItem("shopco-profile-prefs", JSON.stringify(prefs));
+      window.localStorage.setItem(
+        "shopco-profile-prefs",
+        JSON.stringify(prefs),
+      );
     } catch {
       // Preferences remain interactive for the current session if storage is unavailable.
     }
@@ -146,8 +159,10 @@ export function AccountProfileClient() {
     )
   `;
 
-  const orders: any[] = orderData?.data?.orders || [];
-  const reviews: any[] = reviewData?.data?.reviews || [];
+  const orders: CustomerOrderRecord[] = (orderData?.data?.orders ||
+    []) as CustomerOrderRecord[];
+  const reviews: ReviewRecord[] = (reviewData?.data?.reviews ||
+    []) as ReviewRecord[];
 
   // Safely calculate total expenses BEFORE any early return
   const computedExpenses = useMemo(() => {
@@ -155,7 +170,8 @@ export function AccountProfileClient() {
     if (typeof apiExpenses === "number") return apiExpenses;
     const rawOrders = orderData?.data?.orders || [];
     return rawOrders.reduce(
-      (sum: number, o: any) => sum + (Number(o?.totalPrice) || 0),
+      (sum: number, o: CustomerOrderRecord) =>
+        sum + (Number(o?.totalPrice) || 0),
       0,
     );
   }, [orderData]);
@@ -192,7 +208,7 @@ export function AccountProfileClient() {
   }
 
   // ── 4. DERIVED USER & TELEMETRY DATA ──
-  const user = userData?.data?.user || userData?.user || {};
+  const user: any = userData?.data?.user || userData?.user || {};
   const {
     fullName = t("accountDefaultUser"),
     email = userData?.data?.email || "",
@@ -233,11 +249,12 @@ export function AccountProfileClient() {
 
   const normalizedRole = String(role || "USER").toUpperCase();
   const checkRole = normalizedRole === "ADMIN" || normalizedRole === "MANAGER";
-  const roleLabel = normalizedRole === "ADMIN"
-    ? t("accountRoleAdmin")
-    : normalizedRole === "MANAGER"
-      ? t("accountRoleManager")
-      : t("accountRoleCustomer");
+  const roleLabel =
+    normalizedRole === "ADMIN"
+      ? t("accountRoleAdmin")
+      : normalizedRole === "MANAGER"
+        ? t("accountRoleManager")
+        : t("accountRoleCustomer");
   const membershipTier = checkRole
     ? t("accountExecutiveAdminTier")
     : totalOrdersCount >= 5
@@ -306,13 +323,24 @@ export function AccountProfileClient() {
     mainScrollRef.current?.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const currentMeta = TAB_META[active as keyof typeof TAB_META] || TAB_META.overview;
+  const currentMeta =
+    TAB_META[active as keyof typeof TAB_META] || TAB_META.overview;
 
   return (
-    <div dir={direction} className="fixed inset-0 z-40 flex h-screen h-dvh w-full overflow-hidden bg-surface-subtle text-primary antialiased selection:bg-action selection:text-on-action">
+    <div
+      dir={direction}
+      className="fixed inset-0 z-40 flex h-screen h-dvh w-full overflow-hidden bg-surface-subtle text-primary antialiased selection:bg-action selection:text-on-action"
+    >
       {/* ── 1. MOBILE ONLY: Bottom Floating Navigation ── */}
-      <div className={`fixed bottom-4 start-1/2 z-50 block w-[94%] max-w-md lg:hidden ${direction === "rtl" ? "translate-x-1/2" : "-translate-x-1/2"}`}>
-        <MobileAdminNavigation arrayOfData={NAV_LINKS} active={active} goTo={goTo} showAppearanceControls />
+      <div
+        className={`fixed bottom-4 start-1/2 z-50 block w-[94%] max-w-md lg:hidden ${direction === "rtl" ? "translate-x-1/2" : "-translate-x-1/2"}`}
+      >
+        <MobileAdminNavigation
+          arrayOfData={NAV_LINKS}
+          active={active}
+          goTo={goTo}
+          showAppearanceControls
+        />
       </div>
 
       {/* ── 2. DESKTOP SIDEBAR ── */}
@@ -376,7 +404,10 @@ export function AccountProfileClient() {
         }
         collapsedFooterLinks={
           <div className="flex flex-col items-center gap-2">
-            <LocaleSwitcher compact className="h-10 w-10 px-0 [&>span]:hidden" />
+            <LocaleSwitcher
+              compact
+              className="h-10 w-10 px-0 [&>span]:hidden"
+            />
             <ThemeToggle compact className="h-10 w-10" />
             <Link
               href="/"
@@ -729,7 +760,9 @@ export function AccountProfileClient() {
                         {t("uiShopCoPass")}
                       </p>
                       <h3 className="mt-1.5 text-lg font-black uppercase tracking-tight text-primary">
-                        {checkRole ? t("accountAdminCommandTitle") : t("accountMemberPrivilegesTitle")}
+                        {checkRole
+                          ? t("accountAdminCommandTitle")
+                          : t("accountMemberPrivilegesTitle")}
                       </h3>
                     </div>
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-action text-on-action shadow-md">
@@ -762,7 +795,10 @@ export function AccountProfileClient() {
                       >
                         <UserCog size={14} />
                         <span>{t("accountOpenCommandCenter")}</span>
-                        <ArrowUpRight size={13} className={`ms-1 opacity-60 ${direction === "rtl" ? "-scale-x-100" : ""}`} />
+                        <ArrowUpRight
+                          size={13}
+                          className={`ms-1 opacity-60 ${direction === "rtl" ? "-scale-x-100" : ""}`}
+                        />
                       </button>
                     ) : (
                       <Link
@@ -771,7 +807,10 @@ export function AccountProfileClient() {
                       >
                         <Store size={14} />
                         <span>{t("accountExploreArchive")}</span>
-                        <ArrowUpRight size={13} className={`ms-1 opacity-60 ${direction === "rtl" ? "-scale-x-100" : ""}`} />
+                        <ArrowUpRight
+                          size={13}
+                          className={`ms-1 opacity-60 ${direction === "rtl" ? "-scale-x-100" : ""}`}
+                        />
                       </Link>
                     )}
                   </div>
@@ -789,8 +828,8 @@ export function AccountProfileClient() {
                 >
                   {active === "overview" && (
                     <OverviewContent
-                      orders={orders as any}
-                      reviews={reviews as any}
+                      orders={orders}
+                      reviews={reviews}
                       pagination={pagination}
                       onRefresh={handleRefresh}
                       goTo={goTo}
@@ -914,9 +953,15 @@ export function AccountProfileClient() {
                                   aria-checked={isOn}
                                   aria-label={item.title}
                                   onKeyDown={(event) => {
-                                    if (event.key === "Enter" || event.key === " ") {
+                                    if (
+                                      event.key === "Enter" ||
+                                      event.key === " "
+                                    ) {
                                       event.preventDefault();
-                                      setPrefs((current) => ({ ...current, [item.key]: !current[item.key] }));
+                                      setPrefs((current) => ({
+                                        ...current,
+                                        [item.key]: !current[item.key],
+                                      }));
                                     }
                                   }}
                                   onClick={() =>
@@ -960,7 +1005,8 @@ export function AccountProfileClient() {
 
                         <div className="mt-6 flex items-center justify-between rounded-2xl bg-success-soft px-4 py-3 text-[11px] font-bold text-success">
                           <span className="inline-flex items-center gap-1.5">
-                            <CheckCircle2 size={14} /> {t("accountSessionEncryptedActive")}
+                            <CheckCircle2 size={14} />{" "}
+                            {t("accountSessionEncryptedActive")}
                           </span>
                           <span className="font-mono text-[10px] uppercase">
                             TLS 1.3

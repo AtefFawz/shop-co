@@ -12,23 +12,9 @@ import {
   useTransform,
   useMotionTemplate,
 } from "framer-motion";
-import {
-  ArrowUpRight,
-  MoveUpRight,
-  Sparkles,
-  Star,
-  ShieldCheck,
-  Flame,
-  Layers,
-  Plus,
-  ShoppingBag,
-  CheckCircle2,
-} from "lucide-react";
+import { ArrowUpRight, MoveUpRight, Sparkles, Star, ShieldCheck, Flame, Plus, ShoppingBag, CheckCircle2 } from "lucide-react";
 
-import {
-  storefrontHeroContent,
-  storefrontStats,
-} from "@/features/home/data/storefrontContent";
+import { storefrontStats } from "@/features/home/data/storefrontContent";
 import {
   DYNAMIC_WORDS,
   EASE_OUT_EXPO,

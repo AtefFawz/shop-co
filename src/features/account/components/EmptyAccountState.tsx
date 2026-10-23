@@ -1,4 +1,4 @@
-import React from "react";
+
 import Link from "next/link";
 import { Package, Sparkles, ArrowUpRight } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";

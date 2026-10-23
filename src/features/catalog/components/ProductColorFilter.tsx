@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import { ChevronDown, Check } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import type { MessageKey } from "@/shared/i18n/messages";

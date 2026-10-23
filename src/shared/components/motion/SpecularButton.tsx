@@ -8,6 +8,7 @@ import {
 import { Renderer, Program, Mesh, Triangle, Color } from "ogl";
 import { useThemePalette } from "@/shared/theme/useThemePalette";
 
+
 type ButtonSize = "sm" | "md" | "lg";
 
 export interface SpecularButtonProps {
@@ -151,10 +152,24 @@ const SpecularButton = ({
   const fxRef = useRef<HTMLSpanElement>(null);
   const propsRef = useRef<ShaderProps>({} as ShaderProps);
 
-  propsRef.current = {
+  useEffect(() => {
+    propsRef.current = {
+      radius,
+      lineColor: resolvedLineColor,
+      baseColor: resolvedBaseColor,
+      intensity,
+      shineSize,
+      shineFade,
+      thickness,
+      speed,
+      followMouse,
+      proximity,
+      autoAnimate,
+    };
+  }, [
     radius,
-    lineColor: resolvedLineColor,
-    baseColor: resolvedBaseColor,
+    resolvedLineColor,
+    resolvedBaseColor,
     intensity,
     shineSize,
     shineFade,
@@ -163,7 +178,7 @@ const SpecularButton = ({
     followMouse,
     proximity,
     autoAnimate,
-  };
+  ]);
 
   useEffect(() => {
     const btn = btnRef.current;

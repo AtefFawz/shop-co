@@ -9,7 +9,7 @@ import StarRating from "@/shared/components/feedback/StarRating";
 import Pricing from "@/features/catalog/components/ProductPrice";
 import { ProductReviewList } from "@/features/reviews/components/ProductReviewList";
 import { RelatedProductsSection } from "@/features/catalog/components/RelatedProductsSection";
-import Heading from "@/shared/components/ui/SectionHeading";
+
 import ProductDetailsClient from "@/features/catalog/components/ProductDetailsClient";
 import api from "@/lib/api";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
@@ -171,7 +171,7 @@ export default function ProductDetailsPage({
   const reviews = productItem.reviews ?? [];
   const averageRating =
     reviews.length > 0
-      ? reviews.reduce((s: number, r: any) => s + (r.rating || 0), 0) /
+      ? reviews.reduce((sum, review) => sum + (review.rating || 0), 0) /
         reviews.length
       : productItem.ratingsAverage || 0;
 
@@ -179,7 +179,7 @@ export default function ProductDetailsPage({
     imageGallery[activeIdx] || productItem.photo,
   );
 
-  const stock = Number((productItem as any).countInStock ?? 0);
+  const stock = Number(productItem.countInStock ?? 0);
   const isOutOfStock = stock <= 0;
   const isLowStock = stock > 0 && stock <= 5;
   const shortSku = (productItem._id || "").slice(-6).toUpperCase();
@@ -452,9 +452,9 @@ export default function ProductDetailsPage({
                     <span className="rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
                       {productItem.category || t("productAtelierGarment")}
                     </span>
-                    {(productItem as any).style && (
+                    {productItem.style && (
                       <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-secondary">
-                        {(productItem as any).style}
+                        {productItem.style}
                       </span>
                     )}
                   </div>
@@ -610,7 +610,7 @@ export default function ProductDetailsPage({
                     <button
                       key={tab.id}
                       type="button"
-                      onClick={() => setActiveSpecTab(tab.id as any)}
+                      onClick={() => setActiveSpecTab(tab.id as typeof activeSpecTab)}
                       className={`cursor-pointer rounded-lg px-3 py-1 text-[10px] font-black uppercase tracking-wider transition-all ${
                         activeSpecTab === tab.id
                           ? "bg-action text-on-action shadow-2xs"
@@ -699,14 +699,14 @@ export default function ProductDetailsPage({
                 <div className="flex items-center justify-between py-2.5">
                   <span className="font-semibold text-muted">{t("productStyle")}</span>
                   <span className="font-black uppercase text-primary">
-                    {(productItem as any).style || t("productContemporary")}
+                    {productItem.style || t("productContemporary")}
                   </span>
                 </div>
                 <div className="flex items-center justify-between py-2.5">
                   <span className="font-semibold text-muted">{t("productDepartment")}</span>
                   <span className="font-black uppercase text-primary">
                     {productItem.section ||
-                      (productItem as any).gender ||
+                      productItem.gender ||
                       t("productUnisex")}
                   </span>
                 </div>
