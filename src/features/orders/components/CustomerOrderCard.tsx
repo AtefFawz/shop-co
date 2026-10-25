@@ -1,4 +1,5 @@
 "use client";
+import { resolveImageUrl } from "@/lib/imageUrl";
 
 import { useState } from "react";
 import {
@@ -19,12 +20,6 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { getApiErrorDetails } from "@/lib/errorUtils";
 import type { CustomerOrderRecord } from "@/types/domain";
 type Order = CustomerOrderRecord;
-
-const getItemImageUrl = (raw?: string) => {
-  if (!raw) return "https://placehold.co/80x80/111111/FFFFFF?text=SKU";
-  if (raw.startsWith("http")) return raw;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${raw}`;
-};
 
 export default function CustomerOrderCard({
   order,
@@ -177,7 +172,7 @@ export default function CustomerOrderCard({
               className="relative h-13 w-13 shrink-0 overflow-hidden rounded-xl border-2 border-surface bg-surface-muted shadow-2xs transition-transform duration-300 hover:z-10 hover:scale-110 sm:h-15 sm:w-15"
             >
               <img
-                src={getItemImageUrl(item.image)}
+                src={resolveImageUrl(item.image, "https://placehold.co/80x80/111111/FFFFFF?text=SKU")}
                 alt={item.name}
                 className="h-full w-full object-cover"
               />
@@ -283,7 +278,7 @@ export default function CustomerOrderCard({
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-border bg-surface">
                     <img
-                      src={getItemImageUrl(item.image)}
+                      src={resolveImageUrl(item.image, "https://placehold.co/80x80/111111/FFFFFF?text=SKU")}
                       alt={item.name}
                       className="h-full w-full object-cover"
                     />

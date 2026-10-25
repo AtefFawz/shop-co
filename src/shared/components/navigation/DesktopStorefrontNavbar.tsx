@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import SearchBar from "@/features/catalog/components/ProductSearchBar";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { NAV_LINKS } from "@/shared/config/storefrontNavigation";
+import { NAV_LINKS, getStorefrontNavLabel } from "@/shared/config/storefrontNavigation";
 import NavIcons from "@/shared/components/navigation/HeaderActionIcons";
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
@@ -24,13 +24,6 @@ export default function DesktopStorefrontNavbar() {
   const { t } = useLocale();
   const wishlistCount = useWishlistStore((state) => state.items.length);
 
-  const navLabel = (path: string) => {
-    if (path === "/") return t("navHome");
-    if (path === "/selling") return t("navSale");
-    if (path === "/category") return t("navCategory");
-    if (path === "/brand") return t("navBrands");
-    return path;
-  };
 
   const [photo, setPhoto] = useState("");
 
@@ -144,7 +137,7 @@ export default function DesktopStorefrontNavbar() {
                         }`}
                       >
                         <span className="relative z-10">
-                          {navLabel(item.path)}
+                          {getStorefrontNavLabel(item.path, t)}
                         </span>
 
                         {isActive && (

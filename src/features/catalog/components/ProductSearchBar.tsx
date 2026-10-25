@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useRef, useEffect, Suspense } from "react";
+import React, { useState, useRef, useEffect, Suspense, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
   Search,
@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { createCurrencyFormatter } from "@/lib/formatCurrency";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Product } from "@/types";
 
@@ -192,13 +193,12 @@ function ProductSearchBarContent({
     }
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-US", {
-      style: "currency",
-      currency: "EGP",
-      maximumFractionDigits: 0,
-    }).format(Number(price || 0));
-  };
+  const currencyFormatter = useMemo(
+    () => createCurrencyFormatter(locale, 0),
+    [locale],
+  );
+  const formatPrice = (price: number) =>
+    currencyFormatter.format(Number(price || 0));
 
   return (
     <form

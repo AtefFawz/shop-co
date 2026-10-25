@@ -1,4 +1,6 @@
 "use client";
+import SocialAuthButton from "@/features/auth/components/SocialAuthButton";
+
 
 import React, { useRef, useState } from "react";
 import Link from "next/link";
@@ -197,7 +199,7 @@ export default function SignUpPageContent() {
 
           {/* Social OAuth Buttons */}
           <div className="grid grid-cols-1 gap-3">
-            <SocialButton label="Google" onClick={handleGoogleLogin}>
+            <SocialAuthButton label="Google" onClick={handleGoogleLogin}>
               <svg
                 width="16"
                 height="16"
@@ -221,7 +223,7 @@ export default function SignUpPageContent() {
                   fill="#EA4335"
                 />
               </svg>
-            </SocialButton>
+            </SocialAuthButton>
           </div>
 
           {/* Switch to Sign In */}
@@ -243,25 +245,3 @@ export default function SignUpPageContent() {
   );
 }
 
-function SocialButton({
-  label,
-  children,
-  onClick,
-}: {
-  label: string;
-  children: React.ReactNode;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="group flex cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-border/90 bg-surface-subtle py-3 text-xs font-black uppercase tracking-widest text-secondary transition-all duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:bg-surface hover:shadow-sm active:scale-95"
-    >
-      <span className="transition-transform duration-200 group-hover:scale-110">
-        {children}
-      </span>
-      <span>{label}</span>
-    </button>
-  );
-}

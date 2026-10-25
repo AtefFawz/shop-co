@@ -24,17 +24,14 @@ import {
 import RoleSelector from "@/features/admin/users/components/UserRoleSelector";
 import DeleteUserButton from "@/features/admin/users/components/DeleteUserButton";
 import { AdminMetricCard } from "@/features/admin/dashboard/components/AdminMetricCard";
+import { getInitials } from "@/lib/initials";
+import { createCurrencyFormatter } from "@/lib/formatCurrency";
 
 import type { AdminOrderRecord, AdminUserRecord, ReviewRecord } from "@/types/domain";
+import { resolveImageUrl } from "@/lib/imageUrl";
 /* -------------------------------------------------------------------------- */
 /*                                HELPER UTILS                                */
 /* -------------------------------------------------------------------------- */
-
-const getItemImageUrl = (raw?: string) => {
-  if (!raw) return "https://placehold.co/80x80/111111/FFFFFF?text=SKU";
-  if (raw.startsWith("http")) return raw;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${raw}`;
-};
 
 /* -------------------------------------------------------------------------- */
 /*                              MAIN SERVER PAGE                              */
@@ -52,14 +49,7 @@ export default async function AdminUserDetailsPage({
   const t = messages[locale];
   const direction = locale === "ar" ? "rtl" : "ltr";
 
-  const currencyFormatter = new Intl.NumberFormat(
-    locale === "ar" ? "ar-EG" : "en-EG",
-    {
-      style: "currency",
-      currency: "EGP",
-      maximumFractionDigits: 0,
-    },
-  );
+  const currencyFormatter = createCurrencyFormatter(locale, 0);
 
   let user: AdminUserRecord | null = null;
 
@@ -134,16 +124,6 @@ export default async function AdminUserDetailsPage({
     day: "numeric",
     year: "numeric",
   });
-
-  const getInitials = (name?: string) => {
-    if (!name) return "VIP";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  };
 
   const roleUpper = (user.role || "USER").toUpperCase();
   const roleLabel =
@@ -267,7 +247,7 @@ export default async function AdminUserDetailsPage({
                   </div>
                 ) : (
                   <div className="flex h-28 w-28 items-center justify-center rounded-4xl border-4 border-border bg-action font-mono text-3xl font-black text-on-action shadow-lg sm:h-34 sm:w-34">
-                    {getInitials(user.fullName)}
+                    {getInitials(user.fullName, "VIP")}
                   </div>
                 )}
 
@@ -544,7 +524,7 @@ export default async function AdminUserDetailsPage({
                               {items.slice(0, 3).map((it: AdminOrderRecord["orderItems"][number], idx: number) => (
                                 <img
                                   key={idx}
-                                  src={getItemImageUrl(it.image)}
+                                  src={resolveImageUrl(it.image, "https://placehold.co/80x80/111111/FFFFFF?text=SKU")}
                                   alt=""
                                   className="h-10 w-10 rounded-xl border-2 border-surface bg-surface object-cover shadow-2xs"
                                 />

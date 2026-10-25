@@ -1,5 +1,5 @@
 "use client";
-
+import { resolveImageUrl } from "@/lib/imageUrl";
 
 import Link from "next/link";
 import { ShoppingBag, ShieldCheck, ArrowUpRight } from "lucide-react";
@@ -17,12 +17,6 @@ type OrderItem = {
     name?: string;
     category?: string;
   };
-};
-
-const getImageUrl = (raw?: string) => {
-  if (!raw) return "https://placehold.co/120x150/111111/FFFFFF?text=SHOP.CO";
-  if (raw.startsWith("http")) return raw;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${raw}`;
 };
 
 export default function OrderItemsList({
@@ -86,7 +80,7 @@ export default function OrderItemsList({
                 {/* 3D Thumbnail Frame */}
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-surface bg-surface shadow-sm sm:h-24 sm:w-24">
                   <img
-                    src={getImageUrl(item.image)}
+                    src={resolveImageUrl(item.image, "https://placehold.co/120x150/111111/FFFFFF?text=SHOP.CO")}
                     alt={productName}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
                   />

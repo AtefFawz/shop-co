@@ -2,7 +2,14 @@
 
 import Link from "next/link";
 import {
-  Plus, Boxes, Sparkles, AlertTriangle, Tag, Layers, ArrowUpRight, Store,
+  Plus,
+  Boxes,
+  Sparkles,
+  AlertTriangle,
+  Tag,
+  Layers,
+  ArrowUpRight,
+  Store,
 } from "lucide-react";
 import ProductList from "@/features/admin/products/components/AdminProductList";
 import Pagination from "@/shared/components/navigation/LinkPagination";
@@ -24,12 +31,22 @@ type CatalogViewProps = {
 };
 
 export default function AdminProductCatalogView({
-  page, totalCount, productList, pagination, onSaleCount, lowStockCount,
-  pageCatalogValue, startItem, endItem,
+  page,
+  totalCount,
+  productList,
+  pagination,
+  onSaleCount,
+  lowStockCount,
+  pageCatalogValue,
+  startItem,
+  endItem,
 }: CatalogViewProps) {
   const { t, locale, direction } = useLocale();
   return (
-    <div dir={direction} className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8">
+    <div
+      dir={direction}
+      className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-8"
+    >
       {/* GPU Entrance & 3D Card Styles */}
       <style>{`
         @keyframes studioFadeUp {
@@ -42,9 +59,9 @@ export default function AdminProductCatalogView({
             transform: translate3d(0, 0, 0) scale(1);
           }
         }
-        .studio-enter-1 { animation: studioFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.03s both; }
-        .studio-enter-2 { animation: studioFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.09s both; }
-        .studio-enter-3 { animation: studioFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+        .studio-enter-1 { animation: studioFadeUp 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) 0.03s both; }
+        .studio-enter-2 { animation: studioFadeUp 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) 0.09s both; }
+        .studio-enter-3 { animation: studioFadeUp 0.38s cubic-bezier(0.2, 0.7, 0.2, 1) 0.15s both; }
       `}</style>
 
       {/* Subtle Architectural Studio Grid */}
@@ -53,7 +70,7 @@ export default function AdminProductCatalogView({
         className="pointer-events-none absolute inset-0 bg-grid-subtle bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_85%_70%_at_50%_20%,#000_55%,transparent_100%)]"
       />
 
-      <div className="Responsive relative z-10 space-y-6">
+      <div className="Responsive  relative z-10 space-y-6">
         {/* ================================================================ */}
         {/* 1. EXECUTIVE CATALOG HEADER                                      */}
         {/* ================================================================ */}
@@ -74,7 +91,8 @@ export default function AdminProductCatalogView({
                 {t("adminAllProducts")}
               </h1>
               <span className="rounded-full bg-surface-muted px-2.5 py-0.5 font-mono text-[11px] font-black text-secondary">
-                {totalCount.toLocaleString(locale === "ar" ? "ar-EG" : "en-EG")} {t("adminSkuCount")}
+                {totalCount.toLocaleString(locale === "ar" ? "ar-EG" : "en-EG")}{" "}
+                {t("adminSkuCount")}
               </span>
             </div>
 
@@ -84,9 +102,7 @@ export default function AdminProductCatalogView({
                 {startItem}–{endItem}
               </strong>{" "}
               {t("adminOf")}{" "}
-              <strong className="font-bold text-primary">
-                {totalCount}
-              </strong>{" "}
+              <strong className="font-bold text-primary">{totalCount}</strong>{" "}
               {t("adminRegisteredGarments")}
             </p>
           </div>
@@ -107,7 +123,7 @@ export default function AdminProductCatalogView({
 
             <Link
               href="/dashboard/products/add"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-action px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-on-action shadow-[0_12px_28px_-6px_rgba(var(--shadow-rgb),0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-[0_18px_36px_-6px_rgba(var(--shadow-rgb),0.45)] active:scale-95"
+              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-action px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-on-action shadow-[0_12px_28px_-6px_rgba(var(--shadow-rgb),0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-[0_18px_36px_-6px_rgba(var(--shadow-rgb),0.45)] active:scale-95"
             >
               <Plus
                 size={15}
@@ -124,7 +140,7 @@ export default function AdminProductCatalogView({
         {/* ================================================================ */}
         <div className="studio-enter-2 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
           {/* Card 1: Total Listed */}
-          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminMasterArchive")}
@@ -142,7 +158,7 @@ export default function AdminProductCatalogView({
           </div>
 
           {/* Card 2: Page Valuation */}
-          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminPageUnitValue")}
@@ -160,7 +176,7 @@ export default function AdminProductCatalogView({
           </div>
 
           {/* Card 3: On Promotion */}
-          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminActivePromos")}
@@ -178,7 +194,7 @@ export default function AdminProductCatalogView({
           </div>
 
           {/* Card 4: Restock Watch */}
-          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+          <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
               <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminRestockAlerts")}

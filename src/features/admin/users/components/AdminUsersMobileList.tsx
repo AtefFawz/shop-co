@@ -1,12 +1,12 @@
 "use client";
+import { getInitials } from "@/lib/initials";
+import { getUserRoleBadge } from "@/features/admin/users/utils/roleBadge";
+
 
 import React, { useState } from "react";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
 import {
-  Crown,
-  Shield,
-  UserCheck,
   Calendar,
   ChevronRight,
   Copy,
@@ -40,47 +40,11 @@ export default function AdminUsersMobileList({ users }: Props) {
     setTimeout(() => setCopiedId(null), 1800);
   };
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  };
-
-  const getRoleBadge = (rawRole?: string) => {
-    const r = (rawRole || "USER").toUpperCase();
-    if (r === "ADMIN") {
-      return {
-        label: t("usersRoleAdmin"),
-        icon: Crown,
-        className: "border-border-strong bg-action text-on-action",
-        dotClass: "bg-success",
-      };
-    }
-    if (r === "MANAGER" || r === "MANGER") {
-      return {
-        label: t("usersRoleManager"),
-        icon: Shield,
-        className: "border-info-border bg-info-soft text-info",
-        dotClass: "bg-info",
-      };
-    }
-    return {
-      label: t("usersRoleMember"),
-      icon: UserCheck,
-      className: "border-border bg-surface-muted text-secondary",
-      dotClass: "bg-surface-hover",
-    };
-  };
-
   return (
     <div dir={direction} className="space-y-3.5 md:hidden">
       {users.map((user: User) => {
         const shortId = (user._id || "").slice(-6).toUpperCase();
-        const roleInfo = getRoleBadge(user.role);
+        const roleInfo = getUserRoleBadge(user.role, t);
         const RoleIcon = roleInfo.icon;
         const hasAvatar = user.avatar && !brokenAvatars[user._id];
 

@@ -1,4 +1,6 @@
 "use client";
+import { createCurrencyFormatter } from "@/lib/formatCurrency";
+
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
@@ -13,12 +15,7 @@ export default function AdminOrdersPage() {
   const { t, locale, direction } = useLocale();
   const { loading, data, page, totalPages, goToPage, refetch, total } =
     useData("/order/all");
-  const formatMoney = (value: number) =>
-    new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-EG", {
-      style: "currency",
-      currency: "EGP",
-      maximumFractionDigits: 0,
-    }).format(value);
+  const currencyFormatter = createCurrencyFormatter(locale, 0);
 
   // Interactive Studio States
   const [searchQuery, setSearchQuery] = useState("");
@@ -253,7 +250,7 @@ export default function AdminOrdersPage() {
                   {t("ordersPageVolume")}
                 </span>
                 <span className="font-mono text-sm font-black text-on-action">
-                  {formatMoney(telemetry.batchRevenue)}
+                  {currencyFormatter.format(telemetry.batchRevenue)}
                 </span>
               </div>
 
@@ -264,7 +261,7 @@ export default function AdminOrdersPage() {
                   {t("ordersAverageTicket")}
                 </span>
                 <span className="font-mono text-sm font-black text-success">
-                  {formatMoney(telemetry.avgTicket)}
+                  {currencyFormatter.format(telemetry.avgTicket)}
                 </span>
               </div>
 

@@ -43,7 +43,9 @@ export default function NewArrivalsGrid() {
       return promos.length > 0 ? promos : list;
     }
     if (activeTab === "under150") {
-      const affordable = list.filter((p: Product) => Number(p.price || 0) <= 150);
+      const affordable = list.filter(
+        (p: Product) => Number(p.price || 0) <= 150,
+      );
       return affordable.length > 0 ? affordable : list;
     }
     return list;
@@ -60,7 +62,7 @@ export default function NewArrivalsGrid() {
           <div className="h-6 w-36 animate-pulse rounded-full bg-surface-hover" />
           <div className="h-10 w-64 animate-pulse rounded-2xl bg-surface-hover" />
         </div>
-        <div className="grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:gap-6 gap-y-5 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <ProductGridSkeleton key={i} />
           ))}
@@ -106,7 +108,9 @@ export default function NewArrivalsGrid() {
               <button
                 key={tab.id}
                 type="button"
-                onClick={() => setActiveTab(tab.id as "all" | "promo" | "under150")}
+                onClick={() =>
+                  setActiveTab(tab.id as "all" | "promo" | "under150")
+                }
                 className={`cursor-pointer rounded-xl px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${
                   activeTab === tab.id
                     ? "bg-action text-on-action shadow-xs"
@@ -122,7 +126,7 @@ export default function NewArrivalsGrid() {
         {/* ── 3D Architectural Product Grid ── */}
         <div
           style={{ perspective: "1200px" }}
-          className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4"
         >
           {displayedProducts.map((item: Product, idx: number) => (
             <div

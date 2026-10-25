@@ -1,9 +1,12 @@
 "use client";
+import { getInitials } from "@/lib/initials";
+import { getUserRoleBadge } from "@/features/admin/users/utils/roleBadge";
+
 
 import React, { useState } from "react";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
-import { Shield, ChevronRight, Copy, Check, Mail, Calendar, Crown, UserCheck, ArrowUpRight } from "lucide-react";
+import { ChevronRight, Copy, Check, Mail, Calendar, ArrowUpRight } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
@@ -40,43 +43,6 @@ export default function AdminUsersTable({
     setTimeout(() => setCopiedKey(null), 1800);
   };
 
-  const getInitials = (name?: string) => {
-    if (!name) return "U";
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  };
-
-  const getRoleBadge = (rawRole?: string) => {
-    const r = (rawRole || "USER").toUpperCase();
-    if (r === "ADMIN") {
-      return {
-        label: t("usersRoleAdmin"),
-        icon: Crown,
-        className:
-          "border-border-strong bg-action text-on-action shadow-[0_6px_16px_-4px_rgba(var(--shadow-rgb),0.4)]",
-        dotClass: "bg-success-bright",
-      };
-    }
-    if (r === "MANAGER" || r === "MANGER") {
-      return {
-        label: t("usersRoleManager"),
-        icon: Shield,
-        className: "border-info-border bg-info-soft text-info",
-        dotClass: "bg-info",
-      };
-    }
-    return {
-      label: t("usersRoleMember"),
-      icon: UserCheck,
-      className: "border-border/80 bg-surface-subtle text-secondary",
-      dotClass: "bg-surface-hover",
-    };
-  };
-
   if (viewMode === "grid") {
     /* ==================================================================== */
     /* MODE B: 3D VIP IDENTITY BADGE CARDS (DESKTOP GRID)                   */
@@ -89,7 +55,7 @@ export default function AdminUsersTable({
       >
         {users.map((user: User) => {
           const shortId = (user._id || "").slice(-6).toUpperCase();
-          const roleInfo = getRoleBadge(user.role);
+          const roleInfo = getUserRoleBadge(user.role, t);
           const RoleIcon = roleInfo.icon;
           const hasAvatar = user.avatar && !brokenAvatars[user._id];
 
@@ -219,7 +185,7 @@ export default function AdminUsersTable({
           <tbody className="divide-y divide-border-subtle text-xs">
             {users.map((user: User) => {
               const shortId = (user._id || "").slice(-6).toUpperCase();
-              const roleInfo = getRoleBadge(user.role);
+              const roleInfo = getUserRoleBadge(user.role, t);
               const RoleIcon = roleInfo.icon;
               const hasAvatar = user.avatar && !brokenAvatars[user._id];
 

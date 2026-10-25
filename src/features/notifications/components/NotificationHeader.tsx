@@ -6,6 +6,7 @@ import { CheckCheck, X, Search, Volume2, VolumeX } from "lucide-react";
 
 import type { FilterTab } from "./NotificationDropdown";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatNumber } from "@/lib/formatNumber";
 
 type NotificationHeaderProps = {
   unreadCount: number;
@@ -60,6 +61,7 @@ export default function NotificationHeader({
     setSearchOpen((current) => !current);
   };
 
+  const formattedUnreadCount = formatNumber(unreadCount, locale);
   const readCount = Math.max(0, totalCount - unreadCount);
   const readPercentage =
     totalCount > 0 ? Math.round((readCount / totalCount) * 100) : 100;
@@ -111,16 +113,14 @@ export default function NotificationHeader({
               </h3>
               {unreadCount > 0 && (
                 <span className="inline-flex items-center rounded-full border border-border-strong/60 bg-brand-soft px-2 py-0.5 font-mono text-[9.5px] font-bold text-accent">
-                  {new Intl.NumberFormat(
-                    locale === "ar" ? "ar-EG" : "en-US",
-                  ).format(unreadCount)}
+                  {formattedUnreadCount}
                 </span>
               )}
             </div>
 
             <p className="mt-0.5 truncate text-[10.5px] font-medium text-muted">
               {unreadCount > 0
-                ? `${new Intl.NumberFormat(locale === "ar" ? "ar-EG" : "en-US").format(unreadCount)} ${t("notifUnreadLabel")}`
+                ? `${formattedUnreadCount} ${t("notifUnreadLabel")}`
                 : t("notifCaughtUp")}
             </p>
           </div>

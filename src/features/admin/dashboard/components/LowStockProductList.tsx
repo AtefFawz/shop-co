@@ -1,5 +1,6 @@
 // @/features/admin/dashboard/components/LowStackList.tsx
 "use client";
+import { resolveImageUrl } from "@/lib/imageUrl";
 
 import { useState, useMemo } from "react";
 import { AlertTriangle, ArrowUpRight, Edit3, Search, CheckCircle2, Flame } from "lucide-react";
@@ -17,12 +18,6 @@ export const LowStockProductList = ({
   const { t, locale, direction } = useLocale();
   const [filterMode, setFilterMode] = useState<"all" | "out" | "urgent">("all");
   const [searchQuery, setSearchQuery] = useState("");
-
-  const getImageUrl = (url?: string) => {
-    if (!url?.trim()) return "/placeholder.png";
-    if (url.startsWith("http")) return url;
-    return `https://res.cloudinary.com/dudit0nty/image/upload/${url}`;
-  };
 
   const safeList = Array.isArray(lowStockProducts) ? lowStockProducts : [];
 
@@ -203,7 +198,7 @@ export const LowStockProductList = ({
                       <div className="flex items-center gap-3.5">
                         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-border bg-surface-muted shadow-2xs transition-transform duration-300 group-hover:scale-105">
                           <Image
-                            src={getImageUrl(item.images?.[0] || item.photo)}
+                            src={resolveImageUrl(item.images?.[0] || item.photo, "/placeholder.png")}
                             alt={item.name || t("dashboardNoImageAlt")}
                             fill
                             sizes="44px"

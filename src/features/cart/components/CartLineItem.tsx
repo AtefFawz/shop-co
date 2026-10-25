@@ -1,4 +1,5 @@
 "use client";
+import { resolveImageUrl } from "@/lib/imageUrl";
 
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -10,12 +11,6 @@ import { calculateFinalPrice } from "@/lib/logicPricing";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 import type { Product } from "@/types";
-
-const getImageUrl = (raw?: string) => {
-  if (!raw) return "https://placehold.co/160x200/111111/FFFFFF?text=SHOP.CO";
-  if (raw.startsWith("http")) return raw;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${raw}`;
-};
 
 export const CartLineItem = ({ productItem }: { productItem: Product }) => {
   const { t, locale } = useLocale();
@@ -68,7 +63,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
         className="relative h-28 w-24 shrink-0 overflow-hidden rounded-2xl border border-border/70 bg-surface-subtle sm:h-32 sm:w-28"
       >
         <img
-          src={getImageUrl(rawImg)}
+          src={resolveImageUrl(rawImg, "https://placehold.co/160x200/111111/FFFFFF?text=SHOP.CO")}
           alt={productItem.name || t("productImageAlt")}
           className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-108"
         />

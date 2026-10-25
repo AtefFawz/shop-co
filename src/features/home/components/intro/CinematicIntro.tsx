@@ -28,7 +28,10 @@ export default function CinematicIntro() {
     }
 
     const frame = window.requestAnimationFrame(() => setIsVisible(true));
-    const timeout = window.setTimeout(() => setIsVisible(false), INTRO_DURATION);
+    const timeout = window.setTimeout(
+      () => setIsVisible(false),
+      INTRO_DURATION,
+    );
 
     return () => {
       window.cancelAnimationFrame(frame);
@@ -53,7 +56,9 @@ export default function CinematicIntro() {
       }
     };
 
-    const focusFrame = window.requestAnimationFrame(() => skipButtonRef.current?.focus());
+    const focusFrame = window.requestAnimationFrame(() =>
+      skipButtonRef.current?.focus(),
+    );
     window.addEventListener("keydown", handleKeyDown);
     return () => {
       window.cancelAnimationFrame(focusFrame);
@@ -71,10 +76,16 @@ export default function CinematicIntro() {
           dir={isArabic ? "rtl" : "ltr"}
           initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ y: "-100%", transition: { duration: 0.72, ease: [0.76, 0, 0.24, 1] } }}
+          exit={{
+            y: "-100%",
+            transition: { duration: 0.72, ease: [0.76, 0, 0.24, 1] },
+          }}
           className="fixed inset-0 z-[100] flex min-h-[100svh] items-center justify-center overflow-hidden bg-[#111210] px-5 text-[#f4f1e9]"
         >
-          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0"
+          >
             <motion.div
               initial={{ opacity: 0, scale: 0.82 }}
               animate={{ opacity: 0.5, scale: 1 }}
@@ -94,22 +105,35 @@ export default function CinematicIntro() {
           <motion.div
             initial={{ opacity: 0, y: 22, filter: "blur(12px)" }}
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            transition={{ duration: 0.85, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+            transition={{
+              duration: 0.85,
+              delay: 0.12,
+              ease: [0.16, 1, 0.3, 1],
+            }}
             className="relative z-10 flex w-full max-w-4xl flex-col items-center text-center"
           >
             <div className="mb-7 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-[#b8c5a8] sm:text-xs">
               <Sparkles size={13} strokeWidth={1.5} />
-              <span>{isArabic ? "اختيارات الموسم · ٢٠٢٦" : "THE SEASON EDIT · 2026"}</span>
+              <span>
+                {isArabic ? "اختيارات الموسم · ٢٠٢٦" : "THE SEASON EDIT · 2026"}
+              </span>
             </div>
 
             <div className="overflow-hidden py-2">
               <motion.h2
                 initial={{ y: "115%", rotateX: -40 }}
                 animate={{ y: 0, rotateX: 0 }}
-                transition={{ duration: 0.95, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                transition={{
+                  duration: 0.95,
+                  delay: 0.2,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
                 className="font-black text-[clamp(3.2rem,12vw,9.5rem)] leading-[0.82] tracking-[-0.085em]"
               >
-                SHOP.CO<span className="align-top text-[0.22em] tracking-normal">®</span>
+                SHOP.CO
+                <span className="align-top text-[0.22em] tracking-normal">
+                  ®
+                </span>
               </motion.h2>
             </div>
 

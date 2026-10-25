@@ -44,7 +44,7 @@ export const RelatedProductsSection = ({
 
   if (loading) {
     return (
-      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
           <ProductGridSkeleton key={i} />
         ))}
@@ -84,7 +84,7 @@ export const RelatedProductsSection = ({
       </div>
 
       {/* 4-Column Responsive Grid */}
-      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4">
         {recommendations.map((item: Product) => (
           <Card key={item._id} product={item} />
         ))}

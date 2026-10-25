@@ -1,4 +1,6 @@
 "use client";
+import { getInitials } from "@/lib/initials";
+
 
 import { useState, useMemo } from "react";
 import VerifiedRoundedIcon from "@mui/icons-material/VerifiedRounded";
@@ -61,14 +63,6 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
     const sum = reviewsList.reduce((acc, r) => acc + r.rating, 0);
     return (sum / reviewsList.length).toFixed(1);
   }, [reviewsList]);
-
-  const getInitials = (name: string) =>
-    name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
 
   return (
     <div dir={direction} className="space-y-8">

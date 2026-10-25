@@ -2,6 +2,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { cookies } from "next/headers";
+// @ts-ignore CSS side-effect imports are handled by Next.js.
 import "./globals.css";
 import { AuthWatcher } from "@/lib/AuthWatcher";
 import { Toaster } from "react-hot-toast";

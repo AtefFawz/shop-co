@@ -1,5 +1,5 @@
 "use client";
-
+import { resolveImageUrl } from "@/lib/imageUrl";
 
 import { ShoppingBag, ShieldCheck } from "lucide-react";
 import type { Product } from "@/types";
@@ -8,12 +8,6 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
 
 const FREE_SHIPPING_THRESHOLD = 200;
-
-const getImageUrl = (raw?: string) => {
-  if (!raw) return "https://placehold.co/100x120/111111/FFFFFF?text=SKU";
-  if (raw.startsWith("http")) return raw;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${raw}`;
-};
 
 export const OrderSummary = ({ items }: { items: Product[] }) => {
   const { t, locale, direction } = useLocale();
@@ -83,7 +77,7 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
               <div className="flex min-w-0 items-center gap-3">
                 <div className="relative h-14 w-12 shrink-0 overflow-hidden rounded-xl border border-surface bg-surface shadow-2xs">
                   <img
-                    src={getImageUrl(rawImg)}
+                    src={resolveImageUrl(rawImg, "https://placehold.co/100x120/111111/FFFFFF?text=SKU")}
                     alt={item.name}
                     className="h-full w-full object-cover object-top"
                   />

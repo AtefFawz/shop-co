@@ -12,17 +12,11 @@ import Pricing from "@/features/catalog/components/ProductPrice";
 import { Product } from "@/types";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { useWishlistStore } from "@/store/wishlistStore";
+import { resolveImageUrl } from "@/lib/imageUrl";
 
 /* -------------------------------------------------------------------------- */
 /*                                HELPER UTILS                                */
 /* -------------------------------------------------------------------------- */
-
-const CLOUDINARY_BASE = "https://res.cloudinary.com/dudit0nty/image/upload/";
-
-const getImageUrl = (url?: string): string => {
-  if (!url?.trim()) return "";
-  return url.startsWith("http") ? url : `${CLOUDINARY_BASE}${url}`;
-};
 
 /* -------------------------------------------------------------------------- */
 /*                             MAIN CARD COMPONENT                            */
@@ -67,9 +61,7 @@ export default function ProductCard({ product }: { product: Product }) {
   }, [isPaused, images.length]);
 
   const categoryLabel =
-    product.category ||
-    product.section ||
-    t("productAtelierEdit");
+    product.category || product.section || t("productAtelierEdit");
   const ratingValue = Number(product?.ratingsAverage || 0);
 
   return (
@@ -113,7 +105,7 @@ export default function ProductCard({ product }: { product: Product }) {
                   }`}
                 >
                   <Image
-                    src={getImageUrl(imgUrl)}
+                    src={resolveImageUrl(imgUrl)}
                     alt={product.name || t("productImageAlt")}
                     fill
                     quality={85}

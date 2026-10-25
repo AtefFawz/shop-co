@@ -9,6 +9,7 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { formatNumber } from "@/lib/formatNumber";
 
 type NotificationFooterProps = {
   hasMore: boolean;
@@ -31,9 +32,7 @@ export default function NotificationFooter({
 }: NotificationFooterProps) {
   const { locale, t } = useLocale();
 
-  const formattedCount = new Intl.NumberFormat(
-    locale === "ar" ? "ar-EG" : "en-US",
-  ).format(totalCount);
+  const formattedCount = formatNumber(totalCount, locale);
 
   return (
     <footer className="shrink-0 border-t border-border bg-surface-raised p-3 sm:px-4">

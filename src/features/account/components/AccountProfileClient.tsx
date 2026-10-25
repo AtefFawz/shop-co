@@ -41,6 +41,7 @@ import { MobileAdminNavigation } from "@/shared/components/navigation/MobileAdmi
 import { AdminDesktopSidebar } from "@/shared/components/navigation/AdminDesktopSidebar";
 import useData from "@/hooks/getData";
 import { formatCurrency } from "@/lib/formatCurrency";
+import { getInitials } from "@/lib/initials";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
@@ -216,12 +217,7 @@ export function AccountProfileClient() {
     role = "USER",
   } = user;
 
-  const initials = fullName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((n: string) => n[0]?.toUpperCase())
-    .join("");
+  const initials = getInitials(fullName, "U");
 
   const hasValidAvatar = Boolean(avatar) && !avatarError;
 
@@ -598,7 +594,7 @@ export function AccountProfileClient() {
                       aria-hidden="true"
                       className="pointer-events-none absolute -bottom-10 -right-6 select-none text-[9rem] font-black leading-none tracking-tighter text-on-action/[0.03] sm:text-[13rem]"
                     >
-                      {initials || "SC"}
+                      {getInitials(fullName, "SC")}
                     </span>
 
                     {/* === TOP SECTION === */}

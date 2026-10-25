@@ -26,7 +26,12 @@ export default function AdminLayout({
   const { t, direction } = useLocale();
 
   const collection = [
-    { id: "stats", href: "/dashboard", label: t("adminStats"), icon: LayoutDashboard },
+    {
+      id: "stats",
+      href: "/dashboard",
+      label: t("adminStats"),
+      icon: LayoutDashboard,
+    },
     {
       id: "products",
       href: "/dashboard/products",
@@ -83,27 +88,41 @@ export default function AdminLayout({
         extraFooterLinks={
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
-              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">{t("uiLanguagePreference")}</span>
+              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+                {t("uiLanguagePreference")}
+              </span>
               <LocaleSwitcher compact />
             </div>
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
-              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">{t("uiThemePreference")}</span>
+              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+                {t("uiThemePreference")}
+              </span>
               <ThemeToggle compact />
             </div>
             <Link
               href="/"
               className="flex w-full items-center gap-2.5 rounded-2xl px-2.5 py-2 text-xs font-black uppercase tracking-wider text-muted transition-all hover:bg-surface-muted hover:text-primary"
             >
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-secondary"><Store size={15} /></span>
+              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-surface-muted text-secondary">
+                <Store size={15} />
+              </span>
               <span>{t("backToStorefront")}</span>
             </Link>
           </div>
         }
         collapsedFooterLinks={
           <div className="flex flex-col items-center gap-2">
-            <LocaleSwitcher compact className="h-10 w-10 px-0 [&>span]:hidden" />
+            <LocaleSwitcher
+              compact
+              className="h-10 w-10 px-0 [&>span]:hidden"
+            />
             <ThemeToggle compact className="h-10 w-10" />
-            <Link href="/" aria-label={t("backToStorefront")} title={t("backToStorefront")} className="flex h-10 w-10 items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-muted hover:text-primary">
+            <Link
+              href="/"
+              aria-label={t("backToStorefront")}
+              title={t("backToStorefront")}
+              className="flex h-10 w-10 items-center justify-center rounded-xl text-muted transition-colors hover:bg-surface-muted hover:text-primary"
+            >
               <Store size={16} aria-hidden="true" />
             </Link>
           </div>
@@ -112,10 +131,11 @@ export default function AdminLayout({
 
       <div className="flex flex-1 flex-col overflow-hidden relative">
         <main className="flex-1 overflow-y-auto  scrollbar-none">
-          <div className="mx-auto max-w-full pb-28 lg:pb-0">
+          <div className="mx-auto max-w-full pb-20 lg:pb-0">
             <div className="lg:hidden flex items-center justify-between m-4">
               <h1 className="text-2xl font-black uppercase tracking-tighter italic">
-                {collection.find((i) => i.href === path)?.label || t("dashboard")}
+                {collection.find((i) => i.href === path)?.label ||
+                  t("dashboard")}
               </h1>
               <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-action text-on-action shadow-lg">
                 <ShieldCheck size={18} aria-hidden="true" />
@@ -127,9 +147,15 @@ export default function AdminLayout({
         </main>
 
         {/* 4. MOBILE: Bottom Navigation (Floating Style) */}
-        <div className={`lg:hidden fixed bottom-2 start-1/2 z-50 w-[98%] pointer-events-none ${direction === "rtl" ? "translate-x-1/2" : "-translate-x-1/2"}`}>
+        <div
+          className={`lg:hidden fixed bottom-2 start-1/2 z-50 w-[98%] pointer-events-none ${direction === "rtl" ? "translate-x-1/2" : "-translate-x-1/2"}`}
+        >
           <div className="pointer-events-auto">
-            <MobileAdminNavigation arrayOfData={collection} active={path} showAppearanceControls />
+            <MobileAdminNavigation
+              arrayOfData={collection}
+              active={path}
+              showAppearanceControls
+            />
           </div>
         </div>
       </div>

@@ -1,4 +1,7 @@
 "use client";
+import { resolveImageUrl } from "@/lib/imageUrl";
+import { getInitials } from "@/lib/initials";
+import { createCurrencyFormatter } from "@/lib/formatCurrency";
 
 import React, { useState } from "react";
 import {
@@ -17,21 +20,8 @@ import OrderStatusUpdater from "@/features/admin/orders/components/OrderStatusUp
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-import type { AdminOrderRecord } from "@/types/domain";
-export type DesktopOrderProps = {
-  orders: AdminOrderRecord[];
-  page: number;
-  totalPages: number;
-  total: number;
-  goToPage: (page: number) => void;
-  onOrderDeleted?: () => void;
-};
-
-const getItemImageUrl = (raw?: string) => {
-  if (!raw) return "https://placehold.co/80x80/111111/FFFFFF?text=SKU";
-  if (raw.startsWith("http")) return raw;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${raw}`;
-};
+import type { AdminOrdersListProps } from "@/features/admin/orders/types";
+import { AdminOrderRecord } from "@/types/domain";
 
 export const AdminDesktopOrdersTable = ({
   orders,
@@ -40,12 +30,9 @@ export const AdminDesktopOrdersTable = ({
   goToPage,
   total,
   onOrderDeleted,
-}: DesktopOrderProps) => {
+}: AdminOrdersListProps) => {
   const { t, locale, direction } = useLocale();
-  const currencyFormatter = new Intl.NumberFormat(
-    locale === "ar" ? "ar-EG" : "en-EG",
-    { style: "currency", currency: "EGP", maximumFractionDigits: 0 },
-  );
+  const currencyFormatter = createCurrencyFormatter(locale, 0);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -82,23 +69,23 @@ export const AdminDesktopOrdersTable = ({
               {orders.map((order) => {
                 const shortId = (order._id || "").slice(-6).toUpperCase();
                 const isExpanded = expandedOrderId === order._id;
-                const itemsList: AdminOrderRecord["orderItems"] = order.orderItems || [];
+                const itemsList: AdminOrderRecord["orderItems"] =
+                  order.orderItems || [];
                 const totalUnits = itemsList.reduce(
                   (acc, it) => acc + (Number(it.quantity || it.qty) || 1),
                   0,
                 );
-                const initials = (order.user?.fullName || t("ordersGuestClient"))
-                  .split(" ")
-                  .map((n: string) => n[0])
-                  .join("")
-                  .slice(0, 2)
-                  .toUpperCase();
+                const initials = getInitials(
+                  order.user?.fullName || t("ordersGuestClient"),
+                );
 
                 return (
                   <React.Fragment key={order._id}>
                     <tr
                       className={`group transition-colors duration-200 ${
-                        isExpanded ? "bg-surface-subtle" : "hover:bg-surface-subtle/80"
+                        isExpanded
+                          ? "bg-surface-subtle"
+                          : "hover:bg-surface-subtle/80"
                       }`}
                     >
                       {/* 1. Order ID & Date */}
@@ -164,15 +151,26 @@ export const AdminDesktopOrdersTable = ({
                           >
                             {itemsList
                               .slice(0, 4)
-                              .map((item: AdminOrderRecord["orderItems"][number], idx: number) => (
-                                <img
-                                  key={idx}
-                                  src={getItemImageUrl(item.image)}
-                                  alt={item.product?.name || t("adminProductDetails")}
-                                  title={item.product?.name}
-                                  className="h-9 w-9 rounded-xl border-2 border-surface bg-surface-muted object-cover shadow-xs transition-transform duration-300 hover:z-10 hover:scale-115"
-                                />
-                              ))}
+                              .map(
+                                (
+                                  item: AdminOrderRecord["orderItems"][number],
+                                  idx: number,
+                                ) => (
+                                  <img
+                                    key={idx}
+                                    src={resolveImageUrl(
+                                      item.image,
+                                      "https://placehold.co/80x80/111111/FFFFFF?text=SKU",
+                                    )}
+                                    alt={
+                                      item.product?.name ||
+                                      t("adminProductDetails")
+                                    }
+                                    title={item.product?.name}
+                                    className="h-9 w-9 rounded-xl border-2 border-surface bg-surface-muted object-cover shadow-xs transition-transform duration-300 hover:z-10 hover:scale-115"
+                                  />
+                                ),
+                              )}
                             {itemsList.length > 4 && (
                               <div className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-surface bg-action font-mono text-[10px] font-black text-on-action shadow-xs">
                                 +{itemsList.length - 4}
@@ -181,7 +179,12 @@ export const AdminDesktopOrdersTable = ({
                           </div>
 
                           <span className="hidden rounded-lg bg-surface-muted px-2 py-1 font-mono text-[10px] font-bold text-secondary xl:inline-block">
-                            {totalUnits} {t(totalUnits === 1 ? "ordersUnitSingular" : "ordersUnitPlural")}
+                            {totalUnits}{" "}
+                            {t(
+                              totalUnits === 1
+                                ? "ordersUnitSingular"
+                                : "ordersUnitPlural",
+                            )}
                           </span>
                         </div>
                       </td>
@@ -189,7 +192,9 @@ export const AdminDesktopOrdersTable = ({
                       {/* 4. Total Price */}
                       <td className="py-4 px-4 align-middle">
                         <span className="font-mono text-sm font-black text-primary sm:text-base">
-                          {currencyFormatter.format(Number(order.totalPrice || 0))}
+                          {currencyFormatter.format(
+                            Number(order.totalPrice || 0),
+                          )}
                         </span>
                       </td>
 
@@ -213,7 +218,11 @@ export const AdminDesktopOrdersTable = ({
                               : "border-border bg-surface text-secondary hover:border-border-strong hover:text-primary"
                           }`}
                         >
-                          <span>{isExpanded ? t("ordersHideManifest") : t("ordersInspectManifest")}</span>
+                          <span>
+                            {isExpanded
+                              ? t("ordersHideManifest")
+                              : t("ordersInspectManifest")}
+                          </span>
                           <ChevronDown
                             size={13}
                             className={`transition-transform duration-300 ${
@@ -262,40 +271,55 @@ export const AdminDesktopOrdersTable = ({
 
                             {/* Manifest Items Grid */}
                             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                              {itemsList.map((item: AdminOrderRecord["orderItems"][number], idx: number) => {
-                                const qty =
-                                  Number(item.quantity || item.qty) || 1;
-                                const unitPrice =
-                                  Number(item.price || item.product?.price) ||
-                                  0;
-                                return (
-                                  <div
-                                    key={idx}
-                                    className="flex items-center gap-3 rounded-xl border border-border-subtle bg-surface-subtle p-2.5"
-                                  >
-                                    <img
-                                      src={getItemImageUrl(item.image)}
-                                      alt={item.product?.name || t("userDetailProduct")}
-                                      className="h-12 w-12 shrink-0 rounded-lg border border-surface bg-surface object-cover shadow-2xs"
-                                    />
-                                    <div className="min-w-0 flex-1">
-                                      <p className="truncate text-xs font-extrabold text-primary">
-                                        {item.product?.name ||
-                                          item.name ||
-                                          t("userDetailCatalogGarment")}
-                                      </p>
-                                      <div className="mt-1 flex items-center justify-between font-mono text-[10px] font-bold text-muted">
-                                        <span>{t("qty")}: {qty}</span>
-                                        {unitPrice > 0 && (
-                                          <span className="text-primary">
-                                            {currencyFormatter.format(unitPrice)}
-                                          </span>
+                              {itemsList.map(
+                                (
+                                  item: AdminOrderRecord["orderItems"][number],
+                                  idx: number,
+                                ) => {
+                                  const qty =
+                                    Number(item.quantity || item.qty) || 1;
+                                  const unitPrice =
+                                    Number(item.price || item.product?.price) ||
+                                    0;
+                                  return (
+                                    <div
+                                      key={idx}
+                                      className="flex items-center gap-3 rounded-xl border border-border-subtle bg-surface-subtle p-2.5"
+                                    >
+                                      <img
+                                        src={resolveImageUrl(
+                                          item.image,
+                                          "https://placehold.co/80x80/111111/FFFFFF?text=SKU",
                                         )}
+                                        alt={
+                                          item.product?.name ||
+                                          t("userDetailProduct")
+                                        }
+                                        className="h-12 w-12 shrink-0 rounded-lg border border-surface bg-surface object-cover shadow-2xs"
+                                      />
+                                      <div className="min-w-0 flex-1">
+                                        <p className="truncate text-xs font-extrabold text-primary">
+                                          {item.product?.name ||
+                                            item.name ||
+                                            t("userDetailCatalogGarment")}
+                                        </p>
+                                        <div className="mt-1 flex items-center justify-between font-mono text-[10px] font-bold text-muted">
+                                          <span>
+                                            {t("qty")}: {qty}
+                                          </span>
+                                          {unitPrice > 0 && (
+                                            <span className="text-primary">
+                                              {currencyFormatter.format(
+                                                unitPrice,
+                                              )}
+                                            </span>
+                                          )}
+                                        </div>
                                       </div>
                                     </div>
-                                  </div>
-                                );
-                              })}
+                                  );
+                                },
+                              )}
                             </div>
                           </div>
                         </td>
@@ -320,7 +344,11 @@ export const AdminDesktopOrdersTable = ({
             </span>
           </div>
 
-          <ClientPagination page={page} totalPages={totalPages} goToPage={goToPage} />
+          <ClientPagination
+            page={page}
+            totalPages={totalPages}
+            goToPage={goToPage}
+          />
         </div>
       </div>
     </div>

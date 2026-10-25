@@ -330,7 +330,7 @@ export default function BestSellingProductsPage() {
         {/* ================================================================ */}
         {loading ? (
           <div
-            className={`grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 ${
+            className={`grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 ${
               gridCols === 4 ? " lg:grid-cols-4" : "lg:grid-cols-3"
             }`}
           >
@@ -368,7 +368,7 @@ export default function BestSellingProductsPage() {
         ) : (
           <div
             style={{ perspective: "1200px" }}
-            className={`grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 ${
+            className={`grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 ${
               gridCols === 4 ? "lg:grid-cols-4" : "lg:grid-cols-3"
             }`}
           >

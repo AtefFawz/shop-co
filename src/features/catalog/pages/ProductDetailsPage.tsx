@@ -1,4 +1,5 @@
 "use client";
+import { resolveImageUrl } from "@/lib/imageUrl";
 
 import React, { useState, useEffect, use, useRef } from "react";
 import { notFound, useRouter } from "next/navigation";
@@ -33,12 +34,6 @@ import {
   ArrowLeft,
   Flame,
 } from "lucide-react";
-
-const getImageUrl = (url?: string) => {
-  if (!url?.trim()) return "";
-  if (url.startsWith("http")) return url;
-  return `https://res.cloudinary.com/dudit0nty/image/upload/${url}`;
-};
 
 export default function ProductDetailsPage({
   params,
@@ -175,7 +170,7 @@ export default function ProductDetailsPage({
         reviews.length
       : productItem.ratingsAverage || 0;
 
-  const currentImage = getImageUrl(
+  const currentImage = resolveImageUrl(
     imageGallery[activeIdx] || productItem.photo,
   );
 
@@ -430,7 +425,7 @@ export default function ProductDetailsPage({
                         }`}
                       >
                         <Image
-                          src={getImageUrl(imgUrl)}
+                          src={resolveImageUrl(imgUrl)}
                           alt={`${productItem.name} · ${t("productViewAngle")} ${idx + 1}`}
                           fill
                           sizes="88px"

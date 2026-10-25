@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, useMotionValue, useMotionTemplate } from "framer-motion";
 import { BadgeCheck, Quote, ChevronDown, Sparkles } from "lucide-react";
 import StarRating from "@/shared/components/feedback/StarRating";
+import { getInitials } from "@/lib/initials";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 interface Review {
@@ -67,12 +68,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
   const rating = Number(items?.rating || 5);
   const isLongText = comment.length > 115;
 
-  const initials = fullName
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase())
-    .join("");
+  const initials = getInitials(fullName, "U");
 
   const hasValidAvatar = Boolean(items?.avatar) && !imgError;
 

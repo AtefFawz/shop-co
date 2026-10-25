@@ -4,9 +4,13 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { signOut } from "@/lib/signOut";
 import { motion, AnimatePresence } from "framer-motion";
-import { LogOut, PanelLeftClose, PanelLeftOpen, type LucideIcon } from "lucide-react";
+import {
+  LogOut,
+  PanelLeftClose,
+  PanelLeftOpen,
+  type LucideIcon,
+} from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
-
 
 export interface SidebarItem {
   id: string;
@@ -54,7 +58,12 @@ export const AdminDesktopSidebar = ({
         mass: 0.9,
       }}
       className="relative z-50 hidden h-dvh shrink-0 select-none flex-col overflow-visible border-s border-border/60 bg-surface lg:flex"
-      style={{ boxShadow: direction === "rtl" ? "-8px 0 40px rgba(var(--shadow-rgb),0.015)" : "8px 0 40px rgba(var(--shadow-rgb),0.015)" }}
+      style={{
+        boxShadow:
+          direction === "rtl"
+            ? "-8px 0 40px rgba(var(--shadow-rgb),0.015)"
+            : "8px 0 40px rgba(var(--shadow-rgb),0.015)",
+      }}
     >
       {/* ── THE MECHANICAL FLOATING SWITCH ── */}
       <motion.button
@@ -113,7 +122,7 @@ export const AdminDesktopSidebar = ({
                 {collapsedHeaderContent ? (
                   collapsedHeaderContent
                 ) : (
-                  /* ✨ PHYSICAL MASK: شباك عرضه 40 بيكسل (w-10) بيقص أي حاجة براه حرفياً! */
+                  /* ✨ PHYSICAL MASK:  */
                   <div className="w-10 overflow-hidden flex items-center justify-start">
                     <div className="w-[300px] pointer-events-none">
                       {headerContent}
@@ -234,8 +243,12 @@ export const AdminDesktopSidebar = ({
 
               {/* === FLOATING ARCHITECTURAL TOOLTIP === */}
               {!open && (
-                <div className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover:-translate-x-1.5" : "left-full ml-5 group-hover:translate-x-1.5"} z-50 flex items-center gap-2.5 whitespace-nowrap rounded-xl border border-white/10 bg-action/90 px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-on-action opacity-0 shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.2)] backdrop-blur-xl transition-all duration-300 pointer-events-none group-hover:opacity-100`}>
-                  <div className={`absolute top-1/2 ${direction === "rtl" ? "-right-1 border-r border-t" : "-left-1 border-b border-l"} h-2 w-2 -translate-y-1/2 rotate-45 border-white/10 bg-action/90`} />
+                <div
+                  className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover:-translate-x-1.5" : "left-full ml-5 group-hover:translate-x-1.5"} z-50 flex items-center gap-2.5 whitespace-nowrap rounded-xl border border-white/10 bg-action/90 px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-on-action opacity-0 shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.2)] backdrop-blur-xl transition-all duration-300 pointer-events-none group-hover:opacity-100`}
+                >
+                  <div
+                    className={`absolute top-1/2 ${direction === "rtl" ? "-right-1 border-r border-t" : "-left-1 border-b border-l"} h-2 w-2 -translate-y-1/2 rotate-45 border-white/10 bg-action/90`}
+                  />
 
                   <span className="relative z-10">{label}</span>
                   {badge && (
@@ -316,8 +329,12 @@ export const AdminDesktopSidebar = ({
           </AnimatePresence>
 
           {!open && (
-            <div className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover/logout:-translate-x-1.5" : "left-full ml-5 group-hover/logout:translate-x-1.5"} z-50 flex items-center whitespace-nowrap rounded-xl border border-danger-border bg-danger px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-on-danger opacity-0 shadow-[0_15px_35px_rgba(var(--danger-rgb),0.4)] transition-all duration-300 pointer-events-none group-hover/logout:opacity-100`}>
-              <div className={`absolute top-1/2 ${direction === "rtl" ? "-right-1 border-r border-t" : "-left-1 border-b border-l"} h-2 w-2 -translate-y-1/2 rotate-45 border-danger-border bg-danger`} />
+            <div
+              className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover/logout:-translate-x-1.5" : "left-full ml-5 group-hover/logout:translate-x-1.5"} z-50 flex items-center whitespace-nowrap rounded-xl border border-danger-border bg-danger px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-on-danger opacity-0 shadow-[0_15px_35px_rgba(var(--danger-rgb),0.4)] transition-all duration-300 pointer-events-none group-hover/logout:opacity-100`}
+            >
+              <div
+                className={`absolute top-1/2 ${direction === "rtl" ? "-right-1 border-r border-t" : "-left-1 border-b border-l"} h-2 w-2 -translate-y-1/2 rotate-45 border-danger-border bg-danger`}
+              />
               <span className="relative z-10">{t("uiEndSession")}</span>
             </div>
           )}

@@ -160,7 +160,10 @@ export default function AdminProductEditPage({
 
   if (loading && !item.name) {
     return (
-      <div dir={direction} className="min-h-screen flex items-center justify-center bg-surface-subtle">
+      <div
+        dir={direction}
+        className="min-h-screen flex items-center justify-center bg-surface-subtle"
+      >
         <div className="flex flex-col items-center gap-4">
           <div className="w-10 h-10 animate-spin rounded-full border-2 border-border-strong border-t-transparent" />
           <p className="text-xs font-black uppercase tracking-[0.2em] text-muted">
@@ -180,7 +183,10 @@ export default function AdminProductEditPage({
   const totalCount = existingImages.length + newImages.length;
 
   return (
-    <main dir={direction} className="min-h-screen bg-surface-subtle py-8 sm:py-10">
+    <main
+      dir={direction}
+      className="min-h-screen bg-surface-subtle py-8 sm:py-10"
+    >
       <div className="mx-auto w-full  ">
         {/* Header */}
         <header className="mb-6 sm:mb-8 flex items-center gap-4">
@@ -216,7 +222,11 @@ export default function AdminProductEditPage({
           {/* Section 01: Identification */}
           <FormSection label={t("adminProductIdentification")} number="01">
             <div className="space-y-4">
-              <Field label={t("adminProductNameField")} icon={<Tag size={13} />} required>
+              <Field
+                label={t("adminProductNameField")}
+                icon={<Tag size={13} />}
+                required
+              >
                 <input
                   className="w-full min-h-[44px] rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[13px] font-semibold text-primary outline-none transition-all hover:border-border-strong focus:border-primary focus:ring-2 focus:ring-focus/5"
                   type="text"
@@ -229,7 +239,10 @@ export default function AdminProductEditPage({
                 />
               </Field>
 
-              <Field label={t("adminProductDescriptionLabel")} icon={<AlignLeft size={13} />}>
+              <Field
+                label={t("adminProductDescriptionLabel")}
+                icon={<AlignLeft size={13} />}
+              >
                 <textarea
                   className="w-full min-h-24 resize-none rounded-xl border border-border bg-surface px-3.5 py-3 text-[13px] font-semibold text-primary leading-relaxed outline-none transition-all hover:border-border-strong focus:border-primary focus:ring-2 focus:ring-focus/5"
                   placeholder={t("adminProductDescriptionPlaceholder")}
@@ -243,7 +256,11 @@ export default function AdminProductEditPage({
           {/* Section 02: Categorization */}
           <FormSection label={t("adminCategorizationTarget")} number="02">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Field label={t("adminTargetGender")} icon={<Users size={13} />} required>
+              <Field
+                label={t("adminTargetGender")}
+                icon={<Users size={13} />}
+                required
+              >
                 <select
                   className="w-full min-h-[44px] rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[13px] font-semibold text-primary outline-none transition-all hover:border-border-strong focus:border-primary cursor-pointer"
                   value={item.gender || "MEN"}
@@ -252,7 +269,9 @@ export default function AdminProductEditPage({
                   <option value="MEN">{t("adminProductGenderMen")}</option>
                   <option value="WOMEN">{t("adminProductGenderWomen")}</option>
                   <option value="KIDS">{t("adminGenderKids")}</option>
-                  <option value="UNISEX">{t("adminProductGenderUnisex")}</option>
+                  <option value="UNISEX">
+                    {t("adminProductGenderUnisex")}
+                  </option>
                 </select>
               </Field>
 
@@ -268,7 +287,10 @@ export default function AdminProductEditPage({
                 />
               </Field>
 
-              <Field label={t("adminProductSectionLabel")} icon={<Tag size={13} />}>
+              <Field
+                label={t("adminProductSectionLabel")}
+                icon={<Tag size={13} />}
+              >
                 <select
                   className="w-full min-h-[44px] rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[13px] font-semibold text-primary outline-none transition-all hover:border-border-strong focus:border-primary cursor-pointer"
                   value={item.section || "T-SHIRT"}
@@ -312,14 +334,18 @@ export default function AdminProductEditPage({
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="0.00" inputMode="decimal"
+                  placeholder="0.00"
+                  inputMode="decimal"
                   value={item.price || ""}
                   onChange={(e) => handleChange("price", e.target.value)}
                   required
                 />
               </Field>
 
-              <Field label={t("adminDiscountLabel")} icon={<Percent size={13} />}>
+              <Field
+                label={t("adminDiscountLabel")}
+                icon={<Percent size={13} />}
+              >
                 <input
                   className="w-full min-h-[44px] rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[13px] font-semibold text-primary outline-none transition-all hover:border-border-strong focus:border-primary"
                   type="number"
@@ -342,12 +368,17 @@ export default function AdminProductEditPage({
                 </select>
               </Field>
 
-              <Field label={t("adminStockUnitsLabel")} icon={<Boxes size={13} />} required>
+              <Field
+                label={t("adminStockUnitsLabel")}
+                icon={<Boxes size={13} />}
+                required
+              >
                 <input
                   className="w-full min-h-[44px] rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[13px] font-semibold text-primary outline-none transition-all hover:border-border-strong focus:border-primary"
                   type="number"
                   min="0"
-                  placeholder="50" inputMode="numeric"
+                  placeholder="50"
+                  inputMode="numeric"
                   value={item.countInStock ?? 1}
                   onChange={(e) => handleChange("countInStock", e.target.value)}
                   required
@@ -372,7 +403,10 @@ export default function AdminProductEditPage({
                 </p>
               </Field>
 
-              <Field label={t("adminProductColors")} icon={<Palette size={13} />}>
+              <Field
+                label={t("adminProductColors")}
+                icon={<Palette size={13} />}
+              >
                 <input
                   className="w-full min-h-[44px] rounded-xl border border-border bg-surface px-3.5 py-2.5 text-[13px] font-semibold text-primary outline-none transition-all hover:border-border-strong focus:border-primary"
                   type="text"
@@ -391,7 +425,10 @@ export default function AdminProductEditPage({
           <FormSection
             label={t("adminMediaGallery")}
             number="05"
-            description={t("adminProductImageCount").replace("{count}", String(totalCount))}
+            description={t("adminProductImageCount").replace(
+              "{count}",
+              String(totalCount),
+            )}
             action={
               totalCount > 0 ? (
                 <button
@@ -423,7 +460,10 @@ export default function AdminProductEditPage({
                   </div>
                   <div className="mt-2.5">
                     <p className="text-xs font-black uppercase tracking-wider text-secondary">
-                      {t("adminAddImagesRemaining").replace("{count}", String(5 - totalCount))}
+                      {t("adminAddImagesRemaining").replace(
+                        "{count}",
+                        String(5 - totalCount),
+                      )}
                     </p>
                     <p className="text-[10px] text-muted mt-0.5">
                       {t("adminImageUploadLimitHint")}
@@ -512,7 +552,11 @@ export default function AdminProductEditPage({
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-action px-5 py-4 text-xs font-black uppercase tracking-widest text-on-action shadow-[0_10px_28px_-8px_rgba(var(--shadow-rgb),0.1)] transition-all hover:bg-action-hover active:scale-[0.99] disabled:bg-surface-hover disabled:cursor-not-allowed cursor-pointer"
             >
               <Save size={16} />
-              <span>{loading ? t("adminProductUpdateLoading") : t("adminProductUpdateAction")}</span>
+              <span>
+                {loading
+                  ? t("adminProductUpdateLoading")
+                  : t("adminProductUpdateAction")}
+              </span>
             </button>
           </div>
         </form>

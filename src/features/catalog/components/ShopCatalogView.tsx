@@ -3,7 +3,15 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { PackageSearch, LayoutGrid, Grid3X3, ArrowUpDown, RotateCcw, Search, Layers } from "lucide-react";
+import {
+  PackageSearch,
+  LayoutGrid,
+  Grid3X3,
+  ArrowUpDown,
+  RotateCcw,
+  Search,
+  Layers,
+} from "lucide-react";
 
 import Card from "@/features/catalog/components/ProductCard";
 import { CatalogFilterPanel } from "@/features/catalog/components/CatalogFilterPanel";
@@ -290,7 +298,7 @@ export const ShopCatalogView = () => {
             {loading && (
               <div
                 aria-label={t("catalogLoading")}
-                className={`grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 ${
+                className={`grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 lg:grid-cols-3 ${
                   gridCols === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3"
                 }`}
               >
@@ -303,7 +311,7 @@ export const ShopCatalogView = () => {
             {/* Products Grid */}
             {!loading && hasProducts && (
               <div
-                className={`grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3 ${
+                className={`grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 lg:grid-cols-3 ${
                   gridCols === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3"
                 }`}
               >

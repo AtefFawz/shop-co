@@ -103,7 +103,7 @@ export default function BestSellingProductsSection() {
         {/* ── 4-Column Ranked Showroom Grid ── */}
         <div
           style={{ perspective: "1200px" }}
-          className="grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4"
+          className="grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4"
         >
           {displayedItems.map((item: Product, index: number) => (
             <div

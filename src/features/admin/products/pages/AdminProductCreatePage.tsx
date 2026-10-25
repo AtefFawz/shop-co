@@ -191,7 +191,11 @@ export default function AdminProductCreatePage() {
           {/* Section 01: Identification */}
           <FormSection label={t("adminProductIdentification")} number="01">
             <div className="space-y-4">
-              <Field label={t("adminProductNameField")} icon={<Tag size={13} />} required>
+              <Field
+                label={t("adminProductNameField")}
+                icon={<Tag size={13} />}
+                required
+              >
                 <input
                   className="input-base"
                   type="text"
@@ -202,7 +206,10 @@ export default function AdminProductCreatePage() {
                 />
               </Field>
 
-              <Field label={t("adminProductDescriptionLabel")} icon={<AlignLeft size={13} />}>
+              <Field
+                label={t("adminProductDescriptionLabel")}
+                icon={<AlignLeft size={13} />}
+              >
                 <textarea
                   className="input-base min-h-24 resize-none py-3 leading-relaxed"
                   placeholder={t("adminProductDescriptionPlaceholder")}
@@ -216,7 +223,11 @@ export default function AdminProductCreatePage() {
           {/* Section 02: Categorization */}
           <FormSection label={t("adminCategorizationTarget")} number="02">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Field label={t("adminTargetGender")} icon={<Users size={13} />} required>
+              <Field
+                label={t("adminTargetGender")}
+                icon={<Users size={13} />}
+                required
+              >
                 <select
                   className="input-base cursor-pointer"
                   value={item.gender}
@@ -225,7 +236,9 @@ export default function AdminProductCreatePage() {
                   <option value="MEN">{t("adminProductGenderMen")}</option>
                   <option value="WOMEN">{t("adminProductGenderWomen")}</option>
                   <option value="KIDS">{t("adminGenderKids")}</option>
-                  <option value="UNISEX">{t("adminProductGenderUnisex")}</option>
+                  <option value="UNISEX">
+                    {t("adminProductGenderUnisex")}
+                  </option>
                 </select>
               </Field>
 
@@ -239,7 +252,10 @@ export default function AdminProductCreatePage() {
                 />
               </Field>
 
-              <Field label={t("adminProductSectionLabel")} icon={<Tag size={13} />}>
+              <Field
+                label={t("adminProductSectionLabel")}
+                icon={<Tag size={13} />}
+              >
                 <select
                   className="input-base cursor-pointer"
                   value={item.section}
@@ -290,7 +306,10 @@ export default function AdminProductCreatePage() {
                 />
               </Field>
 
-              <Field label={t("adminDiscountLabel")} icon={<Percent size={13} />}>
+              <Field
+                label={t("adminDiscountLabel")}
+                icon={<Percent size={13} />}
+              >
                 <input
                   className="input-base"
                   type="number"
@@ -313,7 +332,11 @@ export default function AdminProductCreatePage() {
                 </select>
               </Field>
 
-              <Field label={t("adminStockUnitsLabel")} icon={<Boxes size={13} />} required>
+              <Field
+                label={t("adminStockUnitsLabel")}
+                icon={<Boxes size={13} />}
+                required
+              >
                 <input
                   className="input-base"
                   type="number"
@@ -343,7 +366,10 @@ export default function AdminProductCreatePage() {
                 </p>
               </Field>
 
-              <Field label={t("adminProductColors")} icon={<Palette size={13} />}>
+              <Field
+                label={t("adminProductColors")}
+                icon={<Palette size={13} />}
+              >
                 <input
                   className="input-base"
                   type="text"
@@ -428,7 +454,11 @@ export default function AdminProductCreatePage() {
               className="flex w-full items-center justify-center gap-2 rounded-2xl bg-action px-5 py-4 text-xs font-black uppercase tracking-widest text-on-action shadow-[0_10px_28px_-8px_rgba(var(--shadow-rgb),0.1)] transition-all hover:bg-action-hover active:scale-[0.99] disabled:bg-surface-hover disabled:cursor-not-allowed cursor-pointer"
             >
               <PackagePlus size={16} />
-              <span>{loading ? t("adminProductLoadingSave") : t("adminProductAddTitle")}</span>
+              <span>
+                {loading
+                  ? t("adminProductLoadingSave")
+                  : t("adminProductAddTitle")}
+              </span>
             </button>
           </div>
         </form>

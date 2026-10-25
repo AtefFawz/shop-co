@@ -18,7 +18,7 @@ import {
   Heart,
 } from "lucide-react";
 
-import { NAV_LINKS } from "@/shared/config/storefrontNavigation";
+import { NAV_LINKS, getStorefrontNavLabel } from "@/shared/config/storefrontNavigation";
 import NavIcons from "@/shared/components/navigation/HeaderActionIcons";
 import api from "@/lib/api";
 import SearchBar from "@/features/catalog/components/ProductSearchBar";
@@ -35,13 +35,6 @@ export default function MobileStorefrontNavbar() {
   const { t, direction } = useLocale();
   const wishlistCount = useWishlistStore((state) => state.items.length);
 
-  const navLabel = (path: string) => {
-    if (path === "/") return t("navHome");
-    if (path === "/selling") return t("navSale");
-    if (path === "/category") return t("navCategory");
-    if (path === "/brand") return t("navBrands");
-    return path;
-  };
   const reduceMotion = useReducedMotion();
   const [mounted, setMounted] = useState(false);
 
@@ -535,7 +528,7 @@ export default function MobileStorefrontNavbar() {
                               sm:text-[15px]
                             "
                                 >
-                                  {navLabel(item.path)}
+                                  {getStorefrontNavLabel(item.path, t)}
                                 </span>
 
                                 <ChevronRight

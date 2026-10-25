@@ -15,6 +15,7 @@ import api from "@/lib/api";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 import { getApiErrorDetails } from "@/lib/errorUtils";
+import { getInitials } from "@/lib/initials";
 interface UpdateProfileModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -55,12 +56,7 @@ export default function UpdateAccountForm({
 
   if (!isOpen || !mounted) return null;
 
-  const initials = (fullName || "U")
-    .split(" ")
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((n) => n[0]?.toUpperCase())
-    .join("");
+  const initials = getInitials(fullName, "U");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
