@@ -2,13 +2,14 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import api from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { Product } from "@/types";
 import {
   Pencil,
   Trash2,
-  AlertTriangle,
   Tag,
   PackageX,
   Search,
@@ -25,8 +26,8 @@ import Image from "next/image";
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
-
 import { getApiErrorDetails } from "@/lib/errorUtils";
+
 export default function AdminProductList({
   initialProducts = [],
 }: {
@@ -34,6 +35,8 @@ export default function AdminProductList({
 }) {
   const router = useRouter();
   const { t, locale, direction } = useLocale();
+
+  const [mounted, setMounted] = useState(false);
   const [productsList, setProductsList] = useState<Product[]>(initialProducts);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [confirmProduct, setConfirmProduct] = useState<Product | null>(null);
@@ -50,10 +53,29 @@ export default function AdminProductList({
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
+    setMounted(true);
     setProductsList(initialProducts);
   }, [initialProducts]);
 
-  // Unified Image Helper (supports both direct URLs & Cloudinary paths)
+  // ── Iron-clad Scroll Lock ──
+  useEffect(() => {
+    if (confirmProduct) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+      document.body.style.touchAction = "none";
+    } else {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    }
+    return () => {
+      document.documentElement.style.overflow = "";
+      document.body.style.overflow = "";
+      document.body.style.touchAction = "";
+    };
+  }, [confirmProduct]);
+
+  // Unified Image Helper
   const getImageUrl = (p: Product) => {
     const raw = p?.photo || p?.images?.[0];
     if (!raw) return null;
@@ -126,77 +148,113 @@ export default function AdminProductList({
   return (
     <div dir={direction} className="min-w-0">
       {/* ================================================================== */}
-      {/* 1. 3D INTERACTIVE DELETE CONFIRMATION MODAL                        */}
+      {/* 1. CHIC & PREMIUM 3D PORTAL MODAL                                  */}
       {/* ================================================================== */}
-      {confirmProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-action/60 p-4 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-border/80 bg-surface p-6 shadow-[0_30px_80px_rgba(var(--shadow-rgb),0.35)] animate-in zoom-in-95 duration-200">
-            {/* Top Warning Icon */}
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-danger-soft text-danger ring-8 ring-danger/10">
-              <AlertTriangle size={24} />
-            </div>
+      {mounted &&
+        createPortal(
+          <AnimatePresence>
+            {confirmProduct && (
+              <div
+                className="fixed inset-0 z-[99999] flex items-center justify-center p-4"
+                style={{ touchAction: "none" }}
+                onWheel={(e) => e.stopPropagation()}
+                onTouchMove={(e) => e.stopPropagation()}
+                onPointerDown={(e) => e.stopPropagation()}
+                dir={direction}
+              >
+                {/* ── Premium Glassmorphism Backdrop ── */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute inset-0 bg-[#071330]/20 backdrop-blur-xl dark:bg-[#060711]/60"
+                  onClick={() => !deletingId && setConfirmProduct(null)}
+                />
 
-            <h3 className="text-center text-lg font-black uppercase tracking-tight text-primary">
-              {t("adminRemoveFromArchive")}
-            </h3>
-            <p className="mt-1 text-center text-xs leading-relaxed text-muted">
-              {t("adminRemoveProductWarning")}
-            </p>
+                {/* ── Sleek Modal Card ── */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 15 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 15 }}
+                  transition={{ type: "spring", stiffness: 350, damping: 25 }}
+                  className="relative z-10 w-full max-w-[340px] overflow-hidden rounded-[28px] border border-border/80 bg-surface p-6 shadow-[0_32px_64px_-16px_rgba(var(--shadow-rgb),0.25)]"
+                >
+                  {/* Subtle Elegant Icon */}
+                  <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-danger-soft text-danger ring-4 ring-danger/5">
+                    <Trash2 size={24} strokeWidth={1.5} />
+                  </div>
 
-            {/* Preview Card of the Product Being Deleted */}
-            <div className="my-5 flex items-center gap-3.5 rounded-2xl border border-border/80 bg-surface-subtle p-3">
-              {getImageUrl(confirmProduct) ? (
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border bg-surface">
-                  <Image
-                    src={getImageUrl(confirmProduct)!}
-                    alt={confirmProduct.name}
-                    fill
-                    sizes="48px"
-                    className="object-cover"
-                  />
-                </div>
-              ) : (
-                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-surface-hover text-[10px] font-black text-muted">
-                  N/A
-                </div>
-              )}
+                  <h3 className="text-center text-lg font-extrabold tracking-tight text-primary">
+                    {t("adminRemoveFromArchive")}
+                  </h3>
+                  <p className="mt-2 text-center text-[13px] font-medium leading-relaxed text-muted">
+                    {t("adminRemoveProductWarning")}
+                  </p>
 
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-black text-primary">
-                  {confirmProduct.name}
-                </p>
-                <div className="mt-0.5 flex items-center gap-2 font-mono text-[10px] font-bold text-muted">
-                  <span>SKU #{confirmProduct._id.slice(-6).toUpperCase()}</span>
-                  <span>•</span>
-                  <span className="text-primary">
-                    {formatCurrency(confirmProduct.price, locale)}
-                  </span>
-                </div>
+                  {/* Chic Product Preview Snippet */}
+                  <div className="my-6 flex items-center gap-3.5 rounded-2xl border border-border-subtle bg-surface-subtle p-3">
+                    {getImageUrl(confirmProduct) ? (
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border/60 bg-surface shadow-2xs">
+                        <Image
+                          src={getImageUrl(confirmProduct)!}
+                          alt={confirmProduct.name}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </div>
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-surface-muted text-[10px] font-bold text-muted">
+                        N/A
+                      </div>
+                    )}
+
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[13px] font-bold text-primary">
+                        {confirmProduct.name}
+                      </p>
+                      <div className="mt-1 flex items-center gap-1.5 font-mono text-[10.5px] font-bold text-muted">
+                        <span>
+                          #{confirmProduct._id.slice(-6).toUpperCase()}
+                        </span>
+                        <span>•</span>
+                        <span className="text-primary">
+                          {formatCurrency(confirmProduct.price, locale)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Elegant Actions */}
+                  <div className="flex gap-2.5">
+                    <button
+                      type="button"
+                      disabled={!!deletingId}
+                      onClick={() => setConfirmProduct(null)}
+                      className="flex-1 cursor-pointer rounded-xl bg-surface-subtle py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-secondary transition-colors hover:bg-surface-muted hover:text-primary disabled:opacity-50"
+                    >
+                      {t("adminCancel")}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(confirmProduct._id)}
+                      disabled={!!deletingId}
+                      className="relative flex-1 cursor-pointer overflow-hidden rounded-xl bg-danger py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-on-danger shadow-[0_8px_16px_-6px_rgba(var(--danger-rgb),0.4)] transition-all hover:bg-danger/90 active:scale-95 disabled:opacity-60"
+                    >
+                      <span className="relative z-10">
+                        {deletingId
+                          ? t("adminDeleting")
+                          : t("adminConfirmDeletion")}
+                      </span>
+                    </button>
+                  </div>
+                </motion.div>
               </div>
-            </div>
-
-            {/* Modal Buttons */}
-            <div className="flex gap-3">
-              <button
-                type="button"
-                disabled={!!deletingId}
-                onClick={() => setConfirmProduct(null)}
-                className="flex-1 cursor-pointer rounded-2xl border border-border bg-surface py-3 text-xs font-black uppercase tracking-wider text-secondary transition-colors hover:border-border-strong hover:bg-surface-subtle disabled:opacity-50"
-              >
-                {t("adminCancel")}
-              </button>
-              <button
-                type="button"
-                onClick={() => handleDelete(confirmProduct._id)}
-                disabled={!!deletingId}
-                className="flex-1 cursor-pointer rounded-2xl bg-danger py-3 text-xs font-black uppercase tracking-wider text-on-danger shadow-[0_10px_24px_-6px_rgba(var(--danger-rgb),0.5)] transition-all hover:bg-danger disabled:opacity-60"
-              >
-                {deletingId ? t("adminDeleting") : t("adminConfirmDeletion")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
 
       {/* ================================================================== */}
       {/* 2. INTERACTIVE STUDIO CONTROL BAR (SEARCH, FILTERS, SORT, VIEW)    */}
@@ -372,7 +430,7 @@ export default function AdminProductList({
                           type="button"
                           onClick={() => handleCopyId(p._id)}
                           title={t("adminCopyFullSku")}
-                          className="inline-flex min-h-6 shrink-0 items-center gap-1 rounded-lg bg-surface-muted px-2 py-1 font-mono text-[10px] font-semibold text-secondary transition-colors hover:bg-brand-soft hover:text-primary"
+                          className="inline-flex min-h-6 shrink-0 items-center gap-1 rounded-lg bg-surface-muted px-2 py-1 font-mono text-[10px] font-semibold text-secondary transition-colors hover:bg-action hover:text-on-action"
                         >
                           <span>#{shortId}</span>
                           {copiedId === p._id ? (

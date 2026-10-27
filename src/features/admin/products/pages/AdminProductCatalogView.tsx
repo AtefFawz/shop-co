@@ -42,6 +42,7 @@ export default function AdminProductCatalogView({
   endItem,
 }: CatalogViewProps) {
   const { t, locale, direction } = useLocale();
+  //   console.log("Admin", productList);
   return (
     <div
       dir={direction}
@@ -70,7 +71,7 @@ export default function AdminProductCatalogView({
         className="pointer-events-none absolute inset-0 bg-grid-subtle bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_85%_70%_at_50%_20%,#000_55%,transparent_100%)]"
       />
 
-      <div className="Responsive  relative z-10 space-y-6">
+      <div className="Responsive relative z-10 space-y-6">
         {/* ================================================================ */}
         {/* 1. EXECUTIVE CATALOG HEADER                                      */}
         {/* ================================================================ */}
@@ -225,7 +226,9 @@ export default function AdminProductCatalogView({
         {/* ================================================================ */}
         {/* 3. UNIFIED INTERACTIVE CATALOG STUDIO + PAGINATION               */}
         {/* ================================================================ */}
-        <div className="studio-enter-3 overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)]">
+        <div
+          className={`studio-enter-3 overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] `}
+        >
           {/* Client Interactive Catalog Component */}
           <ProductList key={page} initialProducts={productList} />
 

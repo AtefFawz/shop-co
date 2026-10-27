@@ -17,7 +17,8 @@ export default function AccountOrdersPanel() {
 
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const orders: CustomerOrderRecord[] = (data?.data?.orders ?? []) as CustomerOrderRecord[];
+  const orders: CustomerOrderRecord[] = (data?.data?.orders ??
+    []) as CustomerOrderRecord[];
   const total = data?.pagination?.total ?? orders.length;
 
   const filteredOrders = useMemo(() => {
@@ -44,7 +45,11 @@ export default function AccountOrdersPanel() {
   return (
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-        <AccountSectionHeader icon={Package} title={t("uiYourOrders")} count={total} />
+        <AccountSectionHeader
+          icon={Package}
+          title={t("uiYourOrders")}
+          count={total}
+        />
 
         {/* Live Status Filter Pills */}
         {orders.length > 0 && (
@@ -101,7 +106,11 @@ export default function AccountOrdersPanel() {
 
       {totalPages > 1 && (
         <div className="pt-2">
-          <ClientPagination page={page} totalPages={totalPages} goToPage={goToPage} />
+          <ClientPagination
+            page={page}
+            totalPages={totalPages}
+            goToPage={goToPage}
+          />
         </div>
       )}
     </div>

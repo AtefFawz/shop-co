@@ -1,4 +1,3 @@
-
 import { AccountProfileClient } from "@/features/account/components/AccountProfileClient";
 
 const AccountProfileView = async () => {

@@ -27,7 +27,11 @@ import { AdminMetricCard } from "@/features/admin/dashboard/components/AdminMetr
 import { getInitials } from "@/lib/initials";
 import { createCurrencyFormatter } from "@/lib/formatCurrency";
 
-import type { AdminOrderRecord, AdminUserRecord, ReviewRecord } from "@/types/domain";
+import type {
+  AdminOrderRecord,
+  AdminUserRecord,
+  ReviewRecord,
+} from "@/types/domain";
 import { resolveImageUrl } from "@/lib/imageUrl";
 /* -------------------------------------------------------------------------- */
 /*                                HELPER UTILS                                */
@@ -62,12 +66,18 @@ export default async function AdminUserDetailsPage({
 
   if (!user) return notFound();
 
-  const ordersList: AdminOrderRecord[] = Array.isArray(user.orders) ? user.orders : [];
-  const reviewsList: Array<ReviewRecord & { product?: { name?: string } }> = Array.isArray(user.reviews) ? user.reviews as Array<ReviewRecord & { product?: { name?: string } }> : [];
+  const ordersList: AdminOrderRecord[] = Array.isArray(user.orders)
+    ? user.orders
+    : [];
+  const reviewsList: Array<ReviewRecord & { product?: { name?: string } }> =
+    Array.isArray(user.reviews)
+      ? (user.reviews as Array<ReviewRecord & { product?: { name?: string } }>)
+      : [];
 
   // Financial & Loyalty Telemetry
   const totalSpent = ordersList.reduce(
-    (acc: number, curr: AdminOrderRecord) => acc + (Number(curr.totalPrice) || 0),
+    (acc: number, curr: AdminOrderRecord) =>
+      acc + (Number(curr.totalPrice) || 0),
     0,
   );
   const avgOrderValue =
@@ -470,7 +480,7 @@ export default async function AdminUserDetailsPage({
         {/* ================================================================ */}
         <div className="dossier-stagger-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Left Column: Recent Orders */}
-          <section className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-6">
+          <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-6">
             <div>
               <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
@@ -510,7 +520,8 @@ export default async function AdminUserDetailsPage({
                       status === "delivered" || status === "completed";
                     const isShipped =
                       status === "shipped" || status === "transit";
-                    const items: AdminOrderRecord["orderItems"] = order.orderItems || [];
+                    const items: AdminOrderRecord["orderItems"] =
+                      order.orderItems || [];
 
                     return (
                       <div
@@ -521,14 +532,24 @@ export default async function AdminUserDetailsPage({
                           {/* Order Item Thumbnails Stack */}
                           {items.length > 0 ? (
                             <div className="flex -space-x-2 shrink-0">
-                              {items.slice(0, 3).map((it: AdminOrderRecord["orderItems"][number], idx: number) => (
-                                <img
-                                  key={idx}
-                                  src={resolveImageUrl(it.image, "https://placehold.co/80x80/111111/FFFFFF?text=SKU")}
-                                  alt=""
-                                  className="h-10 w-10 rounded-xl border-2 border-surface bg-surface object-cover shadow-2xs"
-                                />
-                              ))}
+                              {items
+                                .slice(0, 3)
+                                .map(
+                                  (
+                                    it: AdminOrderRecord["orderItems"][number],
+                                    idx: number,
+                                  ) => (
+                                    <img
+                                      key={idx}
+                                      src={resolveImageUrl(
+                                        it.image,
+                                        "https://placehold.co/80x80/111111/FFFFFF?text=SKU",
+                                      )}
+                                      alt=""
+                                      className="h-10 w-10 rounded-xl border-2 border-surface bg-surface object-cover shadow-2xs"
+                                    />
+                                  ),
+                                )}
                             </div>
                           ) : (
                             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-action text-on-action">
@@ -593,10 +614,10 @@ export default async function AdminUserDetailsPage({
                 </div>
               )}
             </div>
-          </section>
+          </div>
 
           {/* Right Column: Latest Reviews */}
-          <section className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-6">
+          <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-6">
             <div>
               <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
@@ -628,48 +649,53 @@ export default async function AdminUserDetailsPage({
                 </div>
               ) : (
                 <div className="mt-4 max-h-[420px] space-y-3 overflow-y-auto pe-1">
-                  {reviewsList.map((review: ReviewRecord & { product?: { name?: string } }) => {
-                    const rating = Number(review.rating) || 5;
-                    return (
-                      <div
-                        key={review._id}
-                        className="group space-y-3 rounded-2xl border border-border/80 bg-surface-subtle p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-border hover:bg-surface hover:shadow-md"
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="flex items-center gap-1.5">
-                            <div className="flex gap-0.5 text-rating">
-                              {[...Array(5)].map((_, i) => (
-                                <Star
-                                  key={i}
-                                  size={13}
-                                  className={
-                                    i < rating
-                                      ? "fill-rating text-rating"
-                                      : "text-subtle"
-                                  }
-                                />
-                              ))}
+                  {reviewsList.map(
+                    (
+                      review: ReviewRecord & { product?: { name?: string } },
+                    ) => {
+                      const rating = Number(review.rating) || 5;
+                      return (
+                        <div
+                          key={review._id}
+                          className="group space-y-3 rounded-2xl border border-border/80 bg-surface-subtle p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-border hover:bg-surface hover:shadow-md"
+                        >
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-1.5">
+                              <div className="flex gap-0.5 text-rating">
+                                {[...Array(5)].map((_, i) => (
+                                  <Star
+                                    key={i}
+                                    size={13}
+                                    className={
+                                      i < rating
+                                        ? "fill-rating text-rating"
+                                        : "text-subtle"
+                                    }
+                                  />
+                                ))}
+                              </div>
+                              <span className="font-mono text-[11px] font-black text-primary">
+                                {rating}.0
+                              </span>
                             </div>
-                            <span className="font-mono text-[11px] font-black text-primary">
-                              {rating}.0
+
+                            <span className="truncate max-w-[180px] rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-secondary shadow-2xs">
+                              {review.product?.name ||
+                                t.userDetailCatalogGarment}
                             </span>
                           </div>
 
-                          <span className="truncate max-w-[180px] rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-secondary shadow-2xs">
-                            {review.product?.name || t.userDetailCatalogGarment}
-                          </span>
+                          <p className="text-xs font-medium italic leading-relaxed text-secondary">
+                            &ldquo;{review.comment}&rdquo;
+                          </p>
                         </div>
-
-                        <p className="text-xs font-medium italic leading-relaxed text-secondary">
-                          &ldquo;{review.comment}&rdquo;
-                        </p>
-                      </div>
-                    );
-                  })}
+                      );
+                    },
+                  )}
                 </div>
               )}
             </div>
-          </section>
+          </div>
         </div>
       </div>
     </div>

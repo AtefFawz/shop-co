@@ -1,8 +1,14 @@
 "use client";
 
-
 import Link from "next/link";
-import { Star, Package, CreditCard, ShoppingBag, ArrowUpRight, Store } from "lucide-react";
+import {
+  Star,
+  Package,
+  CreditCard,
+  ShoppingBag,
+  ArrowUpRight,
+  Store,
+} from "lucide-react";
 import OrderCard from "@/features/orders/components/CustomerOrderCard";
 import { AccountSectionHeader } from "@/features/account/components/AccountSectionHeader";
 import { formatCurrency } from "@/lib/formatCurrency";
@@ -126,7 +132,12 @@ export default function AccountOverviewPanel({
                 onClick={() => goTo("orders")}
                 className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-border-strong bg-surface/60 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-secondary transition-all hover:border-border hover:bg-action hover:text-on-action"
               >
-                <span>{t("accountInspectAllOrders").replace("{count}", String(totalOrders))}</span>
+                <span>
+                  {t("accountInspectAllOrders").replace(
+                    "{count}",
+                    String(totalOrders),
+                  )}
+                </span>
                 <ArrowUpRight
                   size={14}
                   className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"

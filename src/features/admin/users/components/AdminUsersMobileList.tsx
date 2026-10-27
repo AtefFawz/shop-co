@@ -2,17 +2,10 @@
 import { getInitials } from "@/lib/initials";
 import { getUserRoleBadge } from "@/features/admin/users/utils/roleBadge";
 
-
 import React, { useState } from "react";
 import { User } from "@/types/user";
 import { useRouter } from "next/navigation";
-import {
-  Calendar,
-  ChevronRight,
-  Copy,
-  Check,
-  Mail,
-} from "lucide-react";
+import { Calendar, ChevronRight, Copy, Check, Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
@@ -36,7 +29,9 @@ export default function AdminUsersMobileList({ users }: Props) {
     e.stopPropagation();
     navigator.clipboard?.writeText(id);
     setCopiedId(id);
-    toast.success(`${t("usersCopyId")}: #${id.slice(-6).toUpperCase()} · ${t("usersCopied")}`);
+    toast.success(
+      `${t("usersCopyId")}: #${id.slice(-6).toUpperCase()} · ${t("usersCopied")}`,
+    );
     setTimeout(() => setCopiedId(null), 1800);
   };
 
@@ -125,11 +120,14 @@ export default function AdminUsersMobileList({ users }: Props) {
                 {user.createdAt && (
                   <span className="inline-flex items-center gap-1 text-[10px] font-bold text-muted">
                     <Calendar size={10} />
-                    {new Date(user.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
+                    {new Date(user.createdAt).toLocaleDateString(
+                      locale === "ar" ? "ar-EG" : "en-GB",
+                      {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      },
+                    )}
                   </span>
                 )}
               </div>

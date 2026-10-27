@@ -14,15 +14,30 @@ const footerGroups = [
   },
   {
     titleKey: "footerHelp",
-    itemKeys: ["footerSupport", "footerDelivery", "footerTerms", "footerPrivacy"],
+    itemKeys: [
+      "footerSupport",
+      "footerDelivery",
+      "footerTerms",
+      "footerPrivacy",
+    ],
   },
   {
     titleKey: "footerFaq",
-    itemKeys: ["account", "footerManageDeliveries", "footerOrders", "footerPayments"],
+    itemKeys: [
+      "account",
+      "footerManageDeliveries",
+      "footerOrders",
+      "footerPayments",
+    ],
   },
   {
     titleKey: "footerResources",
-    itemKeys: ["footerFreeEbooks", "footerDevelopmentTutorial", "footerBlog", "footerYoutube"],
+    itemKeys: [
+      "footerFreeEbooks",
+      "footerDevelopmentTutorial",
+      "footerBlog",
+      "footerYoutube",
+    ],
   },
 ] as const;
 
@@ -49,7 +64,7 @@ const columnVariants: Variants = {
 export default function StorefrontFooter() {
   const { t } = useLocale();
   return (
-    <footer className="relative mt-6  w-full select-none overflow-hidden sm:mt-16">
+    <footer className="relative bg-surface-subtle  w-full select-none overflow-hidden ">
       <div className="relative w-full">
         <div
           aria-hidden="true"
@@ -92,7 +107,10 @@ export default function StorefrontFooter() {
                 variants={columnVariants}
                 className="col-span-1 sm:col-span-1 lg:col-span-2"
               >
-                <FooterBenefits title={t(item.titleKey)} feature={item.itemKeys.map((key) => t(key))} />
+                <FooterBenefits
+                  title={t(item.titleKey)}
+                  feature={item.itemKeys.map((key) => t(key))}
+                />
               </motion.div>
             ))}
           </motion.div>

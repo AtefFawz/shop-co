@@ -103,9 +103,10 @@ export default function UpdateAccountForm({
       }
     } catch (err: unknown) {
       const serverMessage = getApiErrorDetails(err).response?.data?.message;
-      const msg = locale === "en" && typeof serverMessage === "string"
-        ? serverMessage
-        : t("uiProfileUpdateFailed");
+      const msg =
+        locale === "en" && typeof serverMessage === "string"
+          ? serverMessage
+          : t("uiProfileUpdateFailed");
       setStatus({ type: "error", message: msg });
     } finally {
       setLoading(false);
@@ -115,7 +116,10 @@ export default function UpdateAccountForm({
   const hasValidPreview = Boolean(previewUrl) && !imgError;
 
   return createPortal(
-    <div dir={direction} className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+    <div
+      dir={direction}
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+    >
       {/* Backdrop */}
       <div
         onClick={() => !loading && onClose()}
@@ -128,7 +132,8 @@ export default function UpdateAccountForm({
         <div className="mb-6 flex items-center justify-between border-b border-border-subtle pb-4">
           <div>
             <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.2em] text-muted">
-              <Sparkles size={10} className="text-primary" /> {t("uiProfileIdentity")}
+              <Sparkles size={10} className="text-primary" />{" "}
+              {t("uiProfileIdentity")}
             </span>
             <h2 className="mt-0.5 text-lg font-black uppercase tracking-tight text-primary">
               {t("uiProfileEditDetails")}
@@ -198,9 +203,7 @@ export default function UpdateAccountForm({
             />
 
             <span className="mt-2.5 text-[10px] font-bold uppercase tracking-widest text-muted">
-              {avatarFile
-                ? avatarFile.name
-                : t("uiProfileClickToUpload")}
+              {avatarFile ? avatarFile.name : t("uiProfileClickToUpload")}
             </span>
           </div>
 

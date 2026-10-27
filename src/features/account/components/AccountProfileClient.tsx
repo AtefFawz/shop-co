@@ -329,14 +329,16 @@ export function AccountProfileClient() {
     >
       {/* ── 1. MOBILE ONLY: Bottom Floating Navigation ── */}
       <div
-        className={`fixed bottom-4 start-1/2 z-50 block w-[94%] max-w-md lg:hidden ${direction === "rtl" ? "translate-x-1/2" : "-translate-x-1/2"}`}
+        className={`fixed inset-x-0 bottom-0 z-50 flex justify-center px-3 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] lg:hidden pointer-events-none`}
       >
-        <MobileAdminNavigation
-          arrayOfData={NAV_LINKS}
-          active={active}
-          goTo={goTo}
-          showAppearanceControls
-        />
+        <div className="pointer-events-auto w-full max-w-md">
+          <MobileAdminNavigation
+            arrayOfData={NAV_LINKS}
+            active={active}
+            goTo={goTo}
+            showAppearanceControls
+          />
+        </div>
       </div>
 
       {/* ── 2. DESKTOP SIDEBAR ── */}
@@ -543,9 +545,9 @@ export function AccountProfileClient() {
           {/* ── Scrollable Main Canvas ── */}
           <main
             ref={mainScrollRef}
-            className="relative z-10 flex-1 overflow-y-auto Responsive py-5 pb-28 lg:pb-5"
+            className="relative Responsive z-10 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain pt-5 pb-4 lg:pb-5"
           >
-            <div className=" space-y-6">
+            <div className="space-y-6 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
               <div
                 style={{ perspective: "1300px" }}
                 className="grid grid-cols-1 gap-5 xl:grid-cols-12"
@@ -682,7 +684,7 @@ export function AccountProfileClient() {
                     </div>
 
                     {/* === BOTTOM ROW: Stats Grid === */}
-                    <div className="relative z-10 mt-6 grid grid-cols-1 gap-3 border-t border-white/10 pt-5 sm:mt-7 sm:grid-cols-3">
+                    <div className="relative z-10 mt-6 grid grid-cols-1 gap-3 border-t border-white/10 pt-5 sm:mt-7  sm:grid-cols-3 ">
                       <div className="flex flex-col justify-center rounded-2xl border border-white/5 bg-action/40 px-4 py-3">
                         <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-on-action-muted">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-success-bright" />
@@ -710,7 +712,7 @@ export function AccountProfileClient() {
                       <button
                         type="button"
                         onClick={() => goTo("orders")}
-                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/[0.08]"
+                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/8"
                       >
                         <p className="text-[9.5px] font-black uppercase tracking-[0.16em] text-on-action-muted">
                           {t("accountTotalOrdersMetric")}
@@ -729,7 +731,7 @@ export function AccountProfileClient() {
                       <button
                         type="button"
                         onClick={() => goTo("reviews")}
-                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/[0.08]"
+                        className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/8"
                       >
                         <p className="text-[9.5px] font-black uppercase tracking-[0.16em] text-on-action-muted">
                           {t("accountPublishedReviewsMetric")}
