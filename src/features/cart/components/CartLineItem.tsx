@@ -1,4 +1,5 @@
 "use client";
+import { getStockCount } from "@/lib/stock";
 import { resolveImageUrl } from "@/lib/imageUrl";
 
 import Link from "next/link";
@@ -22,7 +23,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
   const selected = !outOfStock && productItem.isChose !== false;
 
   const qty = Math.max(1, Number(productItem.count ?? 1));
-  const parsedStock = Number(productItem.countInStock ?? 20);
+  const parsedStock = getStockCount(productItem);
   const maxStock = Number.isFinite(parsedStock) ? Math.max(1, parsedStock) : 20;
   const discount = Number(productItem.discount || 0);
 
@@ -30,6 +31,7 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
     Number(productItem.price || 0),
     discount,
     qty,
+    productItem.isSale,
   );
   const originalTotal = Number(productItem.price || 0) * qty;
 
@@ -55,20 +57,20 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, x: -30, scale: 0.96 }}
       transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-      className="group relative flex gap-3.5 rounded-3xl border border-border bg-surface p-3.5 shadow-[0_10px_30px_-14px_rgba(var(--shadow-rgb),0.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-border hover:shadow-[0_20px_40px_-14px_rgba(var(--shadow-rgb),0.12)] sm:gap-5 sm:p-4"
+      className="group relative flex gap-3.5 rounded-3xl border border-border bg-surface p-3.5 shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-border hover:shadow-card sm:gap-5 sm:p-4"
     >
       {/* ── 1. Product Thumbnail ── */}
       <Link
         href={`/shop/details/${productItem._id}`}
         className="relative h-28 w-24 shrink-0 overflow-hidden rounded-2xl border border-border/70 bg-surface-subtle sm:h-32 sm:w-28"
       >
-        <img
+        <img loading="lazy" decoding="async"
           src={resolveImageUrl(rawImg, "https://placehold.co/160x200/111111/FFFFFF?text=SHOP.CO")}
           alt={productItem.name || t("productImageAlt")}
           className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-108"
         />
-        {discount > 0 && (
-          <span className="absolute start-1.5 top-1.5 rounded-full bg-action/90 px-2 py-0.5 font-mono text-[8px] font-black uppercase text-on-action backdrop-blur-md">
+        {productItem.isSale && discount > 0 && (
+          <span className="absolute start-1.5 top-1.5 rounded-full bg-action/90 px-2 py-0.5 font-mono text-xs font-black uppercase text-on-action backdrop-blur-md">
             -{discount}%
           </span>
         )}
@@ -100,19 +102,19 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
             {/* Variant and stock context */}
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
               {outOfStock && (
-                <span className="rounded-lg bg-danger-soft px-2.5 py-0.5 text-[10px] font-bold text-danger">
+                <span className="rounded-lg bg-danger-soft px-2.5 py-0.5 text-xs font-bold text-danger">
                   {t("outOfStock")}
                 </span>
               )}
               {productItem.size && (
-                <span className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-surface-subtle px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-secondary">
+                <span className="inline-flex items-center gap-1 rounded-lg border border-border/80 bg-surface-subtle px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-secondary">
                   {t("size")}:{" "}
                   <strong className="text-primary">{productItem.size}</strong>
                 </span>
               )}
 
               {productItem.colors && (
-                <span className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-surface-subtle px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-secondary">
+                <span className="inline-flex items-center gap-1.5 rounded-lg border border-border/80 bg-surface-subtle px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-secondary">
                   <span
                     className="h-2.5 w-2.5 rounded-full border border-border"
                     style={{
@@ -149,13 +151,13 @@ export const CartLineItem = ({ productItem }: { productItem: Product }) => {
                 {formatCurrency(finalPrice, locale)}
               </span>
 
-              {discount > 0 && (
+              {productItem.isSale && discount > 0 && (
                 <span className="font-mono text-xs font-bold text-muted line-through">
                   {formatCurrency(originalTotal, locale)}
                 </span>
               )}
             </div>
-            <span className="block font-mono text-[9px] font-bold uppercase tracking-widest text-muted">
+            <span className="block font-mono text-xs font-bold uppercase tracking-widest text-muted">
               {formatCurrency(Number(productItem.price || 0), locale)} / {t("perUnit")}
             </span>
           </div>

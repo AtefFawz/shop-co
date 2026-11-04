@@ -20,7 +20,6 @@ import Link from "next/link";
 import { AdminMetricCard, type AdminMetricCardProps } from "@/features/admin/dashboard/components/AdminMetricCard";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
-import type { Product } from "@/types";
 import { calculateTrend } from "@/utils/formatters";
 import { RevenueTrendChart } from "@/features/admin/dashboard/components/RevenueTrendChart";
 import { LowStockProductList } from "@/features/admin/dashboard/components/LowStockProductList";
@@ -29,24 +28,21 @@ import type { AdminDashboardStats } from "@/types/domain";
 type AdminDashboardClientProps = {
   stats: AdminDashboardStats;
   productsResponse: {
-    data?: { Products?: Product[] };
     pagination?: { total?: number };
     stats?: { onSaleCount?: number; lowStockCount?: number; outOfStockCount?: number };
   };
+  /** Extra sections rendered inside the dashboard canvas (same background/rhythm). */
+  children?: React.ReactNode;
 };
 
 export default function AdminDashboardClient({
   stats,
   productsResponse,
+  children,
 }: AdminDashboardClientProps) {
   const { t, locale, direction } = useLocale();
 
-  const allProducts: Product[] = productsResponse?.data?.Products || [];
-  const totalCount = productsResponse?.pagination?.total ?? allProducts.length;
-
-  const lowStockProducts = allProducts.filter(
-    (p: Product) => (p.countInStock ?? 10) <= 5,
-  );
+  const totalCount = productsResponse?.pagination?.total ?? 0;
 
   const {
     onSaleCount: onSaleProducts = 0,
@@ -66,10 +62,10 @@ export default function AdminDashboardClient({
     100,
   );
 
-  const healthyCount = Math.max(
-    totalCount - lowStockCount - outOfStockProducts,
-    0,
-  );
+  // lowStockCount includes out-of-stock products (countInStock <= 5).
+  // Keep the dashboard inventory segments mutually exclusive.
+  const lowStockOnlyCount = Math.max(0, lowStockCount - outOfStockProducts);
+  const healthyCount = Math.max(totalCount - lowStockCount, 0);
   const healthyPercentage = Math.max(
     0,
     Math.min(Math.round((healthyCount / safeTotal) * 100), 100),
@@ -163,14 +159,14 @@ export default function AdminDashboardClient({
 
       <div className="Responsive relative z-10 space-y-6">
         {/* 1. EXECUTIVE COMMAND HEADER */}
-        <header className="dash-enter-1 flex flex-col justify-between gap-5 rounded-3xl border border-border bg-surface/90 p-5 shadow-[0_12px_36px_-12px_rgba(var(--shadow-rgb),0.06)] backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
+        <header className="dash-enter-1 flex flex-col justify-between gap-5 rounded-3xl border border-border bg-surface/90 p-5 shadow-card backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2.5 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
               </span>
-              <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.22em] text-secondary text-nowrap">
+              <span className="text-xs md:text-xs font-black uppercase tracking-[0.22em] text-secondary text-nowrap">
                 {t("dashboardCommandCenterLive")}
               </span>
             </div>
@@ -179,7 +175,7 @@ export default function AdminDashboardClient({
               <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
                 {t("dashboardOverview")}
               </h1>
-              <span className="hidden font-mono text-[11px] font-bold text-muted sm:inline-block">
+              <span className="hidden font-mono text-xs font-bold text-muted sm:inline-block">
                 {t("dashboardStudioEdition")}
               </span>
             </div>
@@ -215,7 +211,7 @@ export default function AdminDashboardClient({
 
             <Link
               href="/admin/products/add"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-action px-4 py-2.5 text-xs font-black uppercase tracking-wider text-on-action shadow-[0_10px_25px_-6px_rgba(var(--shadow-rgb),0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover"
+              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-action px-4 py-2.5 text-xs font-black uppercase tracking-wider text-on-action shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <PackagePlus size={15} />
               <span>{t("dashboardAddProduct")}</span>
@@ -224,14 +220,14 @@ export default function AdminDashboardClient({
         </header>
 
         {/* 2. EXECUTIVE INTELLIGENCE RIBBON */}
-        <div className="dash-enter-2 relative overflow-hidden rounded-2xl bg-action px-5 py-3.5 text-on-action shadow-[0_14px_34px_-10px_rgba(var(--shadow-rgb),0.25)]">
+        <div className="dash-enter-2 relative overflow-hidden rounded-2xl bg-action px-5 py-3.5 text-on-action shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-on-action">
                 <Sparkles size={14} />
               </span>
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/50">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-on-action/50">
                   {t("dashboardExecutivePulse")}
                 </p>
                 <p className="text-xs font-extrabold tracking-wide text-on-action">
@@ -245,7 +241,7 @@ export default function AdminDashboardClient({
 
             <div className="flex flex-wrap items-center gap-6 sm:gap-8">
               <div>
-                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
+                <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
                   {t("dashboardAverageOrderValue")}
                 </span>
                 <span className="font-mono text-sm font-black text-on-action">
@@ -256,7 +252,7 @@ export default function AdminDashboardClient({
               <span className="hidden h-6 w-px bg-white/15 sm:block" />
 
               <div>
-                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
+                <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
                   {t("dashboardActivePromotions")}
                 </span>
                 <span className="font-mono text-sm font-black text-success">
@@ -267,7 +263,7 @@ export default function AdminDashboardClient({
               <span className="hidden h-6 w-px bg-white/15 sm:block" />
 
               <div>
-                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
+                <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
                   {t("dashboardCriticalRestock")}
                 </span>
                 <span
@@ -299,12 +295,12 @@ export default function AdminDashboardClient({
           <RevenueTrendChart stats={stats} />
 
           {/* 3D Inventory Health Studio */}
-          <div className="xl:col-span-4 flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] sm:p-6">
+          <div className="xl:col-span-4 flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-card sm:p-6">
             <div className="flex items-start justify-between gap-3">
               <div>
                 <div className="flex items-center gap-1.5">
                   <Activity size={12} className="text-primary" />
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted">
                     {t("dashboardInventoryTelemetry")}
                   </p>
                 </div>
@@ -314,7 +310,7 @@ export default function AdminDashboardClient({
               </div>
 
               <span
-                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider ${
+                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider ${
                   outOfStockProducts === 0
                     ? "bg-success-soft text-success"
                     : "bg-warning-soft text-warning"
@@ -362,7 +358,7 @@ export default function AdminDashboardClient({
                   <span className="font-mono text-lg font-black leading-none text-primary">
                     {healthyPercentage}%
                   </span>
-                  <span className="mt-0.5 text-[8px] font-extrabold uppercase tracking-widest text-muted">
+                  <span className="mt-0.5 text-xs font-extrabold uppercase tracking-widest text-muted">
                     {t("dashboardHealthy")}
                   </span>
                 </div>
@@ -372,7 +368,7 @@ export default function AdminDashboardClient({
                 <p className="text-xs font-extrabold uppercase tracking-wide text-primary">
                   {t("dashboardCatalogReadiness")}
                 </p>
-                <p className="text-[11px] leading-relaxed text-muted">
+                <p className="text-xs leading-relaxed text-muted">
                   {t("dashboardCatalogHealthSummary")
                     .replace(
                       "{healthy}",
@@ -389,7 +385,7 @@ export default function AdminDashboardClient({
             {/* Telemetry Bars */}
             <div className="space-y-4">
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[11px] font-bold">
+                <div className="flex items-center justify-between text-xs font-bold">
                   <span className="flex items-center gap-1.5 text-secondary">
                     <CheckCircle2 size={13} className="text-success" />
                     {t("dashboardOptimalStock")}
@@ -407,7 +403,7 @@ export default function AdminDashboardClient({
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[11px] font-bold">
+                <div className="flex items-center justify-between text-xs font-bold">
                   <span className="flex items-center gap-1.5 text-secondary">
                     <Tag size={13} className="text-primary" />
                     {t("dashboardOnPromotion")}
@@ -425,13 +421,13 @@ export default function AdminDashboardClient({
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center justify-between text-[11px] font-bold">
+                <div className="flex items-center justify-between text-xs font-bold">
                   <span className="flex items-center gap-1.5 text-secondary">
                     <AlertTriangle size={13} className="text-warning" />
                     {t("dashboardLowAndDepleted")}
                   </span>
                   <span className="font-mono text-primary">
-                    {lowStockPercentage}% ({lowStockProducts.length})
+                    {lowStockPercentage}% ({lowStockCount})
                   </span>
                 </div>
                 <div className="h-2 w-full overflow-hidden rounded-full bg-surface-muted">
@@ -446,37 +442,37 @@ export default function AdminDashboardClient({
             {/* Bottom Mini Metric Cards */}
             <div className="mt-5 grid grid-cols-3 gap-2.5 border-t border-border-subtle pt-4">
               <div className="rounded-2xl border border-border/70 bg-surface-subtle p-3 transition-transform duration-300 hover:-translate-y-1">
-                <p className="text-[8px] font-extrabold uppercase tracking-wider text-muted">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-muted">
                   {t("dashboardLiveCatalog")}
                 </p>
                 <p className="mt-1 font-mono text-lg font-black leading-none text-primary">
                   {totalCount}
                 </p>
-                <p className="mt-1 text-[9px] font-medium text-muted">
+                <p className="mt-1 text-xs font-medium text-muted">
                   {t("dashboardTotalListed")}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-border/70 bg-surface-subtle p-3 transition-transform duration-300 hover:-translate-y-1">
-                <p className="text-[8px] font-extrabold uppercase tracking-wider text-muted">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-muted">
                   {t("dashboardLowStock")}
                 </p>
                 <p className="mt-1 font-mono text-lg font-black leading-none text-warning">
-                  {lowStockCount}
+                  {lowStockOnlyCount}
                 </p>
-                <p className="mt-1 text-[9px] font-medium text-muted">
+                <p className="mt-1 text-xs font-medium text-muted">
                   {t("dashboardNeedsRestock")}
                 </p>
               </div>
 
               <div className="rounded-2xl border border-danger-border bg-danger-soft p-3 transition-transform duration-300 hover:-translate-y-1">
-                <p className="text-[8px] font-extrabold uppercase tracking-wider text-danger">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-danger">
                   {t("dashboardZeroStock")}
                 </p>
                 <p className="mt-1 font-mono text-lg font-black leading-none text-danger">
                   {outOfStockProducts}
                 </p>
-                <p className="mt-1 text-[9px] font-medium text-danger">
+                <p className="mt-1 text-xs font-medium text-danger">
                   {t("dashboardDepleted")}
                 </p>
               </div>
@@ -486,8 +482,10 @@ export default function AdminDashboardClient({
 
         {/* 5. CRITICAL LOW STOCK WATCHLIST */}
         <div className="dash-enter-4">
-          <LowStockProductList lowStockProducts={lowStockProducts} />
+          <LowStockProductList />
         </div>
+
+        {children ? <div className="dash-enter-4">{children}</div> : null}
       </div>
     </div>
   );

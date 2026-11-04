@@ -63,9 +63,9 @@ export default function ShippingInformationCard({
   );
 
   return (
-    <div className="sticky top-24 space-y-5">
+    <div className="sticky top-[calc(var(--navbar-h)+1.5rem)] space-y-5">
       {/* Main Shipping Dossier Card */}
-      <div className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-6">
+      <div className="overflow-hidden rounded-4xl border border-border bg-surface p-5 shadow-card sm:p-6">
         {/* Card Header */}
         <div className="mb-5 flex items-center justify-between border-b border-border-subtle pb-4">
           <div className="flex items-center gap-3">
@@ -94,7 +94,7 @@ export default function ShippingInformationCard({
                 {customer.fullName}
               </p>
               {customer.email && (
-                <p className="truncate text-[11px] font-medium text-muted">
+                <p className="truncate text-xs font-medium text-muted">
                   {customer.email}
                 </p>
               )}
@@ -107,7 +107,7 @@ export default function ShippingInformationCard({
           {/* Street address */}
           <div className="group rounded-2xl border border-border/70 bg-surface-subtle/80 p-3.5 transition-colors hover:border-border hover:bg-surface">
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
+              <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.16em] text-muted">
                 <MapPin size={12} className="text-primary" />
                 {t("streetAddress")}
               </span>
@@ -135,7 +135,7 @@ export default function ShippingInformationCard({
 
           {/* City / Region */}
           <div className="rounded-2xl border border-border/70 bg-surface-subtle/80 p-3.5">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
+            <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.16em] text-muted">
               <Truck size={12} className="text-primary" />
               {t("city")}
             </span>
@@ -147,7 +147,7 @@ export default function ShippingInformationCard({
           {/* Phone Contact with Call & Copy */}
           <div className="group rounded-2xl border border-border/70 bg-surface-subtle/80 p-3.5 transition-colors hover:border-border hover:bg-surface">
             <div className="flex items-center justify-between">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
+              <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.16em] text-muted">
                 <Phone size={12} className="text-primary" />
                 {t("recipientPhone")}
               </span>
@@ -156,7 +156,7 @@ export default function ShippingInformationCard({
                 {shippingAddress?.phone && (
                   <a
                     href={`tel:${shippingAddress.phone}`}
-                    className="rounded-lg bg-action px-2 py-0.5 text-[9px] font-black uppercase tracking-wider text-on-action hover:bg-action-hover"
+                    className="rounded-lg bg-action px-2 py-0.5 text-xs font-black uppercase tracking-wider text-on-action hover:bg-action-hover"
                   >
                     {t("call")}
                   </a>
@@ -185,7 +185,7 @@ export default function ShippingInformationCard({
 
           {/* Payment Method */}
           <div className="rounded-2xl border border-border/70 bg-surface-subtle/80 p-3.5">
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.16em] text-muted">
+            <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.16em] text-muted">
               <CreditCard size={12} className="text-primary" />
               {t("settlementMethod")}
             </span>
@@ -219,7 +219,7 @@ export default function ShippingInformationCard({
             <h3 className="text-xs font-black uppercase tracking-wider text-primary">
               {t("authenticityGuarantee")}
             </h3>
-            <p className="mt-1 text-[11px] leading-relaxed text-muted">
+            <p className="mt-1 text-xs leading-relaxed text-muted">
               {t("authenticityDescription")}
             </p>
           </div>

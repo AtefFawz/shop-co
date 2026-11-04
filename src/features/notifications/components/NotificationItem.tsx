@@ -264,7 +264,7 @@ export function NotificationItem({
 
         <span className="min-w-0 flex-1">
           <span className="flex items-center justify-between gap-2">
-            <span className="truncate text-[9.5px] font-extrabold uppercase tracking-[0.12em] text-muted">
+            <span className="truncate text-xs font-extrabold uppercase tracking-[0.12em] text-muted">
               {category}
             </span>
 
@@ -272,7 +272,7 @@ export function NotificationItem({
               title={new Date(notification.createdAt).toLocaleString(
                 locale === "ar" ? "ar-EG" : "en-US",
               )}
-              className="inline-flex shrink-0 items-center gap-1 font-mono text-[9.5px] font-medium text-subtle"
+              className="inline-flex shrink-0 items-center gap-1 font-mono text-xs font-medium text-subtle"
             >
               <Clock size={10} />
               {formatRelativeTime(notification.createdAt, locale)}
@@ -281,7 +281,7 @@ export function NotificationItem({
 
           <span
             className={`
-              mt-1 block truncate text-xs tracking-tight sm:text-[13px]
+              mt-1 block truncate text-xs tracking-tight sm:text-[0.8125rem]
               ${
                 isUnread
                   ? "font-extrabold text-primary"
@@ -294,7 +294,7 @@ export function NotificationItem({
 
           <span
             className={`
-              mt-1 block text-[11.5px] leading-[1.65] sm:text-xs
+              mt-1 block text-xs leading-[1.65] sm:text-xs
               ${expanded ? "whitespace-pre-line break-words" : "line-clamp-2"}
               ${isUnread ? "text-secondary" : "text-muted"}
             `}
@@ -321,7 +321,7 @@ export function NotificationItem({
                 className="
                   inline-flex items-center gap-1 rounded-lg
                   border border-border bg-surface-subtle px-2 py-1
-                  font-mono text-[9.5px] font-bold text-secondary
+                  font-mono text-xs font-bold text-secondary
                 "
               >
                 {t("notifOrderReference").replace("{id}", `#${shortOrderId}`)}
@@ -356,7 +356,7 @@ export function NotificationItem({
               aria-expanded={expanded}
               className="
                 inline-flex min-h-6 cursor-pointer items-center gap-1
-                rounded-lg px-2 text-[9.5px] font-bold
+                rounded-lg px-2 text-xs font-bold
                 text-accent transition-colors
                 hover:bg-brand-soft
                 focus-visible:outline-none focus-visible:ring-2
@@ -381,7 +381,7 @@ export function NotificationItem({
             className="
               inline-flex min-h-7 cursor-pointer items-center gap-1.5
               rounded-lg border border-border-strong/60 bg-brand-soft
-              px-2.5 py-1 text-[9.5px] font-bold text-accent
+              px-2.5 py-1 text-xs font-bold text-accent
               transition-all hover:border-action
               hover:bg-action hover:text-on-action
               focus-visible:outline-none focus-visible:ring-2

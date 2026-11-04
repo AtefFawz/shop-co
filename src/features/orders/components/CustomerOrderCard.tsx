@@ -9,9 +9,13 @@ import {
   CheckCircle2,
   ChevronRight,
   Sparkles,
+  RotateCcw,
 } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import api from "@/lib/api";
+import { canCustomerDeleteOrder } from "@/lib/orderRules";
+import { addReorderToCart, fetchReorderPlan } from "@/features/orders/reorder";
 import { toast } from "react-hot-toast";
 import HoldToConfirmButton from "@/shared/components/motion/HoldToConfirmButton";
 import { formatCurrency } from "@/lib/formatCurrency";
@@ -33,6 +37,8 @@ export default function CustomerOrderCard({
   const [ratings, setRatings] = useState<{ [key: string]: number }>({});
   const [comments, setComments] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState<string | null>(null);
+  const [reordering, setReordering] = useState(false);
+  const router = useRouter();
 
   const shortId = (order._id || "").slice(-6).toUpperCase();
   const isDelivered = (order.status || "").toLowerCase() === "delivered";
@@ -97,17 +103,40 @@ export default function CustomerOrderCard({
     }
   };
 
+  const reorder = async () => {
+    if (reordering) return;
+    setReordering(true);
+    try {
+      const plan = await fetchReorderPlan(order._id);
+      if (!plan.items.length) {
+        toast.error(t("reorderNothing"));
+        return;
+      }
+      addReorderToCart(plan);
+      toast.success(plan.unavailable.length ? t("reorderPartial") : t("reorderAdded"));
+      if (plan.items.some((item) => item.priceChanged)) toast(t("reorderPricesUpdated"));
+      if (plan.items.some((item) => item.quantityAdjusted)) toast(t("reorderQuantityReduced"));
+      router.push("/shop/details/cart");
+    } catch (error: unknown) {
+      // The shared API client already reports HTTP errors; cover anything else here.
+      if (!getApiErrorDetails(error).response) toast.error(t("reorderFailed"));
+    } finally {
+      setReordering(false);
+    }
+  };
+
   const deleteOrders = async (id: string) => {
     try {
       await api.delete(`order/${id}`);
       toast.success(t("orderCancelledRemoved"));
       if (onReviewSuccess) onReviewSuccess();
     } catch (err: unknown) {
-      if (getApiErrorDetails(err).response?.status === 404) {
+      const details = getApiErrorDetails(err).response;
+      if (details?.status === 404) {
         toast.error(t("orderNotFound"));
         return;
       }
-      toast.error(t("orderDeleteError"));
+      toast.error(details?.data?.message || t("orderDeleteError"));
     }
   };
 
@@ -115,7 +144,7 @@ export default function CustomerOrderCard({
   const remainingCount = order.orderItems.length - 4;
 
   return (
-    <div dir={direction} className="group relative overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-[0_12px_36px_-12px_rgba(var(--shadow-rgb),0.06)] transition-all duration-300 hover:border-border hover:shadow-[0_20px_45px_-12px_rgba(var(--shadow-rgb),0.1)] sm:p-7">
+    <div dir={direction} className="group relative overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-card transition-all duration-300 hover:border-border hover:shadow-panel sm:p-7">
       {/* ================================================================== */}
       {/* 1. TOP HEADER: ID, TIMESTAMP & STATUS BADGE                        */}
       {/* ================================================================== */}
@@ -131,7 +160,7 @@ export default function CustomerOrderCard({
               </h3>
             </div>
 
-            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[11px] font-bold text-muted">
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-xs font-bold text-muted">
               <span>
                 {order.createdAt
                   ? new Date(order.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-EG", {
@@ -152,7 +181,7 @@ export default function CustomerOrderCard({
 
         {/* Status Badge */}
         <span
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-[10px] font-black uppercase tracking-widest ${getStatusBadge(
+          className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-xs font-black uppercase tracking-widest ${getStatusBadge(
             order.status,
           )}`}
         >
@@ -171,7 +200,7 @@ export default function CustomerOrderCard({
               key={item._id || idx}
               className="relative h-13 w-13 shrink-0 overflow-hidden rounded-xl border-2 border-surface bg-surface-muted shadow-2xs transition-transform duration-300 hover:z-10 hover:scale-110 sm:h-15 sm:w-15"
             >
-              <img
+              <img loading="lazy" decoding="async"
                 src={resolveImageUrl(item.image, "https://placehold.co/80x80/111111/FFFFFF?text=SKU")}
                 alt={item.name}
                 className="h-full w-full object-cover"
@@ -186,7 +215,7 @@ export default function CustomerOrderCard({
         </div>
 
         <div className="text-end font-mono">
-          <span className="block text-[9px] font-black uppercase tracking-widest text-muted">
+          <span className="block text-xs font-black uppercase tracking-widest text-muted">
             {t("totalSettlement")}
           </span>
           <span className="text-xl font-black tracking-tight text-primary sm:text-2xl">
@@ -200,38 +229,49 @@ export default function CustomerOrderCard({
       {/* ================================================================== */}
       <div className="flex flex-col-reverse gap-3 border-t border-border-subtle pt-4 sm:flex-row sm:items-center sm:justify-between">
         {/* Left: Hold to Delete */}
-        <div className="w-full sm:w-auto [&>*]:w-full sm:[&>*]:w-auto">
-          <HoldToConfirmButton
-            doneLabel={t("archived")}
-            backgroundColor="var(--surface-subtle)"
-            fillColor="var(--danger)"
-            textColor="var(--danger)"
-            fillTextColor="var(--text-on-action)"
-            size="sm"
-            radius={16}
-            fillDirection="right"
-            holdTime={1200}
-            releaseTime={200}
-            pressScale={0.96}
-            wave
-            waveAmplitude={5}
-            glow={false}
-            resetAfter={1200}
-            className="w-full border border-border text-[10px] font-black uppercase tracking-wider shadow-none transition-all hover:border-danger-border hover:bg-danger-soft sm:w-auto [&_*]:!font-black"
-            onHold={() => {
-              deleteOrders(order._id);
-              if (onReviewSuccess) onReviewSuccess();
-            }}
-          >
-            {t("holdDeleteOrder")}
-          </HoldToConfirmButton>
-        </div>
+        {canCustomerDeleteOrder(order.status) && (
+          <div className="w-full sm:w-auto [&>*]:w-full sm:[&>*]:w-auto">
+            <HoldToConfirmButton
+              doneLabel={t("archived")}
+              backgroundColor="var(--surface-subtle)"
+              fillColor="var(--danger)"
+              textColor="var(--danger)"
+              fillTextColor="var(--text-on-action)"
+              size="sm"
+              radius={16}
+              fillDirection="right"
+              holdTime={1200}
+              releaseTime={200}
+              pressScale={0.96}
+              wave
+              waveAmplitude={5}
+              glow={false}
+              resetAfter={1200}
+              className="w-full border border-border text-xs font-black uppercase tracking-wider shadow-none transition-all hover:border-danger-border hover:bg-danger-soft sm:w-auto [&_*]:!font-black"
+              onHold={() => {
+                deleteOrders(order._id);
+                if (onReviewSuccess) onReviewSuccess();
+              }}
+            >
+              {t("holdDeleteOrder")}
+            </HoldToConfirmButton>
+          </div>
+        )}
 
         {/* Right Actions: Rate Products + Track Dossier Link */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5 sm:ms-auto">
+          <button
+            type="button"
+            onClick={reorder}
+            disabled={reordering}
+            className="inline-flex flex-1 sm:flex-initial cursor-pointer items-center justify-center gap-1.5 rounded-xl border border-border/90 bg-surface-subtle px-4 py-2.5 text-xs font-black uppercase tracking-wider text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            <RotateCcw size={13} className={reordering ? "animate-spin" : ""} />
+            <span>{reordering ? t("reorderLoading") : t("reorderAction")}</span>
+          </button>
           <Link
             href={`/shop/orders/${order._id}`}
-            className="inline-flex flex-1 sm:flex-initial items-center justify-center gap-1.5 rounded-xl border border-border/90 bg-surface-subtle px-4 py-2.5 text-[10px] font-black uppercase tracking-wider text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
+            className="inline-flex flex-1 sm:flex-initial items-center justify-center gap-1.5 rounded-xl border border-border/90 bg-surface-subtle px-4 py-2.5 text-xs font-black uppercase tracking-wider text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
           >
             <span>{t("trackOrder")}</span>
             <ChevronRight size={13} />
@@ -241,7 +281,7 @@ export default function CustomerOrderCard({
             <button
               type="button"
               onClick={() => setIsReviewOpen(!isReviewOpen)}
-              className="inline-flex flex-1 sm:flex-initial cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-action px-4 py-2.5 text-[10px] font-black uppercase tracking-wider text-on-action shadow-2xs transition-all hover:bg-action-hover"
+              className="inline-flex flex-1 sm:flex-initial cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-action px-4 py-2.5 text-xs font-black uppercase tracking-wider text-on-action shadow-2xs transition-all hover:bg-action-hover"
             >
               <Star
                 size={13}
@@ -264,7 +304,7 @@ export default function CustomerOrderCard({
         <div className="mt-5 space-y-4 border-t border-border-subtle pt-5 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="flex items-center gap-1.5">
             <Sparkles size={13} className="text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-widest text-muted">
+            <span className="text-xs font-black uppercase tracking-widest text-muted">
               {t("submitVerifiedFeedback")}
             </span>
           </div>
@@ -277,7 +317,7 @@ export default function CustomerOrderCard({
               <div className="mb-3.5 flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <div className="h-11 w-11 shrink-0 overflow-hidden rounded-xl border border-border bg-surface">
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={resolveImageUrl(item.image, "https://placehold.co/80x80/111111/FFFFFF?text=SKU")}
                       alt={item.name}
                       className="h-full w-full object-cover"
@@ -288,7 +328,7 @@ export default function CustomerOrderCard({
                   </p>
                 </div>
 
-                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-success-border bg-success-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-success">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full border border-success-border bg-success-soft px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-success">
                   <CheckCircle2 size={11} /> Verified
                 </span>
               </div>
@@ -340,7 +380,7 @@ export default function CustomerOrderCard({
                     loading === item.product ||
                     !comments[item.product]?.trim()
                   }
-                  className="absolute bottom-2.5 end-2.5 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-action px-4 py-2 text-[10px] font-black uppercase tracking-widest text-on-action shadow-sm transition-all hover:bg-action-hover disabled:opacity-25"
+                  className="absolute bottom-2.5 end-2.5 inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-action px-4 py-2 text-xs font-black uppercase tracking-widest text-on-action shadow-sm transition-all hover:bg-action-hover disabled:opacity-25"
                 >
                   {loading === item.product ? (
                     t("publishReview")

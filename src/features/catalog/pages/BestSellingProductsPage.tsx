@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Flame,
@@ -22,16 +22,14 @@ import Heading from "@/shared/components/ui/SectionHeading";
 import { Product } from "@/types";
 import { ProductGridSkeleton } from "@/shared/components/ui/ProductGridSkeleton";
 import useData from "@/hooks/getData";
+import { useDebounce } from "@/hooks/useDebounce";
 import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
-import { formatCurrency } from "@/lib/formatCurrency";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 const EMPTY_PRODUCTS: Product[] = [];
 
 export default function BestSellingProductsPage() {
   const { t, locale, direction } = useLocale();
-  const { data, loading, page, goToPage, totalPages } = useData("/product");
-  const rawProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
 
   // Interactive Showroom Controls
   const [activeTab, setActiveTab] = useState<"sale" | "all" | "under150">(
@@ -42,85 +40,38 @@ export default function BestSellingProductsPage() {
     "featured" | "price-asc" | "price-desc" | "rating-desc"
   >("featured");
   const [gridCols, setGridCols] = useState<3 | 4>(4);
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const backendSort: Record<typeof sortBy, string> = {
+    featured: "popular",
+    "price-asc": "price_asc",
+    "price-desc": "price_desc",
+    "rating-desc": "rating",
+  };
+
+  // Search, sale/price filters, sorting and pagination all run in MongoDB.
+  // This prevents filtering only the currently loaded page on the client.
+  const { data, loading, page, goToPage, total, totalPages } = useData("product", {
+    params: {
+      keyword: debouncedSearch.trim() || null,
+      isSale: activeTab === "sale" ? true : null,
+      maxPrice: activeTab === "under150" ? 150 : null,
+      sort: backendSort[sortBy],
+      includeStats: true,
+    },
+    limit: 12,
+  });
+  const rawProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
+  const displayedProducts = rawProducts;
+  const saleCount = Number(data?.stats?.onSaleCount) || 0;
 
   useEffect(() => {
     document.title = `${t("topSelling")} | SHOP.CO™`;
   }, [locale, t]);
 
-  // Live Telemetry from current products batch
-  const telemetry = useMemo(() => {
-    const saleItems = rawProducts.filter(
-      (p: Product) => p.isSale === true || Number(p.discount) > 0,
-    );
-    const prices = rawProducts
-      .map((p) => Number(p.price) || 0)
-      .filter((v) => v > 0);
-    const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
-
-    const ratings = rawProducts
-      .map((p) => Number(p.ratingsAverage) || 0)
-      .filter((v) => v > 0);
-    const avgRating =
-      ratings.length > 0
-        ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1)
-        : "4.9";
-
-    return {
-      totalBatch: rawProducts.length,
-      saleCount: saleItems.length,
-      minPrice,
-      avgRating,
-    };
-  }, [rawProducts]);
-
-  // Auto-switch to "all" if current page has 0 sale items so page never looks broken
-  useEffect(() => {
-    if (!loading && rawProducts.length > 0 && telemetry.saleCount === 0) {
-      // Reset a stale filter when refreshed data no longer contains sale products.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setActiveTab("all");
-    }
-  }, [loading, rawProducts.length, telemetry.saleCount]);
-
-  // Filtered & Sorted Products
-  const displayedProducts = useMemo(() => {
-    const list = [...rawProducts].filter((item: Product) => {
-      if (activeTab === "sale") {
-        const isPromo = item.isSale === true || Number(item.discount) > 0;
-        if (!isPromo) return false;
-      } else if (activeTab === "under150") {
-        if (Number(item.price || 0) > 150) return false;
-      }
-
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const nameMatch = (item.name || "").toLowerCase().includes(q);
-        const catMatch = (item.category || item.section || "")
-          .toLowerCase()
-          .includes(q);
-        return nameMatch || catMatch;
-      }
-
-      return true;
-    });
-
-    if (sortBy === "price-asc") {
-      list.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
-    } else if (sortBy === "price-desc") {
-      list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
-    } else if (sortBy === "rating-desc") {
-      list.sort(
-        (a, b) => Number(b.ratingsAverage || 0) - Number(a.ratingsAverage || 0),
-      );
-    }
-
-    return list;
-  }, [rawProducts, activeTab, searchQuery, sortBy]);
-
   return (
     <section
       dir={direction}
-      className="relative isolate min-h-screen overflow-hidden bg-surface-subtle  text-primary  "
+      className="page-section relative isolate min-h-screen overflow-hidden bg-surface-subtle text-primary"
     >
       {/* GPU 3D Pedestal Hover Styles */}
       <style>{`
@@ -145,12 +96,12 @@ export default function BestSellingProductsPage() {
         {/* ================================================================ */}
         {/* 1. TOP NAVIGATION & CAMPAIGN HEADER                              */}
         {/* ================================================================ */}
-        <div className="flex flex-col justify-between gap-5 rounded-[2.2rem] border border-border bg-surface/90 p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] backdrop-blur-xl sm:p-7 lg:flex-row lg:items-center">
+        <div className="flex flex-col justify-between gap-5 rounded-4xl border border-border bg-surface/90 p-5 shadow-card backdrop-blur-xl sm:p-7 lg:flex-row lg:items-center">
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <Link
                 href="/"
-                className="group inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-surface-subtle px-3 py-1 text-[10px] font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-surface-subtle px-3 py-1 text-xs font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
               >
                 <ArrowLeft
                   size={12}
@@ -159,7 +110,7 @@ export default function BestSellingProductsPage() {
                 <span>{t("sellingFlagship")}</span>
               </Link>
 
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-on-action">
                 <Crown size={11} className="text-rating" />
                 {t("sellingHighDemandArchive")}
               </span>
@@ -177,33 +128,39 @@ export default function BestSellingProductsPage() {
           {/* Right Dark Telemetry Card */}
           <div className="flex flex-wrap items-center gap-5 rounded-2xl bg-action px-5 py-4 text-on-action shadow-lg sm:gap-7">
             <div>
-              <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
+              <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
                 {t("sellingActivePromos")}
               </span>
               <span className="mt-0.5 block font-mono text-lg font-black text-success">
-                {telemetry.saleCount} {t("sellingDrops")}
+                {saleCount} {t("sellingDrops")}
               </span>
             </div>
 
             <span className="h-7 w-px bg-white/15" />
 
             <div>
-              <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                {t("sellingStartingAt")}
+              <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
+                {t("catalogShowing")}
               </span>
               <span className="mt-0.5 block font-mono text-lg font-black text-on-action">
-                {formatCurrency(telemetry.minPrice, locale)}
+                {total}
               </span>
             </div>
 
             <span className="h-7 w-px bg-white/15" />
 
             <div>
-              <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
-                {t("sellingAvgRating")}
+              <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
+                {t("catalogSort")}
               </span>
               <span className="mt-0.5 block font-mono text-lg font-black text-rating">
-                {telemetry.avgRating} ★
+                {sortBy === "featured"
+                  ? t("sellingSortFeatured")
+                  : sortBy === "price-asc"
+                    ? t("sellingSortPriceLow")
+                    : sortBy === "price-desc"
+                      ? t("sellingSortPriceHigh")
+                      : t("sellingSortRating")}
               </span>
             </div>
           </div>
@@ -212,14 +169,14 @@ export default function BestSellingProductsPage() {
         {/* ================================================================ */}
         {/* 2. INTERACTIVE FILTER, SEARCH & SORT STUDIO BAR                  */}
         {/* ================================================================ */}
-        <div className="flex flex-col justify-between gap-3.5 rounded-3xl border border-border bg-surface p-4 shadow-[0_10px_30px_-12px_rgba(var(--shadow-rgb),0.05)] sm:p-5 lg:flex-row lg:items-center">
+        <div className="flex flex-col justify-between gap-3.5 rounded-3xl border border-border bg-surface p-4 shadow-card sm:p-5 lg:flex-row lg:items-center">
           {/* Left: Filter Mode Pills + Search */}
           <div className="flex flex-wrap items-center gap-2.5">
             <div className="inline-flex flex-wrap rounded-xl border border-border/90 bg-surface-subtle p-1">
               <button
                 type="button"
                 onClick={() => setActiveTab("sale")}
-                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
+                className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                   activeTab === "sale"
                     ? "bg-action text-on-action shadow-2xs"
                     : "text-muted hover:text-primary"
@@ -227,26 +184,26 @@ export default function BestSellingProductsPage() {
               >
                 <Tag size={11} />
                 <span>
-                  {t("navSale")} ({telemetry.saleCount})
+                  {t("navSale")} ({saleCount})
                 </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveTab("all")}
-                className={`cursor-pointer rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
+                className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                   activeTab === "all"
                     ? "bg-action text-on-action shadow-2xs"
                     : "text-muted hover:text-primary"
                 }`}
               >
-                {t("sellingAllBestSellers")} ({rawProducts.length})
+                {t("sellingAllBestSellers")}
               </button>
 
               <button
                 type="button"
                 onClick={() => setActiveTab("under150")}
-                className={`cursor-pointer rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
+                className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                   activeTab === "under150"
                     ? "bg-action text-on-action shadow-2xs"
                     : "text-muted hover:text-primary"
@@ -274,7 +231,7 @@ export default function BestSellingProductsPage() {
 
           {/* Right: Sort Dropdown + Grid Density Switcher */}
           <div className="flex items-center justify-between gap-2.5 sm:justify-end">
-            <span className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-muted">
               {displayedProducts.length} {t("sellingShowing")}
             </span>
 
@@ -287,7 +244,7 @@ export default function BestSellingProductsPage() {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 aria-label={t("catalogSort")}
-                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-black uppercase tracking-wider text-primary focus:border-primary focus:bg-surface focus:outline-none"
+                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-xs font-black uppercase tracking-wider text-primary focus:border-primary focus:bg-surface focus:outline-none"
               >
                 <option value="featured">{t("sellingSortFeatured")}</option>
                 <option value="price-asc">{t("sellingSortPriceLow")}</option>
@@ -379,17 +336,17 @@ export default function BestSellingProductsPage() {
               >
                 {/* Top Rank Crown Header */}
                 <div className="mb-1.5 flex items-center justify-between px-1">
-                  <span className="inline-flex items-center gap-1 rounded-md bg-action px-2 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-on-action">
-                    #{String((page - 1) * 8 + index + 1).padStart(2, "0")}{" "}
+                  <span className="inline-flex items-center gap-1 rounded-md bg-action px-2 py-0.5 font-mono text-xs font-black uppercase tracking-widest text-on-action">
+                    #{String((page - 1) * 12 + index + 1).padStart(2, "0")}{" "}
                     {t("sellingRank").toUpperCase()}
                   </span>
 
                   {item.isSale ? (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-success">
+                    <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-success">
                       <Sparkles size={10} /> {t("sellingDiscount")}
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-warning">
+                    <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-warning">
                       <Flame size={10} className="fill-rating text-warning" />
                       {t("sellingPopular")}
                     </span>

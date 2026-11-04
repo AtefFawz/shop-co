@@ -3,11 +3,9 @@ import { resolveImageUrl } from "@/lib/imageUrl";
 
 import { ShoppingBag, ShieldCheck } from "lucide-react";
 import type { Product } from "@/types";
-import { calculateFinalPrice } from "@/lib/logicPricing";
+import { calculateDeliveryFee, calculateFinalPrice } from "@/lib/logicPricing";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
-
-const FREE_SHIPPING_THRESHOLD = 200;
 
 export const OrderSummary = ({ items }: { items: Product[] }) => {
   const { t, locale, direction } = useLocale();
@@ -20,7 +18,7 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
       return {
         rawSubtotal: acc.rawSubtotal + price * qty,
         discountedSubtotal:
-          acc.discountedSubtotal + calculateFinalPrice(price, disc, qty),
+          acc.discountedSubtotal + calculateFinalPrice(price, disc, qty, item.isSale),
         totalUnits: acc.totalUnits + qty,
       };
     },
@@ -28,14 +26,11 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
   );
 
   const totalSaved = Math.max(0, rawSubtotal - discountedSubtotal);
-  const deliveryFee =
-    discountedSubtotal >= FREE_SHIPPING_THRESHOLD || discountedSubtotal === 0
-      ? 0
-      : 15;
+  const deliveryFee = calculateDeliveryFee(discountedSubtotal);
   const grandTotal = discountedSubtotal + deliveryFee;
 
   return (
-    <div dir={direction} className="sticky top-24 overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-7">
+    <div dir={direction} className="sticky top-[calc(var(--navbar-h)+1.5rem)] overflow-hidden rounded-4xl border border-border bg-surface p-6 shadow-panel sm:p-7">
       {/* Header */}
       <div className="mb-5 flex items-center justify-between border-b border-border-subtle pb-4">
         <div className="flex items-center gap-3">
@@ -52,7 +47,7 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
           </div>
         </div>
 
-        <span className="rounded-full bg-surface-subtle px-3 py-1 font-mono text-[10px] font-black uppercase text-primary">
+        <span className="rounded-full bg-surface-subtle px-3 py-1 font-mono text-xs font-black uppercase text-primary">
           {t("verified")}
         </span>
       </div>
@@ -65,23 +60,24 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
             Number(item.price || 0),
             item.discount !== undefined ? Number(item.discount) : 0,
             qty,
+            item.isSale,
           );
           const rawImg =
             item.photo || (Array.isArray(item.images) ? item.images[0] : "");
 
           return (
             <div
-              key={`${item._id}-${item.size || ""}`}
+              key={`${item._id}-${[item.size].flat().join(",")}-${[item.colors].flat().join(",")}`}
               className="flex items-center justify-between gap-3 rounded-2xl border border-border/70 bg-surface-subtle p-3"
             >
               <div className="flex min-w-0 items-center gap-3">
                 <div className="relative h-14 w-12 shrink-0 overflow-hidden rounded-xl border border-surface bg-surface shadow-2xs">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={resolveImageUrl(rawImg, "https://placehold.co/100x120/111111/FFFFFF?text=SKU")}
                     alt={item.name}
                     className="h-full w-full object-cover object-top"
                   />
-                  <span className="absolute bottom-0.5 end-0.5 rounded bg-action/90 px-1.5 py-0.2 font-mono text-[8px] font-black text-on-action">
+                  <span className="absolute bottom-0.5 end-0.5 rounded bg-action/90 px-1.5 py-0.2 font-mono text-xs font-black text-on-action">
                     ×{qty}
                   </span>
                 </div>
@@ -90,7 +86,7 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
                   <p className="truncate text-xs font-black uppercase text-primary">
                     {item.name}
                   </p>
-                  <div className="mt-0.5 flex items-center gap-2 text-[10px] font-bold text-muted">
+                  <div className="mt-0.5 flex items-center gap-2 text-xs font-bold text-muted">
                     {item.size && <span>{t("size")}: {Array.isArray(item.size) ? item.size.join(", ") : item.size}</span>}
                     {item.colors && <span>· {Array.isArray(item.colors) ? item.colors.join(", ") : item.colors}</span>}
                   </div>
@@ -128,7 +124,7 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
             {t("delivery")}
           </span>
           {deliveryFee === 0 ? (
-            <span className="font-mono text-[10px] font-black uppercase text-success">
+            <span className="font-mono text-xs font-black uppercase text-success">
               {t("free")}
             </span>
           ) : (
@@ -143,10 +139,10 @@ export const OrderSummary = ({ items }: { items: Product[] }) => {
       <div className="mt-5 rounded-2xl bg-action p-4 text-on-action shadow-md">
         <div className="flex items-end justify-between">
           <div>
-            <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-on-action/45">
+            <span className="block text-xs font-black uppercase tracking-[0.2em] text-on-action/45">
               {t("estimatedTotal")}
             </span>
-            <span className="mt-0.5 inline-flex items-center gap-1 text-[11px] font-bold text-success">
+            <span className="mt-0.5 inline-flex items-center gap-1 text-xs font-bold text-success">
               <ShieldCheck size={13} /> {t("verifiedSecure")}
             </span>
           </div>

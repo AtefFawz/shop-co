@@ -47,7 +47,7 @@ export default function HeaderActionIcons({
             {item.photo ? (
               // Profile images are remote and may not be covered by next/image config.
               // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <img loading="lazy" decoding="async"
                 src={item.photo}
                 alt=""
                 className="h-8 w-8 rounded-full border border-border-strong object-cover lg:h-9 lg:w-9"
@@ -57,7 +57,7 @@ export default function HeaderActionIcons({
             )}
 
             {badgeCount > 0 && (
-              <span className="absolute -right-1 -top-1 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-[10px] font-extrabold leading-none text-on-danger shadow-sm ring-2 ring-surface md:h-5 md:min-w-5 md:text-[11px]">
+              <span className="absolute -right-1 -top-1 z-10 flex h-4 min-w-4 items-center justify-center rounded-full bg-danger px-1 text-xs font-extrabold leading-none text-on-danger shadow-sm ring-2 ring-surface md:h-5 md:min-w-5 md:text-xs">
                 {badgeCount > 99 ? "99+" : badgeCount}
               </span>
             )}

@@ -1,14 +1,12 @@
 "use client";
 
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
-  AnimatePresence,
-  LayoutGroup,
-  motion,
-  useReducedMotion,
-} from "framer-motion";
+  AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { ArrowUpRight, Ellipsis, LogOut, Store, X, type LucideIcon } from "lucide-react";
 
 import { signOut } from "@/lib/signOut";
@@ -67,7 +65,7 @@ export const MobileAdminNavigation = ({
 }: NavMobileProps) => {
   const { t, locale, direction } = useLocale();
   const { theme } = useTheme();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const [isExiting, setIsExiting] = useState(false);
   const exitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -193,7 +191,7 @@ export const MobileAdminNavigation = ({
           animate={{ y: 0, opacity: 1 }}
           exit={reduceMotion ? { opacity: 0 } : { y: "100%", opacity: 0.7 }}
           transition={reduceMotion ? { duration: 0.12 } : spring}
-          className="fixed inset-x-0 bottom-0 z-[71] mx-auto flex max-h-[84dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-[30px] border border-border/80 bg-surface/95 shadow-[0_-24px_80px_rgba(0,0,0,0.24)] backdrop-blur-3xl sm:bottom-3 sm:rounded-[30px]"
+          className="fixed inset-x-0 bottom-0 z-[71] mx-auto flex max-h-[84dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl border border-border/80 bg-surface/95 shadow-[0_-24px_80px_rgba(0,0,0,0.24)] backdrop-blur-3xl sm:bottom-3 sm:rounded-3xl"
           style={{ paddingBottom: "max(env(safe-area-inset-bottom), 12px)" }}
         >
           <div className="shrink-0 px-5 pb-3 pt-3">
@@ -203,7 +201,7 @@ export const MobileAdminNavigation = ({
             />
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+                <p className="mb-1 text-xs font-bold uppercase tracking-[0.2em] text-muted">
                   SHOP.CO · {t("uiWorkspaceNavigation")}
                 </p>
                 <h2
@@ -235,7 +233,7 @@ export const MobileAdminNavigation = ({
           <div className="scrollbar-none min-h-0 flex-1 space-y-5 overflow-y-auto px-5 pb-4 pt-1">
             {overflowItems.length > 0 && (
               <div aria-label={t("uiMorePages")} className="space-y-2.5">
-                <h3 className="px-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
+                <h3 className="px-1 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                   {t("uiMorePages")}
                 </h3>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -278,7 +276,7 @@ export const MobileAdminNavigation = ({
                             {badge !== undefined &&
                               badge !== null &&
                               badge !== "" && (
-                                <span className="mt-1 inline-flex rounded-full bg-surface-muted px-1.5 py-0.5 text-[9px] font-bold text-secondary">
+                                <span className="mt-1 inline-flex rounded-full bg-surface-muted px-1.5 py-0.5 text-xs font-bold text-secondary">
                                   {badge}
                                 </span>
                               )}
@@ -327,7 +325,7 @@ export const MobileAdminNavigation = ({
 
             {showAppearanceControls && (
               <div className="space-y-2.5">
-                <h3 className="px-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
+                <h3 className="px-1 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                   {t("uiQuickPreferences")}
                 </h3>
                 <div className="grid grid-cols-2 gap-2.5">
@@ -340,7 +338,7 @@ export const MobileAdminNavigation = ({
                         <span className="block text-xs font-bold text-primary">
                           {t("uiLanguagePreference")}
                         </span>
-                        <span className="mt-0.5 block text-[10px] text-muted">
+                        <span className="mt-0.5 block text-xs text-muted">
                           {locale === "ar" ? "العربية" : "English"}
                         </span>
                       </span>
@@ -360,7 +358,7 @@ export const MobileAdminNavigation = ({
                         <span className="block text-xs font-bold text-primary">
                           {t("uiThemePreference")}
                         </span>
-                        <span className="mt-0.5 block text-[10px] text-muted">
+                        <span className="mt-0.5 block text-xs text-muted">
                           {theme === "dark"
                             ? t("themeSwitchToLight")
                             : t("themeSwitchToDark")}
@@ -422,7 +420,7 @@ export const MobileAdminNavigation = ({
         initial={reduceMotion ? false : { opacity: 0, y: 14, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={spring}
-        className="relative mx-auto w-full max-w-[460px] rounded-[27px] border border-border/80 bg-surface/90 p-1.5 shadow-[0_12px_38px_rgba(var(--shadow-rgb),0.12)] ring-1 ring-focus/[0.035] backdrop-blur-2xl sm:rounded-[30px] sm:p-2"
+        className="relative mx-auto w-full max-w-[460px] rounded-3xl border border-border/80 bg-surface/90 p-1.5 shadow-card ring-1 ring-focus/[0.035] backdrop-blur-2xl sm:rounded-3xl sm:p-2"
         style={{ WebkitTapHighlightColor: "transparent" }}
       >
         <span
@@ -443,14 +441,14 @@ export const MobileAdminNavigation = ({
                 <motion.div
                   whileTap={reduceMotion ? undefined : { scale: 0.94 }}
                   transition={spring}
-                  className={`relative flex min-h-[58px] min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-1.5 py-1.5 text-center outline-none transition-colors duration-200 sm:min-h-[62px] sm:rounded-[20px] ${itemActive ? "text-on-action" : "text-muted hover:bg-surface-muted/80 hover:text-primary"}`}
+                  className={`relative flex min-h-[58px] min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1.5 py-1.5 text-center outline-none transition-colors duration-200 sm:min-h-[62px] sm:rounded-2xl ${itemActive ? "text-on-action" : "text-muted hover:bg-surface-muted/80 hover:text-primary"}`}
                 >
                   {itemActive && (
                     <motion.span
                       layoutId="mobile-admin-active-background"
                       aria-hidden="true"
                       transition={reduceMotion ? { duration: 0 } : spring}
-                      className="absolute inset-0 rounded-[18px] border border-white/10 bg-action shadow-[0_5px_16px_rgba(var(--shadow-rgb),0.18),inset_0_1px_0_rgba(255,255,255,0.1)] sm:rounded-[20px]"
+                      className="absolute inset-0 rounded-2xl border border-white/10 bg-action shadow-[0_5px_16px_rgba(var(--shadow-rgb),0.18),inset_0_1px_0_rgba(255,255,255,0.1)] sm:rounded-2xl"
                     />
                   )}
                   <span className="relative z-10 flex h-5 items-center justify-center">
@@ -460,12 +458,12 @@ export const MobileAdminNavigation = ({
                       aria-hidden="true"
                     />
                     {badge !== undefined && badge !== null && badge !== "" && (
-                      <span className="absolute -end-2 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full border border-surface bg-danger px-1 text-[8px] font-black leading-none text-white">
+                      <span className="absolute -end-2 -top-1 flex min-h-4 min-w-4 items-center justify-center rounded-full border border-surface bg-danger px-1 text-xs font-black leading-none text-white">
                         {badge}
                       </span>
                     )}
                   </span>
-                  <span className="relative z-10 block w-full line-clamp-2 break-words text-[9px] font-bold leading-[11px] sm:text-[10px] sm:leading-3">
+                  <span className="relative z-10 block w-full line-clamp-2 break-words text-xs font-bold leading-[11px] sm:text-xs sm:leading-3">
                     {label}
                   </span>
                   {itemActive && (
@@ -483,7 +481,7 @@ export const MobileAdminNavigation = ({
                 "aria-label": label,
                 "aria-current": itemActive ? ("page" as const) : undefined,
                 className:
-                  "group min-w-0 rounded-[18px] outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface sm:rounded-[20px]",
+                  "group min-w-0 rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface sm:rounded-2xl",
                 style: { WebkitTapHighlightColor: "transparent" as const },
               };
 
@@ -516,7 +514,7 @@ export const MobileAdminNavigation = ({
               aria-label={t("uiNavigationMore")}
               aria-current={isOverflowActive ? "page" : undefined}
               whileTap={reduceMotion ? undefined : { scale: 0.94 }}
-              className={`relative flex min-h-[58px] min-w-0 flex-col items-center justify-center gap-1 rounded-[18px] px-1.5 py-1.5 text-center outline-none transition-colors sm:min-h-[62px] sm:rounded-[20px] ${isMoreOpen || isOverflowActive ? "bg-action/[0.08] text-primary" : "text-muted hover:bg-surface-muted/80 hover:text-primary"} focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface`}
+              className={`relative flex min-h-[58px] min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1.5 py-1.5 text-center outline-none transition-colors sm:min-h-[62px] sm:rounded-2xl ${isMoreOpen || isOverflowActive ? "bg-action/[0.08] text-primary" : "text-muted hover:bg-surface-muted/80 hover:text-primary"} focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface`}
             >
               <span
                 className={`flex h-8 w-8 items-center justify-center rounded-xl transition-colors ${isMoreOpen || isOverflowActive ? "bg-action text-on-action shadow-sm" : "bg-transparent"}`}
@@ -542,7 +540,7 @@ export const MobileAdminNavigation = ({
                   </motion.span>
                 </AnimatePresence>
               </span>
-              <span className="block w-full line-clamp-2 break-words text-[9px] font-bold leading-[11px] sm:text-[10px] sm:leading-3">
+              <span className="block w-full line-clamp-2 break-words text-xs font-bold leading-[11px] sm:text-xs sm:leading-3">
                 {t("uiNavigationMore")}
               </span>
               {isOverflowActive && !isMoreOpen && (

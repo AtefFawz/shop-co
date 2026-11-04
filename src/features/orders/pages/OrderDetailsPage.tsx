@@ -6,6 +6,7 @@ import Link from "next/link";
 import { ArrowLeft, XCircle, ShieldCheck, Sparkles, RefreshCw, Crown, Trash2, Loader2, Printer } from "lucide-react";
 import toast from "react-hot-toast";
 import api from "@/lib/api";
+import { canAdminDeleteOrder } from "@/lib/orderRules";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 import OrderHeader from "@/features/orders/components/OrderDetailsHeader";
@@ -23,6 +24,7 @@ export type Order = {
   totalPrice: number;
   createdAt: string;
   updatedAt?: string;
+  statusHistory?: { status: OrderStatus; changedAt: string; changedBy?: string }[];
   paymentMethod?: string;
   user?: {
     _id?: string;
@@ -77,36 +79,12 @@ export default function OrderDetailsPage() {
   useEffect(() => {
     const checkAdminRole = async () => {
       try {
-        // Check localStorage first for instant detection
-        for (let i = 0; i < localStorage.length; i++) {
-          const key = localStorage.key(i);
-          if (!key) continue;
-          const raw = localStorage.getItem(key);
-          if (
-            raw &&
-            (raw.includes('"ADMIN"') ||
-              raw.includes('"admin"') ||
-              raw.includes('"MANAGER"'))
-          ) {
-            setIsAdmin(true);
-            return;
-          }
-        }
+        const res = await api.get("profile/me");
+        const userObj = res.data?.data?.user;
+        const role = String(userObj?.role || "").toUpperCase();
+        setIsAdmin(role === "ADMIN" || role === "MANAGER");
       } catch {
-        // ignore storage errors
-      }
-
-      // Fallback: verify profile from API
-      try {
-        const res = await api.get("/users/me");
-        const userObj =
-          res.data?.data?.user || res.data?.user || res.data?.data;
-        const role = (userObj?.role || "").toUpperCase();
-        if (role === "ADMIN" || role === "MANAGER" || role === "MANGER") {
-          setIsAdmin(true);
-        }
-      } catch {
-        // Not admin or endpoint differs
+        setIsAdmin(false);
       }
     };
 
@@ -198,12 +176,12 @@ export default function OrderDetailsPage() {
   if (error || !order) {
     return (
       <main className="relative isolate flex min-h-[80vh] items-center justify-center overflow-hidden bg-surface-subtle px-5 py-12 text-primary">
-        <div className="w-full max-w-md rounded-[2.2rem] border border-border bg-surface p-8 text-center shadow-[0_24px_60px_-15px_rgba(var(--shadow-rgb),0.08)]">
+        <div className="w-full max-w-md rounded-4xl border border-border bg-surface p-8 text-center shadow-panel">
           <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-danger-soft text-danger ring-8 ring-danger/10">
             <XCircle size={30} />
           </div>
 
-          <span className="mt-5 inline-block rounded-full bg-surface-muted px-3 py-1 font-mono text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+          <span className="mt-5 inline-block rounded-full bg-surface-muted px-3 py-1 font-mono text-xs font-black uppercase tracking-[0.2em] text-muted">
             {t("archiveLookupFailed")}
           </span>
 
@@ -236,7 +214,7 @@ export default function OrderDetailsPage() {
   }
 
   return (
-    <section className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-10">
+    <section className="page-section relative isolate min-h-screen overflow-hidden bg-surface-subtle text-primary">
       {/* ================================================================== */}
       {/* GPU 3D ANIMATIONS & PRINT STYLES                                   */}
       {/* ================================================================== */}
@@ -276,7 +254,7 @@ export default function OrderDetailsPage() {
         {/* ================================================================ */}
         {/* 1. TOP NAVIGATION & QUICK ACTIONS BAR                            */}
         {/* ================================================================ */}
-        <div className="no-print dossier-anim-1 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-border bg-surface/90 p-4 shadow-[0_10px_30px_-12px_rgba(var(--shadow-rgb),0.05)] backdrop-blur-xl sm:px-6">
+        <div className="no-print dossier-anim-1 flex flex-wrap items-center justify-between gap-3 rounded-3xl border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl sm:px-6">
           <button
             type="button"
             onClick={() => router.back()}
@@ -293,7 +271,7 @@ export default function OrderDetailsPage() {
             {/* Print Official Invoice Button */}
             <button
               type="button"
-              onClick={() => window.print()}
+              onClick={() => router.push(`/shop/orders/${orderId}/invoice`)}
               className="inline-flex cursor-pointer items-center gap-2 rounded-2xl border border-border/90 bg-surface px-4 py-2 text-xs font-black uppercase tracking-wider text-secondary transition-all hover:border-border-strong hover:text-primary"
             >
               <Printer size={14} />
@@ -320,7 +298,7 @@ export default function OrderDetailsPage() {
         {/* 2. EXCLUSIVE ADMIN LIVE DISPATCH COMMAND CONSOLE                 */}
         {/* ================================================================ */}
         {isAdmin && (
-          <div className="no-print dossier-anim-1 relative overflow-hidden rounded-3xl border border-white/15 bg-linear-to-r from-action via-action to-action p-5 text-on-action shadow-[0_22px_50px_-12px_rgba(var(--shadow-rgb),0.35)] sm:p-6">
+          <div className="no-print dossier-anim-1 relative overflow-hidden rounded-3xl border border-white/15 bg-linear-to-r from-action via-action to-action p-5 text-on-action shadow-panel sm:p-6">
             <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-center">
               <div className="flex items-start gap-3.5">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-white/10 text-rating ring-1 ring-white/15">
@@ -328,7 +306,7 @@ export default function OrderDetailsPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-[0.22em] text-rating">
+                    <span className="text-xs font-black uppercase tracking-[0.22em] text-rating">
                       {t("orderAdminCommandMode")}
                     </span>
                     {updatingStatus && (
@@ -357,7 +335,7 @@ export default function OrderDetailsPage() {
                       type="button"
                       disabled={updatingStatus}
                       onClick={() => handleStatusChange(st)}
-                      className={`cursor-pointer rounded-2xl px-3.5 py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-50 ${
+                      className={`cursor-pointer rounded-2xl px-3.5 py-2 text-xs font-black uppercase tracking-widest transition-all duration-200 active:scale-95 disabled:opacity-50 ${
                         isCurrent
                           ? st === "Cancelled"
                             ? "bg-danger text-on-danger shadow-[0_0_20px_rgba(var(--danger-rgb),0.5)] ring-2 ring-white/40"
@@ -370,35 +348,39 @@ export default function OrderDetailsPage() {
                   );
                 })}
 
-                <span className="mx-1 hidden h-6 w-px bg-white/15 sm:inline-block" />
+                {canAdminDeleteOrder(order.status) && (
+                  <>
+                    <span className="mx-1 hidden h-6 w-px bg-white/15 sm:inline-block" />
 
-                {!confirmDelete ? (
-                  <button
-                    type="button"
-                    onClick={() => setConfirmDelete(true)}
-                    className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-danger-border bg-danger-soft px-3.5 py-2 text-[10px] font-black uppercase tracking-widest text-danger transition-all hover:bg-danger hover:text-on-danger"
-                  >
-                    <Trash2 size={13} />
-                    <span>{t("orderPurge")}</span>
-                  </button>
-                ) : (
-                  <div className="inline-flex items-center gap-1.5 rounded-2xl border border-danger-border bg-danger/60 p-1">
-                    <button
-                      type="button"
-                      disabled={deleting}
-                      onClick={handleDeleteOrder}
-                      className="cursor-pointer rounded-xl bg-danger px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-on-danger hover:bg-danger"
-                    >
-                      {deleting ? t("orderDeleting") : t("orderConfirmPurge")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmDelete(false)}
-                      className="cursor-pointer rounded-xl px-2.5 py-1.5 text-[10px] font-black uppercase text-on-action/70 hover:text-on-action"
-                    >
-                      {t("orderCancel")}
-                    </button>
-                  </div>
+                    {!confirmDelete ? (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDelete(true)}
+                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-2xl border border-danger-border bg-danger-soft px-3.5 py-2 text-xs font-black uppercase tracking-widest text-danger transition-all hover:bg-danger hover:text-on-danger"
+                      >
+                        <Trash2 size={13} />
+                        <span>{t("orderPurge")}</span>
+                      </button>
+                    ) : (
+                      <div className="inline-flex items-center gap-1.5 rounded-2xl border border-danger-border bg-danger/60 p-1">
+                        <button
+                          type="button"
+                          disabled={deleting}
+                          onClick={handleDeleteOrder}
+                          className="cursor-pointer rounded-xl bg-danger px-3 py-1.5 text-xs font-black uppercase tracking-wider text-on-danger hover:bg-danger"
+                        >
+                          {deleting ? t("orderDeleting") : t("orderConfirmPurge")}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDelete(false)}
+                          className="cursor-pointer rounded-xl px-2.5 py-1.5 text-xs font-black uppercase text-on-action/70 hover:text-on-action"
+                        >
+                          {t("orderCancel")}
+                        </button>
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
             </div>
@@ -420,12 +402,12 @@ export default function OrderDetailsPage() {
         {/* ================================================================ */}
         {/* 4. 3D TELEMETRY STATUS TRACKER                                   */}
         {/* ================================================================ */}
-        <div className="dossier-anim-3 overflow-hidden rounded-[2.2rem] border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-7">
+        <div className="dossier-anim-3 overflow-hidden rounded-4xl border border-border bg-surface p-5 shadow-card sm:p-7">
           <div className="mb-6 flex flex-col justify-between gap-2 border-b border-border-subtle pb-4 sm:flex-row sm:items-center">
             <div>
               <div className="flex items-center gap-2">
                 <Sparkles size={13} className="text-primary" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-muted">
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-muted">
                   {t("orderLogisticsPipeline")}
                 </span>
               </div>
@@ -435,7 +417,7 @@ export default function OrderDetailsPage() {
             </div>
 
             {isAdmin ? (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-subtle px-3 py-1 text-[10px] font-black uppercase tracking-wider text-secondary">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-surface-subtle px-3 py-1 text-xs font-black uppercase tracking-wider text-secondary">
                 <ShieldCheck size={13} className="text-success" />
                 {t("orderAdminPipelineHint")}
               </span>
@@ -453,6 +435,19 @@ export default function OrderDetailsPage() {
             updating={updatingStatus}
             onSelectStatus={handleStatusChange}
           />
+          {Array.isArray(order.statusHistory) && order.statusHistory.length > 0 && (
+            <div className="mt-6 border-t border-border-subtle pt-5">
+              <h3 className="text-xs font-black uppercase tracking-[.18em] text-muted">{locale === "ar" ? "سجل تحديثات الطلب" : "Order activity history"}</h3>
+              <ol className="mt-3 space-y-3">
+                {[...order.statusHistory].sort((a,b) => new Date(a.changedAt).getTime() - new Date(b.changedAt).getTime()).map((entry,index) => (
+                  <li key={`${entry.status}-${entry.changedAt}-${index}`} className="flex items-center justify-between gap-3 rounded-xl border border-border-subtle bg-surface-subtle px-3 py-2.5 text-xs">
+                    <span className="font-bold">{({ Pending: t("orderStatusPending"), Shipped: t("orderStatusShipped"), Delivered: t("orderStatusDelivered"), Cancelled: t("orderStatusCancelled") } as Record<OrderStatus,string>)[entry.status]}</span>
+                    <time className="shrink-0 font-mono text-muted" dateTime={entry.changedAt}>{new Date(entry.changedAt).toLocaleString(locale === "ar" ? "ar-EG" : "en-GB", { dateStyle: "medium", timeStyle: "short" })}</time>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
         </div>
 
         {/* ================================================================ */}

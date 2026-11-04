@@ -71,14 +71,14 @@ export default function AdminLayout({
         }
         headerContent={
           <div className="flex items-center gap-3 py-4">
-            <div className="w-12 h-12 rounded-2xl bg-action flex items-center justify-center text-on-action shadow-[0_18px_38px_-12px_rgba(var(--shadow-rgb),0.2)] shrink-0">
+            <div className="w-12 h-12 rounded-2xl bg-action flex items-center justify-center text-on-action shadow-card shrink-0">
               <ShieldCheck size={24} />
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="truncate text-sm font-black uppercase leading-none tracking-tighter">
                 {t("adminPanel")}
               </h2>
-              <p className="mt-1 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest text-success">
+              <p className="mt-1 flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-success">
                 <span className="h-1.5 w-1.5 shrink-0 animate-pulse rounded-full bg-success-bright" />
                 {t("liveMode")}
               </p>
@@ -88,13 +88,13 @@ export default function AdminLayout({
         extraFooterLinks={
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
-              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+              <span className="min-w-0 truncate text-xs font-bold text-secondary">
                 {t("uiLanguagePreference")}
               </span>
               <LocaleSwitcher compact />
             </div>
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
-              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+              <span className="min-w-0 truncate text-xs font-bold text-secondary">
                 {t("uiThemePreference")}
               </span>
               <ThemeToggle compact />

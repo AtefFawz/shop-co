@@ -5,12 +5,25 @@ import type { Product } from "@/types";
 export default async function AdminProductCatalogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<{
+    page?: string;
+    keyword?: string;
+    stockStatus?: string;
+    sort?: string;
+  }>;
 }) {
   const params = await searchParams;
   const page = Math.max(1, Number(params?.page) || 1);
   const limit = 10;
-  const productsData = await products("/product", page, limit);
+  const keyword = typeof params?.keyword === "string" ? params.keyword.trim().slice(0, 120) : "";
+  const stockStatus = ["healthy", "low", "out"].includes(params?.stockStatus || "") ? params!.stockStatus! : "all";
+  const sort = ["newest", "price-asc", "price-desc", "stock-asc"].includes(params?.sort || "") ? params!.sort! : "newest";
+  const productsData = await products("/product", page, limit, {
+    keyword: keyword || null,
+    stockStatus: stockStatus === "all" ? null : stockStatus,
+    sort,
+    includeStats: true,
+  });
   const productList: Product[] = productsData?.data?.Products ?? [];
   const pagination = productsData?.pagination ?? {
     page: 1,
@@ -43,6 +56,9 @@ export default async function AdminProductCatalogPage({
       pageCatalogValue={pageCatalogValue}
       startItem={startItem}
       endItem={endItem}
+      keyword={keyword}
+      stockStatus={stockStatus}
+      sort={sort}
     />
   );
 }

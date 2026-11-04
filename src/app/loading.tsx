@@ -122,7 +122,7 @@ export default function Loading() {
         }
 
         .studio-floor {
-          background-image: 
+          background-image:
             linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
             linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
           background-size: 56px 56px;
@@ -243,17 +243,17 @@ export default function Loading() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-action opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-action" />
           </span>
-          <span className="text-[10px] font-black uppercase tracking-[0.24em] text-primary">
+          <span className="text-xs font-black uppercase tracking-[0.24em] text-primary">
             SHOP.CO · ATELIER
           </span>
         </div>
 
-        <div className="hidden items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-muted sm:flex">
+        <div className="hidden items-center gap-2 text-xs font-bold uppercase tracking-[0.22em] text-muted sm:flex">
           <Scissors size={12} className="text-secondary" />
           <span>3D INTERACTIVE LOOKBOOK</span>
         </div>
 
-        <span className="rounded-full border border-border-subtle bg-surface/85 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.18em] text-secondary shadow-2xs">
+        <span className="rounded-full border border-border-subtle bg-surface/85 px-3.5 py-1.5 font-mono text-xs font-extrabold tracking-[0.18em] text-secondary shadow-2xs">
           COLLECTION // 26
         </span>
       </div>
@@ -273,7 +273,7 @@ export default function Loading() {
           {/* A. TAILOR MEASURING TAPE ORBIT RINGS                           */}
           {/* -------------------------------------------------------------- */}
           <div className="tape-ring-1 preserve-3d pointer-events-none absolute h-76 w-76 rounded-full border-2 border-dashed border-border-subtle sm:h-84 sm:w-84">
-            <span className="absolute -top-2 left-1/2 flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full bg-action text-[8px] font-bold text-on-action shadow-md">
+            <span className="absolute -top-2 left-1/2 flex h-4 w-4 -translate-x-1/2 items-center justify-center rounded-full bg-action text-xs font-bold text-on-action shadow-md">
               ✦
             </span>
           </div>
@@ -294,21 +294,21 @@ export default function Loading() {
                   style={{
                     transform: `rotateY(${item.angle}deg) translateZ(172px)`,
                   }}
-                  className="preserve-3d absolute flex items-center gap-2.5 rounded-2xl border border-border-subtle bg-surface px-3.5 py-2.5 shadow-[0_14px_34px_rgba(var(--shadow-rgb),0.10)]"
+                  className="preserve-3d absolute flex items-center gap-2.5 rounded-2xl border border-border-subtle bg-surface px-3.5 py-2.5 shadow-card"
                 >
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-action text-on-action">
                     <Icon size={14} />
                   </span>
                   <div className="pr-1">
                     <div className="flex items-center justify-between gap-2">
-                      <span className="font-mono text-[8px] font-bold tracking-[0.16em] text-muted">
+                      <span className="font-mono text-xs font-bold tracking-[0.16em] text-muted">
                         {item.tag}
                       </span>
-                      <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[9px] font-black text-primary">
+                      <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs font-black text-primary">
                         {item.price}
                       </span>
                     </div>
-                    <p className="mt-0.5 text-[10px] font-black tracking-[0.08em] text-primary">
+                    <p className="mt-0.5 text-xs font-black tracking-[0.08em] text-primary">
                       {item.name}
                     </p>
                   </div>
@@ -335,7 +335,7 @@ export default function Loading() {
                 <path d="M32 10 C32 5, 39 5, 39 10 C39 14, 32 15, 32 19" />
                 <path d="M32 19 L6 34 C3 35.5, 4 38, 8 38 L56 38 C60 38, 61 35.5, 58 34 L32 19 Z" />
               </svg>
-              <span className=" -mt-2 rounded-full border border-border-subtle bg-surface px-2.5 py-0.5 text-[8px] font-black uppercase tracking-[0.2em] text-primary shadow-sm">
+              <span className=" -mt-2 rounded-full border border-border-subtle bg-surface px-2.5 py-0.5 text-xs font-black uppercase tracking-[0.2em] text-primary shadow-sm">
                 NEW SEASON
               </span>
             </div>
@@ -353,7 +353,7 @@ export default function Loading() {
             {/* 3. BAG FRONT FACE (104px wide x 126px high, translateZ 32px) */}
             <div
               style={{ transform: "rotateY(0deg) translateZ(32px)" }}
-              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-action p-3.5 text-on-action shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.25)]"
+              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-action p-3.5 text-on-action shadow-card"
             >
               {/* Bag Rope Eyelets */}
               <div className="flex w-full justify-around px-3">
@@ -363,16 +363,16 @@ export default function Loading() {
 
               {/* Center Brand Print */}
               <div className="text-center">
-                <span className="block text-[15px] font-black tracking-[-0.04em] text-on-action">
+                <span className="block text-[0.9375rem] font-black tracking-[-0.04em] text-on-action">
                   SHOP.CO
                 </span>
-                <span className="mt-0.5 block text-[7px] font-bold uppercase tracking-[0.28em] text-on-action/50">
+                <span className="mt-0.5 block text-xs font-bold uppercase tracking-[0.28em] text-on-action/50">
                   LUXURY BAG
                 </span>
               </div>
 
               {/* Bottom Barcode Strip */}
-              <div className="flex w-full items-center justify-between border-t border-white/15 pt-1.5 text-[7px] font-mono text-on-action/50">
+              <div className="flex w-full items-center justify-between border-t border-white/15 pt-1.5 text-xs font-mono text-on-action/50">
                 <span>EST. 2026</span>
                 <Sparkles size={10} className="text-on-action" />
               </div>
@@ -381,7 +381,7 @@ export default function Loading() {
             {/* 4. BAG BACK FACE (translateZ -32px) */}
             <div
               style={{ transform: "rotateY(180deg) translateZ(32px)" }}
-              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-action p-3.5 text-on-action shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.25)]"
+              className="absolute inset-0 flex flex-col items-center justify-between rounded-b-2xl rounded-t-md border-2 border-white/20 bg-action p-3.5 text-on-action shadow-card"
             >
               <div className="flex w-full justify-around px-3">
                 <span className="h-2 w-2 rounded-full border border-border-subtle bg-action-hover" />
@@ -390,12 +390,12 @@ export default function Loading() {
 
               <div className="text-center">
                 <ShoppingBag size={22} className="mx-auto text-on-action" />
-                <span className="mt-1.5 block text-[8px] font-black uppercase tracking-[0.22em] text-on-action/80">
+                <span className="mt-1.5 block text-xs font-black uppercase tracking-[0.22em] text-on-action/80">
                   FIND YOUR STYLE
                 </span>
               </div>
 
-              <span className="text-[7px] font-mono tracking-widest text-on-action/40">
+              <span className="text-xs font-mono tracking-widest text-on-action/40">
                 EDITION // 04
               </span>
             </div>
@@ -409,7 +409,7 @@ export default function Loading() {
               }}
               className="absolute inset-y-0 flex flex-col items-center justify-center rounded-b-xl border border-border-subtle bg-surface text-primary shadow-inner"
             >
-              <span className="[writing-mode:vertical-rl] text-[9px] font-black uppercase tracking-[0.28em] text-primary">
+              <span className="[writing-mode:vertical-rl] text-xs font-black uppercase tracking-[0.28em] text-primary">
                 SHOP.CO
               </span>
             </div>
@@ -423,7 +423,7 @@ export default function Loading() {
               }}
               className="absolute inset-y-0 flex flex-col items-center justify-center rounded-b-xl border border-border-subtle bg-surface text-primary shadow-inner"
             >
-              <span className="[writing-mode:vertical-rl] text-[9px] font-black uppercase tracking-[0.28em] text-primary">
+              <span className="[writing-mode:vertical-rl] text-xs font-black uppercase tracking-[0.28em] text-primary">
                 2026 EDIT
               </span>
             </div>
@@ -451,7 +451,7 @@ export default function Loading() {
         <div className="mt-4 flex w-full max-w-md flex-col items-center text-center">
           <div className="flex w-full items-end justify-between px-1">
             <div className="text-left">
-              <span className="inline-flex items-center gap-1.5 text-[10px] font-extrabold uppercase tracking-[0.24em] text-muted">
+              <span className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.24em] text-muted">
                 <Sparkles size={11} className="text-primary" />
                 ATELIER STATUS
               </span>
@@ -477,7 +477,7 @@ export default function Loading() {
           </div>
 
           {/* Ruler Ticks Under Progress Bar */}
-          <div className="mt-2 flex w-full justify-between px-1 font-mono text-[8px] font-bold tracking-[0.2em] text-muted">
+          <div className="mt-2 flex w-full justify-between px-1 font-mono text-xs font-bold tracking-[0.2em] text-muted">
             <span>00 CM</span>
             <span>25 CM</span>
             <span>50 CM</span>
@@ -490,7 +490,7 @@ export default function Loading() {
       {/* ================================================================== */}
       {/* 5. BOTTOM EDITORIAL FOOTER                                         */}
       {/* ================================================================== */}
-      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between border-t border-border-subtle pt-4 text-[10px] font-bold uppercase tracking-[0.22em] text-muted">
+      <div className="relative z-30 mx-auto flex w-full max-w-[1440px] items-center justify-between border-t border-border-subtle pt-4 text-xs font-bold uppercase tracking-[0.22em] text-muted">
         <span>FIND CLOTHES THAT MATCH YOUR STYLE</span>
         <span className="hidden sm:inline">200+ INTERNATIONAL BRANDS</span>
         <span className="text-primary">SHOP.CO™</span>

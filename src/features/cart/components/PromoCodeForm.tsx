@@ -48,14 +48,14 @@ export const PromoCodeForm = ({ canCheckout = true }: { canCheckout?: boolean })
           </div>
           <button
             type="submit"
-            className="shrink-0 cursor-pointer rounded-xl border border-border bg-surface px-4 py-3 text-[10px] font-black uppercase tracking-widest text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
+            className="shrink-0 cursor-pointer rounded-xl border border-border bg-surface px-4 py-3 text-xs font-black uppercase tracking-widest text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
           >
             {t("promoApply")}
           </button>
         </div>
 
         {appliedCode && (
-          <div className="flex items-center justify-between rounded-xl bg-success-soft px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-success">
+          <div className="flex items-center justify-between rounded-xl bg-success-soft px-3 py-1.5 text-xs font-black uppercase tracking-wider text-success">
             <span className="inline-flex items-center gap-1.5">
               <CheckCircle2 size={12} /> {t("promoApplied").replace("{code}", appliedCode)}
             </span>
@@ -75,7 +75,7 @@ export const PromoCodeForm = ({ canCheckout = true }: { canCheckout?: boolean })
 
       {/* Primary 3D Checkout CTA */}
       {!canCheckout && (
-        <p className="text-center text-[11px] leading-relaxed text-muted">
+        <p className="text-center text-xs leading-relaxed text-muted">
           {t("noCheckoutSelectionHint")}
         </p>
       )}
@@ -83,7 +83,7 @@ export const PromoCodeForm = ({ canCheckout = true }: { canCheckout?: boolean })
         type="button"
         disabled={!canCheckout}
         onClick={() => router.push("/shop/details/cart/checkout")}
-        className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-[0_16px_36px_-10px_rgba(var(--shadow-rgb),0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-[0_22px_44px_-10px_rgba(var(--shadow-rgb),0.6)] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none"
+        className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-panel active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-none"
       >
         <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
         <span className="relative z-10">{t("promoProceedCheckout")}</span>

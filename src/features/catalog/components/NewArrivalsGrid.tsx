@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Sparkles, Flame } from "lucide-react";
 
@@ -20,36 +20,20 @@ export default function NewArrivalsGrid() {
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword") || "";
 
-  const { data, loading } = useData("/product", {
+  // Apply every campaign filter in MongoDB before pagination. A campaign with
+  // no matching products must stay empty rather than silently showing all items.
+  const [activeTab, setActiveTab] = useState<"all" | "promo" | "under150">("all");
+  const { data, loading } = useData("product", {
     params: {
-      keyword: keyword || undefined,
+      keyword: keyword || null,
+      isSale: activeTab === "promo" ? true : null,
+      maxPrice: activeTab === "under150" ? 150 : null,
+      sort: activeTab === "under150" ? "price_asc" : "newest",
     },
     limit: 8,
   });
 
-  const rawProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
-
-  // Interactive Client Filter & Sort
-  const [activeTab, setActiveTab] = useState<"all" | "promo" | "under150">(
-    "all",
-  );
-
-  const displayedProducts = useMemo(() => {
-    const list = [...rawProducts];
-    if (activeTab === "promo") {
-      const promos = list.filter(
-        (p: Product) => p.isSale === true || Number(p.discount) > 0,
-      );
-      return promos.length > 0 ? promos : list;
-    }
-    if (activeTab === "under150") {
-      const affordable = list.filter(
-        (p: Product) => Number(p.price || 0) <= 150,
-      );
-      return affordable.length > 0 ? affordable : list;
-    }
-    return list;
-  }, [rawProducts, activeTab]);
+  const displayedProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
 
   function handelClick() {
     router.push("/shop");
@@ -91,7 +75,7 @@ export default function NewArrivalsGrid() {
         <div className="flex flex-col items-center text-center">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3.5 py-1 shadow-2xs">
             <Sparkles size={12} className="text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">
+            <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
               {t("newSeason")}
             </span>
           </div>
@@ -101,7 +85,7 @@ export default function NewArrivalsGrid() {
           {/* Interactive Filter Pills */}
           <div className="mt-2 inline-flex flex-wrap items-center justify-center gap-1.5 rounded-2xl border border-border/80 bg-surface-subtle p-1.5 shadow-2xs">
             {[
-              { id: "all", label: `${t("allDrops")} (${rawProducts.length})` },
+              { id: "all", label: t("allDrops") },
               { id: "promo", label: t("featuredPromo") },
               { id: "under150", label: t("essentialsUnder") },
             ].map((tab) => (
@@ -111,7 +95,7 @@ export default function NewArrivalsGrid() {
                 onClick={() =>
                   setActiveTab(tab.id as "all" | "promo" | "under150")
                 }
-                className={`cursor-pointer rounded-xl px-3.5 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all duration-200 ${
+                className={`cursor-pointer rounded-xl px-3.5 py-1.5 text-xs font-black uppercase tracking-wider transition-all duration-200 ${
                   activeTab === tab.id
                     ? "bg-action text-on-action shadow-xs"
                     : "text-muted hover:text-primary"
@@ -124,10 +108,15 @@ export default function NewArrivalsGrid() {
         </div>
 
         {/* ── 3D Architectural Product Grid ── */}
-        <div
-          style={{ perspective: "1200px" }}
-          className="grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4"
-        >
+        {displayedProducts.length === 0 ? (
+          <div className="rounded-2xl border border-border bg-surface-subtle px-5 py-10 text-center text-sm font-semibold text-muted">
+            {t("noProducts")}
+          </div>
+        ) : (
+          <div
+            style={{ perspective: "1200px" }}
+            className="grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4"
+          >
           {displayedProducts.map((item: Product, idx: number) => (
             <div
               key={item._id}
@@ -135,11 +124,11 @@ export default function NewArrivalsGrid() {
             >
               {/* Subtle Edition Index Tag */}
               <div className="mb-1.5 flex items-center justify-between px-1">
-                <span className="font-mono text-[9px] font-black uppercase tracking-widest text-muted transition-colors group-hover:text-primary">
+                <span className="font-mono text-xs font-black uppercase tracking-widest text-muted transition-colors group-hover:text-primary">
                   DROP // 0{idx + 1}
                 </span>
                 {item.isSale && (
-                  <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-success">
+                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-success">
                     <Flame size={10} /> {t("hot")}
                   </span>
                 )}
@@ -149,8 +138,9 @@ export default function NewArrivalsGrid() {
                 <Card product={item} />
               </div>
             </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* ── View All CTA with SpecularButton ── */}
         <div className="flex w-full flex-col items-center justify-center pt-4 pb-6">
@@ -177,7 +167,7 @@ export default function NewArrivalsGrid() {
         {/* Architectural Divider */}
         <div className="relative flex items-center justify-center py-2">
           <div className="h-px w-full bg-linear-to-r from-transparent via-border-strong to-transparent" />
-          <span className="absolute bg-surface px-4 font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-subtle">
+          <span className="absolute bg-surface px-4 font-mono text-xs font-bold uppercase tracking-[0.3em] text-subtle">
             SHOP.CO
           </span>
         </div>

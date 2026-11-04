@@ -43,7 +43,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
 
   if (!mounted) {
     return (
-      <div className="flex h-[230px] w-full flex-col justify-between rounded-[24px] border border-border/70 bg-surface p-6 shadow-xs md:w-[360px]">
+      <div className="flex h-[230px] w-full flex-col justify-between rounded-3xl border border-border/70 bg-surface p-6 shadow-xs md:w-[360px]">
         <div className="flex items-center justify-between">
           <div className="h-4 w-28 animate-pulse rounded-full bg-surface-muted" />
           <div className="h-6 w-12 animate-pulse rounded-full bg-surface-muted" />
@@ -65,7 +65,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
 
   const fullName = items?.fullName || t("reviewAnonymous");
   const comment = items?.comment || "";
-  const rating = Number(items?.rating || 5);
+  const rating = Number(items?.rating);
   const isLongText = comment.length > 115;
 
   const initials = getInitials(fullName, "U");
@@ -78,7 +78,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
       layout
       onMouseMove={handleMouseMove}
       transition={{ type: "spring", stiffness: 360, damping: 30 }}
-      className={`group relative flex w-full flex-col justify-between overflow-hidden rounded-[24px] border border-border/80 bg-surface p-5 sm:p-6 shadow-[0_8px_30px_rgba(var(--shadow-rgb),0.03)]  transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-[0_20px_45px_-12px_rgba(var(--shadow-rgb),0.09)]  ${
+      className={`group relative flex w-full flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-surface p-5 sm:p-6 shadow-card  transition-all duration-300 hover:-translate-y-1 hover:border-border-strong hover:shadow-panel  ${
         isExpanded ? "h-auto" : "min-h-[230px]"
       }`}
     >
@@ -106,7 +106,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
             <StarRating rating={rating} />
           </div>
 
-          <span className="inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 font-mono text-[10px] font-black text-warning">
+          <span className="inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 font-mono text-xs font-black text-warning">
             <Sparkles size={10} className="text-warning" />
             <span>{rating.toFixed(1)}</span>
           </span>
@@ -144,7 +144,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
               />
             </div>
 
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-muted">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.12em] text-muted">
               {t("reviewVerifiedClient")}
             </span>
           </div>
@@ -152,7 +152,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
 
         <motion.div layout className="relative pt-1">
           <p
-            className={`text-[13.5px] leading-relaxed text-secondary transition-colors duration-200 group-hover:text-secondary ${
+            className={`text-[0.8438rem] leading-relaxed text-secondary transition-colors duration-200 group-hover:text-secondary ${
               isExpanded ? "" : "line-clamp-3"
             }`}
           >
@@ -163,7 +163,7 @@ export default function CustomerReviewsSection({ items }: { items: Review }) {
             <button
               type="button"
               onClick={() => setIsExpanded(!isExpanded)}
-              className="mt-3 inline-flex cursor-pointer items-center gap-1 rounded-full border border-border/80 bg-surface-subtle px-3 py-1 text-[10.5px] font-black uppercase tracking-widest text-primary transition-all duration-200 hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
+              className="mt-3 inline-flex cursor-pointer items-center gap-1 rounded-full border border-border/80 bg-surface-subtle px-3 py-1 text-xs font-black uppercase tracking-widest text-primary transition-all duration-200 hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
             >
               <span>{isExpanded ? t("reviewShowLess") : t("reviewReadMore")}</span>
               <motion.span

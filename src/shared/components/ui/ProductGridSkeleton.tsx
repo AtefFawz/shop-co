@@ -5,7 +5,7 @@ export const ProductGridSkeleton = () => {
   return (
     <div
       aria-hidden="true"
-      className="relative mb-3 flex h-full w-full flex-col justify-between overflow-hidden rounded-[1.75rem] border border-border/70 bg-surface p-2.5 shadow-[0_8px_28px_-12px_rgba(var(--shadow-rgb),0.05)] sm:p-3"
+      className="relative mb-3 flex h-full w-full flex-col justify-between overflow-hidden rounded-[1.75rem] border border-border/70 bg-surface p-2.5 shadow-card sm:p-3"
     >
       <style>{`
         @keyframes atelierShimmer {

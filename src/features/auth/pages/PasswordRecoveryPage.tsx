@@ -1,16 +1,10 @@
 "use client";
 
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import {
-  motion,
-  AnimatePresence,
-  useMotionValue,
-  useMotionTemplate,
-  useReducedMotion,
-  useTransform,
-  useSpring,
-} from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useMotionTemplate, useTransform, useSpring } from "framer-motion";
 import {
   FaEnvelope,
   FaLock,
@@ -65,7 +59,7 @@ export default function PasswordRecoveryPage() {
   const [timeLeft, setTimeLeft] = useState(600);
 
   // --- 3D Interactions ---
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -237,7 +231,7 @@ export default function PasswordRecoveryPage() {
                   : "animate-pulse bg-success-bright"
               }`}
             />
-            <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-on-action sm:text-[10px]">
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.14em] text-on-action sm:text-xs">
               0{visualStep} / 03
             </span>
           </div>
@@ -289,7 +283,7 @@ export default function PasswordRecoveryPage() {
               SHOP.CO
             </Link>
 
-            <span className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-[9.5px] font-bold uppercase tracking-[0.16em] text-neutral-300 backdrop-blur-md">
+            <span className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3.5 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-neutral-300 backdrop-blur-md">
               <span
                 className={`h-1.5 w-1.5 animate-ping rounded-full ${
                   otpStatus === "error" ? "bg-rose-500" : "bg-emerald-500"
@@ -329,7 +323,7 @@ export default function PasswordRecoveryPage() {
                   }`}
                 >
                   <FaFingerprint size={11} />
-                  <span className="text-[9.5px] font-black uppercase tracking-[0.2em]">
+                  <span className="text-xs font-black uppercase tracking-[0.2em]">
                     {otpStatus === "success"
                       ? t("recoveryIdentityConfirmed")
                       : otpStatus === "error"
@@ -388,7 +382,7 @@ export default function PasswordRecoveryPage() {
                   )}
                 </h2>
 
-                <p className="mt-4 max-w-md text-[13px] leading-relaxed text-neutral-400 xl:text-sm">
+                <p className="mt-4 max-w-md text-[0.8125rem] leading-relaxed text-neutral-400 xl:text-sm">
                   {currentStepDescription}
                 </p>
               </motion.div>
@@ -398,15 +392,15 @@ export default function PasswordRecoveryPage() {
             <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-5 shadow-2xl backdrop-blur-xl xl:p-6">
               <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
                 <div className="min-w-0">
-                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-neutral-500">
+                  <p className="text-xs font-bold uppercase tracking-[0.18em] text-neutral-500">
                     {t("recoveryTargetIdentity")}
                   </p>
-                  <p className="mt-1 truncate font-mono text-xs font-semibold text-white xl:text-[13px]">
+                  <p className="mt-1 truncate font-mono text-xs font-semibold text-white xl:text-[0.8125rem]">
                     {formData.email || t("recoveryAwaitingEmail")}
                   </p>
                 </div>
                 <div className="shrink-0 rounded-xl border border-white/10 bg-white/[0.05] px-3 py-1.5 text-end">
-                  <p className="text-[8.5px] font-bold uppercase tracking-widest text-neutral-500">
+                  <p className="text-xs font-bold uppercase tracking-widest text-neutral-500">
                     {t("recoveryCompletion")}
                   </p>
                   <p className="mt-0.5 font-mono text-xs font-black text-white xl:text-sm">
@@ -417,7 +411,7 @@ export default function PasswordRecoveryPage() {
 
               {/* 6-Node Live Key Matrix */}
               <div className="mt-4 space-y-2.5">
-                <div className="flex items-center justify-between text-[9.5px] font-bold uppercase tracking-[0.14em] text-neutral-500">
+                <div className="flex items-center justify-between text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
                   <span>{t("recoveryKeyMatrix")}</span>
                   <span
                     className={`font-mono ${
@@ -514,7 +508,7 @@ export default function PasswordRecoveryPage() {
           </div>
 
           {/* Bottom Bar */}
-          <div className="relative z-10 flex items-center justify-between gap-4 border-t border-white/10 pt-5 font-mono text-[10px] uppercase tracking-[0.14em] text-neutral-500">
+          <div className="relative z-10 flex items-center justify-between gap-4 border-t border-white/10 pt-5 font-mono text-xs uppercase tracking-[0.14em] text-neutral-500">
             <span>© 2026 SHOP.CO</span>
             <span className="flex items-center gap-1.5 text-neutral-500">
               <FaLock size={10} className="text-white" />
@@ -550,7 +544,7 @@ export default function PasswordRecoveryPage() {
                   : { x: 0 }
               }
               transition={{ type: "tween", duration: 0.38 }}
-              className={`relative overflow-hidden rounded-[22px] border bg-surface p-5 shadow-[0_25px_65px_-12px_rgba(0,0,0,0.12)] transition-colors duration-300 sm:rounded-[28px] sm:p-8 md:p-9 ${
+              className={`relative overflow-hidden rounded-3xl border bg-surface p-5 shadow-[0_25px_65px_-12px_rgba(0,0,0,0.12)] transition-colors duration-300 sm:rounded-3xl sm:p-8 md:p-9 ${
                 otpStatus === "success"
                   ? "border-success-border ring-4 ring-success/10"
                   : otpStatus === "error"
@@ -607,7 +601,7 @@ export default function PasswordRecoveryPage() {
                     >
                       <div className="mb-1 flex items-center justify-between">
                         <span
-                          className={`font-mono text-[9.5px] font-bold sm:text-[10px] ${
+                          className={`font-mono text-xs font-bold sm:text-xs ${
                             active && otpStatus === "idle"
                               ? "text-neutral-400"
                               : ""
@@ -639,11 +633,11 @@ export default function PasswordRecoveryPage() {
                         ) : null}
                       </div>
 
-                      <p className="truncate text-[9.5px] font-black uppercase tracking-[0.06em] sm:text-[10.5px] sm:tracking-[0.08em]">
+                      <p className="truncate text-xs font-black uppercase tracking-[0.06em] sm:text-xs sm:tracking-[0.08em]">
                         {item.label}
                       </p>
                       <p
-                        className={`mt-0.5 hidden truncate text-[9px] sm:block ${
+                        className={`mt-0.5 hidden truncate text-xs sm:block ${
                           item.num === 2 && otpStatus !== "idle"
                             ? "text-white/80"
                             : active
@@ -669,7 +663,7 @@ export default function PasswordRecoveryPage() {
                   className="mb-6"
                 >
                   <div
-                    className={`mb-2 inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.16em] transition-colors sm:text-[9.5px] ${
+                    className={`mb-2 inline-flex items-center gap-1.5 rounded px-2 py-0.5 text-xs font-black uppercase tracking-[0.16em] transition-colors sm:text-xs ${
                       otpStatus === "success"
                         ? "bg-success text-white"
                         : otpStatus === "error"
@@ -696,7 +690,7 @@ export default function PasswordRecoveryPage() {
                     {currentStepTitle}
                   </h1>
 
-                  <p className="mt-2 text-[11.5px] leading-relaxed text-muted sm:text-[13px]">
+                  <p className="mt-2 text-xs leading-relaxed text-muted sm:text-[0.8125rem]">
                     {visualStep === 2 ? (
                       otpStatus === "success" ? (
                         <span className="font-semibold text-success">
@@ -727,7 +721,7 @@ export default function PasswordRecoveryPage() {
                     exit={{ opacity: 0, height: 0 }}
                     className="mb-5 overflow-hidden"
                   >
-                    <div className="rounded-xl border border-danger-border bg-danger-soft px-3.5 py-2.5 text-center text-[11.5px] font-bold leading-5 text-danger sm:text-xs">
+                    <div className="rounded-xl border border-danger-border bg-danger-soft px-3.5 py-2.5 text-center text-xs font-bold leading-5 text-danger sm:text-xs">
                       {error}
                     </div>
                   </motion.div>
@@ -778,7 +772,7 @@ export default function PasswordRecoveryPage() {
                             onChange={handleChange}
                             onFocus={() => setFocusedField("email")}
                             onBlur={() => setFocusedField(null)}
-                            className="h-11 w-full rounded-xl bg-transparent px-3 text-[13px] font-medium text-primary outline-none placeholder:font-normal placeholder:text-muted sm:h-12 sm:rounded-2xl sm:text-sm"
+                            className="h-11 w-full rounded-xl bg-transparent px-3 text-[0.8125rem] font-medium text-primary outline-none placeholder:font-normal placeholder:text-muted sm:h-12 sm:rounded-2xl sm:text-sm"
                           />
                         </div>
                       </Field>
@@ -793,7 +787,7 @@ export default function PasswordRecoveryPage() {
                             key={otpStatus}
                             initial={{ scale: 0.85, opacity: 0 }}
                             animate={{ scale: 1, opacity: 1 }}
-                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-[10px] font-bold sm:text-[11px] ${
+                            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-mono text-xs font-bold sm:text-xs ${
                               otpStatus === "success"
                                 ? "bg-success text-white"
                                 : otpStatus === "error"
@@ -1013,10 +1007,10 @@ export default function PasswordRecoveryPage() {
                         {/* Password Checklist */}
                         <div className="rounded-xl border border-border bg-surface-subtle/90 p-3.5 sm:rounded-2xl">
                           <div className="mb-2.5 flex items-center justify-between gap-2">
-                            <p className="text-[9.5px] font-black uppercase tracking-[0.12em] text-secondary sm:text-[10px]">
+                            <p className="text-xs font-black uppercase tracking-[0.12em] text-secondary sm:text-xs">
                               {t("recoverySecurityRequirements")}
                             </p>
-                            <span className="rounded bg-[#111111] px-1.5 py-0.5 font-mono text-[9.5px] font-bold text-white">
+                            <span className="rounded bg-[#111111] px-1.5 py-0.5 font-mono text-xs font-bold text-white">
                               {strengthScore}/3
                             </span>
                           </div>
@@ -1056,7 +1050,7 @@ export default function PasswordRecoveryPage() {
                             ].map((rule) => (
                               <span
                                 key={rule.label}
-                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[9.5px] font-bold uppercase tracking-wider transition-all sm:text-[10px] ${
+                                className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider transition-all sm:text-xs ${
                                   rule.met
                                     ? "bg-[#111111] text-white shadow-sm"
                                     : "border border-border bg-surface text-muted"
@@ -1088,7 +1082,7 @@ export default function PasswordRecoveryPage() {
                     }
                     type="submit"
                     disabled={isLoading || otpStatus === "success"}
-                    className={`group relative flex h-11.5 w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-5 text-[11px] font-black uppercase tracking-[0.14em] transition-all focus:outline-none focus:ring-4 sm:h-12.5 sm:rounded-2xl sm:text-xs ${
+                    className={`group relative flex h-11.5 w-full items-center justify-center gap-2.5 overflow-hidden rounded-xl px-5 text-xs font-black uppercase tracking-[0.14em] transition-all focus:outline-none focus:ring-4 sm:h-12.5 sm:rounded-2xl sm:text-xs ${
                       otpStatus === "success"
                         ? "bg-success text-on-success shadow-[0_10px_24px_rgba(var(--success-rgb),0.3)] focus:ring-success/20"
                         : otpStatus === "error"
@@ -1144,7 +1138,7 @@ export default function PasswordRecoveryPage() {
                         setOtpStatus("idle");
                         setStep(1);
                       }}
-                      className="w-full py-1 text-center text-[11px] font-semibold text-muted transition-colors hover:text-primary"
+                      className="w-full py-1 text-center text-xs font-semibold text-muted transition-colors hover:text-primary"
                     >
                       {t("recoveryEmailLabel")}{" "}
                       <span className="font-bold text-primary underline underline-offset-4">
@@ -1159,7 +1153,7 @@ export default function PasswordRecoveryPage() {
               <div className="mt-6 border-t border-border-subtle pt-4 text-center sm:mt-7">
                 <Link
                   href="/auth/signin"
-                  className="group inline-flex items-center justify-center gap-1.5 text-[10.5px] font-black uppercase tracking-[0.13em] text-muted transition-colors hover:text-primary sm:text-[11px]"
+                  className="group inline-flex items-center justify-center gap-1.5 text-xs font-black uppercase tracking-[0.13em] text-muted transition-colors hover:text-primary sm:text-xs"
                 >
                   <FaArrowLeft
                     size={9}
@@ -1194,7 +1188,7 @@ function Field({
   return (
     <div className="min-w-0">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <label className="flex items-center gap-1.5 text-[9.5px] font-black uppercase tracking-[0.13em] text-secondary sm:text-[10.5px]">
+        <label className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.13em] text-secondary sm:text-xs">
           <span className="text-primary">{icon}</span>
           {label}
         </label>
@@ -1252,7 +1246,7 @@ function PasswordInput({
         onChange={onChange}
         onFocus={onFocus}
         onBlur={onBlur}
-        className="h-full min-w-0 flex-1 rounded-xl bg-transparent px-3 text-[13px] font-medium text-primary outline-none placeholder:font-normal placeholder:text-muted sm:rounded-2xl sm:text-sm"
+        className="h-full min-w-0 flex-1 rounded-xl bg-transparent px-3 text-[0.8125rem] font-medium text-primary outline-none placeholder:font-normal placeholder:text-muted sm:rounded-2xl sm:text-sm"
       />
 
       <button

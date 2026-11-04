@@ -1,7 +1,9 @@
 "use client";
 
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
 import { useMemo } from "react";
-import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   BellOff,
   CheckCircle2,
@@ -46,7 +48,7 @@ export default function NotificationList({
   onMarkAsRead,
 }: NotificationListProps) {
   const { t } = useLocale();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
 
   const grouped = useMemo(() => {
     const today: Notification[] = [];
@@ -172,7 +174,7 @@ export default function NotificationList({
             className="
               relative z-10 mt-4 inline-flex min-h-9 cursor-pointer
               items-center gap-1.5 rounded-xl border border-border-strong/70
-              bg-surface-raised px-3.5 text-[10.5px] font-bold
+              bg-surface-raised px-3.5 text-xs font-bold
               text-primary shadow-2xs transition-all
               hover:border-action hover:bg-action hover:text-on-action
               focus-visible:outline-none focus-visible:ring-2
@@ -212,7 +214,7 @@ export default function NotificationList({
             px-4 py-2 backdrop-blur-xl
           "
         >
-          <h4 className="inline-flex items-center gap-1.5 text-[9.5px] font-extrabold uppercase tracking-[0.14em] text-secondary">
+          <h4 className="inline-flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-[0.14em] text-secondary">
             {withSparkle && <Sparkles size={11} className="text-accent" />}
             <span>{title}</span>
           </h4>
@@ -220,7 +222,7 @@ export default function NotificationList({
           <span
             className="
               rounded-full border border-border-strong/50 bg-brand-soft
-              px-2 py-0.5 font-mono text-[9px] font-bold text-accent
+              px-2 py-0.5 font-mono text-xs font-bold text-accent
             "
           >
             {items.length}

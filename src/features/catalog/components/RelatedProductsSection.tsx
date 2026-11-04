@@ -18,10 +18,21 @@ export const RelatedProductsSection = ({
   productItem: Product;
 }) => {
   const { t, direction } = useLocale();
-  const { data, loading } = useData("/product");
-  const allProducts: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
+  const { data: sectionData, loading: loadingSection } = useData("/product", {
+    params: { section: productItem?.section || null },
+    limit: 12,
+  });
+  const { data: categoryData, loading: loadingCategory } = useData("/product", {
+    params: { category: productItem?.category || null },
+    limit: 12,
+  });
+  const allProducts = useMemo(() => {
+    const sectionProducts: Product[] = sectionData?.data?.Products ?? EMPTY_PRODUCTS;
+    const categoryProducts: Product[] = categoryData?.data?.Products ?? EMPTY_PRODUCTS;
+    return [...sectionProducts, ...categoryProducts];
+  }, [sectionData, categoryData]);
 
-  // Exclude current product & smartly fallback to general products if section has < 4 matches
+  // Prefer same-section products, then same-category products; avoid arbitrary first-page results.
   const recommendations = useMemo(() => {
     const others = allProducts.filter((item) => item._id !== productItem?._id);
     const sameSection = others.filter(
@@ -42,7 +53,7 @@ export const RelatedProductsSection = ({
     return Array.from(uniqueMap.values()).slice(0, 4);
   }, [allProducts, productItem]);
 
-  if (loading) {
+  if (loadingSection || loadingCategory) {
     return (
       <div className="grid grid-cols-2 gap-1.5 sm:gap-3 gap-y-5 md:grid-cols-3 lg:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
@@ -61,7 +72,7 @@ export const RelatedProductsSection = ({
         <div>
           <div className="mb-1.5 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3 py-1 shadow-2xs">
             <Sparkles size={11} className="text-primary" />
-            <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
+            <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
               {t("relatedCuratedRecommendations")}
             </span>
           </div>

@@ -17,7 +17,7 @@ export const BrandShowcase = () => {
   };
 
   return (
-    <section dir={direction} className="relative isolate overflow-hidden bg-surface-subtle py-16 text-primary sm:py-22">
+    <section dir={direction} className="page-section relative isolate overflow-hidden bg-surface-subtle text-primary">
       {/* Architectural Studio Grid */}
       <div
         aria-hidden="true"
@@ -30,7 +30,7 @@ export const BrandShowcase = () => {
           <div>
             <div className="mb-2.5 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1 shadow-2xs">
               <span className="h-2 w-2 rounded-full bg-success" />
-              <span className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">
+              <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
                 {t("brandOfficialPartners")}
               </span>
             </div>
@@ -62,11 +62,11 @@ export const BrandShowcase = () => {
                 whileHover={{ y: -6, rotateX: 4, rotateY: -4 }}
                 whileTap={{ scale: 0.98 }}
                 transition={{ duration: 0.25, ease: "easeOut" }}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-[0_10px_30px_-12px_rgba(var(--shadow-rgb),0.06)] transition-colors duration-300 hover:border-border hover:shadow-[0_24px_48px_-12px_rgba(var(--shadow-rgb),0.14)] cursor-pointer sm:p-6"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-card transition-colors duration-300 hover:border-border hover:shadow-panel cursor-pointer sm:p-6"
               >
                 {/* Top Index & Action Arrow */}
                 <div className="flex items-center justify-between">
-                  <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-subtle transition-colors group-hover:text-secondary">
+                  <span className="font-mono text-xs font-bold uppercase tracking-widest text-subtle transition-colors group-hover:text-secondary">
                     HOUSE // 0{index + 1}
                   </span>
 
@@ -88,7 +88,7 @@ export const BrandShowcase = () => {
 
                 {/* Brand Name & Verified Pill */}
                 <div className="flex items-center justify-between border-t border-border-subtle pt-3">
-                  <p className="truncate text-[11px] font-black uppercase tracking-[0.16em] text-muted transition-colors group-hover:text-primary">
+                  <p className="truncate text-xs font-black uppercase tracking-[0.16em] text-muted transition-colors group-hover:text-primary">
                     {brand.name}
                   </p>
                   <ShieldCheck
@@ -110,7 +110,7 @@ export const BrandShowcase = () => {
               onClick={handleNavigateShop}
               whileHover={{ scale: 1.03, y: -2 }}
               whileTap={{ scale: 0.97 }}
-              className="group flex cursor-pointer items-center gap-2.5 rounded-full bg-action px-7 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.35)] transition-all hover:bg-action-hover sm:px-9"
+              className="group flex cursor-pointer items-center gap-2.5 rounded-full bg-action px-7 py-3.5 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-card transition-all hover:bg-action-hover sm:px-9"
             >
               <span>{t("brandExploreAllPartners")}</span>
               <ArrowUpRight

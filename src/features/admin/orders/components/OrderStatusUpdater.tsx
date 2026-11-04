@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 
 import { getApiErrorDetails } from "@/lib/errorUtils";
+import { canAdminDeleteOrder } from "@/lib/orderRules";
 interface Props {
   orderId: string;
   currentStatus: string;
@@ -280,7 +281,7 @@ export default function OrderStatusUpdater({
         onClick={toggleMenu}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className={`group relative inline-flex min-w-[138px] cursor-pointer items-center justify-between gap-2.5 rounded-full border px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.12em] shadow-2xs transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-[148px] sm:px-3.5 sm:py-2 ${
+        className={`group relative inline-flex min-w-[138px] cursor-pointer items-center justify-between gap-2.5 rounded-full border px-3 py-1.5 text-xs font-black uppercase tracking-[0.12em] shadow-2xs transition-all duration-300 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 sm:min-w-[148px] sm:px-3.5 sm:py-2 ${
           activeConfig.pillClass
         } ${isOpen ? "ring-2 ring-focus/15 scale-[1.02]" : ""}`}
       >
@@ -348,17 +349,17 @@ export default function OrderStatusUpdater({
                 : "translateY(0)",
               zIndex: 9999,
             }}
-            className="w-[248px] overflow-hidden rounded-3xl border border-border-subtle bg-surface/95 p-2 text-primary shadow-[0_28px_70px_-12px_rgba(var(--shadow-rgb),0.28)] backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+            className="w-[248px] overflow-hidden rounded-3xl border border-border-subtle bg-surface/95 p-2 text-primary shadow-panel backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
           >
             {/* Menu Header */}
             <div className="flex items-center justify-between border-b border-border-subtle px-3 py-2">
               <div className="flex items-center gap-1.5">
                 <Sparkles size={11} className="text-primary" />
-                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-muted">
                   {t("ordersDispatchControl")}
                 </span>
               </div>
-              <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-[9px] font-bold text-secondary">
+              <span className="rounded bg-surface-muted px-1.5 py-0.5 font-mono text-xs font-bold text-secondary">
                 #{orderId.slice(-6).toUpperCase()}
               </span>
             </div>
@@ -393,11 +394,11 @@ export default function OrderStatusUpdater({
                       </span>
 
                       <div className="min-w-0">
-                        <p className="text-[11px] font-black uppercase tracking-wider leading-none">
+                        <p className="text-xs font-black uppercase tracking-wider leading-none">
                           {getStatusLabel(key)}
                         </p>
                         <p
-                          className={`mt-1 truncate text-[9px] font-medium ${
+                          className={`mt-1 truncate text-xs font-medium ${
                             isSelected ? "text-on-action/65" : "text-muted"
                           }`}
                         >
@@ -417,52 +418,55 @@ export default function OrderStatusUpdater({
             </div>
 
             {/* Danger Zone: 2-Step Safe Delete */}
-            <div className="mt-1 border-t border-border-subtle pt-1.5">
-              {!confirmDelete ? (
-                <button
-                  type="button"
-                  onClick={() => setConfirmDelete(true)}
-                  className="flex w-full cursor-pointer items-center justify-between rounded-2xl px-2.5 py-2 text-start text-danger transition-colors hover:bg-danger-soft"
-                >
-                  <span className="flex items-center gap-2.5">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-danger-soft text-danger">
-                      <Trash2 size={14} />
-                    </span>
-                    <span>
-                      <span className="block text-[11px] font-black uppercase tracking-wider leading-none">
-                        {t("ordersDeleteAction")}
+            {/* Shipped/Delivered orders are financial records: no delete option. */}
+            {canAdminDeleteOrder(status) && (
+              <div className="mt-1 border-t border-border-subtle pt-1.5">
+                {!confirmDelete ? (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmDelete(true)}
+                    className="flex w-full cursor-pointer items-center justify-between rounded-2xl px-2.5 py-2 text-start text-danger transition-colors hover:bg-danger-soft"
+                  >
+                    <span className="flex items-center gap-2.5">
+                      <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-danger-soft text-danger">
+                        <Trash2 size={14} />
                       </span>
-                      <span className="mt-1 block text-[9px] font-medium text-danger">
-                        {t("ordersDeletePermanent")}
+                      <span>
+                        <span className="block text-xs font-black uppercase tracking-wider leading-none">
+                          {t("ordersDeleteAction")}
+                        </span>
+                        <span className="mt-1 block text-xs font-medium text-danger">
+                          {t("ordersDeletePermanent")}
+                        </span>
                       </span>
                     </span>
-                  </span>
-                </button>
-              ) : (
-                <div className="rounded-2xl border border-danger-border bg-danger-soft p-2 animate-in fade-in duration-150">
-                  <div className="mb-2 flex items-center gap-1.5 px-1 text-[10px] font-black uppercase tracking-wider text-danger">
-                    <AlertTriangle size={12} />
-                    <span>{t("ordersConfirmDelete")}</span>
+                  </button>
+                ) : (
+                  <div className="rounded-2xl border border-danger-border bg-danger-soft p-2 animate-in fade-in duration-150">
+                    <div className="mb-2 flex items-center gap-1.5 px-1 text-xs font-black uppercase tracking-wider text-danger">
+                      <AlertTriangle size={12} />
+                      <span>{t("ordersConfirmDelete")}</span>
+                    </div>
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDelete(false)}
+                        className="flex-1 cursor-pointer rounded-xl border border-border bg-surface py-1.5 text-xs font-black uppercase tracking-wider text-secondary hover:bg-surface-subtle"
+                      >
+                        {t("orderCancel")}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleDeleteOrder}
+                        className="flex-1 cursor-pointer rounded-xl bg-danger py-1.5 text-xs font-black uppercase tracking-wider text-on-danger shadow-xs hover:bg-danger"
+                      >
+                        {t("ordersYesDelete")}
+                      </button>
+                    </div>
                   </div>
-                  <div className="flex gap-1.5">
-                    <button
-                      type="button"
-                      onClick={() => setConfirmDelete(false)}
-                      className="flex-1 cursor-pointer rounded-xl border border-border bg-surface py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary hover:bg-surface-subtle"
-                    >
-                      {t("orderCancel")}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={handleDeleteOrder}
-                      className="flex-1 cursor-pointer rounded-xl bg-danger py-1.5 text-[10px] font-black uppercase tracking-wider text-on-danger shadow-xs hover:bg-danger"
-                    >
-                      {t("ordersYesDelete")}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>,
           document.body,
         )}

@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   PackageSearch,
   LayoutGrid,
@@ -30,52 +30,130 @@ export const ShopCatalogView = () => {
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword")?.trim() || "";
 
-  const { data, loading, page, totalPages, goToPage } = useData("/product", {
-    params: {
-      keyword,
-    },
-  });
+  const router = useRouter();
+  const pathname = usePathname();
 
   const {
     currentType,
     currentSection,
     currentStyle,
+    currentPrice,
+    currentColor,
+    currentSize,
+    currentIsSale,
+    currentInStock,
+    filterByColor,
+    filterBySize,
+    filterBySale,
+    filterInStock,
+    hydrateFilters,
     resetFilter,
-    setInitialProducts,
-    filteredProducts: displayProducts,
   } = useFilterStore((state) => state);
 
-  // Interactive Showroom States
-  const [sortBy, setSortBy] = useState<
-    "featured" | "price-asc" | "price-desc" | "rating-desc"
-  >("featured");
+  type SortKey = "featured" | "price-asc" | "price-desc" | "rating-desc";
+  const SORT_KEYS: SortKey[] = [
+    "featured",
+    "price-asc",
+    "price-desc",
+    "rating-desc",
+  ];
+
+  // Interactive Showroom States (sort starts from the URL so links are shareable)
+  const [sortBy, setSortBy] = useState<SortKey>(() => {
+    const fromUrl = searchParams.get("sort") as SortKey | null;
+    return fromUrl && SORT_KEYS.includes(fromUrl) ? fromUrl : "featured";
+  });
+
+  const backendSort: Record<SortKey, string> = {
+    featured: "newest",
+    "price-asc": "price_asc",
+    "price-desc": "price_desc",
+    "rating-desc": "rating",
+  };
+
+  // All active filters and sorting are evaluated by MongoDB before pagination.
+  const { data, loading, page, total, totalPages, goToPage } = useData("product", {
+    params: {
+      keyword: keyword || null,
+      gender: currentType,
+      section: currentSection,
+      style: currentStyle,
+      maxPrice: currentPrice,
+      color: currentColor,
+      size: currentSize,
+      isSale: currentIsSale ? true : null,
+      inStock: currentInStock ? true : null,
+      sort: backendSort[sortBy],
+    },
+    limit: 12,
+  });
+
+  // 1) URL -> store, once on mount.
+  const urlSyncReady = useRef(false);
+  useEffect(() => {
+    const gender = searchParams.get("gender");
+    const section = searchParams.get("section");
+    const style = searchParams.get("style");
+    const maxPrice = Number(searchParams.get("maxPrice"));
+    hydrateFilters({
+      currentType: gender,
+      currentSection: section,
+      currentStyle: style,
+      currentPrice:
+        searchParams.get("maxPrice") && Number.isFinite(maxPrice) && maxPrice > 0
+          ? maxPrice
+          : null,
+      currentColor: searchParams.get("color"),
+      currentSize: searchParams.get("size"),
+      currentIsSale: searchParams.get("isSale") === "true",
+      currentInStock: searchParams.get("inStock") === "true",
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 2) store/sort -> URL (the first run is skipped so the URL is read first).
+  useEffect(() => {
+    if (!urlSyncReady.current) {
+      urlSyncReady.current = true;
+      return;
+    }
+    const params = new URLSearchParams(window.location.search);
+    const setOrDelete = (key: string, value: string | number | null) => {
+      if (value === null || value === "" || value === undefined) {
+        params.delete(key);
+      } else {
+        params.set(key, String(value));
+      }
+    };
+    setOrDelete("gender", currentType);
+    setOrDelete("section", currentSection);
+    setOrDelete("style", currentStyle);
+    setOrDelete("maxPrice", currentPrice);
+    setOrDelete("color", currentColor);
+    setOrDelete("size", currentSize);
+    setOrDelete("isSale", currentIsSale ? "true" : null);
+    setOrDelete("inStock", currentInStock ? "true" : null);
+    setOrDelete("sort", sortBy === "featured" ? null : sortBy);
+    const qs = params.toString();
+    if (qs !== window.location.search.replace(/^\?/, "")) {
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    }
+  }, [currentType, currentSection, currentStyle, currentPrice, currentColor, currentSize, currentIsSale, currentInStock, sortBy, pathname, router]);
+
   const [gridCols, setGridCols] = useState<3 | 4>(4);
 
-  useEffect(() => {
-    const products = data?.data?.Products;
-    if (products) {
-      setInitialProducts(products);
-    }
-  }, [data, setInitialProducts]);
-
-  // Client-side Sort on Filtered Products
-  const sortedProducts = useMemo(() => {
-    const list = [...(displayProducts || [])];
-    if (sortBy === "price-asc") {
-      list.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
-    } else if (sortBy === "price-desc") {
-      list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
-    } else if (sortBy === "rating-desc") {
-      list.sort(
-        (a, b) => Number(b.ratingsAverage || 0) - Number(a.ratingsAverage || 0),
-      );
-    }
-    return list;
-  }, [displayProducts, sortBy]);
-
-  const hasProducts = sortedProducts.length > 0;
+  const products: Product[] = data?.data?.Products ?? [];
+  const hasProducts = products.length > 0;
   const hasActiveFilters = Boolean(
-    currentType || currentSection || currentStyle || sortBy !== "featured",
+    currentType ||
+      currentSection ||
+      currentStyle ||
+      currentPrice !== null ||
+      currentColor ||
+      currentSize ||
+      currentIsSale ||
+      currentInStock ||
+      sortBy !== "featured",
   );
   const localizedFilterLabel = (value?: string | null) => {
     if (!value) return "";
@@ -105,7 +183,7 @@ export const ShopCatalogView = () => {
   return (
     <section
       dir={direction}
-      className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-6 text-primary sm:py-10"
+      className="page-section relative isolate min-h-screen overflow-hidden bg-surface-subtle text-primary"
     >
       {/* Subtle Studio Grid Backdrop */}
       <div
@@ -117,12 +195,12 @@ export const ShopCatalogView = () => {
         {/* ================================================================ */}
         {/* 1. ARCHITECTURAL SHOWROOM BANNER & BREADCRUMB                    */}
         {/* ================================================================ */}
-        <header className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface/90 p-5 shadow-[0_12px_36px_-14px_rgba(var(--shadow-rgb),0.06)] backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
+        <header className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface/90 p-5 shadow-card backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
           <div className="space-y-2">
             {/* Breadcrumb */}
             <nav
               aria-label={t("productBreadcrumb")}
-              className="flex flex-wrap items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted"
+              className="flex flex-wrap items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-muted"
             >
               <Link href="/" className="hover:text-primary transition-colors">
                 {t("catalogFlagship")}
@@ -159,7 +237,7 @@ export const ShopCatalogView = () => {
               </h1>
               {!loading && (
                 <span className="rounded-full bg-surface-subtle px-3 py-0.5 font-mono text-xs font-black text-secondary">
-                  {sortedProducts.length} {t("catalogShowing")}
+                  {total} {t("catalogShowing")}
                 </span>
               )}
             </div>
@@ -187,7 +265,7 @@ export const ShopCatalogView = () => {
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
                 aria-label={t("catalogSort")}
-                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-[11px] font-black uppercase tracking-wider text-primary transition-colors hover:border-border-strong focus:border-primary focus:bg-surface focus:outline-none"
+                className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface-subtle py-2 ps-8 pe-7 text-xs font-black uppercase tracking-wider text-primary transition-colors hover:border-border-strong focus:border-primary focus:bg-surface focus:outline-none"
               >
                 <option value="featured">{t("catalogSortFeatured")}</option>
                 <option value="price-asc">{t("catalogSortPriceLow")}</option>
@@ -232,30 +310,30 @@ export const ShopCatalogView = () => {
         {hasActiveFilters && (
           <div className="flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-border-subtle bg-surface/80 px-4 py-2.5 backdrop-blur-md">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-[10px] font-black uppercase tracking-widest text-muted">
+              <span className="text-xs font-black uppercase tracking-widest text-muted">
                 {t("catalogActiveFilters")}
               </span>
 
               {currentType && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-[10px] font-black uppercase tracking-wider text-on-action">
+                <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-wider text-on-action">
                   {t("catalogDepartment")} {localizedFilterLabel(currentType)}
                 </span>
               )}
 
               {currentSection && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-[10px] font-black uppercase tracking-wider text-on-action">
+                <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-wider text-on-action">
                   {t("catalogType")} {localizedFilterLabel(currentSection)}
                 </span>
               )}
 
               {currentStyle && (
-                <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-[10px] font-black uppercase tracking-wider text-on-action">
+                <span className="inline-flex items-center gap-1 rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-wider text-on-action">
                   {t("catalogStyle")} {localizedFilterLabel(currentStyle)}
                 </span>
               )}
 
               {sortBy !== "featured" && (
-                <span className="inline-flex items-center gap-1 rounded-full border border-border-strong bg-surface px-3 py-1 text-[10px] font-black uppercase tracking-wider text-primary">
+                <span className="inline-flex items-center gap-1 rounded-full border border-border-strong bg-surface px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">
                   {t("catalogSorted")} {localizedSortLabel[sortBy] || sortBy}
                 </span>
               )}
@@ -267,7 +345,7 @@ export const ShopCatalogView = () => {
                 resetFilter();
                 setSortBy("featured");
               }}
-              className="inline-flex cursor-pointer items-center gap-1.5 text-[10px] font-black uppercase tracking-widest text-danger hover:underline"
+              className="inline-flex cursor-pointer items-center gap-1.5 text-xs font-black uppercase tracking-widest text-danger hover:underline"
             >
               <RotateCcw size={11} />
               <span>{t("catalogResetAll")}</span>
@@ -282,7 +360,7 @@ export const ShopCatalogView = () => {
           {/* Desktop Sidebar */}
           <aside
             aria-label={t("filters")}
-            className="sticky top-24 hidden h-fit w-[250px] shrink-0 self-start md:block xl:w-[285px]"
+            className="sticky top-[calc(var(--navbar-h)+1.5rem)] hidden h-fit w-[250px] shrink-0 self-start md:block xl:w-[285px]"
           >
             <CatalogFilterPanel />
           </aside>
@@ -291,7 +369,7 @@ export const ShopCatalogView = () => {
           <main className="min-w-0 flex-1">
             {/* Mobile Filters Bar */}
             <div className="mb-5 md:hidden">
-              <MobileCatalogFilterDrawer />
+              <MobileCatalogFilterDrawer resultCount={total} />
             </div>
 
             {/* Loading Skeleton Grid */}
@@ -315,7 +393,7 @@ export const ShopCatalogView = () => {
                   gridCols === 4 ? "xl:grid-cols-4" : "xl:grid-cols-3"
                 }`}
               >
-                {sortedProducts.map((product: Product) => (
+                {products.map((product: Product) => (
                   <Card key={product._id} product={product} />
                 ))}
               </div>
@@ -323,7 +401,7 @@ export const ShopCatalogView = () => {
 
             {/* Luxury Empty State with Instant Reset */}
             {!loading && !hasProducts && (
-              <div className="flex min-h-[380px] flex-col items-center justify-center rounded-3xl border border-border bg-surface px-6 py-16 text-center shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)]">
+              <div className="flex min-h-[380px] flex-col items-center justify-center rounded-3xl border border-border bg-surface px-6 py-16 text-center shadow-card">
                 <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border/80 bg-surface-subtle text-primary">
                   <PackageSearch size={28} strokeWidth={1.6} />
                 </div>
@@ -360,7 +438,7 @@ export const ShopCatalogView = () => {
                     <strong className="text-primary">{page}</strong>{" "}
                     {t("catalogOf")}{" "}
                     <strong className="text-primary">{totalPages}</strong> (
-                    {data?.pagination?.total ?? sortedProducts.length}{" "}
+                    {total}{" "}
                     {t("catalogTotalItems")})
                   </span>
                 </div>

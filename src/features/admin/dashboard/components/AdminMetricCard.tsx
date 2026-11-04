@@ -60,7 +60,7 @@ export function AdminMetricCard({
 
   return (
     <div className="group relative h-full [perspective:1100px]">
-      <div className="relative flex h-full flex-col justify-between gap-5 overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-[0_10px_30px_-12px_rgba(var(--shadow-rgb),0.06)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [transform-style:preserve-3d] hover:-translate-y-1.5 hover:[transform:rotateX(4deg)_rotateY(-4deg)_translateY(-6px)] hover:border-border-subtle hover:shadow-[0_24px_48px_-12px_rgba(var(--shadow-rgb),0.14)] sm:p-6">
+      <div className="relative flex h-full flex-col justify-between gap-5 overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-card transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] [transform-style:preserve-3d] hover:-translate-y-1.5 hover:[transform:rotateX(4deg)_rotateY(-4deg)_translateY(-6px)] hover:border-border-subtle hover:shadow-panel sm:p-6">
         {/* Architectural Grid Reveal on Hover */}
         <div
           aria-hidden="true"
@@ -77,7 +77,7 @@ export function AdminMetricCard({
 
         {/* Top Row: 3D Extruded Icon Cube & Live Trend Pill */}
         <div className="relative z-10 flex items-center justify-between gap-2 [transform:translateZ(28px)]">
-          <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border/80 bg-surface-subtle text-secondary shadow-2xs transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action group-hover:shadow-[0_12px_24px_-6px_rgba(var(--shadow-rgb),0.35)] [&_svg]:transition-colors group-hover:[&_svg]:!text-on-action">
+          <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border/80 bg-surface-subtle text-secondary shadow-2xs transition-all duration-500 group-hover:rotate-6 group-hover:scale-110 group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action group-hover:shadow-card [&_svg]:transition-colors group-hover:[&_svg]:!text-on-action">
             {renderIcon()}
             <span
               className={`absolute -right-1 -top-1 h-2.5 w-2.5 rounded-full border-2 border-surface ${
@@ -88,7 +88,7 @@ export function AdminMetricCard({
 
           {trend ? (
             <span
-              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] shadow-2xs transition-transform duration-300 group-hover:scale-105 ${
+              className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em] shadow-2xs transition-transform duration-300 group-hover:scale-105 ${
                 trendUp
                   ? "border-success-border bg-success-soft text-success"
                   : "border-warning-border bg-warning-soft text-warning"
@@ -102,7 +102,7 @@ export function AdminMetricCard({
               <span>{trend}</span>
             </span>
           ) : (
-            <span className="rounded-full border border-border/70 bg-surface-subtle px-2.5 py-1 font-mono text-[9px] font-extrabold uppercase tracking-widest text-muted">
+            <span className="rounded-full border border-border/70 bg-surface-subtle px-2.5 py-1 font-mono text-xs font-extrabold uppercase tracking-widest text-muted">
               {resolvedVerifiedLabel}
             </span>
           )}
@@ -121,16 +121,16 @@ export function AdminMetricCard({
             />
           </div>
 
-          <p className="mt-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+          <p className="mt-2.5 text-xs font-black uppercase tracking-[0.18em] text-muted">
             {displayTitle}
           </p>
         </div>
 
         {/* Bottom Row: Subtitle & Animated Telemetry Laser Bar */}
         <div className="relative z-10 space-y-2.5 border-t border-border-subtle pt-3 [transform:translateZ(20px)]">
-          <div className="flex items-center justify-between text-[11px] font-semibold text-muted">
+          <div className="flex items-center justify-between text-xs font-semibold text-muted">
             <span className="truncate">{subtitle || t("genericMetricTelemetry")}</span>
-            <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-muted group-hover:text-primary">
+            <span className="font-mono text-xs font-bold uppercase tracking-widest text-muted group-hover:text-primary">
               {resolvedLiveLabel}
             </span>
           </div>

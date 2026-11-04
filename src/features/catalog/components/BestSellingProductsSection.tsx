@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Flame, Crown } from "lucide-react";
 
@@ -15,30 +15,26 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 const EMPTY_PRODUCTS: Product[] = [];
 
 export default function BestSellingProductsSection() {
-  const { t } = useLocale();
+  const { t, locale } = useLocale();
   const router = useRouter();
   const searchParams = useSearchParams();
   const keyword = searchParams.get("keyword") || "";
+  const [filterMode, setFilterMode] = useState<"sale" | "all">("sale");
 
-  const { data, loading } = useData("/product", {
+  const { data, loading } = useData("product", {
     params: {
-      keyword: keyword || undefined,
+      keyword: keyword || null,
+      isSale: filterMode === "sale" ? true : null,
+      sort: "popular",
     },
-    limit: 8,
+    limit: 4,
   });
 
   const results: Product[] = data?.data?.Products ?? EMPTY_PRODUCTS;
 
-  const [filterMode, setFilterMode] = useState<"sale" | "all">("sale");
-
-  // Smart fallback: if no items have isSale === true, gracefully show top items so section is never empty
-  const displayedItems = useMemo(() => {
-    const saleItems = results.filter((e: Product) => e.isSale === true);
-    if (filterMode === "sale" && saleItems.length > 0) {
-      return saleItems.slice(0, 4);
-    }
-    return results.slice(0, 4);
-  }, [results, filterMode]);
+  // The API applies sale and popularity filters before pagination. Do not
+  // silently label regular products as sale items when there are no promos.
+  const displayedItems = results.slice(0, 4);
 
   function handelClick() {
     router.push("/selling");
@@ -67,7 +63,7 @@ export default function BestSellingProductsSection() {
         <div className="flex flex-col items-center text-center">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-action px-3.5 py-1 text-on-action shadow-xs">
             <Crown size={12} className="text-rating" />
-            <span className="text-[10px] font-black uppercase tracking-[0.22em]">
+            <span className="text-xs font-black uppercase tracking-[0.22em]">
               {t("topSellingMicro")}
             </span>
           </div>
@@ -78,7 +74,7 @@ export default function BestSellingProductsSection() {
             <button
               type="button"
               onClick={() => setFilterMode("sale")}
-              className={`cursor-pointer rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
+              className={`cursor-pointer rounded-xl px-4 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                 filterMode === "sale"
                   ? "bg-action text-on-action shadow-xs"
                   : "text-muted hover:text-primary"
@@ -89,7 +85,7 @@ export default function BestSellingProductsSection() {
             <button
               type="button"
               onClick={() => setFilterMode("all")}
-              className={`cursor-pointer rounded-xl px-4 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
+              className={`cursor-pointer rounded-xl px-4 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                 filterMode === "all"
                   ? "bg-action text-on-action shadow-xs"
                   : "text-muted hover:text-primary"
@@ -99,6 +95,12 @@ export default function BestSellingProductsSection() {
             </button>
           </div>
         </div>
+
+        {displayedItems.length === 0 && !loading && (
+          <div className="rounded-2xl border border-border bg-surface-subtle px-5 py-8 text-center text-sm font-semibold text-muted">
+            {locale === "ar" ? "لا توجد عروض نشطة حاليًا." : "There are no active offers right now."}
+          </div>
+        )}
 
         {/* ── 4-Column Ranked Showroom Grid ── */}
         <div
@@ -112,10 +114,10 @@ export default function BestSellingProductsSection() {
             >
               {/* Rank Crown Bar */}
               <div className="mb-1.5 flex items-center justify-between px-1">
-                <span className="inline-flex items-center gap-1 rounded-md bg-action px-2 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-on-action">
+                <span className="inline-flex items-center gap-1 rounded-md bg-action px-2 py-0.5 font-mono text-xs font-black uppercase tracking-widest text-on-action">
                   #{index + 1} {t("ranked")}
                 </span>
-                <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-wider text-warning">
+                <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-warning">
                   <Flame size={11} className="fill-rating text-warning" />
                   {t("highDemand")}
                 </span>

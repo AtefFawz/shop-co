@@ -69,7 +69,7 @@ export const AdminDesktopSidebar = ({
       <motion.button
         layout
         onClick={() => setOpen(!open)}
-        className={`absolute ${direction === "rtl" ? "-left-[15px]" : "-right-[15px]"} top-9 z-50 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-border/80 bg-surface shadow-[0_4px_12px_rgba(var(--shadow-rgb),0.08)] text-muted transition-all duration-300 hover:scale-110 hover:text-primary active:scale-95 cursor-pointer`}
+        className={`absolute ${direction === "rtl" ? "-left-[15px]" : "-right-[15px]"} top-9 z-50 flex h-[30px] w-[30px] items-center justify-center rounded-full border border-border/80 bg-surface shadow-card text-muted transition-all duration-300 hover:scale-110 hover:text-primary active:scale-95 cursor-pointer`}
         title={open ? t("uiCollapseSidebar") : t("uiExpandSidebar")}
         aria-label={open ? t("uiCollapseSidebar") : t("uiExpandSidebar")}
       >
@@ -95,8 +95,8 @@ export const AdminDesktopSidebar = ({
         <div
           className={`relative overflow-hidden transition-all duration-400 ease-out ${
             open
-              ? "bg-surface border border-border/60 shadow-[0_2px_12px_rgba(var(--shadow-rgb),0.03)] rounded-[20px] p-2"
-              : "bg-transparent border-transparent rounded-[20px] p-0"
+              ? "bg-surface border border-border/60 shadow-card rounded-2xl p-2"
+              : "bg-transparent border-transparent rounded-2xl p-0"
           }`}
         >
           <AnimatePresence mode="wait">
@@ -150,7 +150,7 @@ export const AdminDesktopSidebar = ({
             >
               <div className="flex items-center gap-2">
                 <div className="h-[1px] w-4 bg-surface-hover" />
-                <p className="text-[9px] font-black uppercase text-muted tracking-[0.25em]">
+                <p className="text-xs font-black uppercase text-muted tracking-[0.25em]">
                   {navTitle}
                 </p>
               </div>
@@ -168,7 +168,7 @@ export const AdminDesktopSidebar = ({
               {isActive && (
                 <motion.div
                   layoutId="sidebar-active-pill"
-                  className="absolute inset-0 bg-action rounded-[16px] shadow-[0_12px_24px_rgba(var(--shadow-rgb),0.15)] border border-border-strong"
+                  className="absolute inset-0 bg-action rounded-2xl shadow-card border border-border-strong"
                   style={{
                     boxShadow:
                       "inset 0px 1px 1px rgba(255, 255, 255, 0.15), 0px 8px 20px rgba(var(--shadow-rgb),0.12)",
@@ -183,7 +183,7 @@ export const AdminDesktopSidebar = ({
               {isHovered && !isActive && (
                 <motion.div
                   layoutId="sidebar-hover-pill"
-                  className="absolute inset-0 bg-surface-hover/40 backdrop-blur-sm rounded-[16px] border border-border/50"
+                  className="absolute inset-0 bg-surface-hover/40 backdrop-blur-sm rounded-2xl border border-border/50"
                   transition={{ type: "spring", stiffness: 450, damping: 30 }}
                 />
               )}
@@ -211,7 +211,7 @@ export const AdminDesktopSidebar = ({
                   >
                     <div className="flex items-center gap-2.5">
                       <span
-                        className={`text-[12px] font-black uppercase tracking-[0.08em] truncate transition-colors duration-200 ${
+                        className={`text-[0.75rem] font-black uppercase tracking-[0.08em] truncate transition-colors duration-200 ${
                           isActive
                             ? "text-on-action"
                             : "text-muted group-hover:text-primary"
@@ -227,7 +227,7 @@ export const AdminDesktopSidebar = ({
                     <div className="ms-4 flex shrink-0 items-center gap-2">
                       {badge && (
                         <span
-                          className={`text-[9.5px] font-black px-2 py-0.5 rounded-[6px] transition-all duration-300 ${
+                          className={`text-xs font-black px-2 py-0.5 rounded-[6px] transition-all duration-300 ${
                             isActive
                               ? "bg-white/10 text-on-action backdrop-blur-md border border-white/20 shadow-inner"
                               : "bg-surface border border-border/80 text-primary shadow-sm"
@@ -244,7 +244,7 @@ export const AdminDesktopSidebar = ({
               {/* === FLOATING ARCHITECTURAL TOOLTIP === */}
               {!open && (
                 <div
-                  className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover:-translate-x-1.5" : "left-full ml-5 group-hover:translate-x-1.5"} z-50 flex items-center gap-2.5 whitespace-nowrap rounded-xl border border-white/10 bg-action/90 px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.15em] text-on-action opacity-0 shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.2)] backdrop-blur-xl transition-all duration-300 pointer-events-none group-hover:opacity-100`}
+                  className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover:-translate-x-1.5" : "left-full ml-5 group-hover:translate-x-1.5"} z-50 flex items-center gap-2.5 whitespace-nowrap rounded-xl border border-white/10 bg-action/90 px-3.5 py-2 text-xs font-black uppercase tracking-[0.15em] text-on-action opacity-0 shadow-card backdrop-blur-xl transition-all duration-300 pointer-events-none group-hover:opacity-100`}
                 >
                   <div
                     className={`absolute top-1/2 ${direction === "rtl" ? "-right-1 border-r border-t" : "-left-1 border-b border-l"} h-2 w-2 -translate-y-1/2 rotate-45 border-white/10 bg-action/90`}
@@ -252,7 +252,7 @@ export const AdminDesktopSidebar = ({
 
                   <span className="relative z-10">{label}</span>
                   {badge && (
-                    <span className="relative z-10 bg-white/20 text-[9px] px-1.5 py-0.5 rounded-md border border-white/10">
+                    <span className="relative z-10 bg-white/20 text-xs px-1.5 py-0.5 rounded-md border border-white/10">
                       {badge}
                     </span>
                   )}
@@ -261,7 +261,7 @@ export const AdminDesktopSidebar = ({
             </>
           );
 
-          const className = `group relative flex items-center w-full rounded-[16px] cursor-pointer transition-colors ${
+          const className = `group relative flex items-center w-full rounded-2xl cursor-pointer transition-colors ${
             open ? "px-2 py-1.5" : "w-14 h-14 mx-auto justify-center"
           }`;
 
@@ -299,13 +299,13 @@ export const AdminDesktopSidebar = ({
         {/* NUCLEAR LOGOUT BUTTON */}
         <button
           onClick={() => signOut()}
-          className={`group/logout relative flex items-center w-full rounded-[16px] transition-all duration-400 cursor-pointer overflow-hidden ${
+          className={`group/logout relative flex items-center w-full rounded-2xl transition-all duration-400 cursor-pointer overflow-hidden ${
             open
               ? "px-2.5 py-2.5 hover:bg-danger hover:shadow-[0_8px_30px_rgba(var(--danger-rgb),0.3)] hover:ring-2 hover:ring-danger/20"
               : "w-14 h-14 mx-auto justify-center hover:bg-danger hover:shadow-[0_8px_30px_rgba(var(--danger-rgb),0.3)]"
           }`}
         >
-          <span className="absolute inset-0 bg-gradient-to-r from-danger to-danger translate-y-full rounded-[16px] group-hover/logout:translate-y-0 transition-transform duration-300 ease-out" />
+          <span className="absolute inset-0 bg-gradient-to-r from-danger to-danger translate-y-full rounded-2xl group-hover/logout:translate-y-0 transition-transform duration-300 ease-out" />
 
           <div className="relative z-10 w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-muted group-hover/logout:text-on-danger transition-colors duration-300">
             <LogOut
@@ -321,7 +321,7 @@ export const AdminDesktopSidebar = ({
                 initial={{ opacity: 0, width: 0 }}
                 animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
-                className="relative z-10 ms-3 overflow-hidden whitespace-nowrap text-[11.5px] font-black uppercase tracking-[0.12em] text-muted transition-colors duration-300 group-hover/logout:text-on-danger"
+                className="relative z-10 ms-3 overflow-hidden whitespace-nowrap text-xs font-black uppercase tracking-[0.12em] text-muted transition-colors duration-300 group-hover/logout:text-on-danger"
               >
                 {t("uiEndSession")}
               </motion.span>
@@ -330,7 +330,7 @@ export const AdminDesktopSidebar = ({
 
           {!open && (
             <div
-              className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover/logout:-translate-x-1.5" : "left-full ml-5 group-hover/logout:translate-x-1.5"} z-50 flex items-center whitespace-nowrap rounded-xl border border-danger-border bg-danger px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-on-danger opacity-0 shadow-[0_15px_35px_rgba(var(--danger-rgb),0.4)] transition-all duration-300 pointer-events-none group-hover/logout:opacity-100`}
+              className={`absolute ${direction === "rtl" ? "right-full mr-5 group-hover/logout:-translate-x-1.5" : "left-full ml-5 group-hover/logout:translate-x-1.5"} z-50 flex items-center whitespace-nowrap rounded-xl border border-danger-border bg-danger px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-on-danger opacity-0 shadow-[0_15px_35px_rgba(var(--danger-rgb),0.4)] transition-all duration-300 pointer-events-none group-hover/logout:opacity-100`}
             >
               <div
                 className={`absolute top-1/2 ${direction === "rtl" ? "-right-1 border-r border-t" : "-left-1 border-b border-l"} h-2 w-2 -translate-y-1/2 rotate-45 border-danger-border bg-danger`}

@@ -1,10 +1,11 @@
 "use client";
 
+import { getStockCount } from "@/lib/stock";
 import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight, Flame, Sparkles, Eye, Heart } from "lucide-react";
+import { ArrowUpRight, Flame, Sparkles, Eye, Heart, GitCompareArrows, Bookmark } from "lucide-react";
 import toast from "react-hot-toast";
 
 import StarRating from "@/shared/components/feedback/StarRating";
@@ -13,6 +14,8 @@ import { Product } from "@/types";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { useWishlistStore } from "@/store/wishlistStore";
 import { resolveImageUrl } from "@/lib/imageUrl";
+import { useCompareStore } from "@/store/compareStore";
+import { saveForLater } from "@/features/engagement/api";
 
 /* -------------------------------------------------------------------------- */
 /*                                HELPER UTILS                                */
@@ -22,16 +25,27 @@ import { resolveImageUrl } from "@/lib/imageUrl";
 /*                             MAIN CARD COMPONENT                            */
 /* -------------------------------------------------------------------------- */
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({
+  product,
+  priority = false,
+}: {
+  product: Product;
+  /** Only set for above-the-fold cards; every card used to preload its image. */
+  priority?: boolean;
+}) {
   const { t, direction } = useLocale();
   const isSaved = useWishlistStore((state) =>
     state.items.some((item) => item._id === product._id),
   );
   const toggleSaved = useWishlistStore((state) => state.toggleItem);
+  const isCompared = useCompareStore((state) => state.items.some((item) => item._id === product._id));
+  const compareCount = useCompareStore((state) => state.items.length);
+  const toggleCompare = useCompareStore((state) => state.toggle);
+  const [savingLater, setSavingLater] = useState(false);
   const detailUrl = `/shop/details/${product._id}`;
 
   // 1. Stock Telemetry
-  const stockCount = Number(product?.countInStock ?? 10);
+  const stockCount = getStockCount(product);
   const isOutOfStock = stockCount <= 0;
   const isLowStock = stockCount > 0 && stockCount <= 5;
 
@@ -78,7 +92,7 @@ export default function ProductCard({ product }: { product: Product }) {
       }}
       onTouchStart={() => setIsPaused(true)}
       onTouchEnd={() => setIsPaused(false)}
-      className="group relative flex h-full w-full min-w-0 flex-col justify-between overflow-hidden rounded-2xl border border-border/75 bg-surface p-1.5 shadow-[0_4px_20px_-8px_rgba(var(--shadow-rgb),0.05)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-border-strong/40 hover:shadow-[0_20px_40px_-14px_rgba(var(--shadow-rgb),0.14)] sm:rounded-[1.65rem] sm:p-2.5"
+      className="group relative flex h-full w-full min-w-0 flex-col justify-between overflow-hidden rounded-2xl border border-border/75 bg-surface p-1.5 shadow-card transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1 hover:border-border-strong/40 hover:shadow-card sm:rounded-3xl sm:p-2.5"
     >
       {/* ================================================================== */}
       {/* 1. VISUAL STAGE (OPTIMIZED FOR MOBILE & DESKTOP)                   */}
@@ -109,7 +123,7 @@ export default function ProductCard({ product }: { product: Product }) {
                     alt={product.name || t("productImageAlt")}
                     fill
                     quality={85}
-                    priority={idx === 0}
+                    priority={priority && idx === 0}
                     sizes="(max-width: 640px) 48vw, (max-width: 1024px) 32vw, 24vw"
                     className="object-cover object-top transition-transform duration-700 ease-out group-hover:scale-105"
                   />
@@ -119,7 +133,7 @@ export default function ProductCard({ product }: { product: Product }) {
           ) : (
             <div className="flex h-full w-full flex-col items-center justify-center bg-surface-subtle text-muted">
               <Sparkles size={18} />
-              <span className="mt-1 font-mono text-[8px] font-black uppercase tracking-widest sm:text-[9px]">
+              <span className="mt-1 font-mono text-xs font-black uppercase tracking-widest sm:text-xs">
                 SHOP.CO
               </span>
             </div>
@@ -134,13 +148,13 @@ export default function ProductCard({ product }: { product: Product }) {
           {/* Top-Start Status Badges (Compact on Mobile) */}
           <div className="absolute start-2 top-2 z-30 flex max-w-[calc(100%-3rem)] flex-col items-start gap-1 sm:start-2.5 sm:top-2.5">
             {isOutOfStock ? (
-              <span className="rounded-full bg-danger px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-on-danger shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[9px]">
+              <span className="rounded-full bg-danger px-2 py-0.5 text-xs font-black uppercase tracking-wider text-on-danger shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-xs">
                 {t("soldOut")}
               </span>
             ) : (
               <>
                 {product.isSale && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-action/90 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-on-action shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-[9px]">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-action/90 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-on-action shadow-sm backdrop-blur-md sm:px-2.5 sm:py-1 sm:text-xs">
                     <Sparkles
                       size={8}
                       className="text-rating sm:h-2.5 sm:w-2.5"
@@ -150,7 +164,7 @@ export default function ProductCard({ product }: { product: Product }) {
                 )}
 
                 {isLowStock && (
-                  <span className="inline-flex items-center gap-0.5 rounded-full bg-surface/95 px-2 py-0.5 text-[7px] font-black uppercase tracking-wider text-warning shadow-xs backdrop-blur-md sm:text-[8px]">
+                  <span className="inline-flex items-center gap-0.5 rounded-full bg-surface/95 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-warning shadow-xs backdrop-blur-md sm:text-xs">
                     <Flame size={8} className="fill-rating text-warning" />
                     <span className="truncate">
                       {stockCount} {t("leftInStock")}
@@ -199,7 +213,7 @@ export default function ProductCard({ product }: { product: Product }) {
           {/* Desktop-Only Hover Quick-Inspect Pill */}
           <div className="pointer-events-none absolute inset-x-2.5 bottom-2.5 z-30 hidden translate-y-2 opacity-0 transition-all duration-300 ease-out md:flex md:group-hover:translate-y-0 md:group-hover:opacity-100">
             <span
-              className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-[10px] font-black uppercase tracking-[0.14em] shadow-lg backdrop-blur-xl ${
+              className={`flex w-full items-center justify-between rounded-xl px-3.5 py-2 text-xs font-black uppercase tracking-[0.14em] shadow-lg backdrop-blur-xl ${
                 isOutOfStock
                   ? "bg-action/90 text-subtle"
                   : "bg-surface/95 text-primary"
@@ -246,22 +260,26 @@ export default function ProductCard({ product }: { product: Product }) {
         <div className="min-w-0 space-y-1">
           {/* Category & Rating Row */}
           <div className="flex items-center justify-between gap-1">
-            <span className="truncate font-mono text-[8px] font-extrabold uppercase tracking-[0.14em] text-muted sm:text-[9px]">
+            <span className="truncate font-mono text-xs font-extrabold uppercase tracking-[0.14em] text-muted sm:text-xs">
               {categoryLabel}
             </span>
 
             <div className="flex shrink-0 items-center gap-1">
-              <div className="hidden sm:block">
-                <StarRating rating={ratingValue} />
-              </div>
-              <span className="text-[10px] leading-none text-rating sm:hidden">
-                ★
-              </span>
-              <span className="font-mono text-[9px] font-extrabold text-muted sm:text-[10px]">
-                {ratingValue > 0
-                  ? ratingValue.toFixed(1)
-                  : t("productNewLabel")}
-              </span>
+              {ratingValue > 0 ? (
+                <>
+                  <div className="hidden sm:block">
+                    <StarRating rating={ratingValue} />
+                  </div>
+                  <span className="text-xs leading-none text-rating sm:hidden">★</span>
+                  <span className="font-mono text-xs font-extrabold text-muted sm:text-xs">
+                    {ratingValue.toFixed(1)}
+                  </span>
+                </>
+              ) : (
+                <span className="font-mono text-xs font-extrabold text-muted">
+                  {t("productNewLabel")}
+                </span>
+              )}
             </div>
           </div>
 
@@ -269,7 +287,7 @@ export default function ProductCard({ product }: { product: Product }) {
           <Link href={detailUrl} className="block min-w-0">
             <h4
               title={product.name}
-              className={`line-clamp-1 text-[11.5px] font-black uppercase tracking-tight transition-colors sm:text-[13px] lg:text-sm ${
+              className={`line-clamp-1 text-xs font-black uppercase tracking-tight transition-colors sm:text-[0.8125rem] lg:text-sm ${
                 isOutOfStock
                   ? "text-muted"
                   : "text-primary group-hover:text-secondary"
@@ -288,6 +306,14 @@ export default function ProductCard({ product }: { product: Product }) {
         >
           <div className="w-full min-w-0 overflow-hidden [&>*]:flex-wrap [&>*]:items-baseline [&>*]:gap-x-1.5 [&>*]:gap-y-1">
             <Pricing product={product} />
+          </div>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <button type="button" aria-pressed={isCompared} onClick={() => { if (!isCompared && compareCount >= 4) { toast.error(direction === "rtl" ? "يمكنك مقارنة 4 منتجات كحد أقصى" : "You can compare up to 4 products"); return; } toggleCompare(product); toast.success(isCompared ? (direction === "rtl" ? "تمت الإزالة من المقارنة" : "Removed from comparison") : (direction === "rtl" ? "أُضيف المنتج للمقارنة" : "Added to comparison")); }} className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1.5 text-[10px] font-bold text-muted transition hover:border-border-strong hover:text-primary">
+              <GitCompareArrows size={12}/>{direction === "rtl" ? "قارن" : "Compare"}
+            </button>
+            <button type="button" disabled={savingLater} onClick={async () => { setSavingLater(true); try { await saveForLater(product._id); toast.success(direction === "rtl" ? "تم الحفظ لوقت لاحق — ستجده في مساحتك" : "Saved for later — find it in My Space"); } catch { toast.error(direction === "rtl" ? "سجّل الدخول لحفظ المنتج" : "Sign in to save this item"); } finally { setSavingLater(false); } }} className="inline-flex items-center gap-1.5 rounded-full border border-border px-2.5 py-1.5 text-[10px] font-bold text-muted transition hover:border-border-strong hover:text-primary disabled:opacity-50">
+              <Bookmark size={12}/>{direction === "rtl" ? "احفظ لاحقًا" : "Save later"}
+            </button>
           </div>
         </div>
       </div>

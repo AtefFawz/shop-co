@@ -21,11 +21,12 @@ function CustomerReviewCard({
   };
 }) {
   const { t, locale } = useLocale();
-  const rating = Number(rev.rating) || 5;
+  const rating = Number(rev.rating);
+  const safeRating = Number.isFinite(rating) && rating >= 1 && rating <= 5 ? rating : null;
   const dateStr = rev.updatedAt || rev.createdAt;
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-[0_12px_34px_-14px_rgba(var(--shadow-rgb),0.06)] transition-all duration-300 hover:-translate-y-1 hover:border-border-subtle hover:shadow-[0_22px_45px_-14px_rgba(var(--shadow-rgb),0.12)]">
+    <div className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-border-subtle hover:shadow-panel">
       <div>
         {/* Top Row: Stars & Quote Icon */}
         <div className="mb-4 flex items-center justify-between gap-2">
@@ -36,7 +37,7 @@ function CustomerReviewCard({
                   key={i}
                   size={14}
                   className={
-                    i < rating
+                    safeRating !== null && i < safeRating
                       ? "fill-rating text-rating"
                       : "text-subtle"
                   }
@@ -44,12 +45,12 @@ function CustomerReviewCard({
               ))}
             </div>
             <span className="font-mono text-xs font-black text-primary">
-              {rating.toFixed(1)}
+              {safeRating !== null ? safeRating.toFixed(1) : "—"}
             </span>
           </div>
 
           {rev.product?.name ? (
-            <span className="max-w-[160px] truncate rounded-lg bg-surface-subtle px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-secondary">
+            <span className="max-w-[160px] truncate rounded-lg bg-surface-subtle px-2.5 py-1 text-xs font-black uppercase tracking-wider text-secondary">
               {rev.product.name}
             </span>
           ) : (
@@ -67,7 +68,7 @@ function CustomerReviewCard({
       </div>
 
       {/* Footer */}
-      <div className="flex items-center justify-between border-t border-border-subtle pt-4 text-[10px] font-black uppercase tracking-widest text-muted">
+      <div className="flex items-center justify-between border-t border-border-subtle pt-4 text-xs font-black uppercase tracking-widest text-muted">
         <span className="inline-flex items-center gap-1.5 text-success">
           <CheckCircle2 size={12} /> {t("uiReviewVerified")}
         </span>
@@ -92,7 +93,10 @@ function ReviewsContent() {
     "/profile/my-reviews",
   );
   const { t } = useLocale();
-  const reviews = (data?.data?.reviews ?? []) as Array<ReviewRecord & { comment: string; product?: { name?: string } }>;
+  const reviews = ((data?.data?.reviews ?? []) as Array<ReviewRecord & { comment: string; product?: { name?: string } }>).filter((review) => {
+    const rating = Number(review.rating);
+    return Number.isFinite(rating) && rating >= 1 && rating <= 5;
+  });
   const total = data?.pagination?.total ?? reviews.length;
 
   if (loading && !data) {

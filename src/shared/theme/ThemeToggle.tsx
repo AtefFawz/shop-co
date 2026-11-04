@@ -1,6 +1,8 @@
 "use client";
 
-import { motion, useReducedMotion, AnimatePresence } from "framer-motion";
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
+import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/shared/theme/ThemeProvider";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
@@ -16,7 +18,7 @@ export default function ThemeToggle({
 }: ThemeToggleProps) {
   const { theme, toggleTheme, mounted } = useTheme();
   const { t } = useLocale();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
   const isDark = theme === "dark";
 
   return (

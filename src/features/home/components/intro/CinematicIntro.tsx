@@ -1,7 +1,9 @@
 "use client";
 
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
@@ -12,7 +14,7 @@ const INTRO_DURATION = 1850;
 export default function CinematicIntro() {
   const [isVisible, setIsVisible] = useState(false);
   const skipButtonRef = useRef<HTMLButtonElement>(null);
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
   const { locale } = useLocale();
   const isArabic = locale === "ar";
 
@@ -112,7 +114,7 @@ export default function CinematicIntro() {
             }}
             className="relative z-10 flex w-full max-w-4xl flex-col items-center text-center"
           >
-            <div className="mb-7 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.32em] text-[#b8c5a8] sm:text-xs">
+            <div className="mb-7 flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.32em] text-[#b8c5a8] sm:text-xs">
               <Sparkles size={13} strokeWidth={1.5} />
               <span>
                 {isArabic ? "اختيارات الموسم · ٢٠٢٦" : "THE SEASON EDIT · 2026"}
@@ -160,7 +162,7 @@ export default function CinematicIntro() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.8 }}
-              className="mt-3 text-[9px] font-medium uppercase tracking-[0.3em] text-white/40"
+              className="mt-3 text-xs font-medium uppercase tracking-[0.3em] text-white/40"
             >
               {isArabic ? "اكتشف المجموعة" : "DISCOVER THE COLLECTION"}
             </motion.span>
@@ -170,7 +172,7 @@ export default function CinematicIntro() {
             type="button"
             ref={skipButtonRef}
             onClick={() => setIsVisible(false)}
-            className="absolute bottom-6 end-5 z-20 inline-flex min-h-10 items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-white/75 transition hover:border-white/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8c5a8] sm:bottom-8 sm:end-8"
+            className="absolute bottom-6 end-5 z-20 inline-flex min-h-10 items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-white/75 transition hover:border-white/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b8c5a8] sm:bottom-8 sm:end-8"
           >
             <span>{isArabic ? "تخطّي المقدمة" : "Skip intro"}</span>
             <ArrowUpRight size={13} />

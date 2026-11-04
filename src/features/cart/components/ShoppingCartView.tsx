@@ -60,23 +60,23 @@ export const ShoppingCartView = () => {
   };
 
   return (
-    <section className="relative isolate min-h-screen overflow-hidden bg-surface-subtle py-8 text-primary sm:py-12">
+    <section className="page-section relative isolate min-h-screen overflow-hidden bg-surface-subtle text-primary">
       {/* Subtle Architectural Studio Grid */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 bg-grid-subtle bg-size-[3.5rem_3.5rem] mask-[radial-gradient(ellipse_85%_70%_at_50%_20%,#000_55%,transparent_100%)]"
       />
 
-      <div className="Responsive relative z-10 space-y-6 px-3 sm:px-6">
+      <div className="Responsive relative z-10 space-y-6">
         {/* ================================================================ */}
         {/* 1. TOP ATELIER BAG HEADER                                        */}
         {/* ================================================================ */}
-        <header className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface/90 p-5 shadow-[0_12px_36px_-14px_rgba(var(--shadow-rgb),0.06)] backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
+        <header className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface/90 p-5 shadow-card backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
           <div className="space-y-1.5">
             <div className="flex flex-wrap items-center gap-2.5">
               <Link
                 href="/shop"
-                className="group inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-surface-subtle px-3 py-1 text-[10px] font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
+                className="group inline-flex items-center gap-1.5 rounded-full border border-border/80 bg-surface-subtle px-3 py-1 text-xs font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
               >
                 <ArrowLeft
                   size={12}
@@ -85,7 +85,7 @@ export const ShoppingCartView = () => {
                 <span>{t("continueShopping")}</span>
               </Link>
 
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-on-action">
                 <Sparkles size={10} className="text-rating" />
                 ATELIER BAG
               </span>
@@ -107,7 +107,7 @@ export const ShoppingCartView = () => {
               type="button"
               onClick={() => selectAll(!isEverythingSelected)}
               disabled={selectableLineCount === 0}
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-secondary transition-colors hover:border-border-strong hover:bg-surface-muted hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-border bg-surface px-3.5 py-2 text-xs font-black uppercase tracking-wider text-secondary transition-colors hover:border-border-strong hover:bg-surface-muted hover:text-primary disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-surface"
             >
               <CheckCircle2 size={13} />
               <span>{isEverythingSelected ? t("deselectAllItems") : t("selectAllItems")}</span>
@@ -116,7 +116,7 @@ export const ShoppingCartView = () => {
               type="button"
               onClick={handleRemoveSelected}
               disabled={selectedLineCount === 0}
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-danger-border/80 bg-danger-soft/60 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-danger transition-colors hover:bg-danger hover:text-on-danger disabled:cursor-not-allowed disabled:opacity-40"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-danger-border/80 bg-danger-soft/60 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-danger transition-colors hover:bg-danger hover:text-on-danger disabled:cursor-not-allowed disabled:opacity-40"
             >
               <Trash2 size={13} />
               <span>{t("removeSelectedItems")}</span>
@@ -124,7 +124,7 @@ export const ShoppingCartView = () => {
             <button
               type="button"
               onClick={handleClearBag}
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-danger-border/80 bg-danger-soft/60 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-danger transition-colors hover:bg-danger hover:text-on-danger"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl border border-danger-border/80 bg-danger-soft/60 px-3.5 py-2 text-xs font-black uppercase tracking-wider text-danger transition-colors hover:bg-danger hover:text-on-danger"
             >
               <Trash2 size={13} />
               <span>{t("clearBag")}</span>
@@ -140,7 +140,7 @@ export const ShoppingCartView = () => {
         {/* ================================================================ */}
         {/* 2. LIVE FREE EXPRESS SHIPPING PROGRESS BAR                       */}
         {/* ================================================================ */}
-        <div className="overflow-hidden rounded-2xl border border-border bg-action px-5 py-4 text-on-action shadow-[0_14px_34px_-10px_rgba(var(--shadow-rgb),0.22)]">
+        <div className="overflow-hidden rounded-2xl border border-border bg-action px-5 py-4 text-on-action shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2.5">
               <span
@@ -175,7 +175,7 @@ export const ShoppingCartView = () => {
               )}
             </div>
 
-            <span className="font-mono text-[11px] font-black text-on-action/70">
+            <span className="font-mono text-xs font-black text-on-action/70">
               {shippingProgress}%
             </span>
           </div>
@@ -209,12 +209,12 @@ export const ShoppingCartView = () => {
           </div>
 
           {/* Right: Sticky 3D Receipt & Promo Sidebar */}
-          <aside className="sticky top-24 w-full shrink-0 overflow-hidden rounded-[2rem] border border-border bg-surface shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] lg:w-[360px] xl:w-[390px]">
+          <aside className="sticky top-[calc(var(--navbar-h)+1.5rem)] w-full shrink-0 overflow-hidden rounded-4xl border border-border bg-surface shadow-panel lg:w-[360px] xl:w-[390px]">
             <CartOrderSummary product={selectedItems} />
             <PromoCodeForm canCheckout={selectedLineCount > 0} />
 
             {/* Buyer Guarantee Footer */}
-            <div className="flex items-center justify-center gap-2 border-t border-border-subtle bg-surface-subtle px-5 py-3 text-[10px] font-black uppercase tracking-widest text-muted">
+            <div className="flex items-center justify-center gap-2 border-t border-border-subtle bg-surface-subtle px-5 py-3 text-xs font-black uppercase tracking-widest text-muted">
               <ShieldCheck size={14} className="text-success" />
               <span>{t("securedCheckout")}</span>
             </div>

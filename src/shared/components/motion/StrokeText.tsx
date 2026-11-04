@@ -1,3 +1,5 @@
+"use client";
+
 import {
   CSSProperties,
   useEffect,
@@ -9,6 +11,7 @@ import {
 } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
 
 
 if (typeof window !== "undefined") {
@@ -64,6 +67,7 @@ const StrokeText = ({
   className = "",
   style = {},
 }: StrokeTextProps) => {
+  const reduceMotion = useAppReducedMotion();
   const rootRef = useRef<HTMLSpanElement | null>(null);
   const strokeTextRef = useRef<SVGTextElement | null>(null);
   const wipeRectRef = useRef<SVGRectElement | null>(null);
@@ -164,9 +168,9 @@ const StrokeText = ({
         gsap.set(wipe, { attr: { width: fillEnabled ? box.width : 0 } });
     };
 
-    const prefersReducedMotion = window.matchMedia?.(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const prefersReducedMotion =
+      reduceMotion ||
+      window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
     if (prefersReducedMotion) {
       setEnd();
       return () => gsap.killTweensOf(targets);
@@ -261,6 +265,7 @@ const StrokeText = ({
     trigger,
     fillMode,
     reverse,
+    reduceMotion,
   ]);
 
   const viewBox = box

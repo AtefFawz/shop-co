@@ -2,6 +2,7 @@
 
 // Pagination navigation for URL-driven route state.
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
@@ -28,15 +29,21 @@ const getVisiblePages = (current: number, total: number) => {
 
 export default function LinkPagination({ currentPage, totalPages }: LinkPaginationProps) {
   const { t, direction } = useLocale();
+  const searchParams = useSearchParams();
   if (totalPages <= 1) return null;
 
   const visiblePages = getVisiblePages(currentPage, totalPages);
+  const pageHref = (nextPage: number) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("page", String(nextPage));
+    return `?${params.toString()}`;
+  };
 
   return (
     <div dir={direction} className="flex items-center justify-between gap-2 border-t border-border-subtle pt-4 sm:justify-center">
       {currentPage > 1 ? (
         <Link
-          href={`?page=${currentPage - 1}`}
+          href={pageHref(currentPage - 1)}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-bold text-secondary hover:bg-surface-subtle active:scale-95 transition-all shadow-sm"
         >
           {direction === "rtl" ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
@@ -74,7 +81,7 @@ export default function LinkPagination({ currentPage, totalPages }: LinkPaginati
           ) : (
             <Link
               key={pageNum}
-              href={`?page=${pageNum}`}
+              href={pageHref(Number(pageNum))}
               className="w-8 h-8 rounded-xl bg-transparent hover:bg-surface-muted text-secondary text-xs font-bold inline-flex items-center justify-center transition-all active:scale-95"
             >
               {pageNum}
@@ -85,7 +92,7 @@ export default function LinkPagination({ currentPage, totalPages }: LinkPaginati
 
       {currentPage < totalPages ? (
         <Link
-          href={`?page=${currentPage + 1}`}
+          href={pageHref(currentPage + 1)}
           className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-border bg-surface text-xs font-bold text-secondary hover:bg-surface-subtle active:scale-95 transition-all shadow-sm"
         >
           <span className="hidden sm:inline">{t("paginationNext")}</span>

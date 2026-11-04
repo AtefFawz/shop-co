@@ -14,7 +14,7 @@ export default function UsersEmptyState({
 }: EmptyStateProps) {
   const { t, direction } = useLocale();
   return (
-    <div dir={direction} className="flex flex-col items-center justify-center rounded-3xl border border-border bg-surface px-6 py-16 text-center shadow-[0_12px_34px_-12px_rgba(var(--shadow-rgb),0.05)]">
+    <div dir={direction} className="flex flex-col items-center justify-center rounded-3xl border border-border bg-surface px-6 py-16 text-center shadow-card">
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl border border-border/80 bg-surface-subtle text-primary shadow-2xs">
         <Users size={26} strokeWidth={1.6} />
       </div>
@@ -33,7 +33,7 @@ export default function UsersEmptyState({
         <button
           type="button"
           onClick={onReset}
-          className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-action px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-on-action shadow-sm transition-all hover:-translate-y-0.5 hover:bg-action-hover"
+          className="mt-5 inline-flex cursor-pointer items-center gap-2 rounded-xl bg-action px-4 py-2.5 text-xs font-black uppercase tracking-widest text-on-action shadow-sm transition-all hover:-translate-y-0.5 hover:bg-action-hover"
         >
           <RotateCcw size={12} />
           <span>{t("usersResetFilters")}</span>

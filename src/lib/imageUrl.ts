@@ -4,6 +4,22 @@ const CLOUDINARY_UPLOAD_BASE =
 export type ImageSource = string | null | undefined;
 
 /**
+ * Ask Cloudinary for the best format/quality for the browser (WebP/AVIF, smart
+ * quality). Next's image optimizer is disabled in next.config.ts, so this is
+ * what keeps remote product images small.
+ */
+function withCloudinaryAuto(url: string): string {
+  if (
+    url.includes("res.cloudinary.com") &&
+    url.includes("/image/upload/") &&
+    !url.includes("f_auto")
+  ) {
+    return url.replace("/image/upload/", "/image/upload/f_auto,q_auto/");
+  }
+  return url;
+}
+
+/**
  * Resolve an image source from an API payload.
  * Absolute/local/data/blob URLs are returned unchanged; Cloudinary public IDs
  * are normalized through one shared resolver so every feature behaves the same.
@@ -23,10 +39,12 @@ export function resolveImageUrl(
     /^(?:data|blob):/i.test(value) ||
     value.startsWith("/")
   ) {
-    return value;
+    return withCloudinaryAuto(value);
   }
 
-  return `${CLOUDINARY_UPLOAD_BASE}${value.replace(/^\/+/, "")}`;
+  return withCloudinaryAuto(
+    `${CLOUDINARY_UPLOAD_BASE}${value.replace(/^\/+/, "")}`,
+  );
 }
 
 type ProductImageSource = {

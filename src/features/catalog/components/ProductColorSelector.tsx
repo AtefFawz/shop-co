@@ -1,6 +1,7 @@
 "use client";
 
 import CheckIcon from "@mui/icons-material/Check";
+import { toHex } from "@/lib/colorPalette";
 
 type ProductColorSelectorProps = {
   product: { colors?: string[] | string | null };
@@ -37,7 +38,7 @@ export default function ProductColorSelector({
             key={color}
             type="button"
             onClick={() => setSelectedColor(color)}
-            style={{ backgroundColor: color }}
+            style={{ backgroundColor: toHex(color) ?? color }}
             aria-label={`Choose ${color}`}
             aria-pressed={isSelected}
             title={color}

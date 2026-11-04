@@ -2,6 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useToasterStore } from "react-hot-toast";
+import {
+  isQuietHoursActive,
+  useNotificationPreferences,
+} from "@/shared/preferences/NotificationPreferencesProvider";
 
 type AudioContextWithWebkit = typeof window & {
   webkitAudioContext?: typeof AudioContext;
@@ -14,6 +18,8 @@ type AudioContextWithWebkit = typeof window & {
  */
 export default function ToastSoundListener() {
   const { toasts } = useToasterStore();
+  const { preferences } = useNotificationPreferences();
+  const quietHoursActive = isQuietHoursActive(preferences);
   const seenIds = useRef(new Set<string>());
   const audioContext = useRef<AudioContext | null>(null);
   const userEnabledAudio = useRef(false);
@@ -62,7 +68,13 @@ export default function ToastSoundListener() {
 
       // Haptics are independent from audio autoplay restrictions and work on
       // supported mobile browsers even before sound has been unlocked.
-      if (toast.visible && toast.type !== "loading" && typeof navigator !== "undefined") {
+      if (
+        toast.visible &&
+        toast.type !== "loading" &&
+        preferences.vibrationEnabled &&
+        !quietHoursActive &&
+        typeof navigator !== "undefined"
+      ) {
         try {
           if (typeof navigator.vibrate === "function") navigator.vibrate([24, 35, 18]);
         } catch {
@@ -70,22 +82,18 @@ export default function ToastSoundListener() {
         }
       }
 
-      if (!toast.visible || toast.type === "loading" || !userEnabledAudio.current) {
+      if (
+        !toast.visible ||
+        toast.type === "loading" ||
+        !userEnabledAudio.current ||
+        !preferences.soundEnabled ||
+        quietHoursActive
+      ) {
         // Do not replay toasts that were already visible before sound was enabled.
         seenIds.current.add(toast.id);
         continue;
       }
 
-      let soundMuted = false;
-      try {
-        soundMuted = window.localStorage.getItem("shopco_notif_sound") === "muted";
-      } catch {
-        // If storage is unavailable, retain the default unmuted preference.
-      }
-      if (soundMuted) {
-        seenIds.current.add(toast.id);
-        continue;
-      }
 
       const context = audioContext.current;
       // Leave post-gesture toasts unmarked until the browser resumes the context.
@@ -134,7 +142,7 @@ export default function ToastSoundListener() {
     if (seenIds.current.size > 250) {
       seenIds.current = new Set(toasts.map((toast) => toast.id));
     }
-  }, [toasts, audioReady]);
+  }, [toasts, audioReady, preferences.soundEnabled, preferences.vibrationEnabled, quietHoursActive]);
 
   return null;
 }

@@ -7,7 +7,13 @@ import { getApiErrorDetails } from "@/lib/errorUtils";
 export interface ProductEditItem {
   _id?: string;
   name: string;
+  nameAr?: string;
   description: string;
+  descriptionAr?: string;
+  categoryAr?: string;
+  sectionAr?: string;
+  genderAr?: string;
+  styleAr?: string;
   price: string | number;
   category: string;
   //   type: string;
@@ -31,7 +37,13 @@ export const usePatch = () => {
 
   const [item, setItem] = useState<ProductEditItem>({
     name: "",
+    nameAr: "",
     description: "",
+    descriptionAr: "",
+    categoryAr: "",
+    sectionAr: "",
+    genderAr: "للجنسين",
+    styleAr: "كاجوال",
     price: "",
     category: "",
     // type: "",
@@ -67,18 +79,24 @@ export const usePatch = () => {
 
       setItem({
         _id: data._id,
-        name: data.name || "",
-        description: data.description || "",
+        name: data.nameEn || data.name || "",
+        nameAr: data.nameAr || "",
+        description: data.descriptionEn || data.description || "",
+        descriptionAr: data.descriptionAr || "",
+        categoryAr: data.categoryAr || "",
+        sectionAr: data.sectionAr || "",
+        genderAr: data.genderAr || "",
+        styleAr: data.styleAr || "",
         price: data.price !== undefined ? String(data.price) : "",
-        category: data.category || "",
+        category: data.categoryEn || data.category || "",
         // type: data.type || data.section || "",
-        section: data.section || data.type || "T-SHIRT",
-        gender: data.gender || "MEN",
+        section: data.sectionEn || data.section || data.type || "T-SHIRT",
+        gender: data.genderEn || data.gender || "MEN",
         isSale: String(data.isSale ?? "false"),
         discount: data.discount !== undefined ? String(data.discount) : "",
         size: data.size || "",
         colors: data.colors || "",
-        style: data.style || "Casual",
+        style: data.styleEn || data.style || "Casual",
         countInStock:
           data.countInStock !== undefined ? String(data.countInStock) : "1",
         images:

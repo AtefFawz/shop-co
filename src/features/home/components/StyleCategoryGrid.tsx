@@ -21,7 +21,7 @@ export default function StyleCategoryGrid() {
   return (
     <div className="Responsive py-8 sm:py-12">
       {/* Main Architectural Bento Vault Container */}
-      <div className="relative isolate overflow-hidden rounded-[2.5rem] border border-border bg-surface-subtle px-4 py-12 shadow-[0_24px_60px_-20px_rgba(var(--shadow-rgb),0.08)] ">
+      <div className="relative isolate overflow-hidden rounded-4xl border border-border bg-surface-subtle px-4 py-12 shadow-panel ">
         {/* Subtle Architectural Studio Grid */}
         <div
           aria-hidden="true"
@@ -32,7 +32,7 @@ export default function StyleCategoryGrid() {
         <div className="relative z-10 flex flex-col items-center text-center">
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface/85 px-3.5 py-1 shadow-2xs backdrop-blur-md">
             <Layers size={12} className="text-primary" />
-            <span className="text-[10px] font-black uppercase tracking-[0.22em] text-secondary">
+            <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
               {locale === "ar"
                 ? "مختارات الأناقة · ٢٠٢٦"
                 : "AESTHETIC ARCHIVE · 2026"}
@@ -57,7 +57,7 @@ export default function StyleCategoryGrid() {
               <div
                 key={displayName}
                 onClick={() => handleClick(e.name)}
-                className={`${e.cols} group/bento relative cursor-pointer overflow-hidden rounded-3xl border-2 border-surface bg-surface shadow-[0_14px_34px_-12px_rgba(var(--shadow-rgb),0.10)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5 hover:border-border hover:shadow-[0_28px_55px_-14px_rgba(var(--shadow-rgb),0.2)]`}
+                className={`${e.cols} group/bento relative cursor-pointer overflow-hidden rounded-3xl border-2 border-surface bg-surface shadow-card transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:-translate-y-1.5 hover:border-border hover:shadow-panel`}
               >
                 {/* Background Style Image */}
                 <Image
@@ -74,7 +74,7 @@ export default function StyleCategoryGrid() {
                 {/* Top-Left Glassmorphic Style Title Pill */}
                 <div className="absolute left-5 top-5 z-20 flex items-center gap-2.5">
                   <div className="rounded-2xl border border-border bg-surface/90 px-4 py-2 shadow-sm backdrop-blur-md transition-transform duration-300 group-hover/bento:scale-105">
-                    <span className="block font-mono text-[8px] font-black uppercase tracking-[0.22em] text-muted">
+                    <span className="block font-mono text-xs font-black uppercase tracking-[0.22em] text-muted">
                       STYLE // 0{index + 1}
                     </span>
                     <span className="text-xl font-black uppercase tracking-tight text-primary sm:text-2xl">
@@ -85,7 +85,7 @@ export default function StyleCategoryGrid() {
 
                 {/* Bottom-Right Interactive Action Trigger */}
                 <div className="absolute bottom-5 right-5 z-20 flex items-center gap-2">
-                  <span className="translate-x-2 rounded-full bg-surface/95 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary opacity-0 shadow-md backdrop-blur-md transition-all duration-300 group-hover/bento:translate-x-0 group-hover/bento:opacity-100">
+                  <span className="translate-x-2 rounded-full bg-surface/95 px-3.5 py-1.5 text-xs font-black uppercase tracking-widest text-primary opacity-0 shadow-md backdrop-blur-md transition-all duration-300 group-hover/bento:translate-x-0 group-hover/bento:opacity-100">
                     {t("exploreCollection")}
                   </span>
 

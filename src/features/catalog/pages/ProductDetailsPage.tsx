@@ -1,7 +1,8 @@
 "use client";
+import { getStockCount } from "@/lib/stock";
 import { resolveImageUrl } from "@/lib/imageUrl";
 
-import React, { useState, useEffect, use, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { notFound, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,19 +37,20 @@ import {
 } from "lucide-react";
 
 export default function ProductDetailsPage({
-  params,
+  id,
+  initialProduct = null,
 }: {
-  params: Promise<{ id: string }>;
+  id: string;
+  /** Rendered on the server for SEO; the client only refetches when it is missing. */
+  initialProduct?: Product | null;
 }) {
-  const { id } = use(params);
   const router = useRouter();
   const { t, locale, direction } = useLocale();
 
-  const [productItem, setProductItem] = useState<Product | null>(null);
+  const [productItem, setProductItem] = useState<Product | null>(initialProduct);
   const [activeIdx, setActiveIdx] = useState<number>(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isNotified, setIsNotified] = useState(false);
+  const [isLoading, setIsLoading] = useState(!initialProduct);
   const [zoomOpen, setZoomOpen] = useState(false);
   const [activeSpecTab, setActiveSpecTab] = useState<
     "story" | "specs" | "care"
@@ -72,16 +74,11 @@ export default function ProductDetailsPage({
       }
     };
 
-    if (id) {
+    // The server already supplied the product; only fetch when it could not.
+    if (id && !initialProduct) {
       fetchData();
     }
-  }, [id]);
-
-  useEffect(() => {
-    if (productItem?.name) {
-      document.title = `${productItem.name} · ${locale === "ar" ? "تفاصيل المنتج" : "Product details"} | SHOP.CO™`;
-    }
-  }, [productItem?.name, locale]);
+  }, [id, initialProduct]);
 
   const imageGallery: string[] =
     productItem?.images && productItem.images.length > 0
@@ -139,10 +136,10 @@ export default function ProductDetailsPage({
   // Bespoke 3D Skeleton Loader
   if (isLoading) {
     return (
-      <section className="min-h-screen bg-surface-subtle pt-24 pb-16 sm:pt-28">
+      <section className="page-section min-h-screen bg-surface-subtle">
         <div className="Responsive animate-pulse space-y-6">
           <div className="h-12 w-full rounded-3xl bg-surface" />
-          <div className="grid grid-cols-1 gap-8 rounded-[2.5rem] bg-surface p-6 md:grid-cols-12 sm:p-8">
+          <div className="grid grid-cols-1 gap-8 rounded-4xl bg-surface p-6 md:grid-cols-12 sm:p-8">
             <div className="aspect-square rounded-3xl bg-surface-muted md:col-span-6" />
             <div className="flex flex-col justify-between space-y-6 md:col-span-6">
               <div className="space-y-3">
@@ -174,13 +171,13 @@ export default function ProductDetailsPage({
     imageGallery[activeIdx] || productItem.photo,
   );
 
-  const stock = Number(productItem.countInStock ?? 0);
+  const stock = getStockCount(productItem);
   const isOutOfStock = stock <= 0;
   const isLowStock = stock > 0 && stock <= 5;
   const shortSku = (productItem._id || "").slice(-6).toUpperCase();
 
   return (
-    <section dir={direction} className="relative isolate min-h-screen overflow-hidden bg-surface-subtle pt-22 pb-16 text-primary sm:pt-26">
+    <section dir={direction} className="page-section relative isolate min-h-screen overflow-hidden bg-surface-subtle text-primary">
       {/* Subtle Studio Grid Backdrop */}
       <div
         aria-hidden="true"
@@ -225,12 +222,12 @@ export default function ProductDetailsPage({
         {/* ================================================================ */}
         {/* 1. TOP BREADCRUMB & QUICK UTILITY BAR                            */}
         {/* ================================================================ */}
-        <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-surface/90 px-4 py-3.5 shadow-[0_10px_30px_-12px_rgba(var(--shadow-rgb),0.05)] backdrop-blur-xl sm:px-6">
+        <div className="flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-surface/90 px-4 py-3.5 shadow-card backdrop-blur-xl sm:px-6">
           <div className="flex items-center gap-3 overflow-x-auto whitespace-nowrap">
             <button
               type="button"
               onClick={() => router.back()}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-surface-subtle px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary transition-colors hover:bg-action hover:text-on-action"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl bg-surface-subtle px-3 py-1.5 text-xs font-black uppercase tracking-widest text-primary transition-colors hover:bg-action hover:text-on-action"
             >
               <ArrowLeft size={13} />
               <span>{t("back")}</span>
@@ -238,7 +235,7 @@ export default function ProductDetailsPage({
 
             <nav
               aria-label={t("productBreadcrumb")}
-              className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-muted sm:text-xs"
+              className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-muted sm:text-xs"
             >
               <Link href="/" className="hover:text-primary transition-colors">
                 {t("catalogFlagship")}
@@ -266,7 +263,7 @@ export default function ProductDetailsPage({
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="hidden rounded-xl border border-border/80 bg-surface-subtle px-3 py-1.5 font-mono text-[10px] font-black text-secondary sm:inline-block">
+            <span className="hidden rounded-xl border border-border/80 bg-surface-subtle px-3 py-1.5 font-mono text-xs font-black text-secondary sm:inline-block">
               SKU #{shortSku}
             </span>
 
@@ -274,7 +271,7 @@ export default function ProductDetailsPage({
               type="button"
               onClick={handleShare}
               title={t("productShare")}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border/90 bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border/90 bg-surface px-3 py-1.5 text-xs font-black uppercase tracking-wider text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
             >
               <Share2 size={12} />
               <span className="hidden sm:inline">{t("productShare")}</span>
@@ -285,7 +282,7 @@ export default function ProductDetailsPage({
         {/* ================================================================ */}
         {/* 2. MAIN 3D ATELIER SHOWROOM CARD                                 */}
         {/* ================================================================ */}
-        <div className="overflow-hidden rounded-[2.5rem] border border-border bg-surface p-4 shadow-[0_20px_60px_-18px_rgba(var(--shadow-rgb),0.08)] sm:p-7 lg:p-9">
+        <div className="overflow-hidden rounded-4xl border border-border bg-surface p-4 shadow-panel sm:p-7 lg:p-9">
           <article className="grid grid-cols-1 gap-8 md:grid-cols-12 lg:gap-10 md:items-stretch">
             {/* ── LEFT 6 COLS: 3D INTERACTIVE GALLERY STAGE ── */}
             <div
@@ -305,7 +302,7 @@ export default function ProductDetailsPage({
                     transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
                     transformStyle: "preserve-3d",
                   }}
-                  className={`relative h-full w-full overflow-hidden rounded-[1.85rem] border-2 border-border bg-app shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.12)] transition-transform duration-200 ease-out ${
+                  className={`relative h-full w-full overflow-hidden rounded-[1.85rem] border-2 border-border bg-app shadow-panel transition-transform duration-200 ease-out ${
                     isOutOfStock ? "grayscale opacity-85" : ""
                   }`}
                 >
@@ -331,19 +328,19 @@ export default function ProductDetailsPage({
                   {/* Top-Left Status & Sale Badges */}
                   <div className="absolute start-4 top-4 z-20 flex flex-col items-start gap-1.5">
                     {isOutOfStock ? (
-                      <span className="rounded-full bg-danger px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-on-danger shadow-md backdrop-blur-md">
+                      <span className="rounded-full bg-danger px-3.5 py-1 text-xs font-black uppercase tracking-[0.18em] text-on-danger shadow-md backdrop-blur-md">
                         {t("soldOut")}
                       </span>
                     ) : (
                       <>
                         {productItem.isSale && (
-                          <span className="inline-flex items-center gap-1.5 rounded-full bg-action/90 px-3.5 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-on-action shadow-md backdrop-blur-md">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-action/90 px-3.5 py-1 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-md backdrop-blur-md">
                             <Sparkles size={11} className="text-rating" />
                             <span>{t("productSeasonalSale")}</span>
                           </span>
                         )}
                         {isLowStock && (
-                          <span className="inline-flex items-center gap-1 rounded-full bg-surface/95 px-3 py-1 text-[9px] font-black uppercase tracking-wider text-warning shadow-sm backdrop-blur-md">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-surface/95 px-3 py-1 text-xs font-black uppercase tracking-wider text-warning shadow-sm backdrop-blur-md">
                             <Flame
                               size={11}
                               className="fill-rating text-warning"
@@ -370,7 +367,7 @@ export default function ProductDetailsPage({
                   {/* Bottom Angle Counter & Prev/Next Controls */}
                   {imageGallery.length > 1 && (
                     <div className="absolute inset-x-4 bottom-4 z-20 flex items-center justify-between">
-                      <span className="rounded-full border border-white/40 bg-action/55 px-3 py-1 font-mono text-[10px] font-black uppercase tracking-widest text-on-action backdrop-blur-md">
+                      <span className="rounded-full border border-white/40 bg-action/55 px-3 py-1 font-mono text-xs font-black uppercase tracking-widest text-on-action backdrop-blur-md">
                         {t("productViewAngle")} 0{activeIdx + 1} / 0{imageGallery.length}
                       </span>
 
@@ -444,11 +441,11 @@ export default function ProductDetailsPage({
                 {/* Category & Style Pills */}
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
+                    <span className="rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-on-action">
                       {productItem.category || t("productAtelierGarment")}
                     </span>
                     {productItem.style && (
-                      <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-secondary">
+                      <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-secondary">
                         {productItem.style}
                       </span>
                     )}
@@ -456,15 +453,15 @@ export default function ProductDetailsPage({
 
                   {/* Stock Badge */}
                   {stock > 5 ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-success-border bg-success-soft px-3 py-1 text-[10px] font-black uppercase tracking-wider text-success">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-success-border bg-success-soft px-3 py-1 text-xs font-black uppercase tracking-wider text-success">
                       <CheckCircle2 size={12} /> {t("productInStock")} ({stock} {t("productReadyStock")})
                     </span>
                   ) : stock > 0 ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-warning-border bg-warning-soft px-3 py-1 text-[10px] font-black uppercase tracking-wider text-warning">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-warning-border bg-warning-soft px-3 py-1 text-xs font-black uppercase tracking-wider text-warning">
                       <AlertTriangle size={12} /> {t("productLowStock")} ({stock} {t("productStockRemaining")})
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-border bg-danger-soft px-3 py-1 text-[10px] font-black uppercase tracking-wider text-danger">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-border bg-danger-soft px-3 py-1 text-xs font-black uppercase tracking-wider text-danger">
                       <XCircle size={12} /> {t("outOfStock")}
                     </span>
                   )}
@@ -489,14 +486,14 @@ export default function ProductDetailsPage({
                         /5
                       </span>
                     </span>
-                    <span className="text-[11px] font-bold text-muted">
+                    <span className="text-xs font-bold text-muted">
                       ({reviews.length} {t("productReviewCount")})
                     </span>
                   </div>
                 </div>
 
                 {/* Short Editorial Excerpt */}
-                <p className="text-xs font-medium leading-relaxed text-muted sm:text-[13px]">
+                <p className="text-xs font-medium leading-relaxed text-muted sm:text-[0.8125rem]">
                   {productItem.description ||
                     t("productShortDescriptionFallback")}
                 </p>
@@ -515,37 +512,11 @@ export default function ProductDetailsPage({
                       </p>
                     </div>
 
-                    {isNotified ? (
-                      <div className="flex items-center gap-2.5 rounded-2xl border border-success-border bg-success-soft p-4 text-xs font-bold text-success">
-                        <CheckCircle2 size={16} className="shrink-0" />
-                        <span>
-                          {t("productRestockConfirmed")}
-                        </span>
-                      </div>
-                    ) : (
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                          setIsNotified(true);
-                          toast.success(t("productRestockActivated"));
-                        }}
-                        className="flex flex-col gap-2.5 sm:flex-row"
-                      >
-                        <input
-                          type="email"
-                          placeholder={t("productRestockPlaceholder")}
-                          required
-                          className="flex-1 rounded-2xl border border-border bg-surface-subtle px-4 py-3.5 text-xs font-semibold text-primary placeholder:text-muted focus:border-primary focus:bg-surface focus:outline-none"
-                        />
-                        <button
-                          type="submit"
-                          className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action px-6 py-3.5 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition-all hover:bg-action-hover active:scale-95"
-                        >
-                          <Bell size={14} />
-                          <span>{t("productNotifyMe")}</span>
-                        </button>
-                      </form>
-                    )}
+                    <div className="rounded-2xl border border-border bg-surface-subtle px-4 py-3 text-xs font-semibold leading-6 text-muted">
+                      {locale === "ar"
+                        ? "خدمة التنبيه عند إعادة التوفر غير متاحة حاليًا. يمكنك متابعة صفحة المنتج لاحقًا."
+                        : "Restock notifications are not available yet. Please check this product again later."}
+                    </div>
                   </div>
                 ) : (
                   <ProductDetailsClient product={productItem} />
@@ -556,13 +527,13 @@ export default function ProductDetailsPage({
               <div className="grid grid-cols-3 gap-2.5 border-t border-border-subtle pt-5">
                 <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-surface-subtle p-3 text-center sm:flex-row sm:gap-2">
                   <Truck size={15} className="shrink-0 text-primary" />
-                  <span className="text-[9px] font-black uppercase tracking-wider text-secondary sm:text-[10px]">
+                  <span className="text-xs font-black uppercase tracking-wider text-secondary sm:text-xs">
                     {t("productExpressDispatch")}
                   </span>
                 </div>
                 <div className="flex flex-col items-center justify-center gap-1 rounded-2xl bg-surface-subtle p-3 text-center sm:flex-row sm:gap-2">
                   <RotateCcw size={15} className="shrink-0 text-primary" />
-                  <span className="text-[9px] font-black uppercase tracking-wider text-secondary sm:text-[10px]">
+                  <span className="text-xs font-black uppercase tracking-wider text-secondary sm:text-xs">
                     {t("productReturns30Days")}
                   </span>
                 </div>
@@ -571,7 +542,7 @@ export default function ProductDetailsPage({
                     size={15}
                     className="shrink-0 text-success"
                   />
-                  <span className="text-[9px] font-black uppercase tracking-wider text-secondary sm:text-[10px]">
+                  <span className="text-xs font-black uppercase tracking-wider text-secondary sm:text-xs">
                     {t("productAuthentic")}
                   </span>
                 </div>
@@ -585,7 +556,7 @@ export default function ProductDetailsPage({
         {/* ================================================================ */}
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
           {/* Left 8 Cols: Interactive Tabbed Editorial Details */}
-          <div className="flex flex-col justify-between rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] lg:col-span-8 sm:p-8">
+          <div className="flex flex-col justify-between rounded-4xl border border-border bg-surface p-6 shadow-card lg:col-span-8 sm:p-8">
             <div>
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border-subtle pb-4">
                 <div className="flex items-center gap-2">
@@ -606,7 +577,7 @@ export default function ProductDetailsPage({
                       key={tab.id}
                       type="button"
                       onClick={() => setActiveSpecTab(tab.id as typeof activeSpecTab)}
-                      className={`cursor-pointer rounded-lg px-3 py-1 text-[10px] font-black uppercase tracking-wider transition-all ${
+                      className={`cursor-pointer rounded-lg px-3 py-1 text-xs font-black uppercase tracking-wider transition-all ${
                         activeSpecTab === tab.id
                           ? "bg-action text-on-action shadow-2xs"
                           : "text-muted hover:text-primary"
@@ -667,7 +638,7 @@ export default function ProductDetailsPage({
           </div>
 
           {/* Right 4 Cols: Technical Specifications Card */}
-          <div className="flex flex-col justify-between rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] lg:col-span-4 sm:p-8">
+          <div className="flex flex-col justify-between rounded-4xl border border-border bg-surface p-6 shadow-card lg:col-span-4 sm:p-8">
             <div>
               <div className="mb-4 flex items-center justify-between">
                 <h3 className="text-xs font-black uppercase tracking-[0.2em] text-primary">

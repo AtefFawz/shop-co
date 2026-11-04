@@ -23,12 +23,13 @@ export interface OrderRecord {
   updatedAt?: string;
   status: string;
   totalPrice?: number;
+  shippingFee?: number;
+  paymentMethod?: "cod" | "card";
   orderItems: OrderLineItem[];
   isPaid?: boolean;
   paidAt?: string;
   isDelivered?: boolean;
   deliveredAt?: string;
-  paymentMethod?: string;
   shippingAddress?: {
     address?: string;
     city?: string;
@@ -63,6 +64,9 @@ export interface WeeklySalesPoint {
 }
 
 export interface AdminDashboardStats {
+  onSaleCount?: number;
+  lowStockCount?: number;
+  outOfStockCount?: number;
   totalRevenue?: number;
   totalOrders?: number;
   totalUsers?: number;

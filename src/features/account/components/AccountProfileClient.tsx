@@ -27,10 +27,6 @@ import {
   ArrowUpRight,
   Crown,
   ChevronRight,
-  Bell,
-  Lock,
-  Smartphone,
-  CheckCircle2,
 } from "lucide-react";
 
 import UpdateProfileModal from "@/features/account/components/UpdateAccountForm";
@@ -46,6 +42,10 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
 import toast from "react-hot-toast";
+import { DisplayPreferencesPanel } from "@/features/preferences/components/DisplayPreferencesPanel";
+import { NotificationPreferencesPanel } from "@/features/preferences/components/NotificationPreferencesPanel";
+import { AccountSecurityPanel } from "@/features/preferences/components/AccountSecurityPanel";
+import { LocalPrivacyPanel } from "@/features/preferences/components/LocalPrivacyPanel";
 
 import type { CustomerOrderRecord, ReviewRecord } from "@/types/domain";
 const NAV = [
@@ -97,52 +97,6 @@ export function AccountProfileClient() {
   const [avatarError, setAvatarError] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [copiedEmail, setCopiedEmail] = useState(false);
-
-  const [prefs, setPrefs] = useState({
-    orderSms: true,
-    dropAlerts: true,
-    privateProfile: false,
-  });
-  const [prefsLoaded, setPrefsLoaded] = useState(false);
-
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem("shopco-profile-prefs");
-      if (saved) {
-        const parsed = JSON.parse(saved) as Partial<typeof prefs>;
-        setPrefs((current) => ({
-          orderSms:
-            typeof parsed.orderSms === "boolean"
-              ? parsed.orderSms
-              : current.orderSms,
-          dropAlerts:
-            typeof parsed.dropAlerts === "boolean"
-              ? parsed.dropAlerts
-              : current.dropAlerts,
-          privateProfile:
-            typeof parsed.privateProfile === "boolean"
-              ? parsed.privateProfile
-              : current.privateProfile,
-        }));
-      }
-    } catch {
-      // Ignore malformed or unavailable browser storage; retain safe defaults.
-    } finally {
-      setPrefsLoaded(true);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!prefsLoaded) return;
-    try {
-      window.localStorage.setItem(
-        "shopco-profile-prefs",
-        JSON.stringify(prefs),
-      );
-    } catch {
-      // Preferences remain interactive for the current session if storage is unavailable.
-    }
-  }, [prefs, prefsLoaded]);
 
   const [heroTilt, setHeroTilt] = useState({ x: 0, y: 0 });
 
@@ -201,7 +155,7 @@ export function AccountProfileClient() {
         <div className="relative flex h-16 w-16 items-center justify-center rounded-3xl bg-action text-on-action shadow-xl">
           <div className="h-7 w-7 animate-spin rounded-full border-2 border-white/25 border-t-white" />
         </div>
-        <p className="font-mono text-[10px] font-black uppercase tracking-[0.28em] text-muted">
+        <p className="font-mono text-xs font-black uppercase tracking-[0.28em] text-muted">
           {t("accountInitializingPortal")}
         </p>
       </div>
@@ -325,7 +279,7 @@ export function AccountProfileClient() {
   return (
     <div
       dir={direction}
-      className="fixed inset-0 z-40 flex h-screen h-dvh w-full overflow-hidden bg-surface-subtle text-primary antialiased selection:bg-action selection:text-on-action"
+      className="fixed inset-x-0 bottom-0 top-(--navbar-h) z-40 flex w-full overflow-hidden bg-surface-subtle text-primary antialiased selection:bg-action selection:text-on-action"
     >
       {/* ── 1. MOBILE ONLY: Bottom Floating Navigation ── */}
       <div
@@ -369,7 +323,7 @@ export function AccountProfileClient() {
                 </p>
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-success" />
               </div>
-              <p className="truncate font-mono text-[10px] font-medium text-muted">
+              <p className="truncate font-mono text-xs font-medium text-muted">
                 {email}
               </p>
             </div>
@@ -378,13 +332,13 @@ export function AccountProfileClient() {
         extraFooterLinks={
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
-              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+              <span className="min-w-0 truncate text-xs font-bold text-secondary">
                 {t("uiLanguagePreference")}
               </span>
               <LocaleSwitcher compact />
             </div>
             <div className="flex items-center justify-between gap-3 rounded-xl border border-border/70 bg-surface-subtle px-3 py-2">
-              <span className="min-w-0 truncate text-[11px] font-bold text-secondary">
+              <span className="min-w-0 truncate text-xs font-bold text-secondary">
                 {t("uiThemePreference")}
               </span>
               <ThemeToggle compact />
@@ -421,7 +375,7 @@ export function AccountProfileClient() {
 
       {/* ── 3. RIGHT INSET WORKSPACE ── */}
       <div className="flex h-full min-w-0 flex-1 flex-col overflow-hidden lg:p-2.5">
-        <div className="relative flex h-full w-full flex-col overflow-hidden bg-surface-subtle lg:rounded-[26px] lg:border lg:border-border/90 lg:shadow-[0_12px_45px_rgba(var(--shadow-rgb),0.05)]">
+        <div className="relative flex h-full w-full flex-col overflow-hidden bg-surface-subtle lg:rounded-[26px] lg:border lg:border-border/90 lg:shadow-panel">
           {/* Subtle Architectural Grid inside Workspace */}
           <div
             aria-hidden="true"
@@ -439,7 +393,7 @@ export function AccountProfileClient() {
               </Link>
               <span className="text-subtle lg:hidden">/</span>
 
-              <div className="hidden items-center gap-2 text-[11px] font-bold uppercase tracking-[0.15em] text-muted lg:flex">
+              <div className="hidden items-center gap-2 text-xs font-bold uppercase tracking-[0.15em] text-muted lg:flex">
                 <span>{t("navProfile")}</span>
                 <ChevronRight size={12} className="text-subtle" />
               </div>
@@ -448,7 +402,7 @@ export function AccountProfileClient() {
                 <h2 className="truncate text-xs font-black uppercase tracking-[0.08em] text-primary sm:text-sm">
                   {t(currentMeta.titleKey)}
                 </h2>
-                <span className="hidden rounded-md border border-border bg-surface-muted px-2 py-0.5 font-mono text-[9.5px] font-bold uppercase tracking-wider text-secondary sm:inline-block">
+                <span className="hidden rounded-md border border-border bg-surface-muted px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-secondary sm:inline-block">
                   {t(currentMeta.badgeKey)}
                 </span>
               </div>
@@ -471,7 +425,7 @@ export function AccountProfileClient() {
                     key={tab.id}
                     type="button"
                     onClick={() => goTo(tab.id)}
-                    className={`relative flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-[10.5px] font-black uppercase tracking-wider transition-colors ${
+                    className={`relative flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-colors ${
                       isTabActive
                         ? "text-on-action"
                         : "text-muted hover:text-primary"
@@ -493,7 +447,7 @@ export function AccountProfileClient() {
                       <span>{t(tab.labelKey)}</span>
                       {count !== null && count > 0 && (
                         <span
-                          className={`rounded-full px-1.5 py-0.2 font-mono text-[9px] ${
+                          className={`rounded-full px-1.5 py-0.2 font-mono text-xs ${
                             isTabActive
                               ? "bg-white/20 text-on-action"
                               : "bg-surface-hover text-secondary"
@@ -524,7 +478,7 @@ export function AccountProfileClient() {
 
               <Link
                 href="/shop"
-                className="hidden h-9 items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 text-[10.5px] font-black uppercase tracking-[0.12em] text-primary transition hover:border-border-strong hover:bg-surface-subtle sm:inline-flex"
+                className="hidden h-9 items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 text-xs font-black uppercase tracking-[0.12em] text-primary transition hover:border-border-strong hover:bg-surface-subtle sm:inline-flex"
               >
                 <Store size={13} />
                 <span>{t("accountShowroom")}</span>
@@ -534,7 +488,7 @@ export function AccountProfileClient() {
               <button
                 type="button"
                 onClick={() => setIsEditOpen(true)}
-                className="flex h-9 cursor-pointer items-center gap-1.5 rounded-xl bg-action px-3.5 text-[10.5px] font-black uppercase tracking-[0.12em] text-on-action shadow-xs transition hover:bg-action-hover active:scale-95 sm:px-4"
+                className="flex h-9 cursor-pointer items-center gap-1.5 rounded-xl bg-action px-3.5 text-xs font-black uppercase tracking-[0.12em] text-on-action shadow-xs transition hover:bg-action-hover active:scale-95 sm:px-4"
               >
                 <Edit3 size={12} />
                 <span>{t("uiEditProfileAction")}</span>
@@ -545,9 +499,9 @@ export function AccountProfileClient() {
           {/* ── Scrollable Main Canvas ── */}
           <main
             ref={mainScrollRef}
-            className="relative Responsive z-10 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain pt-5 pb-4 lg:pb-5"
+            className="relative Responsive z-10 min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-y-contain py-4 lg:py-5"
           >
-            <div className="space-y-6 pb-[calc(8rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
+            <div className="space-y-6 pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] lg:pb-0">
               <div
                 style={{ perspective: "1300px" }}
                 className="grid grid-cols-1 gap-5 xl:grid-cols-12"
@@ -563,14 +517,14 @@ export function AccountProfileClient() {
                     transform: `rotateX(${heroTilt.y}deg) rotateY(${heroTilt.x}deg)`,
                     transformStyle: "preserve-3d",
                   }}
-                  className="group relative flex flex-col justify-between overflow-hidden rounded-[28px] border border-border-strong bg-action p-1 text-on-action shadow-[0_24px_60px_-15px_rgba(var(--shadow-rgb),0.25)] transition-transform duration-200 ease-out xl:col-span-8"
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border-strong bg-action p-1 text-on-action shadow-panel transition-transform duration-200 ease-out xl:col-span-8"
                 >
                   {/* Animated Conic Border Glow */}
-                  <div className="absolute inset-0 z-0 overflow-hidden rounded-[28px]">
+                  <div className="absolute inset-0 z-0 overflow-hidden rounded-3xl">
                     <div className="absolute -inset-[100%] animate-[spin_8s_linear_infinite] bg-orbit-gradient opacity-40" />
                   </div>
 
-                  <div className="relative z-10 flex h-full flex-col justify-between overflow-hidden rounded-[24px] border border-white/10 bg-action/95 p-6 backdrop-blur-2xl sm:p-8">
+                  <div className="relative z-10 flex h-full flex-col justify-between overflow-hidden rounded-3xl border border-white/10 bg-action/95 p-6 backdrop-blur-2xl sm:p-8">
                     {/* Interactive Mouse Spotlight */}
                     <motion.div
                       aria-hidden="true"
@@ -608,7 +562,7 @@ export function AccountProfileClient() {
                           type="button"
                           onClick={() => setIsEditOpen(true)}
                           title={t("uiProfileChangePhoto")}
-                          className="group/avatar relative flex h-26 w-26 cursor-pointer items-center justify-center overflow-hidden rounded-[22px] border border-white/20 bg-white/10 font-mono text-2xl font-black text-on-action shadow-[0_0_30px_rgba(255,255,255,0.08)] sm:h-28 sm:w-28 sm:text-3xl"
+                          className="group/avatar relative flex h-26 w-26 cursor-pointer items-center justify-center overflow-hidden rounded-3xl border border-white/20 bg-white/10 font-mono text-2xl font-black text-on-action shadow-[0_0_30px_rgba(255,255,255,0.08)] sm:h-28 sm:w-28 sm:text-3xl"
                         >
                           {hasValidAvatar ? (
                             <Image
@@ -630,11 +584,11 @@ export function AccountProfileClient() {
                       {/* Identity Details + Copyable Email Pill */}
                       <div className="flex min-w-0 flex-1 flex-col items-center gap-2.5 sm:items-start">
                         <div className="flex flex-wrap items-center justify-center gap-1.5 sm:justify-start">
-                          <span className="inline-flex items-center gap-1 rounded-md bg-surface px-2.5 py-0.5 text-[9px] font-black uppercase tracking-[0.16em] text-primary shadow-sm">
+                          <span className="inline-flex items-center gap-1 rounded-md bg-surface px-2.5 py-0.5 text-xs font-black uppercase tracking-[0.16em] text-primary shadow-sm">
                             <ShieldCheck size={10} />
                             {roleLabel}
                           </span>
-                          <span className="inline-flex items-center gap-1 rounded-md border border-warning-border bg-warning-soft px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-[0.14em] text-rating">
+                          <span className="inline-flex items-center gap-1 rounded-md border border-warning-border bg-warning-soft px-2.5 py-0.5 text-xs font-bold uppercase tracking-[0.14em] text-rating">
                             <Sparkles size={9} />
                             {membershipTier}
                           </span>
@@ -651,7 +605,7 @@ export function AccountProfileClient() {
                               onClick={handleCopyEmail}
                               whileTap={{ scale: 0.96 }}
                               title={t("uiCopyEmailHint")}
-                              className={`group/copy inline-flex max-w-full cursor-pointer items-center gap-2 rounded-xl border px-3 py-1.5 font-mono text-[11.5px] transition-all duration-200 ${
+                              className={`group/copy inline-flex max-w-full cursor-pointer items-center gap-2 rounded-xl border px-3 py-1.5 font-mono text-xs transition-all duration-200 ${
                                 copiedEmail
                                   ? "border-success-border bg-success-soft text-success"
                                   : "border-white/15 bg-white/[0.06] text-on-action-muted hover:border-white/30 hover:bg-white/[0.12] hover:text-on-action"
@@ -686,7 +640,7 @@ export function AccountProfileClient() {
                     {/* === BOTTOM ROW: Stats Grid === */}
                     <div className="relative z-10 mt-6 grid grid-cols-1 gap-3 border-t border-white/10 pt-5 sm:mt-7  sm:grid-cols-3 ">
                       <div className="flex flex-col justify-center rounded-2xl border border-white/5 bg-action/40 px-4 py-3">
-                        <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.14em] text-on-action-muted">
+                        <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.14em] text-on-action-muted">
                           <span className="h-2 w-2 animate-pulse rounded-full bg-success-bright" />
                           <span>{t("uiTierReadiness")}</span>
                         </div>
@@ -703,7 +657,7 @@ export function AccountProfileClient() {
                               className="h-full rounded-full bg-linear-to-r from-border-strong via-white to-rating"
                             />
                           </div>
-                          <span className="font-mono text-[10px] font-black text-on-action">
+                          <span className="font-mono text-xs font-black text-on-action">
                             {tierProgress}%
                           </span>
                         </div>
@@ -714,7 +668,7 @@ export function AccountProfileClient() {
                         onClick={() => goTo("orders")}
                         className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/8"
                       >
-                        <p className="text-[9.5px] font-black uppercase tracking-[0.16em] text-on-action-muted">
+                        <p className="text-xs font-black uppercase tracking-[0.16em] text-on-action-muted">
                           {t("accountTotalOrdersMetric")}
                         </p>
                         <div className="mt-1 flex items-baseline justify-between gap-2">
@@ -733,7 +687,7 @@ export function AccountProfileClient() {
                         onClick={() => goTo("reviews")}
                         className="group/stat flex cursor-pointer flex-col justify-center rounded-2xl border border-white/10 bg-white/4 px-4 py-3 text-start transition hover:border-white/25 hover:bg-white/8"
                       >
-                        <p className="text-[9.5px] font-black uppercase tracking-[0.16em] text-on-action-muted">
+                        <p className="text-xs font-black uppercase tracking-[0.16em] text-on-action-muted">
                           {t("accountPublishedReviewsMetric")}
                         </p>
                         <div className="mt-1 flex items-baseline justify-between gap-2">
@@ -751,10 +705,10 @@ export function AccountProfileClient() {
                 </motion.div>
 
                 {/* 2. Right Bento Card: Pass / Quick Portal (4 Columns) */}
-                <div className="flex flex-col justify-between gap-4 rounded-[28px] border border-border bg-surface p-6 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] xl:col-span-4">
+                <div className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface p-6 shadow-card xl:col-span-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-[9.5px] font-black uppercase tracking-[0.18em] text-muted">
+                      <p className="text-xs font-black uppercase tracking-[0.18em] text-muted">
                         {t("uiShopCoPass")}
                       </p>
                       <h3 className="mt-1.5 text-lg font-black uppercase tracking-tight text-primary">
@@ -776,7 +730,7 @@ export function AccountProfileClient() {
 
                   {/* Cumulative Spend Pill */}
                   <div className="flex items-center justify-between rounded-2xl bg-surface-subtle px-4 py-3">
-                    <span className="text-[10px] font-black uppercase tracking-wider text-muted">
+                    <span className="text-xs font-black uppercase tracking-wider text-muted">
                       {t("accountLifetimeSpend")}
                     </span>
                     <span className="font-mono text-base font-black text-primary">
@@ -789,7 +743,7 @@ export function AccountProfileClient() {
                       <button
                         type="button"
                         onClick={() => router.push("/dashboard")}
-                        className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action text-[11px] font-black uppercase tracking-[0.14em] text-on-action shadow-md transition hover:bg-action-hover active:scale-95"
+                        className="flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action text-xs font-black uppercase tracking-[0.14em] text-on-action shadow-md transition hover:bg-action-hover active:scale-95"
                       >
                         <UserCog size={14} />
                         <span>{t("accountOpenCommandCenter")}</span>
@@ -801,7 +755,7 @@ export function AccountProfileClient() {
                     ) : (
                       <Link
                         href="/shop"
-                        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-action text-[11px] font-black uppercase tracking-[0.14em] text-on-action shadow-md transition hover:bg-action-hover active:scale-95"
+                        className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-action text-xs font-black uppercase tracking-[0.14em] text-on-action shadow-md transition hover:bg-action-hover active:scale-95"
                       >
                         <Store size={14} />
                         <span>{t("accountExploreArchive")}</span>
@@ -840,8 +794,10 @@ export function AccountProfileClient() {
 
                   {active === "settings" && (
                     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+                      <DisplayPreferencesPanel />
+
                       {/* Identity Configuration Card */}
-                      <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-6 shadow-[0_12px_36px_-14px_rgba(var(--shadow-rgb),0.06)] lg:col-span-6">
+                      <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-6 shadow-card lg:col-span-6">
                         <div className="space-y-4">
                           <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                             <div className="flex items-center gap-3">
@@ -852,13 +808,13 @@ export function AccountProfileClient() {
                                 <h3 className="text-sm font-black uppercase tracking-tight text-primary">
                                   {t("accountIdentityPortrait")}
                                 </h3>
-                                <p className="text-[11px] font-medium text-muted">
+                                <p className="text-xs font-medium text-muted">
                                   {t("accountPublicProfileUpdate")}
                                 </p>
                               </div>
                             </div>
 
-                            <span className="rounded-full bg-success-soft px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-success">
+                            <span className="rounded-full bg-success-soft px-2.5 py-1 text-xs font-black uppercase tracking-wider text-success">
                               {t("accountVerified")}
                             </span>
                           </div>
@@ -903,114 +859,12 @@ export function AccountProfileClient() {
                         </button>
                       </div>
 
-                      {/* Telemetry & Notification Toggles */}
-                      <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-6 shadow-[0_12px_36px_-14px_rgba(var(--shadow-rgb),0.06)] lg:col-span-6">
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-3 border-b border-border-subtle pb-4">
-                            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-action text-on-action">
-                              <Bell size={17} />
-                            </div>
-                            <div>
-                              <h3 className="text-sm font-black uppercase tracking-tight text-primary">
-                                {t("accountAlertsTitle")}
-                              </h3>
-                              <p className="text-[11px] font-medium text-muted">
-                                {t("accountAlertsDescription")}
-                              </p>
-                            </div>
-                          </div>
-
-                          <div className="space-y-3">
-                            {[
-                              {
-                                key: "orderSms" as const,
-                                title: t("accountCourierUpdates"),
-                                sub: t("accountCourierUpdatesHint"),
-                                icon: Smartphone,
-                              },
-                              {
-                                key: "dropAlerts" as const,
-                                title: t("accountLimitedCollectionAlerts"),
-                                sub: t("accountLimitedCollectionAlertsHint"),
-                                icon: Sparkles,
-                              },
-                              {
-                                key: "privateProfile" as const,
-                                title: t("accountPrivacyPreference"),
-                                sub: t("accountPrivacyPreferenceHint"),
-                                icon: Lock,
-                              },
-                            ].map((item) => {
-                              const Icon = item.icon;
-                              const isOn = prefs[item.key];
-                              return (
-                                <div
-                                  key={item.key}
-                                  role="switch"
-                                  tabIndex={0}
-                                  aria-checked={isOn}
-                                  aria-label={item.title}
-                                  onKeyDown={(event) => {
-                                    if (
-                                      event.key === "Enter" ||
-                                      event.key === " "
-                                    ) {
-                                      event.preventDefault();
-                                      setPrefs((current) => ({
-                                        ...current,
-                                        [item.key]: !current[item.key],
-                                      }));
-                                    }
-                                  }}
-                                  onClick={() =>
-                                    setPrefs((p) => ({
-                                      ...p,
-                                      [item.key]: !p[item.key],
-                                    }))
-                                  }
-                                  className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-border/70 bg-surface-subtle p-3.5 transition hover:border-border hover:bg-surface"
-                                >
-                                  <div className="flex items-center gap-3">
-                                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-surface text-primary shadow-2xs">
-                                      <Icon size={15} />
-                                    </span>
-                                    <div>
-                                      <p className="text-xs font-black uppercase text-primary">
-                                        {item.title}
-                                      </p>
-                                      <p className="text-[11px] text-muted">
-                                        {item.sub}
-                                      </p>
-                                    </div>
-                                  </div>
-
-                                  <div
-                                    className={`flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors ${
-                                      isOn ? "bg-action" : "bg-surface-hover"
-                                    }`}
-                                  >
-                                    <span
-                                      className={`h-5 w-5 rounded-full bg-surface shadow-xs transition-transform ${
-                                        isOn ? "translate-x-5" : "translate-x-0"
-                                      }`}
-                                    />
-                                  </div>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-
-                        <div className="mt-6 flex items-center justify-between rounded-2xl bg-success-soft px-4 py-3 text-[11px] font-bold text-success">
-                          <span className="inline-flex items-center gap-1.5">
-                            <CheckCircle2 size={14} />{" "}
-                            {t("accountSessionEncryptedActive")}
-                          </span>
-                          <span className="font-mono text-[10px] uppercase">
-                            TLS 1.3
-                          </span>
-                        </div>
-                      </div>
+                      <NotificationPreferencesPanel />
+                      <AccountSecurityPanel
+                        email={email}
+                        emailVerified={user.emailVerified !== false}
+                      />
+                      <LocalPrivacyPanel />
                     </div>
                   )}
                 </motion.div>

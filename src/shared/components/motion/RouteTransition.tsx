@@ -1,12 +1,14 @@
 "use client";
 
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
+import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 
 export default function RouteTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
 
   return (
     <AnimatePresence mode="wait" initial={false}>

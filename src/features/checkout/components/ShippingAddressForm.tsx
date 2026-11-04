@@ -29,18 +29,19 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
     city: "",
     phone: "",
   });
+  const cardPaymentsEnabled = process.env.NEXT_PUBLIC_CARD_PAYMENTS_ENABLED === "true";
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cod");
   const [focused, setFocused] = useState<string | null>(null);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    onSubmit({ ...formData, paymentMethod });
+    onSubmit({ ...formData, paymentMethod: cardPaymentsEnabled ? paymentMethod : "cod" });
   };
 
   return (
     <div
       dir={direction}
-      className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_50px_-15px_rgba(var(--shadow-rgb),0.08)] sm:p-8"
+      className="overflow-hidden rounded-4xl border border-border bg-surface p-6 shadow-panel sm:p-8"
     >
       {/* Header */}
       <div className="mb-6 flex items-center gap-3.5 border-b border-border-subtle pb-4">
@@ -60,7 +61,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
       <form onSubmit={handleSubmit} className="space-y-5">
         {/* 1. Street Address */}
         <div className="space-y-2">
-          <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+          <label htmlFor="shipping-address" className="block px-1 text-xs font-black uppercase tracking-[0.18em] text-muted">
             {t("streetAddress")}
           </label>
           <div
@@ -81,6 +82,8 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
             </span>
 
             <input
+              id="shipping-address"
+              autoComplete="street-address"
               required
               type="text"
               value={formData.address}
@@ -90,7 +93,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
               onChange={(e) =>
                 setFormData({ ...formData, address: e.target.value })
               }
-              className="w-full bg-transparent py-3.5 pe-4 ps-14 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+              className="w-full bg-transparent py-3.5 pe-4 ps-14 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[0.8125rem]"
             />
           </div>
         </div>
@@ -99,7 +102,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           {/* City */}
           <div className="space-y-2">
-            <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+            <label htmlFor="shipping-city" className="block px-1 text-xs font-black uppercase tracking-[0.18em] text-muted">
               {t("city")}
             </label>
             <div
@@ -120,6 +123,8 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
               </span>
 
               <input
+              id="shipping-city"
+              autoComplete="address-level2"
                 required
                 type="text"
                 value={formData.city}
@@ -129,7 +134,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
                 onChange={(e) =>
                   setFormData({ ...formData, city: e.target.value })
                 }
-                className="w-full bg-transparent py-3.5 pe-4 ps-14 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+                className="w-full bg-transparent py-3.5 pe-4 ps-14 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[0.8125rem]"
               />
             </div>
 
@@ -140,7 +145,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
                   key={c}
                   type="button"
                   onClick={() => setFormData({ ...formData, city: c })}
-                  className={`cursor-pointer rounded-lg border px-2 py-0.5 text-[9px] font-black uppercase transition-all ${
+                  className={`cursor-pointer rounded-lg border px-2 py-0.5 text-xs font-black uppercase transition-all ${
                     formData.city.toLowerCase() === c.toLowerCase()
                       ? "border-border-strong bg-action text-on-action"
                       : "border-border bg-surface-subtle text-muted hover:border-border-strong hover:text-primary"
@@ -164,7 +169,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
 
           {/* Phone Number */}
           <div className="space-y-2">
-            <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+            <label htmlFor="shipping-phone" className="block px-1 text-xs font-black uppercase tracking-[0.18em] text-muted">
               {t("phone")}
             </label>
             <div
@@ -185,6 +190,9 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
               </span>
 
               <input
+              id="shipping-phone"
+              autoComplete="tel"
+              inputMode="tel"
                 required
                 type="tel"
                 value={formData.phone}
@@ -198,7 +206,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
                 onChange={(e) =>
                   setFormData({ ...formData, phone: e.target.value })
                 }
-                className="w-full bg-transparent py-3.5 ps-14 pe-4 font-mono text-xs font-bold text-primary placeholder:font-sans placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+                className="w-full bg-transparent py-3.5 ps-14 pe-4 font-mono text-xs font-bold text-primary placeholder:font-sans placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[0.8125rem]"
               />
             </div>
           </div>
@@ -206,7 +214,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
 
         {/* 3. Interactive Payment Method Selector */}
         <div className="space-y-2.5 border-t border-border-subtle pt-5">
-          <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+          <label className="block px-1 text-xs font-black uppercase tracking-[0.18em] text-muted">
             {t("paymentMethod")}
           </label>
 
@@ -227,7 +235,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
                     {t("cashOnDelivery")}
                   </span>
                   <span
-                    className={`block text-[10px] ${
+                    className={`block text-xs ${
                       paymentMethod === "cod"
                         ? "text-on-action/65"
                         : "text-muted"
@@ -244,8 +252,11 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
 
             <button
               type="button"
-              onClick={() => setPaymentMethod("card")}
-              className={`flex cursor-pointer items-center justify-between rounded-2xl border p-3.5 text-start transition-all ${
+              disabled={!cardPaymentsEnabled}
+              onClick={() => cardPaymentsEnabled && setPaymentMethod("card")}
+              aria-disabled={!cardPaymentsEnabled}
+              title={!cardPaymentsEnabled ? (locale === "ar" ? "الدفع بالبطاقة غير متاح حاليًا" : "Card payments are not enabled yet") : undefined}
+              className={`flex items-center justify-between rounded-2xl border p-3.5 text-start transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
                 paymentMethod === "card"
                   ? "border-border bg-action text-on-action shadow-md"
                   : "border-border bg-surface-subtle text-primary hover:border-border-strong"
@@ -258,13 +269,13 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
                     {t("cardOnDelivery")}
                   </span>
                   <span
-                    className={`block text-[10px] ${
+                    className={`block text-xs ${
                       paymentMethod === "card"
                         ? "text-on-action/65"
                         : "text-muted"
                     }`}
                   >
-                    {t("cardTerminal")}
+                    {cardPaymentsEnabled ? t("cardTerminal") : (locale === "ar" ? "غير متاح حاليًا" : "Not available yet")}
                   </span>
                 </div>
               </div>
@@ -280,7 +291,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
           <button
             type="submit"
             disabled={state}
-            className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-[0_18px_40px_-10px_rgba(var(--shadow-rgb),0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-[0_24px_48px_-10px_rgba(var(--shadow-rgb),0.6)] active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-surface-hover disabled:shadow-none"
+            className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-panel active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-surface-hover disabled:shadow-none"
           >
             <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
 
@@ -302,7 +313,7 @@ export const ShippingAddressForm = ({ onSubmit, state }: ShippingAddressFormProp
             )}
           </button>
 
-          <p className="mt-3 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-widest text-muted">
             <ShieldCheck size={13} className="text-success" />
             <span>{t("returnsProtection")}</span>
           </p>

@@ -28,6 +28,9 @@ type CatalogViewProps = {
   pageCatalogValue: number;
   startItem: number;
   endItem: number;
+  keyword: string;
+  stockStatus: string;
+  sort: string;
 };
 
 export default function AdminProductCatalogView({
@@ -40,6 +43,9 @@ export default function AdminProductCatalogView({
   pageCatalogValue,
   startItem,
   endItem,
+  keyword,
+  stockStatus,
+  sort,
 }: CatalogViewProps) {
   const { t, locale, direction } = useLocale();
   //   console.log("Admin", productList);
@@ -75,14 +81,14 @@ export default function AdminProductCatalogView({
         {/* ================================================================ */}
         {/* 1. EXECUTIVE CATALOG HEADER                                      */}
         {/* ================================================================ */}
-        <header className="studio-enter-1 flex flex-col justify-between gap-5 rounded-3xl border border-border bg-surface/90 p-5 shadow-[0_12px_36px_-12px_rgba(var(--shadow-rgb),0.06)] backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
+        <header className="studio-enter-1 flex flex-col justify-between gap-5 rounded-3xl border border-border bg-surface/90 p-5 shadow-card backdrop-blur-xl sm:p-6 lg:flex-row lg:items-center">
           <div className="space-y-1.5">
             <div className="inline-flex items-center gap-2.5 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-action opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-action" />
               </span>
-              <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
+              <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
                 {t("adminCatalogStudio")}
               </span>
             </div>
@@ -91,7 +97,7 @@ export default function AdminProductCatalogView({
               <h1 className="text-2xl font-black uppercase tracking-[-0.04em] text-primary sm:text-3xl">
                 {t("adminAllProducts")}
               </h1>
-              <span className="rounded-full bg-surface-muted px-2.5 py-0.5 font-mono text-[11px] font-black text-secondary">
+              <span className="rounded-full bg-surface-muted px-2.5 py-0.5 font-mono text-xs font-black text-secondary">
                 {totalCount.toLocaleString(locale === "ar" ? "ar-EG" : "en-EG")}{" "}
                 {t("adminSkuCount")}
               </span>
@@ -124,7 +130,7 @@ export default function AdminProductCatalogView({
 
             <Link
               href="/dashboard/products/add"
-              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-action px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-on-action shadow-[0_12px_28px_-6px_rgba(var(--shadow-rgb),0.35)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-[0_18px_36px_-6px_rgba(var(--shadow-rgb),0.45)] active:scale-95"
+              className="group relative inline-flex items-center gap-2 overflow-hidden rounded-2xl bg-action px-5 py-2.5 text-xs font-black uppercase tracking-[0.14em] text-on-action shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:bg-action-hover hover:shadow-card active:scale-95"
             >
               <Plus
                 size={15}
@@ -143,13 +149,13 @@ export default function AdminProductCatalogView({
           {/* Card 1: Total Listed */}
           <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminMasterArchive")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-primary sm:text-2xl">
                 {totalCount}
               </p>
-              <p className="mt-0.5 text-[10px] font-semibold text-muted">
+              <p className="mt-0.5 text-xs font-semibold text-muted">
                 {t("adminTotalListedSkus")}
               </p>
             </div>
@@ -161,13 +167,13 @@ export default function AdminProductCatalogView({
           {/* Card 2: Page Valuation */}
           <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminPageUnitValue")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-primary sm:text-2xl">
                 {formatCurrency(pageCatalogValue, locale)}
               </p>
-              <p className="mt-0.5 text-[10px] font-semibold text-muted">
+              <p className="mt-0.5 text-xs font-semibold text-muted">
                 {productList.length} {t("adminItemsOnPage")} {page}
               </p>
             </div>
@@ -179,13 +185,13 @@ export default function AdminProductCatalogView({
           {/* Card 3: On Promotion */}
           <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminActivePromos")}
               </p>
               <p className="mt-1 font-mono text-xl font-black text-success sm:text-2xl">
                 {onSaleCount}
               </p>
-              <p className="mt-0.5 text-[10px] font-semibold text-muted">
+              <p className="mt-0.5 text-xs font-semibold text-muted">
                 {t("adminDiscountedItems")}
               </p>
             </div>
@@ -197,7 +203,7 @@ export default function AdminProductCatalogView({
           {/* Card 4: Restock Watch */}
           <div className="group flex items-center justify-between rounded-2xl border border-border bg-surface p-4 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-sm">
             <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-muted">
                 {t("adminRestockAlerts")}
               </p>
               <p
@@ -207,7 +213,7 @@ export default function AdminProductCatalogView({
               >
                 {lowStockCount}
               </p>
-              <p className="mt-0.5 text-[10px] font-semibold text-muted">
+              <p className="mt-0.5 text-xs font-semibold text-muted">
                 {t("adminSkusAtMostFive")}
               </p>
             </div>
@@ -227,10 +233,16 @@ export default function AdminProductCatalogView({
         {/* 3. UNIFIED INTERACTIVE CATALOG STUDIO + PAGINATION               */}
         {/* ================================================================ */}
         <div
-          className={`studio-enter-3 overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] `}
+          className={`studio-enter-3 overflow-hidden rounded-3xl border border-border bg-surface shadow-card `}
         >
           {/* Client Interactive Catalog Component */}
-          <ProductList key={page} initialProducts={productList} />
+          <ProductList
+            key={`${page}-${keyword}-${stockStatus}-${sort}`}
+            initialProducts={productList}
+            initialKeyword={keyword}
+            initialStockFilter={stockStatus as "all" | "healthy" | "low" | "out"}
+            initialSortBy={sort === "newest" ? "default" : sort as "price-asc" | "price-desc" | "stock-asc"}
+          />
 
           {/* Bottom Pagination Bar */}
           {pagination.totalPages > 1 && (

@@ -1,43 +1,23 @@
-import { io, Socket } from "socket.io-client";
-import axios from "axios";
-import Cookies from "js-cookie";
+import { io, type Socket } from "socket.io-client";
+import api from "@/lib/api";
 
-const createSocket = (): Socket | null => {
-  const token = Cookies.get("token");
-
-  if (!token) {
-    console.log("No token, socket will not connect");
+export async function createSocket(): Promise<Socket | null> {
+  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL;
+  if (!socketUrl) {
+    console.warn("NEXT_PUBLIC_SOCKET_URL is not configured; real-time notifications are disabled.");
     return null;
   }
 
-  return io(process.env.NEXT_PUBLIC_SOCKET_URL, {
-    // autoConnect: true,
-    auth: {
-      token,
-    },
-  });
-};
-
-const refreshAccessToken = async () => {
-  const res = await axios.post(
-    "/api/backend/auth/refresh-token",
-    {},
-    {
-      withCredentials: true,
-    },
-  );
-
-  const newAccessToken = res.data?.data?.token;
-
-  if (!newAccessToken) {
-    throw new Error("Failed to refresh access token");
+  const response = await api.post("auth/socket-ticket", {});
+  const ticket = response.data?.data?.ticket;
+  if (typeof ticket !== "string" || !ticket) {
+    throw new Error("The API did not return a socket ticket");
   }
 
-  Cookies.set("token", newAccessToken, {
-    path: "/",
+  return io(socketUrl, {
+    autoConnect: false,
+    reconnection: false,
+    transports: ["websocket", "polling"],
+    auth: { ticket },
   });
-
-  return newAccessToken;
-};
-
-export { createSocket, refreshAccessToken };
+}

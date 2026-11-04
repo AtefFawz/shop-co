@@ -47,7 +47,7 @@ const AdminMobileOrdersList = ({
             return (
               <div
                 key={order._id}
-                className="overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_10px_28px_-10px_rgba(var(--shadow-rgb),0.07)] transition-all duration-300"
+                className="overflow-hidden rounded-3xl border border-border bg-surface shadow-card transition-all duration-300"
               >
                 {/* Card Top: Customer & Total Price */}
                 <div className="flex items-start justify-between gap-3 p-4">
@@ -59,7 +59,7 @@ const AdminMobileOrdersList = ({
                       <p className="truncate text-sm font-black leading-tight text-primary">
                         {order.user?.fullName || t("ordersGuestClient")}
                       </p>
-                      <p className="mt-0.5 truncate text-[11px] font-medium text-muted">
+                      <p className="mt-0.5 truncate text-xs font-medium text-muted">
                         {order.user?.email || t("ordersNoEmail")}
                       </p>
                     </div>
@@ -69,7 +69,7 @@ const AdminMobileOrdersList = ({
                     <p className="font-mono text-lg font-black leading-none text-primary">
                       {currencyFormatter.format(Number(order.totalPrice || 0))}
                     </p>
-                    <p className="mt-1 inline-flex items-center gap-1 text-[10px] font-bold text-muted">
+                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-bold text-muted">
                       <Calendar size={10} />
                       {order.createdAt
                         ? new Date(order.createdAt).toLocaleDateString(
@@ -93,7 +93,7 @@ const AdminMobileOrdersList = ({
                     <button
                       type="button"
                       onClick={() => handleCopyId(order._id)}
-                      className="inline-flex items-center gap-1 rounded-lg bg-surface-muted px-2.5 py-1 font-mono text-[10px] font-black text-primary"
+                      className="inline-flex items-center gap-1 rounded-lg bg-surface-muted px-2.5 py-1 font-mono text-xs font-black text-primary"
                     >
                       <span>#{shortId}</span>
                       {copiedId === order._id ? (
@@ -111,7 +111,7 @@ const AdminMobileOrdersList = ({
                             item: AdminOrderRecord["orderItems"][number],
                             idx: number,
                           ) => (
-                            <img
+                            <img loading="lazy" decoding="async"
                               key={idx}
                               src={resolveImageUrl(
                                 item.image,
@@ -123,7 +123,7 @@ const AdminMobileOrdersList = ({
                           ),
                         )}
                       {itemsList.length > 3 && (
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-surface bg-action font-mono text-[9px] font-black text-on-action">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-lg border-2 border-surface bg-action font-mono text-xs font-black text-on-action">
                           +{itemsList.length - 3}
                         </div>
                       )}
@@ -148,7 +148,7 @@ const AdminMobileOrdersList = ({
                         prev === order._id ? null : order._id,
                       )
                     }
-                    className="flex w-full items-center justify-between text-[10px] font-black uppercase tracking-widest text-secondary"
+                    className="flex w-full items-center justify-between text-xs font-black uppercase tracking-widest text-secondary"
                   >
                     <span className="inline-flex items-center gap-1.5">
                       <ShoppingBag size={11} />
@@ -175,7 +175,7 @@ const AdminMobileOrdersList = ({
                             key={idx}
                             className="flex items-center gap-2.5 rounded-xl bg-surface p-2 shadow-2xs"
                           >
-                            <img
+                            <img loading="lazy" decoding="async"
                               src={resolveImageUrl(
                                 item.image,
                                 "https://placehold.co/80x80/111111/FFFFFF?text=SKU",
@@ -189,7 +189,7 @@ const AdminMobileOrdersList = ({
                                   item.name ||
                                   t("adminProductDetails")}
                               </p>
-                              <p className="font-mono text-[10px] font-bold text-muted">
+                              <p className="font-mono text-xs font-bold text-muted">
                                 {t("qty")}: {item.quantity || item.qty || 1}
                               </p>
                             </div>

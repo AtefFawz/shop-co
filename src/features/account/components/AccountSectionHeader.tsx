@@ -16,7 +16,7 @@ const AccountSectionHeader = ({
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3.5">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-action text-on-action shadow-[0_8px_20px_-6px_rgba(var(--shadow-rgb),0.35)]">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-action text-on-action shadow-card">
           <Icon size={19} />
         </div>
         <div>
@@ -24,7 +24,7 @@ const AccountSectionHeader = ({
             {title}
           </h2>
           {typeof count === "number" && (
-            <p className="font-mono text-[10px] font-bold uppercase tracking-widest text-muted">
+            <p className="font-mono text-xs font-bold uppercase tracking-widest text-muted">
               {count} {count === 1 ? t("recordTotal") : t("recordsTotal")}
             </p>
           )}

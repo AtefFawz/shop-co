@@ -98,7 +98,7 @@ export default function AccountOverviewPanel({
         />
 
         {orders.length === 0 ? (
-          <div className="flex flex-col items-center justify-center rounded-3xl border border-border bg-surface px-6 py-14 text-center shadow-[0_12px_34px_-14px_rgba(var(--shadow-rgb),0.05)]">
+          <div className="flex flex-col items-center justify-center rounded-3xl border border-border bg-surface px-6 py-14 text-center shadow-card">
             <div className="mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-surface-subtle text-primary">
               <ShoppingBag size={24} />
             </div>
@@ -110,7 +110,7 @@ export default function AccountOverviewPanel({
             </p>
             <Link
               href="/shop"
-              className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-action px-6 py-3 text-[10px] font-black uppercase tracking-widest text-on-action shadow-md transition hover:-translate-y-0.5 hover:bg-action-hover"
+              className="mt-5 inline-flex items-center gap-2 rounded-2xl bg-action px-6 py-3 text-xs font-black uppercase tracking-widest text-on-action shadow-md transition hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <Store size={13} />
               <span>{t("accountExploreShop")}</span>
@@ -130,7 +130,7 @@ export default function AccountOverviewPanel({
               <button
                 type="button"
                 onClick={() => goTo("orders")}
-                className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-border-strong bg-surface/60 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-secondary transition-all hover:border-border hover:bg-action hover:text-on-action"
+                className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-3xl border-2 border-dashed border-border-strong bg-surface/60 py-4 text-xs font-black uppercase tracking-[0.2em] text-secondary transition-all hover:border-border hover:bg-action hover:text-on-action"
               >
                 <span>
                   {t("accountInspectAllOrders").replace(
@@ -175,7 +175,7 @@ function StatCard({
   return (
     <div
       onClick={onClick}
-      className="overview-3d-card group relative flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-[0_10px_30px_-12px_rgba(var(--shadow-rgb),0.05)]"
+      className="overview-3d-card group relative flex cursor-pointer items-center justify-between gap-4 overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-card"
     >
       <div className="flex items-center gap-4 min-w-0">
         <div
@@ -185,13 +185,13 @@ function StatCard({
         </div>
 
         <div className="min-w-0 text-start">
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-muted">
             {label}
           </p>
           <p className="mt-1 font-mono text-2xl font-black leading-none tracking-tight text-primary sm:text-3xl">
             {value ?? 0}
           </p>
-          <p className="mt-1.5 truncate text-[10px] font-semibold text-muted">
+          <p className="mt-1.5 truncate text-xs font-semibold text-muted">
             {sub}
           </p>
         </div>

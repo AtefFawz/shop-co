@@ -1,71 +1,36 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-export default async function proxy(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  const baseUrl = request.nextUrl.origin;
+const STATIC_FILE = /\.(?:png|jpe?g|gif|webp|avif|svg|ico|css|js|map|txt|xml|json|woff2?|ttf|otf|mp4|webm)$/i;
 
+export default function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
   if (
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
-    pathname.includes(".")
+    pathname.startsWith("/auth") ||
+    (STATIC_FILE.test(pathname) && !pathname.startsWith("/dashboard"))
   ) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get("token")?.value;
-  const refreshToken = request.cookies.get("refreshToken")?.value;
-  const role = request.cookies.get("role")?.value;
-
-  const currentRole = role;
-  const response = NextResponse.next();
-
-  if (pathname.startsWith("/auth")) {
-    return NextResponse.next();
-  }
-
-  if (!token && refreshToken) {
-    try {
-      const refreshResponse = await fetch(
-        `${baseUrl}api/backend/auth/refresh-token`,
-        {
-          method: "POST",
-          headers: {
-            Cookie: `refreshToken=${refreshToken}`,
-          },
-        },
-      );
-      if (refreshResponse.ok) {
-        const jsonData = await refreshResponse.json();
-        const newAccessToken = jsonData.data?.token;
-
-        response.cookies.set("token", newAccessToken, {
-          httpOnly: false,
-          path: "/",
-        });
-      }
-    } catch (error) {
-      console.log("❌ Error From Refresh Token Middleware =>", error);
-    }
-  }
-
-  if (pathname.startsWith("/dashboard")) {
-    if (!refreshToken) {
-      return safeRedirect("/auth/signin", request);
+  if (pathname === "/dashboard" || pathname.startsWith("/dashboard/")) {
+    // Backend API middleware is the security boundary and validates role from
+    // MongoDB on every admin request. This only avoids rendering an obviously
+    // signed-out admin shell; it does not trust a client-writable role cookie.
+    const accessToken = request.cookies.get("accessToken")?.value;
+    if (!accessToken) {
+      const target = new URL("/auth/signin", request.url);
+      target.searchParams.set("next", pathname);
+      return NextResponse.redirect(target);
     }
 
-    if (currentRole !== "ADMIN" && currentRole !== "MANAGER") {
-      return safeRedirect("/auth/signin", request);
-    }
+    const response = NextResponse.next();
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    return response;
   }
 
-  return response;
-}
-
-function safeRedirect(urlPath: string, request: NextRequest) {
-  const response = NextResponse.redirect(new URL(urlPath, request.url));
-  response.headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
-  return response;
+  return NextResponse.next();
 }
 
 export const config = {

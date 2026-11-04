@@ -51,11 +51,11 @@ export const AdminDesktopOrdersTable = ({
 
   return (
     <div dir={direction} className="hidden md:block">
-      <div className="w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)]">
+      <div className="w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
         <div className="w-full overflow-x-auto">
           <table className="w-full border-collapse text-start">
             <thead>
-              <tr className="border-b border-border-subtle bg-surface-subtle/70 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+              <tr className="border-b border-border-subtle bg-surface-subtle/70 text-xs font-black uppercase tracking-[0.18em] text-muted">
                 <th className="py-4 px-5">{t("adminOrderTimestamp")}</th>
                 <th className="py-4 px-4">{t("adminCustomer")}</th>
                 <th className="py-4 px-4">{t("adminManifestItems")}</th>
@@ -105,7 +105,7 @@ export const AdminDesktopOrdersTable = ({
                             )}
                           </button>
 
-                          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-muted">
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold text-muted">
                             <Calendar size={10} />
                             {order.createdAt
                               ? new Date(order.createdAt).toLocaleDateString(
@@ -131,7 +131,7 @@ export const AdminDesktopOrdersTable = ({
                             <p className="truncate text-xs font-extrabold text-primary sm:text-sm">
                               {order.user?.fullName || t("ordersGuestClient")}
                             </p>
-                            <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] font-medium text-muted">
+                            <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-medium text-muted">
                               <Mail size={10} className="shrink-0" />
                               <span className="truncate">
                                 {order.user?.email || t("ordersNoEmail")}
@@ -156,7 +156,7 @@ export const AdminDesktopOrdersTable = ({
                                   item: AdminOrderRecord["orderItems"][number],
                                   idx: number,
                                 ) => (
-                                  <img
+                                  <img loading="lazy" decoding="async"
                                     key={idx}
                                     src={resolveImageUrl(
                                       item.image,
@@ -172,13 +172,13 @@ export const AdminDesktopOrdersTable = ({
                                 ),
                               )}
                             {itemsList.length > 4 && (
-                              <div className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-surface bg-action font-mono text-[10px] font-black text-on-action shadow-xs">
+                              <div className="flex h-9 w-9 items-center justify-center rounded-xl border-2 border-surface bg-action font-mono text-xs font-black text-on-action shadow-xs">
                                 +{itemsList.length - 4}
                               </div>
                             )}
                           </div>
 
-                          <span className="hidden rounded-lg bg-surface-muted px-2 py-1 font-mono text-[10px] font-bold text-secondary xl:inline-block">
+                          <span className="hidden rounded-lg bg-surface-muted px-2 py-1 font-mono text-xs font-bold text-secondary xl:inline-block">
                             {totalUnits}{" "}
                             {t(
                               totalUnits === 1
@@ -212,7 +212,7 @@ export const AdminDesktopOrdersTable = ({
                         <button
                           type="button"
                           onClick={() => toggleExpand(order._id)}
-                          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-2 text-[10px] font-black uppercase tracking-wider transition-all ${
+                          className={`inline-flex cursor-pointer items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black uppercase tracking-wider transition-all ${
                             isExpanded
                               ? "border-border-strong bg-action text-on-action shadow-xs"
                               : "border-border bg-surface text-secondary hover:border-border-strong hover:text-primary"
@@ -246,12 +246,12 @@ export const AdminDesktopOrdersTable = ({
                                   size={14}
                                   className="text-primary"
                                 />
-                                <span className="text-[11px] font-black uppercase tracking-[0.16em] text-primary">
+                                <span className="text-xs font-black uppercase tracking-[0.16em] text-primary">
                                   {t("ordersInspectManifest")} · #{order._id}
                                 </span>
                               </div>
 
-                              <div className="flex flex-wrap items-center gap-4 text-[11px] font-semibold text-muted">
+                              <div className="flex flex-wrap items-center gap-4 text-xs font-semibold text-muted">
                                 {order.paymentMethod && (
                                   <span className="inline-flex items-center gap-1">
                                     <CreditCard size={12} />
@@ -286,7 +286,7 @@ export const AdminDesktopOrdersTable = ({
                                       key={idx}
                                       className="flex items-center gap-3 rounded-xl border border-border-subtle bg-surface-subtle p-2.5"
                                     >
-                                      <img
+                                      <img loading="lazy" decoding="async"
                                         src={resolveImageUrl(
                                           item.image,
                                           "https://placehold.co/80x80/111111/FFFFFF?text=SKU",
@@ -303,7 +303,7 @@ export const AdminDesktopOrdersTable = ({
                                             item.name ||
                                             t("userDetailCatalogGarment")}
                                         </p>
-                                        <div className="mt-1 flex items-center justify-between font-mono text-[10px] font-bold text-muted">
+                                        <div className="mt-1 flex items-center justify-between font-mono text-xs font-bold text-muted">
                                           <span>
                                             {t("qty")}: {qty}
                                           </span>

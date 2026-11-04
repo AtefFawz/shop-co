@@ -8,23 +8,23 @@ import { ProductStyleFilter } from "@/features/catalog/components/ProductStyleFi
 import PriceRangeFilter from "@/features/catalog/components/PriceRangeFilter";
 import { ProductColorFilter } from "@/features/catalog/components/ProductColorFilter";
 import { ProductSizeFilter } from "@/features/catalog/components/ProductSizeFilter";
-import { useFilterStore } from "@/store/filterStore";
+import { countActiveFilters, useFilterStore } from "@/store/filterStore";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { AvailabilityFilterControls } from "@/features/catalog/components/AvailabilityFilterControls";
 
 import { useState } from "react";
 const CATEGORIES = ["T-SHIRT", "SHIRT", "PANTS", "JEANS"];
 const DRESS_STYLES = ["Casual", "Formal", "Party", "Gym"];
 
-export default function MobileCatalogFilterDrawer() {
+type MobileCatalogFilterDrawerProps = { resultCount: number };
+
+export default function MobileCatalogFilterDrawer({ resultCount }: MobileCatalogFilterDrawerProps) {
   const { t, direction } = useLocale();
   const reset = useFilterStore((e) => e.resetFilter);
-  const products = useFilterStore((e) => e.filteredProducts);
   const { currentSection, currentType, currentStyle } = useFilterStore();
   const [open, setOpen] = React.useState(false);
 
-  const activeCount = [currentSection, currentType, currentStyle].filter(
-    Boolean,
-  ).length;
+  const activeCount = useFilterStore((s) => countActiveFilters(s));
   const filterLabels: Record<string, string> = {
     "T-SHIRT": t("adminSectionTShirt"),
     SHIRT: t("adminSectionShirt"),
@@ -43,11 +43,11 @@ export default function MobileCatalogFilterDrawer() {
     <div dir={direction} className="flex w-full items-center justify-between gap-3 rounded-2xl border border-border bg-surface px-4 py-3 shadow-2xs">
       {/* Left Mobile Telemetry */}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[11px] font-black uppercase tracking-wider text-primary">
+        <p className="truncate text-xs font-black uppercase tracking-wider text-primary">
           {activeFilterLabel}
         </p>
-        <p className="text-[10px] font-semibold text-muted">
-          {products.length} {t("products")}
+        <p className="text-xs font-semibold text-muted">
+          {resultCount} {t("products")}
         </p>
       </div>
 
@@ -55,12 +55,12 @@ export default function MobileCatalogFilterDrawer() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-action px-4 py-2.5 text-[10px] font-black uppercase tracking-widest text-on-action shadow-xs active:scale-95"
+        className="inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl bg-action px-4 py-2.5 text-xs font-black uppercase tracking-widest text-on-action shadow-xs active:scale-95"
       >
         <SlidersHorizontal size={13} />
         <span>{t("filters")}</span>
         {activeCount > 0 && (
-          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success font-mono text-[9px] font-black text-on-success">
+          <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success font-mono text-xs font-black text-on-success">
             {activeCount}
           </span>
         )}
@@ -94,8 +94,8 @@ export default function MobileCatalogFilterDrawer() {
                 <span className="block text-sm font-black uppercase tracking-tight text-primary">
                   {t("catalogFiltersTitle")}
                 </span>
-                <span className="block text-[10px] font-semibold text-muted">
-                  {products.length} {t("products")}
+                <span className="block text-xs font-semibold text-muted">
+                  {resultCount} {t("products")}
                 </span>
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function MobileCatalogFilterDrawer() {
               <button
                 type="button"
                 onClick={reset}
-                className="inline-flex items-center gap-1 rounded-xl border border-border px-3 py-1.5 text-[10px] font-black uppercase tracking-widest text-secondary"
+                className="inline-flex items-center gap-1 rounded-xl border border-border px-3 py-1.5 text-xs font-black uppercase tracking-widest text-secondary"
               >
                 <RotateCcw size={11} />
                 <span>{t("reset")}</span>
@@ -123,7 +123,7 @@ export default function MobileCatalogFilterDrawer() {
           {/* Filter Sections */}
           <div className="divide-y divide-border-subtle">
             <div className="pb-4">
-              <p className="mb-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+              <p className="mb-2.5 text-xs font-black uppercase tracking-[0.18em] text-muted">
                 {t("catalogCategory")}
               </p>
               <ProductCategoryFilter content={CATEGORIES} />
@@ -132,9 +132,10 @@ export default function MobileCatalogFilterDrawer() {
             <PriceRangeFilter />
             <ProductColorFilter />
             <ProductSizeFilter />
+            <AvailabilityFilterControls />
 
             <div className="pt-4">
-              <p className="mb-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+              <p className="mb-2.5 text-xs font-black uppercase tracking-[0.18em] text-muted">
                 {t("dressAesthetic")}
               </p>
               <ProductStyleFilter content={DRESS_STYLES} />
@@ -148,7 +149,7 @@ export default function MobileCatalogFilterDrawer() {
             className="mt-6 flex w-full items-center justify-center gap-2 rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-lg active:scale-98"
           >
             <Sparkles size={13} />
-            <span>{t("exploreProducts")} · {products.length}</span>
+            <span>{t("exploreProducts")} · {resultCount}</span>
           </button>
         </div>
       </Drawer>

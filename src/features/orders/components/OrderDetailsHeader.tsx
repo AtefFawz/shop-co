@@ -63,11 +63,11 @@ export default function OrderDetailsHeader({
     : t("recent");
 
   return (
-    <div dir={direction} className="relative overflow-hidden rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-8">
+    <div dir={direction} className="relative overflow-hidden rounded-4xl border border-border bg-surface p-6 shadow-card sm:p-8">
       {/* Giant Background Watermark */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -end-6 -top-8 select-none font-mono text-[130px] font-black leading-none tracking-tighter text-primary/[0.025]"
+        className="pointer-events-none absolute -end-6 -top-8 select-none font-mono text-[8.125rem] font-black leading-none tracking-tighter text-primary/[0.025]"
       >
         #{shortId}
       </div>
@@ -76,13 +76,13 @@ export default function OrderDetailsHeader({
         {/* Left: Order Identifier & Timestamp */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-on-action">
               <Package size={11} />
               {t("orderOfficialManifest")}
             </span>
 
             {totalUnits > 0 && (
-              <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-[10px] font-extrabold text-secondary">
+              <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-xs font-extrabold text-secondary">
                 {totalUnits} {totalUnits === 1 ? t("orderGarment") : t("orderGarments")}
               </span>
             )}
@@ -97,7 +97,7 @@ export default function OrderDetailsHeader({
               type="button"
               onClick={handleCopyId}
               title={t("copyFullOrderId")}
-              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border/90 bg-surface-subtle px-3 py-1.5 font-mono text-[10px] font-bold text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
+              className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border/90 bg-surface-subtle px-3 py-1.5 font-mono text-xs font-bold text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
             >
               <span className="max-w-[120px] truncate sm:max-w-none">
                 {order._id}
@@ -221,7 +221,7 @@ function OrderStatusBadge({ status }: { status: OrderStatus }) {
         <span className="block text-xs font-black uppercase tracking-wider leading-none">
           {{ Pending: t("orderStatusPending"), Shipped: t("orderStatusShipped"), Delivered: t("orderStatusDelivered"), Cancelled: t("orderStatusCancelled") }[status]}
         </span>
-        <span className="mt-0.5 block text-[9px] font-bold opacity-75">
+        <span className="mt-0.5 block text-xs font-bold opacity-75">
           {active.sub}
         </span>
       </div>

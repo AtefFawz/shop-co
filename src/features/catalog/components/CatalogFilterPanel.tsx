@@ -2,27 +2,24 @@
 
 
 import { SlidersHorizontal, RotateCcw, Sparkles } from "lucide-react";
-import { useFilterStore } from "@/store/filterStore";
+import { countActiveFilters, useFilterStore } from "@/store/filterStore";
 import { ProductCategoryFilter } from "@/features/catalog/components/ProductCategoryFilter";
 import PriceRangeFilter from "@/features/catalog/components/PriceRangeFilter";
 import { ProductColorFilter } from "@/features/catalog/components/ProductColorFilter";
 import { ProductSizeFilter } from "@/features/catalog/components/ProductSizeFilter";
 import { StyleFilterSection } from "@/features/catalog/components/StyleFilterSection";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { AvailabilityFilterControls } from "@/features/catalog/components/AvailabilityFilterControls";
 
 const PRODUCT_CATEGORIES = ["T-SHIRT", "SHIRT", "PANTS", "JEANS"];
 
 export const CatalogFilterPanel = () => {
   const { t } = useLocale();
-  const { resetFilter, currentSection, currentStyle, currentType } =
-    useFilterStore((s) => s);
-
-  const activeCount = [currentSection, currentStyle, currentType].filter(
-    Boolean,
-  ).length;
+  const resetFilter = useFilterStore((s) => s.resetFilter);
+  const activeCount = useFilterStore((s) => countActiveFilters(s));
 
   return (
-    <nav className="w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)]">
+    <nav className="w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-card">
       {/* Studio Filter Header */}
       <div className="flex items-center justify-between border-b border-border-subtle bg-surface-subtle/70 px-5 py-4">
         <div className="flex items-center gap-2.5">
@@ -35,12 +32,12 @@ export const CatalogFilterPanel = () => {
                 {t("catalogFiltersTitle")}
               </span>
               {activeCount > 0 && (
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success font-mono text-[9px] font-black text-on-success">
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-success font-mono text-xs font-black text-on-success">
                   {activeCount}
                 </span>
               )}
             </div>
-            <span className="block text-[9px] font-bold uppercase tracking-widest text-muted">
+            <span className="block text-xs font-bold uppercase tracking-widest text-muted">
               {t("catalogRefine")}
             </span>
           </div>
@@ -49,7 +46,7 @@ export const CatalogFilterPanel = () => {
         <button
           type="button"
           onClick={resetFilter}
-          className="inline-flex cursor-pointer items-center gap-1 rounded-xl border border-border/80 bg-surface px-2.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-muted transition-all hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
+          className="inline-flex cursor-pointer items-center gap-1 rounded-xl border border-border/80 bg-surface px-2.5 py-1.5 text-xs font-black uppercase tracking-widest text-muted transition-all hover:border-border-strong hover:bg-action hover:text-on-action active:scale-95"
         >
           <RotateCcw size={11} />
           <span>{t("reset")}</span>
@@ -60,7 +57,7 @@ export const CatalogFilterPanel = () => {
       <div className="divide-y divide-border-subtle px-5">
         <div className="py-4">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-muted">
               {t("catalogCategory")}
             </p>
             <Sparkles size={11} className="text-subtle" />
@@ -72,6 +69,7 @@ export const CatalogFilterPanel = () => {
         <ProductColorFilter />
         <ProductSizeFilter />
         <StyleFilterSection />
+        <AvailabilityFilterControls />
       </div>
     </nav>
   );

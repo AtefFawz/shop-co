@@ -54,25 +54,35 @@ export default function UpdateAccountForm({
     setImgError(false);
   }, [currentUser.fullName, currentUser.avatar]);
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+    };
+  }, [previewUrl]);
+
   if (!isOpen || !mounted) return null;
 
   const initials = getInitials(fullName, "U");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        setStatus({
-          type: "error",
-          message: t("uiProfileInvalidImage"),
-        });
-        return;
-      }
-      setAvatarFile(file);
-      setPreviewUrl(URL.createObjectURL(file));
-      setImgError(false);
-      setStatus({ type: "", message: "" });
+    if (!file) return;
+    const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+    if (!allowedTypes.has(file.type) || file.size > 5 * 1024 * 1024) {
+      setStatus({
+        type: "error",
+        message: locale === "ar"
+          ? "استخدم صورة JPG أو PNG أو WebP بحجم لا يتجاوز 5 ميجابايت."
+          : "Use a JPG, PNG or WebP image up to 5 MB.",
+      });
+      e.target.value = "";
+      return;
     }
+    setAvatarFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+    setImgError(false);
+    setStatus({ type: "", message: "" });
+    e.target.value = "";
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -127,11 +137,11 @@ export default function UpdateAccountForm({
       />
 
       {/* Modal Card */}
-      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-[2.4rem] border border-border/80 bg-surface p-6 text-primary shadow-[0_35px_90px_rgba(var(--shadow-rgb),0.4)] animate-in zoom-in-95 duration-200 sm:p-8">
+      <div className="relative z-10 w-full max-w-md overflow-hidden rounded-4xl border border-border/80 bg-surface p-6 text-primary shadow-panel animate-in zoom-in-95 duration-200 sm:p-8">
         {/* Header */}
         <div className="mb-6 flex items-center justify-between border-b border-border-subtle pb-4">
           <div>
-            <span className="inline-flex items-center gap-1 text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+            <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-[0.2em] text-muted">
               <Sparkles size={10} className="text-primary" />{" "}
               {t("uiProfileIdentity")}
             </span>
@@ -173,10 +183,10 @@ export default function UpdateAccountForm({
           <div className="flex flex-col items-center">
             <label
               htmlFor="avatar-upload"
-              className="group relative flex h-28 w-28 cursor-pointer items-center justify-center overflow-hidden rounded-[2rem] border-4 border-border bg-action font-mono text-2xl font-black text-on-action shadow-lg transition-transform duration-300 hover:scale-105"
+              className="group relative flex h-28 w-28 cursor-pointer items-center justify-center overflow-hidden rounded-4xl border-4 border-border bg-action font-mono text-2xl font-black text-on-action shadow-lg transition-transform duration-300 hover:scale-105"
             >
               {hasValidPreview ? (
-                <img
+                <img loading="lazy" decoding="async"
                   src={previewUrl}
                   alt={t("uiAvatarPreviewAlt")}
                   onError={() => setImgError(true)}
@@ -188,7 +198,7 @@ export default function UpdateAccountForm({
 
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 bg-action/55 opacity-0 backdrop-blur-[2px] transition-opacity duration-200 group-hover:opacity-100">
                 <Camera className="text-on-action" size={22} />
-                <span className="font-sans text-[8px] font-black uppercase tracking-widest text-on-action">
+                <span className="font-sans text-xs font-black uppercase tracking-widest text-on-action">
                   {t("uiProfileChangePhoto")}
                 </span>
               </div>
@@ -202,14 +212,14 @@ export default function UpdateAccountForm({
               onChange={handleFileChange}
             />
 
-            <span className="mt-2.5 text-[10px] font-bold uppercase tracking-widest text-muted">
+            <span className="mt-2.5 text-xs font-bold uppercase tracking-widest text-muted">
               {avatarFile ? avatarFile.name : t("uiProfileClickToUpload")}
             </span>
           </div>
 
           {/* Full Name Input */}
           <div className="space-y-2">
-            <label className="block px-1 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+            <label className="block px-1 text-xs font-black uppercase tracking-[0.18em] text-muted">
               {t("uiProfileFullName")}
             </label>
             <div className="relative flex items-center">
@@ -242,7 +252,7 @@ export default function UpdateAccountForm({
             <button
               type="submit"
               disabled={loading}
-              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action py-3.5 text-xs font-black uppercase tracking-widest text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.4)] transition-all hover:bg-action-hover active:scale-98 disabled:opacity-50"
+              className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action py-3.5 text-xs font-black uppercase tracking-widest text-on-action shadow-card transition-all hover:bg-action-hover active:scale-98 disabled:opacity-50"
             >
               {loading ? (
                 <>

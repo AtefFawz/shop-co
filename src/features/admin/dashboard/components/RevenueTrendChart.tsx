@@ -120,7 +120,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
       : "";
 
   return (
-    <div dir={direction} className="xl:col-span-8 flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] sm:p-6">
+    <div dir={direction} className="xl:col-span-8 flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-card sm:p-6">
       {/* ================================================================== */}
       {/* 1. HEADER & INTERACTIVE MODE SWITCHER                              */}
       {/* ================================================================== */}
@@ -128,7 +128,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
         <div>
           <div className="flex items-center gap-1.5">
             <span className="h-2 w-2 rounded-full bg-action" />
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+            <p className="text-xs font-black uppercase tracking-[0.2em] text-muted">
               {t("dashboardRevenueTrajectory")}
             </p>
           </div>
@@ -143,7 +143,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
           <button
             type="button"
             onClick={() => setShowAvgLine((prev) => !prev)}
-            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+            className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-extrabold uppercase tracking-wider transition-all ${
               showAvgLine
                 ? "border-border-subtle bg-surface-muted text-primary"
                 : "border-border bg-surface text-muted hover:text-primary"
@@ -158,7 +158,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
             <button
               type="button"
               onClick={() => setChartMode("3d-bars")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider transition-all ${
                 chartMode === "3d-bars"
                   ? "bg-action text-on-action shadow-xs"
                   : "text-muted hover:text-primary"
@@ -170,7 +170,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
             <button
               type="button"
               onClick={() => setChartMode("area-wave")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+              className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider transition-all ${
                 chartMode === "area-wave"
                   ? "bg-action text-on-action shadow-xs"
                   : "text-muted hover:text-primary"
@@ -188,7 +188,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
       {/* ================================================================== */}
       <div className="my-4 grid grid-cols-2 gap-3 rounded-2xl border border-border-subtle bg-surface-subtle p-3.5 sm:grid-cols-4">
         <div>
-          <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
+          <span className="block text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             {selectedDay
               ? t("dashboardInspecting").replace("{day}", formatDay(selectedDay.day))
               : t("dashboardPeakDay").replace("{day}", formatDay(peakDay.day))}
@@ -199,7 +199,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
         </div>
 
         <div>
-          <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
+          <span className="block text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             {t("dashboardWeeklyTotal")}
           </span>
           <span className="mt-0.5 block font-mono text-base font-black text-primary sm:text-lg">
@@ -208,7 +208,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
         </div>
 
         <div>
-          <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
+          <span className="block text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             {t("dashboardDailyAverage")}
           </span>
           <span className="mt-0.5 block font-mono text-base font-black text-secondary sm:text-lg">
@@ -217,7 +217,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
         </div>
 
         <div>
-          <span className="block text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
+          <span className="block text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
             {t("dashboardDayShare")}
           </span>
           <span className="mt-0.5 inline-flex items-center gap-1 font-mono text-base font-black text-success sm:text-lg">
@@ -250,7 +250,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
               style={{ bottom: `${avgLinePercent}%` }}
               className="pointer-events-none absolute inset-x-4 z-20 flex items-center border-b border-dashed border-border-strong/80 transition-all duration-500"
             >
-              <span className="-top-2.5 end-0 ms-auto rounded-md bg-action px-2 py-0.5 font-mono text-[8px] font-bold uppercase tracking-widest text-on-action shadow-xs">
+              <span className="-top-2.5 end-0 ms-auto rounded-md bg-action px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-widest text-on-action shadow-xs">
                 {t("dashboardAvgAbbrev")} {formatCompactRevenue(avgDailyRevenue)}
               </span>
             </div>
@@ -278,7 +278,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
                   >
                     {/* Floating 3D Value Pill Above Column */}
                     <div
-                      className={`mb-2 rounded-lg px-2 py-0.5 font-mono text-[10px] font-black transition-all duration-300 ${
+                      className={`mb-2 rounded-lg px-2 py-0.5 font-mono text-xs font-black transition-all duration-300 ${
                         isPeak || isSelected
                           ? "-translate-y-1 bg-action text-on-action shadow-md scale-105"
                           : "bg-surface/90 text-muted group-hover:-translate-y-1 group-hover:bg-action group-hover:text-on-action"
@@ -292,7 +292,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
                       style={{ height: barHeight }}
                       className={`relative w-full max-w-[42px] rounded-t-2xl rounded-b-lg transition-all duration-500 ease-out group-hover:-translate-y-1 ${
                         isPeak
-                          ? "bg-linear-to-b from-action via-action to-action-hover shadow-[0_14px_28px_-6px_rgba(var(--shadow-rgb),0.45)] ring-2 ring-focus/15"
+                          ? "bg-linear-to-b from-action via-action to-action-hover shadow-card ring-2 ring-focus/15"
                           : isSelected
                             ? "bg-action-hover shadow-lg"
                             : rev > 0
@@ -311,7 +311,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
 
                     {/* Day Label */}
                     <span
-                      className={`mt-2.5 text-[10px] uppercase tracking-wider transition-colors ${
+                      className={`mt-2.5 text-xs uppercase tracking-wider transition-colors ${
                         isPeak || isSelected
                           ? "font-black text-primary"
                           : "font-bold text-muted group-hover:text-primary"
@@ -384,7 +384,7 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
                   <span
                     key={d.day}
                     onMouseEnter={() => setSelectedDay(d)}
-                    className="cursor-pointer text-[10px] font-bold uppercase text-muted hover:text-primary"
+                    className="cursor-pointer text-xs font-bold uppercase text-muted hover:text-primary"
                   >
                     {formatDay(d.day)}
                   </span>
@@ -398,12 +398,12 @@ export const RevenueTrendChart = (props: RevenueTrendChartProps) => {
       {/* ================================================================== */}
       {/* 4. FOOTER TELEMETRY SUMMARY                                        */}
       {/* ================================================================== */}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-[11px] font-semibold text-muted">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs font-semibold text-muted">
         <span className="inline-flex items-center gap-1.5">
           <Calendar size={13} className="text-secondary" />
           {t("dashboardInspectHint")}
         </span>
-        <span className="font-mono text-[10px] font-extrabold uppercase tracking-wider text-primary">
+        <span className="font-mono text-xs font-extrabold uppercase tracking-wider text-primary">
           {t("dashboardTopPerformer").replace("{day}", formatDay(peakDay.day)).replace("{amount}", formatCurrency(Number(peakDay.revenue) || 0, locale))}
         </span>
       </div>

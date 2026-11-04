@@ -24,7 +24,7 @@ export const ProductStyleFilter = ({ content }: { content: string[] }) => {
           <button
             key={id}
             type="button"
-            onClick={() => set(item)}
+            onClick={() => set(isActive ? null : item)}
             dir={direction}
             className={`group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-start text-xs font-black uppercase tracking-wider transition-all duration-200 ${
               isActive

@@ -1,9 +1,9 @@
 "use client";
 
 
-import Kids from "@/assets/category/kids.png";
-import Men from "@/assets/category/man.png";
-import Women from "@/assets/category/women.png";
+import Kids from "@/assets/category/kids.webp";
+import Men from "@/assets/category/man.webp";
+import Women from "@/assets/category/women.webp";
 import Image from "next/image";
 import { GoArrowUpRight } from "react-icons/go";
 import { Sparkles } from "lucide-react";
@@ -71,7 +71,7 @@ export const CategoryGallery = () => {
         <div>
           <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
             <Sparkles size={11} className="text-primary" />
-            <span className="text-[9px] font-black uppercase tracking-[0.24em] text-secondary">
+            <span className="text-xs font-black uppercase tracking-[0.24em] text-secondary">
               {t("catalogCuratedDepartments")}
             </span>
           </div>
@@ -94,7 +94,7 @@ export const CategoryGallery = () => {
           <div
             key={cat.id}
             onClick={() => handleClick(cat.slug)}
-            className="dept-3d-card group/card relative h-[360px] cursor-pointer overflow-hidden rounded-[2.2rem] border-2 border-surface bg-action shadow-[0_16px_40px_-12px_rgba(var(--shadow-rgb),0.16)] sm:h-[400px]"
+            className="dept-3d-card group/card relative h-[360px] cursor-pointer overflow-hidden rounded-4xl border-2 border-surface bg-action shadow-card sm:h-[400px]"
           >
             {/* Background Portrait Image */}
             <Image
@@ -110,10 +110,10 @@ export const CategoryGallery = () => {
 
             {/* Top HUD Bar Inside Card */}
             <div className="absolute inset-x-5 top-5 z-20 flex items-center justify-between">
-              <span className="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[9px] font-black uppercase tracking-[0.18em] text-on-action backdrop-blur-md">
+              <span className="rounded-full border border-white/20 bg-white/15 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-on-action backdrop-blur-md">
                 {cat.badge}
               </span>
-              <span className="font-mono text-[10px] font-bold tracking-widest text-on-action/70">
+              <span className="font-mono text-xs font-bold tracking-widest text-on-action/70">
                 {cat.code}
               </span>
             </div>
@@ -127,7 +127,7 @@ export const CategoryGallery = () => {
                 <p className="mt-1.5 line-clamp-2 text-xs font-medium leading-relaxed text-on-action/75 transition-all duration-300 group-hover/card:text-on-action">
                   {cat.subtitle}
                 </p>
-                <span className="mt-2.5 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-success">
+                <span className="mt-2.5 inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.2em] text-success">
                   <span>{t("categoryExploreCollection")}</span>
                   <span>→</span>
                 </span>

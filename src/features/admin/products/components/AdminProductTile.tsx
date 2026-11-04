@@ -92,7 +92,7 @@ export default function AdminProductTile({
             </span>
           </div>
 
-          <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5 text-[10px] text-muted">
+          <div className="mt-2 flex min-w-0 flex-wrap items-center gap-1.5 text-xs text-muted">
             <span className="inline-flex max-w-full items-center gap-1 rounded-md bg-surface-muted px-2 py-1 font-mono font-semibold">
               <span>#{sku}</span>
             </span>
@@ -119,12 +119,12 @@ export default function AdminProductTile({
 
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span
-              className={`inline-flex min-h-6 items-center rounded-full border px-2.5 py-1 text-[10px] font-semibold ${stockClass}`}
+              className={`inline-flex min-h-6 items-center rounded-full border px-2.5 py-1 text-xs font-semibold ${stockClass}`}
             >
               {stockLabel}
             </span>
             {Number(product.discount) > 0 && (
-              <span className="inline-flex min-h-6 items-center rounded-full bg-brand-soft px-2.5 py-1 text-[10px] font-semibold text-accent">
+              <span className="inline-flex min-h-6 items-center rounded-full bg-brand-soft px-2.5 py-1 text-xs font-semibold text-accent">
                 -{product.discount}%
               </span>
             )}

@@ -6,19 +6,24 @@ import React, { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Sparkles, Crown, CheckCircle2, ArrowUpRight } from "lucide-react";
-import Signup from "@/assets/shop/signup.png";
+import Signup from "@/assets/shop/signup.webp";
 import { SignUpForm } from "@/features/auth/components/SignUpForm";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
+import { startGoogleOAuth } from "@/lib/googleOAuth";
 
 export default function SignUpPageContent() {
   const { t, direction } = useLocale();
   const stageRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}auth/google`;
+  const handleGoogleLogin = async () => {
+    try {
+      await startGoogleOAuth();
+    } catch (error) {
+      console.error("Google sign-in could not start:", error);
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -63,7 +68,7 @@ export default function SignUpPageContent() {
         <div className="relative z-20 flex items-center justify-between">
           <Link
             href="/"
-            className="group inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-on-action backdrop-blur-md transition-all hover:bg-surface hover:text-primary"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-white/15 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-on-action backdrop-blur-md transition-all hover:bg-surface hover:text-primary"
           >
             <ArrowLeft
               size={13}
@@ -72,7 +77,7 @@ export default function SignUpPageContent() {
             <span>{t("authBackToFlagship")}</span>
           </Link>
 
-          <span className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-on-action/80 backdrop-blur-md">
+          <span className="rounded-full border border-white/15 bg-white/10 px-3.5 py-1.5 font-mono text-xs font-extrabold tracking-[0.2em] text-on-action/80 backdrop-blur-md">
             {t("authArchive2026")}
           </span>
         </div>
@@ -84,7 +89,7 @@ export default function SignUpPageContent() {
               transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
               transformStyle: "preserve-3d",
             }}
-            className="w-full max-w-[390px] rounded-3xl border border-white/20 bg-white/10 p-6 shadow-[0_35px_80px_rgba(var(--shadow-rgb),0.65)] backdrop-blur-2xl transition-transform duration-200 ease-out"
+            className="w-full max-w-[390px] rounded-3xl border border-white/20 bg-white/10 p-6 shadow-panel backdrop-blur-2xl transition-transform duration-200 ease-out"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -96,13 +101,13 @@ export default function SignUpPageContent() {
                 </span>
               </div>
 
-              <span className="inline-flex items-center gap-1 rounded-full bg-warning-soft px-2.5 py-1 font-mono text-[9px] font-black uppercase tracking-widest text-warning">
+              <span className="inline-flex items-center gap-1 rounded-full bg-warning-soft px-2.5 py-1 font-mono text-xs font-black uppercase tracking-widest text-warning">
                 <Crown size={11} /> {t("authFounderTier")}
               </span>
             </div>
 
             <div className="my-6 space-y-1">
-              <p className="font-mono text-[10px] uppercase tracking-[0.22em] text-on-action/50">
+              <p className="font-mono text-xs uppercase tracking-[0.22em] text-on-action/50">
                 {t("authMemberPrivileges")}
               </p>
               <p className="text-2xl font-black uppercase tracking-tight text-on-action">
@@ -148,7 +153,7 @@ export default function SignUpPageContent() {
         <div className="mb-5 flex items-center justify-between md:hidden">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary shadow-2xs"
+            className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1.5 text-xs font-black uppercase tracking-widest text-primary shadow-2xs"
           >
             <ArrowLeft size={13} />
             <span>{t("catalogFlagship")}</span>
@@ -164,12 +169,12 @@ export default function SignUpPageContent() {
         </div>
 
         {/* Form Card Container */}
-        <div className="mx-auto w-full max-w-[450px] rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_60px_-15px_rgba(var(--shadow-rgb),0.07)] sm:p-8">
+        <div className="mx-auto w-full max-w-[450px] rounded-4xl border border-border bg-surface p-6 shadow-panel sm:p-8">
           {/* Header */}
           <div className="mb-6 space-y-1.5">
             <div className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
               <Sparkles size={11} className="text-primary" />
-              <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
+              <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
                 {t("authOnboarding")}
               </span>
             </div>
@@ -191,7 +196,7 @@ export default function SignUpPageContent() {
               <div className="w-full border-t border-border-subtle" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-surface px-4 text-[9px] font-black uppercase tracking-[0.22em] text-muted">
+              <span className="bg-surface px-4 text-xs font-black uppercase tracking-[0.22em] text-muted">
                 {t("authRegistrationDivider")}
               </span>
             </div>

@@ -37,7 +37,7 @@ export const FooterSocialLinks = () => {
       <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-border-strong/80 bg-surface/70 px-3 py-1 backdrop-blur-sm">
         <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-success" />
         <Globe size={11} className="text-muted" />
-        <span className="font-mono text-[9.5px] font-bold uppercase tracking-wider text-secondary">
+        <span className="font-mono text-xs font-bold uppercase tracking-wider text-secondary">
           Worldwide Express Shipping
         </span>
       </div>
@@ -59,7 +59,7 @@ export const FooterSocialLinks = () => {
                     animate={{ opacity: 1, y: -34, scale: 1 }}
                     exit={{ opacity: 0, y: 4, scale: 0.85 }}
                     transition={{ type: "spring", stiffness: 420, damping: 24 }}
-                    className="pointer-events-none absolute z-20 rounded-md bg-action px-2 py-0.5 font-mono text-[9px] font-bold uppercase tracking-wider text-on-action shadow-md whitespace-nowrap"
+                    className="pointer-events-none absolute z-20 rounded-md bg-action px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-on-action shadow-md whitespace-nowrap"
                   >
                     {label}
                   </motion.span>

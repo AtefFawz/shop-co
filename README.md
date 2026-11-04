@@ -15,12 +15,13 @@ A responsive fashion e-commerce frontend built with **Next.js App Router**, **Re
 - Standardized Egyptian pound (EGP) formatting across the main shopping, checkout, account, and order flows.
 - Mobile navigation and search rendered through portals so they are not trapped by parent stacking contexts.
 - Responsive motion and support for `prefers-reduced-motion`.
-- Existing Axios clients, request flows, backend rewrite, and server transport settings were retained from the supplied project.
+- The browser API client uses the same-origin `/api/backend` and `/api/auth` rewrites, sends the active locale, and relies on HttpOnly session cookies (no JavaScript-readable access token or manual Bearer header).
+- Catalog search, filtering, and pagination follow Backend V5. Checkout submits product variants and an idempotency key; the backend remains authoritative for price, discount, stock, and shipping.
 - Existing image loading configuration is retained in `next.config.ts`.
 
 ## Requirements
 
-- Node.js 20.9 or newer (recommended for the current Next.js version).
+- Node.js 22.13 or newer (the repository `.nvmrc` pins 22.16.0).
 - npm.
 - A running backend API for authenticated/product data features.
 
@@ -28,7 +29,8 @@ A responsive fashion e-commerce frontend built with **Next.js App Router**, **Re
 
 ```bash
 cp .env.example .env.local
-npm ci
+npm install # resolves the current dependencies and creates package-lock.json
+# Commit the generated package-lock.json; use npm ci on subsequent clean installs
 npm run dev
 ```
 
@@ -41,6 +43,7 @@ Set these environment variables in `.env.local` or your deployment environment:
 | `NEXT_PUBLIC_SITE_URL` | Public storefront URL used for canonical and social metadata. |
 | `NEXT_PUBLIC_API_URL` | Backend API base URL used by the rewrite and server-side data client. |
 | `NEXT_PUBLIC_SOCKET_URL` | Socket.IO server origin used for authenticated live updates. |
+| `NEXT_PUBLIC_CARD_PAYMENTS_ENABLED` | Keep `false` until a real backend card-payment gateway is enabled; cash on delivery remains available. |
 
 For local development, the backend URL defaults to `http://localhost:4000/api/` in the Next.js rewrite. Update `.env.local` when your API runs elsewhere. Point `NEXT_PUBLIC_SOCKET_URL` at the Socket.IO server origin (usually the same host without the `/api/` suffix).
 
@@ -97,10 +100,19 @@ src/
   utils/                  General-purpose helpers
 ```
 
-See [`ARCHITECTURE.md`](./ARCHITECTURE.md) for the naming conventions and route-to-page ownership map. App Router files keep Next.js's required `page.tsx` name; their UI implementations use descriptive names under `src/features/**/pages/`.
+See [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md) for the naming conventions and route-to-page ownership map. App Router files keep Next.js's required `page.tsx` name; their UI implementations use descriptive names under `src/features/**/pages/`.
 
 ## Notes
 
 - Keep real secrets out of `NEXT_PUBLIC_*` variables: Next.js exposes them to the browser.
-- API configuration and API-related modules were preserved from the uploaded source project.
+- API configuration remains environment-driven; see [`docs/BACKEND_V5_FRONTEND_INTEGRATION_AR.md`](./docs/BACKEND_V5_FRONTEND_INTEGRATION_AR.md) for the exact Backend V5 contract, cookie flow, OAuth flow, and deployment checklist.
+- This frontend repository intentionally does not include a package lock because the supplied lockfile did not match `package.json`. Run `npm install` once, review and commit the newly generated lockfile, then use `npm ci` in CI and production builds.
 - Product, auth, cart, order, and notification workflows still depend on the configured backend.
+
+## Display preferences
+
+The account Settings tab includes app-wide reading preferences: small/standard/large text scale, comfortable line spacing, reduced motion, and higher contrast. Preferences are stored locally in the browser and apply to both storefront and admin screens. English uses Geist and Arabic uses IBM Plex Sans Arabic. No backend endpoint or schema change is required.
+
+## Account settings (V7)
+
+See [`docs/ACCOUNT_SETTINGS_V7_AR.md`](docs/ACCOUNT_SETTINGS_V7_AR.md) for the Arabic implementation notes, supported backend capabilities, and the exact scope of local preference reset.

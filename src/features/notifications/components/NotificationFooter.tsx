@@ -45,7 +45,7 @@ export default function NotificationFooter({
             group flex min-h-10 w-full cursor-pointer
             items-center justify-center gap-2 rounded-xl
             border border-border bg-surface-subtle px-3 py-2.5
-            text-[10px] font-bold uppercase tracking-[0.12em]
+            text-xs font-bold uppercase tracking-[0.12em]
             text-secondary transition-colors duration-200
             hover:border-action hover:bg-action hover:text-on-action
             focus-visible:outline-none focus-visible:ring-2
@@ -72,7 +72,7 @@ export default function NotificationFooter({
                   className="
                     rounded-md border border-border-subtle
                     bg-surface-muted px-1.5 py-0.5
-                    font-mono text-[9px] tracking-normal
+                    font-mono text-xs tracking-normal
                     text-secondary
                     group-hover:border-on-action/20
                     group-hover:bg-on-action/10
@@ -93,7 +93,7 @@ export default function NotificationFooter({
         </button>
       ) : (
         <div className="flex flex-wrap items-center justify-between gap-2 px-1 py-1">
-          <span className="inline-flex items-center gap-1.5 text-[10px] font-medium text-muted">
+          <span className="inline-flex items-center gap-1.5 text-xs font-medium text-muted">
             <CheckCircle2
               size={13}
               className="text-success"
@@ -107,7 +107,7 @@ export default function NotificationFooter({
             onClick={onClose}
             className="
               inline-flex min-h-8 items-center gap-1.5 rounded-lg
-              px-2 text-[10px] font-bold text-secondary
+              px-2 text-xs font-bold text-secondary
               transition-colors hover:bg-surface-muted hover:text-primary
               focus-visible:outline-none focus-visible:ring-2
               focus-visible:ring-focus

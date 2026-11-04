@@ -1,21 +1,22 @@
 "use client";
 
-import { Suspense, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Cookies from "js-cookie";
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
+import { Suspense, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { useSocketStore } from "@/store/socketStore";
+import { useUserStore } from "@/store/userStore";
+import api from "@/lib/api";
 
 function OAuthContent() {
-  const { t, direction } = useLocale();
+  const { t, direction, locale } = useLocale();
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const reduceMotion = useReducedMotion();
-
-  const token = searchParams.get("token");
-  const role = searchParams.get("role");
+  const reduceMotion = useAppReducedMotion();
+  const authorization = useRef<{ code: string | null; state: string | null } | null>(null);
+  const exchangeStarted = useRef(false);
 
   const isRTL = direction === "rtl";
 
@@ -41,51 +42,78 @@ function OAuthContent() {
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-
     let timer: ReturnType<typeof setTimeout> | undefined;
+    let disposed = false;
+
+    // Read the one-time code once and remove it from the address bar immediately.
+    // Keeping it in a ref lets the deferred effect survive React Strict Mode's
+    // setup/cleanup replay without issuing two exchanges for the same code.
+    if (authorization.current === null) {
+      const currentUrl = new URL(window.location.href);
+      authorization.current = {
+        code: currentUrl.searchParams.get("code"),
+        state: currentUrl.searchParams.get("state"),
+      };
+      // Remove one-time credentials before any other script or navigation runs.
+      window.history.replaceState({}, "", "/auth/success");
+    }
 
     const restoreOverflow = () => {
       document.body.style.overflow = previousOverflow;
     };
 
-    if (token && role) {
-      const isProd = process.env.NODE_ENV === "production";
-
-      Cookies.set("token", token, {
-        path: "/",
-        secure: isProd,
-        sameSite: isProd ? "none" : "lax",
-      });
-
-      Cookies.set("role", role, {
-        path: "/",
-        secure: isProd,
-        sameSite: isProd ? "none" : "lax",
-      });
-
-      useSocketStore.getState().setSocketReady(true);
-      toast.success(welcomeText);
-
-      timer = setTimeout(() => {
-        restoreOverflow();
-
-        if (role === "ADMIN" || role === "MANAGER") {
-          router.replace("/dashboard");
-        } else {
-          router.replace("/");
-        }
-      }, 1300);
-    } else {
+    const fail = () => {
+      if (disposed) return;
       restoreOverflow();
       toast.error(failedText);
       router.replace("/auth/signin");
-    }
+    };
+
+    const exchangeCode = async () => {
+      if (exchangeStarted.current) return;
+      exchangeStarted.current = true;
+      const { code, state } = authorization.current || { code: null, state: null };
+      if (!code || !state) {
+        fail();
+        return;
+      }
+
+      try {
+        // Same-origin rewrite keeps the HTTP-only refresh cookie on the
+        // storefront origin so the normal API client can rotate it later.
+        const response = await api.post("auth/google/exchange", { code, state });
+        const user = response.data?.data?.user;
+        const role = user?.role;
+        if (!user || typeof role !== "string") {
+          throw new Error("Google sign-in returned an invalid session");
+        }
+        if (disposed) return;
+
+        useUserStore.getState().setUser(user);
+        useSocketStore.getState().setSocketReady(true);
+        toast.success(welcomeText);
+        timer = setTimeout(() => {
+          restoreOverflow();
+          router.replace(role === "ADMIN" || role === "MANAGER" ? "/dashboard" : "/");
+        }, 900);
+      } catch (error) {
+        console.error("Google OAuth exchange failed:", error);
+        fail();
+      }
+    };
+
+    // Deferring to the next task means Strict Mode's first development-only
+    // effect is cleaned up before a network request can consume the code.
+    timer = setTimeout(() => {
+      void exchangeCode();
+    }, 0);
 
     return () => {
+      disposed = true;
       if (timer) clearTimeout(timer);
       restoreOverflow();
     };
-  }, [token, role, router, welcomeText, failedText]);
+  }, [router, locale, welcomeText, failedText]);
 
   const entranceTransition = reduceMotion
     ? { duration: 0 }
@@ -96,9 +124,9 @@ function OAuthContent() {
   return (
     <main
       dir={direction}
-      className="
+      className="page-section
         relative isolate flex min-h-screen items-center justify-center
-        overflow-hidden bg-surface-subtle px-4 py-10
+        overflow-hidden bg-surface-subtle px-4
         font-sans text-primary selection:bg-action
         selection:text-on-action
       "
@@ -131,7 +159,7 @@ function OAuthContent() {
         transition={entranceTransition}
         className="
           relative z-10 w-full max-w-sm overflow-hidden
-          rounded-[2rem] border border-border
+          rounded-4xl border border-border
           bg-surface-raised p-7 text-center
           shadow-[var(--shadow-floating)]
           sm:p-9
@@ -209,7 +237,7 @@ function OAuthContent() {
               relative flex h-14 w-14 items-center justify-center
               rounded-2xl border border-white/10
               bg-action text-on-action
-              shadow-[0_12px_30px_-8px_rgba(var(--shadow-rgb),0.30)]
+              shadow-card
             "
           >
             <svg

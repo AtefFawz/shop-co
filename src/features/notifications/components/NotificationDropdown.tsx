@@ -1,19 +1,15 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { Bell } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import type { Notification } from "@/store/notificationStore";
 import { useNotifications } from "@/hooks/useNotifications";
+import { useDebounce } from "@/hooks/useDebounce";
 
 import NotificationHeader from "./NotificationHeader";
 import NotificationList from "./NotificationList";
@@ -27,40 +23,40 @@ export default function NotificationDropdown() {
   const [open, setOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   const router = useRouter();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelId = useId();
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
 
   const {
     notifications,
     unreadCount,
+    totalCount,
     page,
     totalPages,
     loading,
     loadMore,
     handleMarkAsRead,
     handleMarkAllAsRead,
-  } = useNotifications();
+  } = useNotifications({
+    keyword: debouncedSearch,
+    unreadOnly: activeTab === "unread",
+    orderOnly: activeTab === "orders",
+  });
 
+  // The server performs the full-list search; this small local guard keeps live socket
+  // notifications from bypassing the currently selected tab/search while results refresh.
   const filteredNotifications = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase();
-
     return notifications.filter((notification) => {
       if (activeTab === "unread" && notification.read) return false;
       if (activeTab === "orders" && !notification.order) return false;
       if (!query) return true;
-
-      return [
-        notification.title,
-        notification.message,
-        notification.order,
-      ].some((value) =>
-        String(value ?? "")
-          .toLocaleLowerCase()
-          .includes(query),
+      return [notification.title, notification.message, notification.order].some((value) =>
+        String(value ?? "").toLocaleLowerCase().includes(query),
       );
     });
   }, [notifications, activeTab, searchQuery]);
@@ -187,7 +183,7 @@ export default function NotificationDropdown() {
               className="
                 absolute -end-1 -top-1 z-20 flex h-5
                 min-w-5 items-center justify-center rounded-full
-                bg-danger px-1 font-mono text-[9.5px]
+                bg-danger px-1 font-mono text-xs
                 font-extrabold leading-none text-white
                 shadow-[0_4px_12px_rgba(var(--danger-rgb),0.45)]
                 ring-2 ring-surface
@@ -261,7 +257,7 @@ export default function NotificationDropdown() {
 
               <NotificationHeader
                 unreadCount={unreadCount}
-                totalCount={notifications.length}
+                totalCount={totalCount}
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
                 searchQuery={searchQuery}

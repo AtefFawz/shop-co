@@ -15,6 +15,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { createCurrencyFormatter } from "@/lib/formatCurrency";
 import { useDebounce } from "@/hooks/useDebounce";
+import api from "@/lib/api";
 import { Product } from "@/types";
 
 type ProductSearchBarProps = {
@@ -121,36 +122,40 @@ function ProductSearchBarContent({
     };
   }, [isMobile, isActive]);
 
-  // 2. Fetch Live Results on Debounced Query
+  // 2. Fetch top matches from the backend's indexed Arabic/English search.
   useEffect(() => {
-    const fetchResults = async () => {
-      if (!debouncedQuery.trim()) {
-        setResults([]);
-        setSelectedIndex(-1);
-        return;
-      }
+    const keyword = debouncedQuery.trim();
+    if (!keyword) {
+      setResults([]);
+      setSelectedIndex(-1);
+      setIsSearching(false);
+      return;
+    }
 
-      setIsSearching(true);
-      try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/product?keyword=${encodeURIComponent(
-            debouncedQuery.trim(),
-          )}`,
-        );
-        const data = await response.json();
-        const found =
-          data?.data?.Products || data?.Products || data?.data || [];
+    const controller = new AbortController();
+    setIsSearching(true);
+
+    api
+      .get("product", {
+        params: { keyword, page: 1, limit: 5, sort: "popular" },
+        signal: controller.signal,
+      })
+      .then((response) => {
+        if (controller.signal.aborted) return;
+        const found = response.data?.data?.Products;
         setResults(Array.isArray(found) ? found.slice(0, 5) : []);
         setSelectedIndex(-1);
-      } catch (error) {
+      })
+      .catch((error: unknown) => {
+        if (controller.signal.aborted) return;
         console.error("Search failed:", error);
         setResults([]);
-      } finally {
-        setIsSearching(false);
-      }
-    };
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setIsSearching(false);
+      });
 
-    fetchResults();
+    return () => controller.abort();
   }, [debouncedQuery]);
 
   // 3. Submit & Navigation Handlers
@@ -217,12 +222,12 @@ function ProductSearchBarContent({
           isMobile
             ? `h-12 w-full rounded-2xl border px-3.5 ${
                 isActive
-                  ? "border-border-strong bg-surface shadow-[0_12px_32px_rgba(var(--shadow-rgb),0.12)] ring-4 ring-focus/10"
+                  ? "border-border-strong bg-surface shadow-card ring-4 ring-focus/10"
                   : "border-border bg-surface-subtle/90 shadow-2xs"
               }`
             : `h-11 w-full rounded-2xl border px-3.5 ${
                 isActive
-                  ? "border-border-strong bg-surface shadow-[0_14px_38px_-6px_rgba(var(--shadow-rgb),0.14)] ring-4 ring-focus/10"
+                  ? "border-border-strong bg-surface shadow-card ring-4 ring-focus/10"
                   : "border-border-subtle bg-surface-subtle/75 hover:border-border hover:bg-surface"
               }`
         }`}
@@ -255,7 +260,7 @@ function ProductSearchBarContent({
           onFocus={() => setIsActive(true)}
           placeholder={t("navSearchDescription")}
           aria-label={t("navSearch")}
-          className="h-full min-w-0 flex-1 bg-transparent px-3 text-xs font-bold text-primary outline-none placeholder:font-medium placeholder:text-muted/75 sm:text-[13px]"
+          className="h-full min-w-0 flex-1 bg-transparent px-3 text-xs font-bold text-primary outline-none placeholder:font-medium placeholder:text-muted/75 sm:text-[0.8125rem]"
         />
 
         {/* Right/End Controls: Clear Button OR Desktop Shortcut Badge */}
@@ -279,14 +284,14 @@ function ProductSearchBarContent({
               <button
                 type="submit"
                 aria-label={t("searchGo")}
-                className="hidden h-7 cursor-pointer items-center gap-1 rounded-xl bg-action px-2.5 text-[10px] font-black uppercase tracking-wider text-on-action shadow-2xs transition-transform hover:scale-105 active:scale-95 sm:inline-flex"
+                className="hidden h-7 cursor-pointer items-center gap-1 rounded-xl bg-action px-2.5 text-xs font-black uppercase tracking-wider text-on-action shadow-2xs transition-transform hover:scale-105 active:scale-95 sm:inline-flex"
               >
                 <span>{t("searchGo")}</span>
                 <CornerDownLeft size={11} />
               </button>
             </>
           ) : !isMobile ? (
-            <kbd className="pointer-events-none hidden select-none items-center gap-0.5 rounded-lg border border-border-subtle bg-surface px-2 py-0.5 font-mono text-[10px] font-bold text-muted shadow-2xs sm:inline-flex">
+            <kbd className="pointer-events-none hidden select-none items-center gap-0.5 rounded-lg border border-border-subtle bg-surface px-2 py-0.5 font-mono text-xs font-bold text-muted shadow-2xs sm:inline-flex">
               <span>⌘</span>
               <span>K</span>
             </kbd>
@@ -313,7 +318,7 @@ function ProductSearchBarContent({
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 6, scale: 0.98 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="absolute inset-x-0 top-full mt-2.5 overflow-hidden rounded-3xl border border-border bg-surface/95 shadow-[0_24px_60px_-12px_rgba(var(--shadow-rgb),0.22)] backdrop-blur-2xl"
+            className="absolute inset-x-0 top-full mt-2.5 overflow-hidden rounded-3xl border border-border bg-surface/95 shadow-panel backdrop-blur-2xl"
           >
             {/* Top Progress Shimmer when Searching */}
             {isSearching && (
@@ -325,7 +330,7 @@ function ProductSearchBarContent({
             {/* CASE 1: Empty Query -> Show Curated Quick Tags */}
             {!query.trim() ? (
               <div className="p-4">
-                <div className="mb-2.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                <div className="mb-2.5 flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.18em] text-muted">
                   <TrendingUp size={12} className="text-primary" />
                   <span>{t("curated")}</span>
                 </div>
@@ -339,7 +344,7 @@ function ProductSearchBarContent({
                         setQuery(tag);
                         executeSearch(tag);
                       }}
-                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border-subtle bg-surface-subtle px-3 py-1.5 text-[11px] font-bold text-secondary transition-all hover:-translate-y-0.5 hover:border-border-strong hover:bg-action hover:text-on-action"
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-border-subtle bg-surface-subtle px-3 py-1.5 text-xs font-bold text-secondary transition-all hover:-translate-y-0.5 hover:border-border-strong hover:bg-action hover:text-on-action"
                     >
                       <Sparkles size={11} />
                       <span>{tag}</span>
@@ -352,7 +357,7 @@ function ProductSearchBarContent({
               <div>
                 {/* Status Header */}
                 <div className="flex items-center justify-between border-b border-border-subtle/70 bg-surface-subtle/50 px-4 py-2.5">
-                  <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-muted">
+                  <span className="flex items-center gap-1.5 text-xs font-black uppercase tracking-[0.18em] text-muted">
                     <Sparkles size={11} className="text-primary" />
                     {isSearching
                       ? t("searchSearchingCatalog")
@@ -360,7 +365,7 @@ function ProductSearchBarContent({
                   </span>
 
                   {!isSearching && results.length > 0 && (
-                    <span className="rounded-full bg-surface px-2 py-0.5 font-mono text-[10px] font-black text-primary shadow-2xs">
+                    <span className="rounded-full bg-surface px-2 py-0.5 font-mono text-xs font-black text-primary shadow-2xs">
                       {results.length}
                     </span>
                   )}
@@ -389,7 +394,7 @@ function ProductSearchBarContent({
                               {/* Product Thumbnail */}
                               <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl border border-border-subtle bg-surface-muted">
                                 {imgUrl ? (
-                                  <img
+                                  <img loading="lazy" decoding="async"
                                     src={imgUrl}
                                     alt={product.name}
                                     className="h-full w-full object-cover object-top transition-transform duration-300 group-hover:scale-110"
@@ -404,7 +409,7 @@ function ProductSearchBarContent({
                               {/* Title & Category */}
                               <div className="min-w-0">
                                 <p
-                                  className={`truncate text-xs font-black uppercase tracking-tight sm:text-[13px] ${
+                                  className={`truncate text-xs font-black uppercase tracking-tight sm:text-[0.8125rem] ${
                                     isHighlighted
                                       ? "text-on-action"
                                       : "text-primary"
@@ -415,7 +420,7 @@ function ProductSearchBarContent({
 
                                 <div className="mt-1 flex flex-wrap items-center gap-2">
                                   <span
-                                    className={`font-mono text-[11px] font-black ${
+                                    className={`font-mono text-xs font-black ${
                                       isHighlighted
                                         ? "text-on-action/90"
                                         : "text-primary"
@@ -426,7 +431,7 @@ function ProductSearchBarContent({
 
                                   {product.category && (
                                     <span
-                                      className={`rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                                      className={`rounded-md px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider ${
                                         isHighlighted
                                           ? "bg-white/15 text-on-action"
                                           : "bg-surface-muted text-secondary"
@@ -460,7 +465,7 @@ function ProductSearchBarContent({
                           <p className="text-xs font-black uppercase tracking-wider text-primary">
                             {t("noMatchingProducts")}
                           </p>
-                          <p className="mt-1 text-[11px] text-muted">
+                          <p className="mt-1 text-xs text-muted">
                             {t("noMatchingProductsHint")}
                           </p>
                         </div>
@@ -472,7 +477,7 @@ function ProductSearchBarContent({
                   <div className="border-t border-border-subtle/70 bg-surface-subtle/40 p-2">
                     <button
                       type="submit"
-                      className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action py-3 text-[10.5px] font-black uppercase tracking-[0.16em] text-on-action shadow-sm transition-all hover:opacity-95 active:scale-[0.99]"
+                      className="group flex w-full cursor-pointer items-center justify-center gap-2 rounded-2xl bg-action py-3 text-xs font-black uppercase tracking-[0.16em] text-on-action shadow-sm transition-all hover:opacity-95 active:scale-[0.99]"
                     >
                       <span>
                         {t("searchViewAllResults").replace(

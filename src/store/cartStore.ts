@@ -116,7 +116,7 @@ export function summarizeCart(items: readonly CartProduct[]): CartSummary {
     const price = Math.max(0, Number(item.price) || 0);
     const discount = Math.min(100, Math.max(0, Number(item.discount) || 0));
     const subtotal = price * quantity;
-    const total = calculateFinalPrice(price, discount, quantity);
+    const total = calculateFinalPrice(price, discount, quantity, item.isSale);
     const stockLimit = getStockLimit(item);
     const selected = item.isChose !== false && stockLimit !== 0;
 

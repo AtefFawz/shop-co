@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Slider from "@mui/material/Slider";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -24,7 +24,7 @@ const ThemeAwareSlider = styled(Slider)({
     "&::before": { display: "none" },
   },
   "& .MuiSlider-valueLabel": {
-    fontSize: 10,
+    fontSize: "0.625rem",
     fontWeight: 900,
     background: "var(--action)",
     color: "var(--text-on-action)",
@@ -33,26 +33,37 @@ const ThemeAwareSlider = styled(Slider)({
   },
 });
 
-const PRESETS = [150, 500, 1500, 5000];
+const MAX_PRICE = 5000;
+const PRESETS = [150, 500, 1500, MAX_PRICE];
 
 export default function PriceRangeFilter() {
   const { t, locale, direction } = useLocale();
-  const [price, setPrice] = useState<number>(1000);
+  // The store is the source of truth: null means "all prices" (slider at max).
+  const storePrice = useFilterStore((s) => s.currentPrice);
   const filterPrice = useFilterStore((s) => s.filterPrice);
+  const [price, setPrice] = useState<number>(storePrice ?? MAX_PRICE);
 
-  const applyPreset = (val: number) => {
+  // Keep the slider in sync when the store changes elsewhere (reset, URL, drawer).
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPrice(storePrice ?? MAX_PRICE);
+  }, [storePrice]);
+
+  const commit = (val: number) => {
     setPrice(val);
-    filterPrice?.(val);
+    filterPrice(val >= MAX_PRICE ? null : val);
   };
+
+  const applyPreset = (val: number) => commit(val);
 
   return (
     <div dir={direction} className="w-full py-4">
       <div className="mb-3 flex items-center justify-between">
-        <span className="text-[11px] font-black uppercase tracking-[0.16em] text-secondary">
+        <span className="text-xs font-black uppercase tracking-[0.16em] text-secondary">
           {t("priceCeiling")}
         </span>
-        <span className="rounded-lg bg-action px-2.5 py-0.5 font-mono text-[11px] font-black text-on-action">
-          {t("upTo")} {formatCurrency(price, locale)}
+        <span className="rounded-lg bg-action px-2.5 py-0.5 font-mono text-xs font-black text-on-action">
+          {price >= MAX_PRICE ? t("allPrices") : `${t("upTo")} ${formatCurrency(price, locale)}`}
         </span>
       </div>
 
@@ -61,16 +72,16 @@ export default function PriceRangeFilter() {
           valueLabelDisplay="auto"
           value={price}
           onChange={(_, v) => setPrice(v as number)}
-          onChangeCommitted={(_, v) => filterPrice?.(v as number)}
+          onChangeCommitted={(_, v) => commit(v as number)}
           min={0}
-          max={5000}
+          max={MAX_PRICE}
           valueLabelFormat={(v) => formatCurrency(v, locale)}
         />
       </Box>
 
-      <div className="mt-1 flex justify-between font-mono text-[10px] font-bold text-muted">
+      <div className="mt-1 flex justify-between font-mono text-xs font-bold text-muted">
         <span>{formatCurrency(0, locale)}</span>
-        <span>{formatCurrency(5000, locale)}</span>
+        <span>{formatCurrency(MAX_PRICE, locale)}</span>
       </div>
 
       {/* Quick Price Presets */}
@@ -80,13 +91,13 @@ export default function PriceRangeFilter() {
             key={preset}
             type="button"
             onClick={() => applyPreset(preset)}
-            className={`cursor-pointer rounded-lg border py-1 font-mono text-[9px] font-black uppercase transition-all ${
+            className={`cursor-pointer rounded-lg border py-1 font-mono text-xs font-black uppercase transition-all ${
               price === preset
                 ? "border-border-strong bg-action text-on-action"
                 : "border-border bg-surface-subtle text-secondary hover:border-border-strong"
             }`}
           >
-            {preset === 5000 ? t("allPrices") : `${t("upTo")} ${formatCurrency(preset, locale)}`}
+            {preset === MAX_PRICE ? t("allPrices") : `${t("upTo")} ${formatCurrency(preset, locale)}`}
           </button>
         ))}
       </div>

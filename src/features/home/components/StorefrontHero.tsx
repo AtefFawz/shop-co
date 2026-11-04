@@ -1,17 +1,11 @@
 "use client";
 
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
-import {
-  AnimatePresence,
-  motion,
-  useReducedMotion,
-  useMotionValue,
-  useSpring,
-  useTransform,
-  useMotionTemplate,
-} from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from "framer-motion";
 import { ArrowUpRight, MoveUpRight, Sparkles, Star, ShieldCheck, Flame, Plus, ShoppingBag, CheckCircle2 } from "lucide-react";
 
 import { storefrontStats } from "@/features/home/data/storefrontContent";
@@ -50,7 +44,7 @@ export default function StorefrontHero() {
         fabric: ["تيري عضوي 480 GSM", "نسيج تقني ياباني", "مزيج سوبيما ممشّط"][index],
       }))
     : LOOKBOOK_EDITS;
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
   const [activeSlide, setActiveSlide] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
   const [hotspotOpen, setHotspotOpen] = useState(true);
@@ -154,7 +148,7 @@ export default function StorefrontHero() {
         />
 
         {/* Main Section with your Responsive class + balanced vertical spacing */}
-        <section className="Responsive relative  px-4 py-10! 2xl:pt-0! lg:pb-10! ">
+        <section className="Responsive relative py-10! 2xl:pt-0! lg:pb-10! ">
           <div className="grid grid-cols-1 items-center gap-x-12 lg:grid-cols-12 lg:gap-8 xl:gap-12">
             {/* ================================================================ */}
             {/* LEFT COLUMN: 3D KINETIC TYPOGRAPHY & CONVERSION (7 COLUMNS)      */}
@@ -165,17 +159,17 @@ export default function StorefrontHero() {
                 initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.7, ease: EASE_OUT_EXPO }}
-                className="group mb-5 inline-flex items-center gap-3 rounded-full border border-border-subtle bg-surface/85 px-4 py-1.5 shadow-[0_4px_16px_rgba(var(--shadow-rgb),0.04)] backdrop-blur-md transition-all duration-300 hover:border-border hover:bg-surface"
+                className="group mb-5 inline-flex items-center gap-3 rounded-full border border-border-subtle bg-surface/85 px-4 py-1.5 shadow-card backdrop-blur-md transition-all duration-300 hover:border-border hover:bg-surface"
               >
                 <span className="relative flex h-2 w-2">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-action opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-action" />
                 </span>
-                <span className="text-[10px] font-extrabold uppercase tracking-[0.22em] text-primary sm:text-[11px]">
+                <span className="text-xs font-extrabold uppercase tracking-[0.22em] text-primary sm:text-xs">
                   {t("heroCollection")}
                 </span>
                 <span className="h-3 w-px bg-surface-hover" />
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-secondary">
+                <span className="inline-flex items-center gap-1 text-xs font-bold text-secondary">
                   <Sparkles
                     size={12}
                     className="text-primary transition-transform duration-500 group-hover:rotate-180"
@@ -255,7 +249,7 @@ export default function StorefrontHero() {
                 initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
                 animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                 transition={{ duration: 0.8, delay: 0.25, ease: EASE_OUT_EXPO }}
-                className="mt-5 max-w-[52ch] text-pretty text-sm leading-[1.75] text-secondary sm:text-[15px] sm:leading-[1.8]"
+                className="mt-5 max-w-[52ch] text-pretty text-sm leading-[1.75] text-secondary sm:text-[0.9375rem] sm:leading-[1.8]"
               >
                 {t("heroDescription")}
               </motion.p>
@@ -267,14 +261,14 @@ export default function StorefrontHero() {
                 transition={{ duration: 0.7, delay: 0.32, ease: EASE_OUT_EXPO }}
                 className="mt-4 flex flex-wrap items-center gap-2"
               >
-                <span className="mr-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-muted">
+                <span className="mr-1 text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                   {t("curated")}
                 </span>
                 {quickTags.map((tag) => (
                   <Link
                     key={tag}
                     href="/shop"
-                    className="group relative overflow-hidden rounded-full border border-border-strong/90 bg-surface/75 px-3.5 py-1 text-[11px] font-bold text-secondary shadow-2xs backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:bg-action hover:text-on-action hover:shadow-md"
+                    className="group relative overflow-hidden rounded-full border border-border-strong/90 bg-surface/75 px-3.5 py-1 text-xs font-bold text-secondary shadow-2xs backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-border-strong hover:bg-action hover:text-on-action hover:shadow-md"
                   >
                     {tag}
                   </Link>
@@ -294,7 +288,7 @@ export default function StorefrontHero() {
                 >
                   <Link
                     href="/shop"
-                    className="group relative inline-flex min-h-[52px] items-center justify-center gap-4 overflow-hidden rounded-full bg-action px-8 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] text-on-action shadow-[0_18px_38px_-10px_rgba(var(--shadow-rgb),0.45)] transition-all duration-300 hover:shadow-[0_24px_48px_-10px_rgba(var(--shadow-rgb),0.6)] sm:min-h-[56px] sm:px-9"
+                    className="group relative inline-flex min-h-[52px] items-center justify-center gap-4 overflow-hidden rounded-full bg-action px-8 py-3.5 text-xs font-extrabold uppercase tracking-[0.16em] text-on-action shadow-card transition-all duration-300 hover:shadow-panel sm:min-h-[56px] sm:px-9"
                   >
                     {/* Animated light sweep */}
                     <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
@@ -336,7 +330,7 @@ export default function StorefrontHero() {
                     {["S", "M", "A"].map((letter, idx) => (
                       <span
                         key={letter}
-                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-surface text-[10px] font-black text-on-action ${
+                        className={`flex h-6 w-6 items-center justify-center rounded-full border-2 border-surface text-xs font-black text-on-action ${
                           idx === 0
                             ? "bg-action"
                             : idx === 1
@@ -348,14 +342,9 @@ export default function StorefrontHero() {
                       </span>
                     ))}
                   </div>
-                  <div className="flex text-warning">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={12} fill="currentColor" />
-                    ))}
-                  </div>
-                  <span className="font-extrabold text-primary">4.9/5</span>
-                  <span className="text-[11px] text-muted">
-                    ({t("reviewCount")})
+                  <span className="inline-flex items-center gap-1.5 text-xs font-extrabold text-primary">
+                    <ShieldCheck size={14} className="text-success" />
+                    {t("heroAuthentic")}
                   </span>
                 </div>
 
@@ -379,13 +368,13 @@ export default function StorefrontHero() {
                 {storefrontStats.map((item, index) => (
                   <div
                     key={`${item.title}-${index}`}
-                    className="group relative overflow-hidden rounded-2xl border border-border bg-surface/70 p-3.5 shadow-[0_8px_24px_rgba(var(--shadow-rgb),0.03)] backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-border-subtle hover:bg-surface hover:shadow-[0_16px_32px_rgba(var(--shadow-rgb),0.07)] sm:p-4"
+                    className="group relative overflow-hidden rounded-2xl border border-border bg-surface/70 p-3.5 shadow-card backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-border-subtle hover:bg-surface hover:shadow-card sm:p-4"
                   >
                     <span className="pointer-events-none absolute -right-4 -top-4 h-14 w-14 rounded-full bg-action/[0.03] transition-transform duration-500 group-hover:scale-150" />
                     <p className="text-[clamp(1.35rem,2.6vw,2.15rem)] font-black leading-none tracking-[-0.05em] text-primary">
                       <AnimatedStatValue rawValue={item.title} />
                     </p>
-                    <p className="mt-1.5 text-[9px] font-bold uppercase leading-snug tracking-[0.1em] text-muted sm:text-[11px]">
+                    <p className="mt-1.5 text-xs font-bold uppercase leading-snug tracking-[0.1em] text-muted sm:text-xs">
                       {statLabels[index]}
                     </p>
                   </div>
@@ -441,7 +430,7 @@ export default function StorefrontHero() {
                   animate={{ opacity: 1, scale: 1, rotateY: 0 }}
                   transition={{ duration: 1.1, ease: EASE_OUT_EXPO }}
                   style={{ transformStyle: "preserve-3d" }}
-                  className="relative z-10 aspect-[4/4.65] w-full overflow-hidden rounded-[2.2rem] border-2 border-surface bg-app shadow-[0_35px_90px_-20px_rgba(var(--shadow-rgb),0.22)] sm:rounded-[2.5rem]"
+                  className="relative z-10 aspect-[4/4.65] w-full overflow-hidden rounded-4xl border-2 border-surface bg-app shadow-panel sm:rounded-4xl"
                 >
                   {/* Dynamic Mouse-Following Studio Glare */}
                   <motion.div
@@ -468,7 +457,7 @@ export default function StorefrontHero() {
                     <span className="text-[clamp(3.8rem,7vw,5.6rem)] font-black uppercase leading-none tracking-[-0.06em] text-primary/[0.065]">
                       SHOP.CO
                     </span>
-                    <span className="mt-1 text-[10px] font-extrabold uppercase tracking-[0.45em] text-primary/20">
+                    <span className="mt-1 text-xs font-extrabold uppercase tracking-[0.45em] text-primary/20">
                       {locale === "ar" ? "مختارات الموسم · ٢٠٢٦" : "ARCHIVE // 2026"}
                     </span>
                   </motion.div>
@@ -481,7 +470,7 @@ export default function StorefrontHero() {
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface/90 px-3.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-primary shadow-xs backdrop-blur-md"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-border-subtle bg-surface/90 px-3.5 py-1 text-xs font-extrabold uppercase tracking-[0.18em] text-primary shadow-xs backdrop-blur-md"
                       >
                         <Flame
                           size={12}
@@ -491,7 +480,7 @@ export default function StorefrontHero() {
                       </motion.span>
                     </AnimatePresence>
 
-                    <span className="rounded-full border border-border-subtle bg-surface/80 px-3 py-1 font-mono text-[10px] font-bold tracking-widest text-secondary backdrop-blur-md">
+                    <span className="rounded-full border border-border-subtle bg-surface/80 px-3 py-1 font-mono text-xs font-bold tracking-widest text-secondary backdrop-blur-md">
                       LOOK / {currentEdit.id}
                     </span>
                   </div>
@@ -533,7 +522,7 @@ export default function StorefrontHero() {
                         type="button"
                         onClick={() => setHotspotOpen((prev) => !prev)}
                         aria-label={t("heroToggleHotspots")}
-                        className="group relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-action text-on-action shadow-[0_8px_20px_rgba(var(--shadow-rgb),0.35)] transition-transform duration-300 hover:scale-110"
+                        className="group relative flex h-8 w-8 items-center justify-center rounded-full border-2 border-surface bg-action text-on-action shadow-card transition-transform duration-300 hover:scale-110"
                       >
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-action opacity-60" />
                         <Plus
@@ -552,17 +541,17 @@ export default function StorefrontHero() {
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.88, y: 8 }}
                             transition={{ duration: 0.25 }}
-                            className=" absolute left-10 -top-3 w-48 rounded-2xl border border-border bg-surface/95 p-2.5 shadow-[0_16px_36px_rgba(var(--shadow-rgb),0.18)] backdrop-blur-xl"
+                            className=" absolute left-10 -top-3 w-48 rounded-2xl border border-border bg-surface/95 p-2.5 shadow-card backdrop-blur-xl"
                           >
                             <div className="flex items-center justify-between">
-                              <span className="text-[9px] font-extrabold uppercase tracking-wider text-muted">
+                              <span className="text-xs font-extrabold uppercase tracking-wider text-muted">
                                 {currentEdit.fabric}
                               </span>
-                              <span className="rounded-md bg-action px-1.5 py-0.5 text-[10px] font-black text-on-action">
+                              <span className="rounded-md bg-action px-1.5 py-0.5 text-xs font-black text-on-action">
                                 {currentEdit.price}
                               </span>
                             </div>
-                            <p className="mt-1 truncate text-[11px] font-extrabold text-primary">
+                            <p className="mt-1 truncate text-xs font-extrabold text-primary">
                               {currentEdit.title}
                             </p>
                           </motion.div>
@@ -645,15 +634,15 @@ export default function StorefrontHero() {
                   }}
                   className="absolute -left-2 bottom-[24%] z-30 hidden sm:block lg:-left-7"
                 >
-                  <div className="flex items-center gap-3 rounded-2xl border border-surface bg-surface/95 px-3.5 py-2.5 shadow-[0_20px_40px_rgba(var(--shadow-rgb),0.12)] backdrop-blur-xl">
+                  <div className="flex items-center gap-3 rounded-2xl border border-surface bg-surface/95 px-3.5 py-2.5 shadow-card backdrop-blur-xl">
                     <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-success-soft text-success">
                       <CheckCircle2 size={16} />
                     </div>
                     <div>
-                      <p className="text-[9px] font-extrabold uppercase tracking-[0.14em] text-muted">
+                      <p className="text-xs font-extrabold uppercase tracking-[0.14em] text-muted">
                         Verified Quality
                       </p>
-                      <p className="text-[11px] font-bold text-primary">
+                      <p className="text-xs font-bold text-primary">
                         {currentEdit.fabric}
                       </p>
                     </div>
@@ -680,12 +669,12 @@ export default function StorefrontHero() {
                 >
                   <Link
                     href="/shop"
-                    className="group block rounded-2xl border border-surface bg-surface/95 p-3.5 shadow-[0_25px_60px_rgba(var(--shadow-rgb),0.18)] backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-surface"
+                    className="group block rounded-2xl border border-surface bg-surface/95 p-3.5 shadow-panel backdrop-blur-xl transition-all duration-300 hover:-translate-y-1 hover:bg-surface"
                   >
                     <div className="flex items-center gap-3.5">
                       <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-action text-on-action shadow-md transition-transform duration-300 group-hover:scale-105">
                         <ShoppingBag size={17} />
-                        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-success text-[9px] font-black text-on-success">
+                        <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-success text-xs font-black text-on-success">
                           +
                         </span>
                       </div>
@@ -700,7 +689,7 @@ export default function StorefrontHero() {
                             transition={{ duration: 0.22 }}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <span className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-muted">
+                              <span className="text-xs font-extrabold uppercase tracking-[0.16em] text-muted">
                                 {currentEdit.tag}
                               </span>
                               <span className="text-xs font-black text-primary">
@@ -710,7 +699,7 @@ export default function StorefrontHero() {
                             <span className="mt-0.5 block truncate text-xs font-extrabold text-primary">
                               {currentEdit.title}
                             </span>
-                            <span className="mt-0.5 block truncate text-[10px] text-muted">
+                            <span className="mt-0.5 block truncate text-xs text-muted">
                               {currentEdit.subtitle}
                             </span>
                           </motion.div>
@@ -743,7 +732,7 @@ export default function StorefrontHero() {
                   <span className="text-xs font-bold text-muted">
                     / 0{LOOKBOOK_EDITS.length}
                   </span>
-                  <span className="ml-2 hidden text-[10px] font-bold uppercase tracking-widest text-muted sm:inline-block">
+                  <span className="ml-2 hidden text-xs font-bold uppercase tracking-widest text-muted sm:inline-block">
                     · Interactive 3D Stage
                   </span>
                 </div>

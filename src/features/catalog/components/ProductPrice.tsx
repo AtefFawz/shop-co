@@ -7,14 +7,14 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 
 export default function ProductPrice({ product }: { product: Product }) {
   const { locale } = useLocale();
-  const result = calculateFinalPrice(product.price, Number(product.discount));
+  const result = calculateFinalPrice(product.price, Number(product.discount), 1, product.isSale);
   return (
     <div className="flex items-center gap-2 flex-nowrap text-nowrap">
       <span className="text-sm md:text-xl font-bold text-primary ">
         {formatCurrency(result, locale)}
       </span>
 
-      {product.discount && (
+      {product.isSale && Number(product.discount) > 0 && (
         <>
           <del className="text-muted text-xs md:text-lg">
             {formatCurrency(product.price, locale)}

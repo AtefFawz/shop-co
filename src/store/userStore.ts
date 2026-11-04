@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { clearSessionHint, markSessionHint } from "@/lib/sessionHint";
 
 export interface CurrentUser {
   _id?: string;
@@ -20,6 +21,13 @@ interface UserStore {
 export const useUserStore = create<UserStore>((set) => ({
   user: null,
   isAuthenticated: false,
-  setUser: (user) => set({ user, isAuthenticated: Boolean(user) }),
-  clearUser: () => set({ user: null, isAuthenticated: false }),
+  setUser: (user) => {
+    if (user) markSessionHint();
+    else clearSessionHint();
+    set({ user, isAuthenticated: Boolean(user) });
+  },
+  clearUser: () => {
+    clearSessionHint();
+    set({ user: null, isAuthenticated: false });
+  },
 }));

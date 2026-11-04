@@ -47,7 +47,7 @@ export default function AdminUsersMobileList({ users }: Props) {
           <div
             key={user._id}
             onClick={() => handleNavigate(user._id)}
-            className="group cursor-pointer overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_10px_28px_-10px_rgba(var(--shadow-rgb),0.07)] transition-all duration-300 active:scale-[0.99]"
+            className="group cursor-pointer overflow-hidden rounded-3xl border border-border bg-surface shadow-card transition-all duration-300 active:scale-[0.99]"
           >
             {/* Top Section */}
             <div className="flex items-start justify-between gap-3 p-4">
@@ -83,7 +83,7 @@ export default function AdminUsersMobileList({ users }: Props) {
                   <h3 className="truncate text-sm font-black uppercase tracking-tight text-primary">
                     {user.fullName || t("usersUnnamed")}
                   </h3>
-                  <p className="mt-0.5 flex items-center gap-1 truncate text-[11px] font-medium text-muted">
+                  <p className="mt-0.5 flex items-center gap-1 truncate text-xs font-medium text-muted">
                     <Mail size={10} className="shrink-0" />
                     <span className="truncate">{user.email}</span>
                   </p>
@@ -94,7 +94,7 @@ export default function AdminUsersMobileList({ users }: Props) {
               <button
                 type="button"
                 onClick={(e) => handleCopyId(e, user._id)}
-                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-surface-muted px-2.5 py-1 font-mono text-[10px] font-black text-primary"
+                className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-surface-muted px-2.5 py-1 font-mono text-xs font-black text-primary"
               >
                 <span>#{shortId}</span>
                 {copiedId === user._id ? (
@@ -111,14 +111,14 @@ export default function AdminUsersMobileList({ users }: Props) {
             <div className="flex items-center justify-between gap-2 bg-surface-subtle/70 px-4 py-3">
               <div className="flex items-center gap-2">
                 <span
-                  className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider ${roleInfo.className}`}
+                  className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-black uppercase tracking-wider ${roleInfo.className}`}
                 >
                   <RoleIcon size={10} />
                   {roleInfo.label}
                 </span>
 
                 {user.createdAt && (
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-muted">
+                  <span className="inline-flex items-center gap-1 text-xs font-bold text-muted">
                     <Calendar size={10} />
                     {new Date(user.createdAt).toLocaleDateString(
                       locale === "ar" ? "ar-EG" : "en-GB",
@@ -132,7 +132,7 @@ export default function AdminUsersMobileList({ users }: Props) {
                 )}
               </div>
 
-              <span className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-primary shadow-2xs">
+              <span className="inline-flex items-center gap-1 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-black uppercase tracking-wider text-primary shadow-2xs">
                 <span>{t("usersProfile")}</span>
                 <ChevronRight size={12} />
               </span>

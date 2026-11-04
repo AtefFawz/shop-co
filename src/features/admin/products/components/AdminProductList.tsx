@@ -1,11 +1,11 @@
 // @/features/admin/products/components/ProductList.tsx
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import api from "@/lib/api";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Product } from "@/types";
 import {
   Pencil,
@@ -25,15 +25,24 @@ import Image from "next/image";
 
 import toast from "react-hot-toast";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { useDebounce } from "@/hooks/useDebounce";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { getApiErrorDetails } from "@/lib/errorUtils";
 
 export default function AdminProductList({
   initialProducts = [],
+  initialKeyword = "",
+  initialStockFilter = "all",
+  initialSortBy = "default",
 }: {
   initialProducts?: Product[];
+  initialKeyword?: string;
+  initialStockFilter?: "all" | "healthy" | "low" | "out";
+  initialSortBy?: "default" | "price-asc" | "price-desc" | "stock-asc";
 }) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { t, locale, direction } = useLocale();
 
   const [mounted, setMounted] = useState(false);
@@ -43,19 +52,42 @@ export default function AdminProductList({
 
   // Interactive Studio Controls
   const [viewMode, setViewMode] = useState<"table" | "grid">("table");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(initialKeyword);
+  const debouncedSearch = useDebounce(searchQuery, 350);
   const [stockFilter, setStockFilter] = useState<
     "all" | "healthy" | "low" | "out"
-  >("all");
+  >(initialStockFilter);
   const [sortBy, setSortBy] = useState<
     "default" | "price-asc" | "price-desc" | "stock-asc"
-  >("default");
+  >(initialSortBy);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
   useEffect(() => {
     setMounted(true);
     setProductsList(initialProducts);
   }, [initialProducts]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const nextKeyword = debouncedSearch.trim();
+    const currentKeyword = params.get("keyword") || "";
+    const currentStock = params.get("stockStatus") || "all";
+    const currentSort = params.get("sort") || "newest";
+    const nextSort = sortBy === "default" ? "newest" : sortBy;
+
+    if (currentKeyword === nextKeyword && currentStock === stockFilter && currentSort === nextSort) return;
+
+    if (nextKeyword) params.set("keyword", nextKeyword);
+    else params.delete("keyword");
+    if (stockFilter !== "all") params.set("stockStatus", stockFilter);
+    else params.delete("stockStatus");
+    if (nextSort !== "newest") params.set("sort", nextSort);
+    else params.delete("sort");
+    params.set("page", "1");
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  }, [debouncedSearch, stockFilter, sortBy, pathname, router, searchParams]);
 
   // ── Iron-clad Scroll Lock ──
   useEffect(() => {
@@ -113,37 +145,8 @@ export default function AdminProductList({
     }
   };
 
-  // Filter & Sort Logic
-  const filteredProducts = useMemo(() => {
-    const list = [...(productsList || [])].filter((p: Product) => {
-      const stock = Number(p.countInStock ?? 10);
-      if (stockFilter === "healthy" && stock <= 5) return false;
-      if (stockFilter === "low" && (stock === 0 || stock > 5)) return false;
-      if (stockFilter === "out" && stock !== 0) return false;
-
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const nameMatch = (p.name || "").toLowerCase().includes(q);
-        const catMatch = (p.category || "").toLowerCase().includes(q);
-        const idMatch = (p._id || "").toLowerCase().includes(q);
-        return nameMatch || catMatch || idMatch;
-      }
-      return true;
-    });
-
-    if (sortBy === "price-asc") {
-      list.sort((a, b) => Number(a.price || 0) - Number(b.price || 0));
-    } else if (sortBy === "price-desc") {
-      list.sort((a, b) => Number(b.price || 0) - Number(a.price || 0));
-    } else if (sortBy === "stock-asc") {
-      list.sort(
-        (a: Product, b: Product) =>
-          Number(a.countInStock ?? 10) - Number(b.countInStock ?? 10),
-      );
-    }
-
-    return list;
-  }, [productsList, searchQuery, stockFilter, sortBy]);
+  // The catalog endpoint owns filtering and sorting so pagination always reflects the full catalog.
+  const filteredProducts = productsList;
 
   return (
     <div dir={direction} className="min-w-0">
@@ -178,7 +181,7 @@ export default function AdminProductList({
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: 15 }}
                   transition={{ type: "spring", stiffness: 350, damping: 25 }}
-                  className="relative z-10 w-full max-w-[340px] overflow-hidden rounded-[28px] border border-border/80 bg-surface p-6 shadow-[0_32px_64px_-16px_rgba(var(--shadow-rgb),0.25)]"
+                  className="relative z-10 w-full max-w-[340px] overflow-hidden rounded-3xl border border-border/80 bg-surface p-6 shadow-panel"
                 >
                   {/* Subtle Elegant Icon */}
                   <div className="mx-auto mb-5 flex h-14 w-14 items-center justify-center rounded-full bg-danger-soft text-danger ring-4 ring-danger/5">
@@ -188,7 +191,7 @@ export default function AdminProductList({
                   <h3 className="text-center text-lg font-extrabold tracking-tight text-primary">
                     {t("adminRemoveFromArchive")}
                   </h3>
-                  <p className="mt-2 text-center text-[13px] font-medium leading-relaxed text-muted">
+                  <p className="mt-2 text-center text-[0.8125rem] font-medium leading-relaxed text-muted">
                     {t("adminRemoveProductWarning")}
                   </p>
 
@@ -205,16 +208,16 @@ export default function AdminProductList({
                         />
                       </div>
                     ) : (
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-surface-muted text-[10px] font-bold text-muted">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border/60 bg-surface-muted text-xs font-bold text-muted">
                         N/A
                       </div>
                     )}
 
                     <div className="min-w-0 flex-1">
-                      <p className="truncate text-[13px] font-bold text-primary">
+                      <p className="truncate text-[0.8125rem] font-bold text-primary">
                         {confirmProduct.name}
                       </p>
-                      <div className="mt-1 flex items-center gap-1.5 font-mono text-[10.5px] font-bold text-muted">
+                      <div className="mt-1 flex items-center gap-1.5 font-mono text-xs font-bold text-muted">
                         <span>
                           #{confirmProduct._id.slice(-6).toUpperCase()}
                         </span>
@@ -232,7 +235,7 @@ export default function AdminProductList({
                       type="button"
                       disabled={!!deletingId}
                       onClick={() => setConfirmProduct(null)}
-                      className="flex-1 cursor-pointer rounded-xl bg-surface-subtle py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-secondary transition-colors hover:bg-surface-muted hover:text-primary disabled:opacity-50"
+                      className="flex-1 cursor-pointer rounded-xl bg-surface-subtle py-3.5 text-xs font-extrabold uppercase tracking-wider text-secondary transition-colors hover:bg-surface-muted hover:text-primary disabled:opacity-50"
                     >
                       {t("adminCancel")}
                     </button>
@@ -240,7 +243,7 @@ export default function AdminProductList({
                       type="button"
                       onClick={() => handleDelete(confirmProduct._id)}
                       disabled={!!deletingId}
-                      className="relative flex-1 cursor-pointer overflow-hidden rounded-xl bg-danger py-3.5 text-[11px] font-extrabold uppercase tracking-wider text-on-danger shadow-[0_8px_16px_-6px_rgba(var(--danger-rgb),0.4)] transition-all hover:bg-danger/90 active:scale-95 disabled:opacity-60"
+                      className="relative flex-1 cursor-pointer overflow-hidden rounded-xl bg-danger py-3.5 text-xs font-extrabold uppercase tracking-wider text-on-danger shadow-[0_8px_16px_-6px_rgba(var(--danger-rgb),0.4)] transition-all hover:bg-danger/90 active:scale-95 disabled:opacity-60"
                     >
                       <span className="relative z-10">
                         {deletingId
@@ -291,7 +294,7 @@ export default function AdminProductList({
                 key={tab.id}
                 type="button"
                 onClick={() => setStockFilter(tab.id)}
-                className={`cursor-pointer rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider transition-all ${
+                className={`cursor-pointer rounded-lg px-2.5 py-1 text-xs font-black uppercase tracking-wider transition-all ${
                   stockFilter === tab.id
                     ? "bg-action text-on-action shadow-2xs"
                     : "text-muted hover:text-primary"
@@ -315,7 +318,7 @@ export default function AdminProductList({
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
               aria-label={t("sortProducts")}
-              className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface py-2 ps-8 pe-7 text-[11px] font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:outline-none"
+              className="cursor-pointer appearance-none rounded-xl border border-border/90 bg-surface py-2 ps-8 pe-7 text-xs font-extrabold uppercase tracking-wider text-secondary focus:border-primary focus:outline-none"
             >
               <option value="default">{t("adminSortDefault")}</option>
               <option value="price-desc">{t("adminSortPriceHigh")}</option>
@@ -329,7 +332,7 @@ export default function AdminProductList({
             <button
               type="button"
               onClick={() => setViewMode("table")}
-              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider transition-all ${
+              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-black uppercase tracking-wider transition-all ${
                 viewMode === "table"
                   ? "bg-action text-on-action"
                   : "text-muted hover:text-primary"
@@ -342,7 +345,7 @@ export default function AdminProductList({
             <button
               type="button"
               onClick={() => setViewMode("grid")}
-              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider transition-all ${
+              className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-black uppercase tracking-wider transition-all ${
                 viewMode === "grid"
                   ? "bg-action text-on-action"
                   : "text-muted hover:text-primary"
@@ -380,7 +383,7 @@ export default function AdminProductList({
                 setStockFilter("all");
                 setSortBy("default");
               }}
-              className="mt-4 cursor-pointer rounded-xl bg-action px-4 py-2 text-[10px] font-black uppercase tracking-widest text-on-action hover:bg-action-hover"
+              className="mt-4 cursor-pointer rounded-xl bg-action px-4 py-2 text-xs font-black uppercase tracking-widest text-on-action hover:bg-action-hover"
             >
               {t("adminResetFilters")}
             </button>
@@ -416,7 +419,7 @@ export default function AdminProductList({
                         />
                       </div>
                     ) : (
-                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-muted text-[10px] font-bold text-muted">
+                      <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl border border-border bg-surface-muted text-xs font-bold text-muted">
                         N/A
                       </div>
                     )}
@@ -430,7 +433,7 @@ export default function AdminProductList({
                           type="button"
                           onClick={() => handleCopyId(p._id)}
                           title={t("adminCopyFullSku")}
-                          className="inline-flex min-h-6 shrink-0 items-center gap-1 rounded-lg bg-surface-muted px-2 py-1 font-mono text-[10px] font-semibold text-secondary transition-colors hover:bg-action hover:text-on-action"
+                          className="inline-flex min-h-6 shrink-0 items-center gap-1 rounded-lg bg-surface-muted px-2 py-1 font-mono text-xs font-semibold text-secondary transition-colors hover:bg-action hover:text-on-action"
                         >
                           <span>#{shortId}</span>
                           {copiedId === p._id ? (
@@ -442,7 +445,7 @@ export default function AdminProductList({
                             <Copy size={11} className="shrink-0" />
                           )}
                         </button>
-                        <span className="max-w-full truncate rounded-lg border border-border-subtle bg-surface-subtle px-2 py-1 text-[10px] font-semibold text-muted">
+                        <span className="max-w-full truncate rounded-lg border border-border-subtle bg-surface-subtle px-2 py-1 text-xs font-semibold text-muted">
                           {p.category || t("dashboardGeneralCategory")}
                         </span>
                       </div>
@@ -451,24 +454,24 @@ export default function AdminProductList({
 
                   <div className="mt-3 grid grid-cols-2 gap-2 rounded-xl bg-surface-subtle p-3">
                     <div className="min-w-0">
-                      <p className="text-[10px] font-medium text-muted">
+                      <p className="text-xs font-medium text-muted">
                         {t("adminUnitPrice")}
                       </p>
                       <p className="mt-0.5 font-mono text-sm font-bold text-primary">
                         {formatCurrency(p.price || 0, locale)}
                       </p>
                       {Number(p.discount) > 0 && (
-                        <span className="mt-1 inline-flex rounded-md bg-success-soft px-1.5 py-0.5 text-[9px] font-bold text-success">
+                        <span className="mt-1 inline-flex rounded-md bg-success-soft px-1.5 py-0.5 text-xs font-bold text-success">
                           -{p.discount}%
                         </span>
                       )}
                     </div>
                     <div className="min-w-0" dir={direction}>
-                      <p className="text-[10px] font-medium text-muted">
+                      <p className="text-xs font-medium text-muted">
                         {t("adminStockTelemetry")}
                       </p>
                       <span
-                        className={`mt-1 inline-flex max-w-full items-center gap-1 rounded-full border px-2 py-1 text-[10px] font-bold ${isOut ? "border-danger-border bg-danger-soft text-danger" : isLow ? "border-warning-border bg-warning-soft text-warning" : "border-success-border bg-success-soft text-success"}`}
+                        className={`mt-1 inline-flex max-w-full items-center gap-1 rounded-full border px-2 py-1 text-xs font-bold ${isOut ? "border-danger-border bg-danger-soft text-danger" : isLow ? "border-warning-border bg-warning-soft text-warning" : "border-success-border bg-success-soft text-success"}`}
                       >
                         <span
                           className={`h-1.5 w-1.5 shrink-0 rounded-full ${isOut ? "bg-danger" : isLow ? "bg-warning" : "bg-success"}`}
@@ -529,7 +532,7 @@ export default function AdminProductList({
           <div className="hidden w-full min-w-0 overflow-x-auto overscroll-x-contain xl:block">
             <table className="w-full min-w-[900px] border-collapse text-start">
               <thead>
-                <tr className="border-b border-border-subtle bg-surface-subtle/60 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+                <tr className="border-b border-border-subtle bg-surface-subtle/60 text-xs font-black uppercase tracking-[0.18em] text-muted">
                   <th className="py-3.5 px-5">{t("adminGarmentSku")}</th>
                   <th className="hidden py-3.5 px-4 sm:table-cell">
                     {t("adminCategory")}
@@ -570,7 +573,7 @@ export default function AdminProductList({
                               />
                             </div>
                           ) : (
-                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-muted text-[10px] font-black uppercase text-muted">
+                            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-border bg-surface-muted text-xs font-black uppercase text-muted">
                               N/A
                             </div>
                           )}
@@ -588,7 +591,7 @@ export default function AdminProductList({
                                 type="button"
                                 onClick={() => handleCopyId(p._id)}
                                 title={t("adminCopyFullSku")}
-                                className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-surface-muted px-1.5 py-0.5 font-mono text-[10px] font-bold text-muted transition-colors hover:bg-action hover:text-on-action"
+                                className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-surface-muted px-1.5 py-0.5 font-mono text-xs font-bold text-muted transition-colors hover:bg-action hover:text-on-action"
                               >
                                 <span>#{shortId}</span>
                                 {copiedId === p._id ? (
@@ -602,7 +605,7 @@ export default function AdminProductList({
                               </button>
 
                               {(p.section || p.style) && (
-                                <span className="truncate text-[10px] font-semibold uppercase tracking-wider text-muted">
+                                <span className="truncate text-xs font-semibold uppercase tracking-wider text-muted">
                                   · {p.section || p.style}
                                 </span>
                               )}
@@ -613,7 +616,7 @@ export default function AdminProductList({
 
                       {/* 2. Category */}
                       <td className="hidden py-3.5 px-4 align-middle sm:table-cell">
-                        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface-subtle px-3 py-1 text-[10px] font-black uppercase tracking-wider text-secondary">
+                        <span className="inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface-subtle px-3 py-1 text-xs font-black uppercase tracking-wider text-secondary">
                           <Tag size={11} className="text-muted" />
                           {p.category || t("dashboardGeneralCategory")}
                         </span>
@@ -626,7 +629,7 @@ export default function AdminProductList({
                             {formatCurrency(p.price || 0, locale)}
                           </span>
                           {Number(p.discount) > 0 && (
-                            <span className="mt-0.5 inline-block w-fit rounded bg-success-soft px-1.5 py-0.2 text-[9px] font-black uppercase text-success">
+                            <span className="mt-0.5 inline-block w-fit rounded bg-success-soft px-1.5 py-0.2 text-xs font-black uppercase text-success">
                               -{p.discount}% Promo
                             </span>
                           )}
@@ -660,11 +663,11 @@ export default function AdminProductList({
                           </div>
 
                           {isOut ? (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-danger-border bg-danger-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-danger">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-danger-border bg-danger-soft px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-danger">
                               {t("adminZeroUnits")}
                             </span>
                           ) : isLow ? (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-warning">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-warning">
                               <Flame size={10} />
                               {t("adminLowStockCount").replace(
                                 "{count}",
@@ -672,7 +675,7 @@ export default function AdminProductList({
                               )}
                             </span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 rounded-full border border-success-border bg-success-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-success">
+                            <span className="inline-flex items-center gap-1 rounded-full border border-success-border bg-success-soft px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-success">
                               <CheckCircle2 size={10} />
                               {t("adminInStockCount").replace(
                                 "{count}",
@@ -691,7 +694,7 @@ export default function AdminProductList({
                             onClick={() =>
                               router.push(`/dashboard/products/edit/${p._id}`)
                             }
-                            className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-action px-3.5 py-2 text-[10px] font-black uppercase tracking-wider text-on-action shadow-2xs transition-all hover:-translate-y-0.5 hover:bg-action-hover active:scale-[0.98]"
+                            className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-xl bg-action px-3.5 py-2 text-xs font-black uppercase tracking-wider text-on-action shadow-2xs transition-all hover:-translate-y-0.5 hover:bg-action-hover active:scale-[0.98]"
                             title={t("adminEditProduct")}
                             aria-label={t("adminEditProduct")}
                           >
@@ -708,7 +711,7 @@ export default function AdminProductList({
                           <button
                             type="button"
                             onClick={() => setConfirmProduct(p)}
-                            className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-danger-border bg-danger-soft px-3 py-2 text-[10px] font-black uppercase tracking-wider text-danger transition-all hover:-translate-y-0.5 hover:border-danger-border hover:bg-danger hover:text-on-danger active:scale-[0.98]"
+                            className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-danger-border bg-danger-soft px-3 py-2 text-xs font-black uppercase tracking-wider text-danger transition-all hover:-translate-y-0.5 hover:border-danger-border hover:bg-danger hover:text-on-danger active:scale-[0.98]"
                             title={t("adminDeleteProduct")}
                             aria-label={t("adminDeleteProduct")}
                           >
@@ -744,7 +747,7 @@ export default function AdminProductList({
             return (
               <div
                 key={p._id}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-surface-subtle p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-border hover:bg-surface hover:shadow-[0_24px_48px_-12px_rgba(var(--shadow-rgb),0.12)]"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border/80 bg-surface-subtle p-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:border-border hover:bg-surface hover:shadow-panel"
               >
                 {/* Product Image Stage */}
                 <div className="relative aspect-square w-full overflow-hidden rounded-2xl border border-border/60 bg-surface">
@@ -764,12 +767,12 @@ export default function AdminProductList({
 
                   {/* Top Floating Badges */}
                   <div className="absolute inset-x-2.5 top-2.5 flex items-center justify-between gap-2">
-                    <span className="rounded-full bg-surface/90 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-primary shadow-2xs backdrop-blur-md">
+                    <span className="rounded-full bg-surface/90 px-2.5 py-1 text-xs font-black uppercase tracking-wider text-primary shadow-2xs backdrop-blur-md">
                       {p.category || t("dashboardGeneralCategory")}
                     </span>
 
                     <span
-                      className={`rounded-full px-2.5 py-1 text-[9px] font-black uppercase tracking-wider shadow-2xs backdrop-blur-md ${
+                      className={`rounded-full px-2.5 py-1 text-xs font-black uppercase tracking-wider shadow-2xs backdrop-blur-md ${
                         isOut
                           ? "bg-danger text-on-danger"
                           : isLow
@@ -798,7 +801,7 @@ export default function AdminProductList({
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between text-[10px] font-mono text-muted">
+                  <div className="flex items-center justify-between text-xs font-mono text-muted">
                     <span>SKU #{p._id.slice(-6).toUpperCase()}</span>
                     <span>
                       {p.section || p.style || t("adminArchiveLabel")}
@@ -813,7 +816,7 @@ export default function AdminProductList({
                     onClick={() =>
                       router.push(`/dashboard/products/edit/${p._id}`)
                     }
-                    className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-action py-2.5 text-[10px] font-black uppercase tracking-wider text-on-action transition-all hover:bg-action-hover"
+                    className="flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-xl bg-action py-2.5 text-xs font-black uppercase tracking-wider text-on-action transition-all hover:bg-action-hover"
                   >
                     <Pencil size={12} />
                     <span>{t("adminEditSku")}</span>

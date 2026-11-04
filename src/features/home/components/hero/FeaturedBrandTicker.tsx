@@ -17,13 +17,13 @@ export function FeaturedBrandTicker({ reduceMotion }: { reduceMotion: boolean | 
       <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-action via-action/85 to-transparent sm:w-32" />
       <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-action via-action/85 to-transparent sm:w-32" />
 
-      <div className="Responsive mx-auto flex items-center gap-6 px-4 py-3 sm:px-8 lg:gap-10">
+      <div className="Responsive flex items-center gap-6 py-3 lg:gap-10">
         <div className="relative z-20 hidden shrink-0 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-4 py-2 backdrop-blur-md lg:flex">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success-bright opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-success-bright" />
           </span>
-          <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-on-action/80">
+          <span className="text-xs font-bold uppercase tracking-[0.22em] text-on-action/80">
             {t("brandTickerVerified")}
           </span>
         </div>
@@ -45,7 +45,7 @@ export function FeaturedBrandTicker({ reduceMotion }: { reduceMotion: boolean | 
                     key={`${copy}-${index}-${brand}`}
                     className="group flex shrink-0 items-center"
                   >
-                    <span className="cursor-default px-6 text-xl font-black uppercase tracking-[-0.03em] text-on-action/50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 group-hover:text-on-action sm:px-9 sm:text-2xl lg:text-[26px]">
+                    <span className="cursor-default px-6 text-xl font-black uppercase tracking-[-0.03em] text-on-action/50 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 group-hover:text-on-action sm:px-9 sm:text-2xl lg:text-[1.625rem]">
                       {brand}
                     </span>
                     <span className="text-xs text-on-action/35 transition-all duration-500 group-hover:rotate-180 group-hover:scale-125 group-hover:text-on-action">

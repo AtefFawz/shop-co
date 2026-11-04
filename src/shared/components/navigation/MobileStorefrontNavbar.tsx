@@ -1,10 +1,12 @@
 "use client";
 
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
 import { useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Menu,
   X,
@@ -16,9 +18,17 @@ import {
   LogIn,
   Sparkles,
   Heart,
+  GitCompareArrows,
+  Bookmark,
+  Clock3,
+  BellRing,
+  LayoutGrid,
 } from "lucide-react";
 
-import { NAV_LINKS, getStorefrontNavLabel } from "@/shared/config/storefrontNavigation";
+import {
+  NAV_LINKS,
+  getStorefrontNavLabel,
+} from "@/shared/config/storefrontNavigation";
 import NavIcons from "@/shared/components/navigation/HeaderActionIcons";
 import api from "@/lib/api";
 import SearchBar from "@/features/catalog/components/ProductSearchBar";
@@ -35,7 +45,7 @@ export default function MobileStorefrontNavbar() {
   const { t, direction } = useLocale();
   const wishlistCount = useWishlistStore((state) => state.items.length);
 
-  const reduceMotion = useReducedMotion();
+  const reduceMotion = useAppReducedMotion();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -161,8 +171,8 @@ export default function MobileStorefrontNavbar() {
         aria-label={t("navMainHeader")}
         className="
           relative flex min-h-[76px] items-center justify-between
-          gap-2  bg-surface px-1
-         
+          gap-2   
+
         "
       >
         {/* Menu + Brand */}
@@ -267,9 +277,9 @@ export default function MobileStorefrontNavbar() {
                   transition={transition}
                   className="
                 fixed inset-x-3 top-[84px] z-[9997]
-                rounded-[24px] border border-border
+                rounded-3xl border border-border
                 bg-surface p-3
-                shadow-[0_20px_60px_rgba(var(--shadow-rgb),0.16)]
+                shadow-panel
                 sm:inset-x-5 sm:p-4
               "
                 >
@@ -308,7 +318,7 @@ export default function MobileStorefrontNavbar() {
                     <SearchBar />
                   </div>
 
-                  <div className="mt-3 flex items-center gap-2 px-1 text-[11px] text-muted">
+                  <div className="mt-3 flex items-center gap-2 px-1 text-xs text-muted">
                     <Search size={13} />
                     <span>{t("navDiscover")}</span>
                   </div>
@@ -378,7 +388,7 @@ export default function MobileStorefrontNavbar() {
                     <Link
                       href="/"
                       onClick={closeMenu}
-                      className="text-[23px] font-black tracking-[-1.5px] text-primary"
+                      className="text-[1.4375rem] font-black tracking-[-1.5px] text-primary"
                     >
                       SHOP<span className="text-muted">.CO</span>
                     </Link>
@@ -415,6 +425,8 @@ export default function MobileStorefrontNavbar() {
                       {photo ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
+                          loading="lazy"
+                          decoding="async"
                           src={photo}
                           alt={t("navProfile")}
                           className="h-11 w-11 rounded-full border border-border object-cover"
@@ -451,7 +463,7 @@ export default function MobileStorefrontNavbar() {
                   <div className="px-4 pt-7 sm:px-5">
                     <p
                       className="
-                  mb-3 px-3 text-[10px] font-bold uppercase
+                  mb-3 px-3 text-xs font-bold uppercase
                   tracking-[0.2em] text-muted
                 "
                     >
@@ -524,8 +536,8 @@ export default function MobileStorefrontNavbar() {
                                 <span
                                   className="
                               relative z-10 min-w-0 flex-1
-                              text-[14px] font-semibold tracking-[-0.1px]
-                              sm:text-[15px]
+                              text-[0.875rem] font-semibold tracking-[-0.1px]
+                              sm:text-[0.9375rem]
                             "
                                 >
                                   {getStorefrontNavLabel(item.path, t)}
@@ -548,12 +560,94 @@ export default function MobileStorefrontNavbar() {
                     </nav>
                   </div>
 
+                  {/* Personal tools: direct routes for every product action */}
+                  <div className="px-4 pt-7 sm:px-5">
+                    <div className="mb-3 flex items-center justify-between px-3">
+                      <p className="text-xs font-bold uppercase tracking-[0.2em] text-muted">
+                        {direction === "rtl" ? "مساحتك" : "YOUR SPACE"}
+                      </p>
+                      <Link
+                        href="/my-space"
+                        onClick={closeMenu}
+                        className="text-[11px] font-bold text-action hover:underline"
+                      >
+                        {direction === "rtl" ? "عرض الكل" : "View all"}
+                      </Link>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        {
+                          href: "/my-space",
+                          label: direction === "rtl" ? "مساحتي" : "My space",
+                          Icon: LayoutGrid,
+                        },
+                        {
+                          href: "/stylist",
+                          label:
+                            direction === "rtl"
+                              ? "نسّق إطلالتي"
+                              : "Personal Stylist",
+                          Icon: Sparkles,
+                        },
+                        {
+                          href: "/compare",
+                          label:
+                            direction === "rtl" ? "مقارنة المنتجات" : "Compare",
+                          Icon: GitCompareArrows,
+                        },
+                        {
+                          href: "/saved-for-later",
+                          label:
+                            direction === "rtl"
+                              ? "محفوظ لوقت لاحق"
+                              : "Saved for later",
+                          Icon: Bookmark,
+                        },
+                        {
+                          href: "/recently-viewed",
+                          label:
+                            direction === "rtl"
+                              ? "شوهدت مؤخرًا"
+                              : "Recently viewed",
+                          Icon: Clock3,
+                        },
+                        {
+                          href: "/price-alerts",
+                          label:
+                            direction === "rtl"
+                              ? "تنبيهات الأسعار"
+                              : "Price alerts",
+                          Icon: BellRing,
+                        },
+                        {
+                          href: "/my-orders",
+                          label: direction === "rtl" ? "طلباتي" : "My orders",
+                          Icon: ShoppingBag,
+                        },
+                      ].map(({ href, label, Icon }) => (
+                        <Link
+                          key={href}
+                          href={href}
+                          onClick={closeMenu}
+                          className="flex min-h-12 items-center gap-2 rounded-xl border border-border bg-surface-subtle px-3 text-xs font-bold text-secondary transition hover:border-border-strong hover:text-primary"
+                        >
+                          <Icon size={15} className="shrink-0" />
+                          <span className="min-w-0 truncate">{label}</span>
+                          <ArrowUpRight
+                            size={12}
+                            className="ms-auto shrink-0 text-muted"
+                          />
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Account actions */}
                   <div className="mt-auto px-4 pb-5 pt-8 sm:px-5">
                     <div className="mb-5 h-px bg-surface-hover" />
 
                     <Link
-                      href="/contactUs"
+                      href="/auth/signin"
                       onClick={closeMenu}
                       className="
                     flex min-h-12 items-center justify-center
@@ -567,7 +661,7 @@ export default function MobileStorefrontNavbar() {
                     </Link>
 
                     <Link
-                      href="/"
+                      href="/auth/signup"
                       onClick={closeMenu}
                       className="
                     mt-3 flex min-h-12 items-center justify-center
@@ -583,7 +677,7 @@ export default function MobileStorefrontNavbar() {
 
                     <p
                       className="
-                  mt-5 text-center text-[10px]
+                  mt-5 text-center text-xs
                   font-medium tracking-[0.16em] text-muted
                 "
                     >

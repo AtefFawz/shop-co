@@ -56,6 +56,14 @@ export default async function AdminUserDetailsPage({
   const currencyFormatter = createCurrencyFormatter(locale, 0);
 
   let user: AdminUserRecord | null = null;
+  let actorRole = "";
+
+  try {
+    const actorResponse = await serverApi("profile/me");
+    actorRole = String(actorResponse?.data?.user?.role || "").toUpperCase();
+  } catch {
+    actorRole = "";
+  }
 
   try {
     const response = await serverApi(`admin/users/${id}`);
@@ -69,10 +77,14 @@ export default async function AdminUserDetailsPage({
   const ordersList: AdminOrderRecord[] = Array.isArray(user.orders)
     ? user.orders
     : [];
-  const reviewsList: Array<ReviewRecord & { product?: { name?: string } }> =
+  const reviewsList: Array<ReviewRecord & { product?: { name?: string } }> = (
     Array.isArray(user.reviews)
       ? (user.reviews as Array<ReviewRecord & { product?: { name?: string } }>)
-      : [];
+      : []
+  ).filter((review) => {
+    const rating = Number(review.rating);
+    return Number.isFinite(rating) && rating >= 1 && rating <= 5;
+  });
 
   // Financial & Loyalty Telemetry
   const totalSpent = ordersList.reduce(
@@ -91,11 +103,11 @@ export default async function AdminUserDetailsPage({
     reviewsList.length > 0
       ? (
           reviewsList.reduce(
-            (acc: number, r: ReviewRecord) => acc + (Number(r.rating) || 5),
+            (acc: number, r: ReviewRecord) => acc + Number(r.rating),
             0,
           ) / reviewsList.length
         ).toFixed(1)
-      : "5.0";
+      : "—";
 
   // Loyalty Tier Calculation
   const loyaltyTier =
@@ -123,7 +135,7 @@ export default async function AdminUserDetailsPage({
           : {
               name: t.userTierRegistered,
               nextGoal: 250,
-              progress: 12,
+              progress: 0,
               badge: t.userBadgeNew,
             };
 
@@ -203,7 +215,7 @@ export default async function AdminUserDetailsPage({
         {/* ================================================================ */}
         {/* 1. TOP COMMAND BAR & NAVIGATION                                  */}
         {/* ================================================================ */}
-        <div className="dossier-stagger-1 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-surface/90 p-4 shadow-[0_10px_30px_-12px_rgba(var(--shadow-rgb),0.05)] backdrop-blur-xl sm:px-6 sm:py-4">
+        <div className="dossier-stagger-1 flex flex-wrap items-center justify-between gap-4 rounded-3xl border border-border bg-surface/90 p-4 shadow-card backdrop-blur-xl sm:px-6 sm:py-4">
           <Link
             href="/dashboard/admin/users"
             className="group inline-flex items-center gap-2.5 rounded-2xl border border-border/80 bg-surface-subtle px-4 py-2 text-xs font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
@@ -216,25 +228,25 @@ export default async function AdminUserDetailsPage({
           </Link>
 
           <div className="flex items-center gap-3">
-            <div className="hidden items-center gap-2 rounded-2xl border border-border/80 bg-surface-subtle px-3.5 py-2 font-mono text-[11px] font-bold text-secondary sm:flex">
+            <div className="hidden items-center gap-2 rounded-2xl border border-border/80 bg-surface-subtle px-3.5 py-2 font-mono text-xs font-bold text-secondary sm:flex">
               <span className="h-2 w-2 rounded-full bg-success" />
               <span>
                 {t.userDetailDossier} #{shortId}
               </span>
             </div>
 
-            <DeleteUserButton userId={user._id} userName={user.fullName} />
+            {actorRole === "ADMIN" && <DeleteUserButton userId={user._id} userName={user.fullName} />}
           </div>
         </div>
 
         {/* ================================================================ */}
         {/* 2. HERO DOSSIER STAGE + 3D VIP BLACK MEMBERSHIP PASS             */}
         {/* ================================================================ */}
-        <div className="dossier-stagger-2 relative overflow-hidden rounded-[2.2rem] border border-border bg-surface p-2 shadow-[0_16px_45px_-14px_rgba(var(--shadow-rgb),0.07)] sm:p-8">
+        <div className="dossier-stagger-2 relative overflow-hidden rounded-4xl border border-border bg-surface p-2 shadow-panel sm:p-8">
           {/* Giant Background Watermark */}
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute -right-6 -top-10 select-none text-[160px] font-black uppercase leading-none tracking-tighter text-primary/2.5"
+            className="pointer-events-none absolute -right-6 -top-10 select-none text-[10rem] font-black uppercase leading-none tracking-tighter text-primary/2.5"
           >
             SHOP.CO
           </div>
@@ -269,12 +281,12 @@ export default async function AdminUserDetailsPage({
               {/* Identity Metadata & Role Controller */}
               <div className="min-w-0 flex-1 space-y-3.5">
                 <div className="flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action">
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-action px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-on-action">
                     <Crown size={11} className="text-rating" />
                     {roleLabel} · {t.userDetailClearance}
                   </span>
 
-                  <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-[10px] font-extrabold text-secondary">
+                  <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-xs font-extrabold text-secondary">
                     {loyaltyTier.badge}
                   </span>
                 </div>
@@ -296,19 +308,17 @@ export default async function AdminUserDetailsPage({
                   </div>
                 </div>
 
-                {/* Role Switcher */}
-                <div className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:justify-start">
-                  <span className="text-[10px] font-black uppercase tracking-[0.18em] text-muted">
-                    {t.userDetailModifyRole}
-                  </span>
+                {/* Role changes are restricted to ADMIN by the backend contract. */}
+                {actorRole === "ADMIN" && <div className="flex flex-wrap items-center justify-center gap-3 pt-1 sm:justify-start">
+                  <span className="text-xs font-black uppercase tracking-[0.18em] text-muted">{t.userDetailModifyRole}</span>
                   <RoleSelector userId={user._id} initialRole={user.role} />
-                </div>
+                </div>}
               </div>
             </div>
 
             {/* Right 5 Columns: 3D Holographic VIP Membership Pass */}
             <div style={{ perspective: "1100px" }} className="lg:col-span-5">
-              <div className="vip-3d-pass relative overflow-hidden rounded-3xl border border-white/15 bg-linear-to-br from-action via-action to-action p-5 text-on-action shadow-[0_22px_50px_-12px_rgba(var(--shadow-rgb),0.4)]">
+              <div className="vip-3d-pass relative overflow-hidden rounded-3xl border border-white/15 bg-linear-to-br from-action via-action to-action p-5 text-on-action shadow-panel">
                 {/* Ambient Foil Glow */}
                 <div
                   aria-hidden="true"
@@ -325,7 +335,7 @@ export default async function AdminUserDetailsPage({
                     </span>
                   </div>
 
-                  <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 font-mono text-[9px] font-bold uppercase tracking-widest text-rating">
+                  <span className="rounded-full border border-white/15 bg-white/10 px-2.5 py-0.5 font-mono text-xs font-bold uppercase tracking-widest text-rating">
                     {loyaltyTier.name}
                   </span>
                 </div>
@@ -333,7 +343,7 @@ export default async function AdminUserDetailsPage({
                 {/* Middle Pass Stats */}
                 <div className="relative z-10 my-5 flex items-end justify-between">
                   <div>
-                    <span className="block text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/45">
+                    <span className="block text-xs font-bold uppercase tracking-[0.2em] text-on-action/45">
                       {t.userDetailCumulativeSpend}
                     </span>
                     <span className="mt-0.5 block font-mono text-2xl font-black tracking-tight text-on-action">
@@ -342,7 +352,7 @@ export default async function AdminUserDetailsPage({
                   </div>
 
                   <div className="text-end font-mono">
-                    <span className="block text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/45">
+                    <span className="block text-xs font-bold uppercase tracking-[0.2em] text-on-action/45">
                       {t.userDetailAverageOrder}
                     </span>
                     <span className="mt-0.5 block text-sm font-black text-success">
@@ -353,7 +363,7 @@ export default async function AdminUserDetailsPage({
 
                 {/* Tier Progress Bar */}
                 <div className="relative z-10 space-y-1.5">
-                  <div className="flex items-center justify-between font-mono text-[9px] font-bold uppercase tracking-widest text-on-action/55">
+                  <div className="flex items-center justify-between font-mono text-xs font-bold uppercase tracking-widest text-on-action/55">
                     <span>{t.userDetailTierReadiness}</span>
                     <span>{loyaltyTier.progress}%</span>
                   </div>
@@ -366,7 +376,7 @@ export default async function AdminUserDetailsPage({
                 </div>
 
                 {/* Bottom Card Chip & Serial */}
-                <div className="relative z-10 mt-4 flex items-center justify-between border-t border-white/10 pt-3 font-mono text-[9px] tracking-[0.22em] text-on-action/40">
+                <div className="relative z-10 mt-4 flex items-center justify-between border-t border-white/10 pt-3 font-mono text-xs tracking-[0.22em] text-on-action/40">
                   <span>ID // {user._id}</span>
                   <span>2026™</span>
                 </div>
@@ -378,14 +388,14 @@ export default async function AdminUserDetailsPage({
         {/* ================================================================ */}
         {/* 3. DARK EXECUTIVE CLIENT TELEMETRY RIBBON                        */}
         {/* ================================================================ */}
-        <div className="dossier-stagger-3 relative overflow-hidden rounded-2xl bg-action px-5 py-3.5 text-on-action shadow-[0_14px_34px_-10px_rgba(var(--shadow-rgb),0.25)]">
+        <div className="dossier-stagger-3 relative overflow-hidden rounded-2xl bg-action px-5 py-3.5 text-on-action shadow-card">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
               <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-white/10 text-on-action">
                 <Sparkles size={14} />
               </span>
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-on-action/50">
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-on-action/50">
                   {t.userDetailIntelligence}
                 </p>
                 <p className="text-xs font-extrabold tracking-wide text-on-action">
@@ -398,7 +408,7 @@ export default async function AdminUserDetailsPage({
 
             <div className="flex flex-wrap items-center gap-6 sm:gap-8">
               <div>
-                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
+                <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
                   {t.userDetailAverageTicket}
                 </span>
                 <span className="font-mono text-sm font-black text-on-action">
@@ -409,7 +419,7 @@ export default async function AdminUserDetailsPage({
               <span className="hidden h-6 w-px bg-white/15 sm:block" />
 
               <div>
-                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
+                <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
                   {t.userDetailCompletedOrders}
                 </span>
                 <span className="font-mono text-sm font-black text-success">
@@ -420,11 +430,11 @@ export default async function AdminUserDetailsPage({
               <span className="hidden h-6 w-px bg-white/15 sm:block" />
 
               <div>
-                <span className="block text-[9px] font-bold uppercase tracking-[0.18em] text-on-action/45">
+                <span className="block text-xs font-bold uppercase tracking-[0.18em] text-on-action/45">
                   {t.userDetailClientRating}
                 </span>
                 <span className="font-mono text-sm font-black text-rating">
-                  {avgRating} / 5.0 ★
+                  {reviewsList.length > 0 ? `${avgRating} / 5.0 ★` : "—"}
                 </span>
               </div>
             </div>
@@ -467,8 +477,8 @@ export default async function AdminUserDetailsPage({
             icon={<Star />}
             title={t.userDetailSubmittedReviews}
             value={reviewsList.length}
-            trend={`${avgRating} ★ ${t.userDetailRatingAverage}`}
-            trendUp={Number(avgRating) >= 4}
+            trend={reviewsList.length > 0 ? `${avgRating} ★ ${t.userDetailRatingAverage}` : t.userDetailNoReviews}
+            trendUp={reviewsList.length > 0 && Number(avgRating) >= 4}
             subtitle={t.userDetailVerifiedFeedback}
             verifiedLabel={t.userBadgeVerified}
             liveLabel={t.dashboardLiveStatus}
@@ -480,11 +490,11 @@ export default async function AdminUserDetailsPage({
         {/* ================================================================ */}
         <div className="dossier-stagger-4 grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Left Column: Recent Orders */}
-          <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-6">
+          <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-card sm:p-6">
             <div>
               <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted">
                     {t.userDetailTransactionLog}
                   </p>
                   <h2 className="mt-0.5 flex items-center gap-2 text-base font-black uppercase tracking-tight text-primary sm:text-lg">
@@ -506,7 +516,7 @@ export default async function AdminUserDetailsPage({
                   <p className="text-xs font-black uppercase tracking-wider text-primary">
                     {t.userDetailNoOrdersTitle}
                   </p>
-                  <p className="mt-1 text-[11px] text-muted">
+                  <p className="mt-1 text-xs text-muted">
                     {t.userDetailNoOrdersDescription}
                   </p>
                 </div>
@@ -539,7 +549,7 @@ export default async function AdminUserDetailsPage({
                                     it: AdminOrderRecord["orderItems"][number],
                                     idx: number,
                                   ) => (
-                                    <img
+                                    <img loading="lazy" decoding="async"
                                       key={idx}
                                       src={resolveImageUrl(
                                         it.image,
@@ -559,11 +569,11 @@ export default async function AdminUserDetailsPage({
 
                           <div className="min-w-0">
                             <div className="flex items-center gap-2">
-                              <span className="rounded bg-surface px-2 py-0.5 font-mono text-[10px] font-black text-primary shadow-2xs">
+                              <span className="rounded bg-surface px-2 py-0.5 font-mono text-xs font-black text-primary shadow-2xs">
                                 #{(order._id || "").slice(-6).toUpperCase()}
                               </span>
                               {order.createdAt && (
-                                <span className="text-[10px] font-bold text-muted">
+                                <span className="text-xs font-bold text-muted">
                                   {new Date(order.createdAt).toLocaleDateString(
                                     locale === "ar" ? "ar-EG" : "en-GB",
                                     {
@@ -581,7 +591,7 @@ export default async function AdminUserDetailsPage({
                                 Number(order.totalPrice || 0),
                               )}
                               {items.length > 0 && (
-                                <span className="ms-2 font-sans text-[11px] font-semibold text-muted">
+                                <span className="ms-2 font-sans text-xs font-semibold text-muted">
                                   · {items.length} {t.userDetailUnits}
                                 </span>
                               )}
@@ -591,7 +601,7 @@ export default async function AdminUserDetailsPage({
 
                         {/* Status Badge */}
                         <span
-                          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-[9px] font-black uppercase tracking-wider ${
+                          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black uppercase tracking-wider ${
                             isDelivered
                               ? "border-success-border bg-success-soft text-success"
                               : isShipped
@@ -617,11 +627,11 @@ export default async function AdminUserDetailsPage({
           </div>
 
           {/* Right Column: Latest Reviews */}
-          <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-6">
+          <div className="flex flex-col justify-between rounded-3xl border border-border bg-surface p-5 shadow-card sm:p-6">
             <div>
               <div className="flex items-center justify-between border-b border-border-subtle pb-4">
                 <div>
-                  <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+                  <p className="text-xs font-black uppercase tracking-[0.2em] text-muted">
                     {t.userDetailCustomerSentiment}
                   </p>
                   <h2 className="mt-0.5 flex items-center gap-2 text-base font-black uppercase tracking-tight text-primary sm:text-lg">
@@ -643,7 +653,7 @@ export default async function AdminUserDetailsPage({
                   <p className="text-xs font-black uppercase tracking-wider text-primary">
                     {t.userDetailNoReviews}
                   </p>
-                  <p className="mt-1 text-[11px] text-muted">
+                  <p className="mt-1 text-xs text-muted">
                     {t.userDetailNoReviewsDescription}
                   </p>
                 </div>
@@ -653,7 +663,7 @@ export default async function AdminUserDetailsPage({
                     (
                       review: ReviewRecord & { product?: { name?: string } },
                     ) => {
-                      const rating = Number(review.rating) || 5;
+                      const rating = Number(review.rating);
                       return (
                         <div
                           key={review._id}
@@ -674,12 +684,12 @@ export default async function AdminUserDetailsPage({
                                   />
                                 ))}
                               </div>
-                              <span className="font-mono text-[11px] font-black text-primary">
+                              <span className="font-mono text-xs font-black text-primary">
                                 {rating}.0
                               </span>
                             </div>
 
-                            <span className="truncate max-w-[180px] rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-secondary shadow-2xs">
+                            <span className="truncate max-w-[180px] rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-xs font-black uppercase tracking-wider text-secondary shadow-2xs">
                               {review.product?.name ||
                                 t.userDetailCatalogGarment}
                             </span>

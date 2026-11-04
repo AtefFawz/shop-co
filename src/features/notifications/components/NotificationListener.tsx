@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import type { Socket } from "socket.io-client";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
@@ -14,12 +15,18 @@ import {
   AlertTriangle,
 } from "lucide-react";
 
-import { createSocket, refreshAccessToken } from "@/lib/sockets/socket";
+import { createSocket } from "@/lib/sockets/socket";
+import { useSocketStore } from "@/store/socketStore";
 import {
   useNotificationStore,
   type Notification,
 } from "@/store/notificationStore";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import {
+  isOrderStatusNotification,
+  isQuietHoursActive,
+  useNotificationPreferences,
+} from "@/shared/preferences/NotificationPreferencesProvider";
 
 function getToastVisuals(
   title = "",
@@ -101,7 +108,12 @@ export default function NotificationListener() {
   const router = useRouter();
   const { locale, t } = useLocale();
   const seenNotificationIds = useRef(new Set<string>());
-  const refreshingToken = useRef(false);
+  const { preferences } = useNotificationPreferences();
+  const preferencesRef = useRef(preferences);
+
+  useEffect(() => {
+    preferencesRef.current = preferences;
+  }, [preferences]);
 
   const addNotification = useNotificationStore(
     (state) => state.addNotification,
@@ -126,7 +138,20 @@ export default function NotificationListener() {
         }
       }
 
+      // Keep the notification in the inbox/store even when its banner is muted.
+      // The backend remains the source of truth for the persisted notification.
       addNotification(notification);
+
+      const currentPreferences = preferencesRef.current;
+      const orderNotification = isOrderStatusNotification(notification);
+      if (
+        !currentPreferences.inAppBanners ||
+        (orderNotification && !currentPreferences.orderUpdates) ||
+        isQuietHoursActive(currentPreferences)
+      ) {
+        return;
+      }
+
       const { Icon, label, iconStyle } = getToastVisuals(
         notification.title,
         notification.message,
@@ -169,7 +194,7 @@ export default function NotificationListener() {
                     size={11}
                     className="text-amber-600 dark:text-amber-400"
                   />
-                  <span className="text-[9px] font-bold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">
+                  <span className="text-xs font-bold uppercase tracking-[0.14em] text-neutral-500 dark:text-neutral-400">
                     {label}
                   </span>
                 </div>
@@ -194,7 +219,7 @@ export default function NotificationListener() {
                     className="
                       mt-3 inline-flex min-h-8 cursor-pointer items-center
                       gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5
-                      text-[10px] font-semibold text-white
+                      text-xs font-semibold text-white
                       transition-colors hover:bg-neutral-700
                       focus-visible:outline-none focus-visible:ring-2
                       focus-visible:ring-neutral-900 focus-visible:ring-offset-2
@@ -239,51 +264,63 @@ export default function NotificationListener() {
     [addNotification, locale, router, t],
   );
 
-  useEffect(() => {
-    const socket = createSocket();
+  const socketReady = useSocketStore((state) => state.socketReady);
 
-    if (!socket) return;
+  useEffect(() => {
+    if (!socketReady) return;
 
     let disposed = false;
+    let socket: Socket | null = null;
+    let retryTimer: ReturnType<typeof setTimeout> | undefined;
+    let attempts = 0;
 
-    const handleConnectError = async (error: Error) => {
-      if (error.message !== "ACCESS_TOKEN_EXPIRED") return;
-      if (refreshingToken.current) return;
-
-      refreshingToken.current = true;
-
+    const connectWithFreshTicket = async () => {
       try {
-        const newToken = await refreshAccessToken();
-
-        if (disposed || !newToken) return;
-
-        socket.auth = { token: newToken };
-        socket.connect();
-      } catch {
-        if (!disposed) {
-          toast.error(t("authSessionExpiredToast"));
+        const nextSocket = await createSocket();
+        if (disposed || !nextSocket) {
+          nextSocket?.disconnect();
+          return;
         }
-      } finally {
-        refreshingToken.current = false;
+
+        socket = nextSocket;
+        nextSocket.on("notification", handleIncomingNotification);
+        nextSocket.on("new_notification", handleIncomingNotification);
+        nextSocket.on("connect", () => {
+          attempts = 0;
+        });
+        nextSocket.on("connect_error", () => {
+          nextSocket.disconnect();
+          if (disposed) return;
+          attempts += 1;
+          const delay = Math.min(30_000, 1_000 * 2 ** Math.min(attempts - 1, 5));
+          retryTimer = setTimeout(() => {
+            void connectWithFreshTicket();
+          }, delay);
+        });
+        nextSocket.connect();
+      } catch (error) {
+        if (disposed) return;
+        console.warn("Realtime notification connection is unavailable:", error);
+        attempts += 1;
+        const delay = Math.min(30_000, 1_000 * 2 ** Math.min(attempts - 1, 5));
+        retryTimer = setTimeout(() => {
+          void connectWithFreshTicket();
+        }, delay);
       }
     };
 
-    socket.on("notification", handleIncomingNotification);
-    socket.on("new_notification", handleIncomingNotification);
-    socket.on("connect_error", handleConnectError);
+    void connectWithFreshTicket();
 
     return () => {
       disposed = true;
-
-      // Remove only this component's handlers. Do not erase handlers
-      // registered by other parts of the application.
-      socket.off("notification", handleIncomingNotification);
-      socket.off("new_notification", handleIncomingNotification);
-      socket.off("connect_error", handleConnectError);
-
-      // Socket connection lifecycle remains managed by the shared socket layer.
+      if (retryTimer) clearTimeout(retryTimer);
+      if (socket) {
+        socket.off("notification", handleIncomingNotification);
+        socket.off("new_notification", handleIncomingNotification);
+        socket.disconnect();
+      }
     };
-  }, [handleIncomingNotification, t]);
+  }, [handleIncomingNotification, socketReady]);
 
   return null;
 }

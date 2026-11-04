@@ -137,7 +137,7 @@ export default function UserRoleSelector({
         type="button"
         disabled={loading}
         onClick={toggleOpen}
-        className={`group inline-flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] shadow-2xs transition-all duration-300 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${currentConfig.badgeClass}`}
+        className={`group inline-flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 text-xs font-black uppercase tracking-[0.14em] shadow-2xs transition-all duration-300 hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 ${currentConfig.badgeClass}`}
       >
         {loading ? (
           <Loader2 size={13} className="animate-spin" />
@@ -166,11 +166,11 @@ export default function UserRoleSelector({
               left: coords.left,
               zIndex: 9999,
             }}
-            className="w-44 overflow-hidden rounded-2xl border border-border-subtle bg-surface/95 p-1.5 shadow-[0_20px_50px_rgba(var(--shadow-rgb),0.22)] backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
+            className="w-44 overflow-hidden rounded-2xl border border-border-subtle bg-surface/95 p-1.5 shadow-panel backdrop-blur-xl animate-in fade-in zoom-in-95 duration-150"
           >
             <div className="mb-1 flex items-center gap-1 border-b border-border-subtle px-3 py-1.5">
               <Sparkles size={11} className="text-primary" />
-              <span className="text-[9px] font-black uppercase tracking-wider text-muted">
+              <span className="text-xs font-black uppercase tracking-wider text-muted">
                 {t("adminUserRole")}
               </span>
             </div>
@@ -185,7 +185,7 @@ export default function UserRoleSelector({
                   key={r}
                   type="button"
                   onClick={() => handleUpdateRole(r)}
-                  className={`group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-start text-[10px] font-black uppercase tracking-widest transition-all ${
+                  className={`group flex w-full cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-start text-xs font-black uppercase tracking-widest transition-all ${
                     isSelected
                       ? "bg-action text-on-action shadow-2xs"
                       : "hover:bg-surface-subtle text-secondary"

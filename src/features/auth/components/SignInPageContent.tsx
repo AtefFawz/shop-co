@@ -2,23 +2,56 @@
 import SocialAuthButton from "@/features/auth/components/SocialAuthButton";
 
 
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Sparkles, Star, Layers, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, Sparkles, Layers, ArrowUpRight, ShieldCheck } from "lucide-react";
 import Login from "@/assets/shop/screenShop.webp";
 import { SignInForm } from "@/features/auth/components/SignInForm";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
+import { startGoogleOAuth } from "@/lib/googleOAuth";
 
 export default function SignInPageContent() {
   const { t, direction } = useLocale();
+  const router = useRouter();
   const stageRef = useRef<HTMLDivElement>(null);
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
-  const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}auth/google`;
+  // The access cookie lives 15 minutes, so a still-signed-in admin who reopens
+  // /dashboard later is bounced here by the proxy (it cannot see the refresh cookie,
+  // which is scoped to /api/auth). Try a silent refresh once and send them back.
+  useEffect(() => {
+    const next = new URLSearchParams(window.location.search).get("next");
+    if (!next || !next.startsWith("/dashboard") || next.startsWith("//")) return;
+
+    let cancelled = false;
+    axios
+      .post("/api/auth/refresh-token", {}, {
+        withCredentials: true,
+        timeout: 15_000,
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+      })
+      .then(() => {
+        if (!cancelled) router.replace(next);
+      })
+      .catch(() => {
+        // No valid session: stay on the form.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [router]);
+
+  const handleGoogleLogin = async () => {
+    try {
+      await startGoogleOAuth();
+    } catch (error) {
+      console.error("Google sign-in could not start:", error);
+    }
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -74,7 +107,7 @@ export default function SignInPageContent() {
         <div className="relative z-30 flex items-center justify-between">
           <Link
             href="/"
-            className="group inline-flex items-center gap-2.5 rounded-full border border-border-subtle bg-surface/90 px-4 py-2 text-[10px] font-black uppercase tracking-[0.22em] text-primary shadow-2xs backdrop-blur-md transition-all hover:bg-action hover:text-on-action"
+            className="group inline-flex items-center gap-2.5 rounded-full border border-border-subtle bg-surface/90 px-4 py-2 text-xs font-black uppercase tracking-[0.22em] text-primary shadow-2xs backdrop-blur-md transition-all hover:bg-action hover:text-on-action"
           >
             <ArrowLeft
               size={13}
@@ -83,7 +116,7 @@ export default function SignInPageContent() {
             <span>{t("authBackToFlagship")}</span>
           </Link>
 
-          <span className="rounded-full border border-border-subtle bg-surface/80 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-secondary backdrop-blur-md">
+          <span className="rounded-full border border-border-subtle bg-surface/80 px-3.5 py-1.5 font-mono text-xs font-extrabold tracking-[0.2em] text-secondary backdrop-blur-md">
             {t("authArchive2026")}
           </span>
         </div>
@@ -98,7 +131,7 @@ export default function SignInPageContent() {
             className="relative aspect-[4/4.5] w-full max-w-[420px] transition-transform duration-200 ease-out"
           >
             {/* Main Arch Pedestal */}
-            <div className="relative h-full w-full overflow-hidden rounded-[2.4rem] border-2 border-surface bg-app shadow-[0_35px_80px_-20px_rgba(var(--shadow-rgb),0.22)]">
+            <div className="relative h-full w-full overflow-hidden rounded-4xl border-2 border-surface bg-app shadow-panel">
               <Image
                 src={Login}
                 alt="SHOP.CO Luxury Fashion"
@@ -111,7 +144,7 @@ export default function SignInPageContent() {
 
               {/* Bottom Editorial Copy Inside Frame */}
               <div className="absolute inset-x-6 bottom-6 z-20 text-on-action">
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-[9px] font-black uppercase tracking-[0.2em] text-on-action backdrop-blur-md">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-on-action backdrop-blur-md">
                   <Sparkles size={10} /> {t("authMemberPortal")}
                 </span>
                 <h2 className="mt-2 text-3xl font-black uppercase leading-[0.92] tracking-[-0.04em] lg:text-4xl">
@@ -123,16 +156,16 @@ export default function SignInPageContent() {
             {/* Floating 3D Badge 1 (Top-Left) */}
             <div
               style={{ transform: "translateZ(55px)" }}
-              className="absolute -left-5 top-8 z-30 flex items-center gap-3 rounded-2xl border border-surface bg-surface/95 px-3.5 py-2.5 shadow-[0_18px_40px_rgba(var(--shadow-rgb),0.14)] backdrop-blur-xl"
+              className="absolute -left-5 top-8 z-30 flex items-center gap-3 rounded-2xl border border-surface bg-surface/95 px-3.5 py-2.5 shadow-card backdrop-blur-xl"
             >
               <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-action text-on-action">
                 <Layers size={15} />
               </div>
               <div>
-                <p className="text-[9px] font-extrabold uppercase tracking-wider text-muted">
+                <p className="text-xs font-extrabold uppercase tracking-wider text-muted">
                   {t("authCuratedCatalog")}
                 </p>
-                <p className="text-[11px] font-black text-primary">
+                <p className="text-xs font-black text-primary">
                   {t("authLuxuryHouses")}
                 </p>
               </div>
@@ -141,21 +174,16 @@ export default function SignInPageContent() {
             {/* Floating 3D Badge 2 (Bottom-Right) */}
             <div
               style={{ transform: "translateZ(70px)" }}
-              className="absolute -bottom-4 -right-4 z-30 flex items-center gap-2.5 rounded-2xl border border-surface bg-action px-4 py-3 text-on-action shadow-[0_22px_45px_rgba(var(--shadow-rgb),0.3)]"
+              className="absolute -bottom-4 -right-4 z-30 flex items-center gap-2.5 rounded-2xl border border-surface bg-action px-4 py-3 text-on-action shadow-panel"
             >
-              <div className="flex text-rating">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} size={11} fill="currentColor" />
-                ))}
-              </div>
-              <span className="font-mono text-xs font-black">4.9/5</span>
-              <span className="text-[10px] text-on-action/60">{t("authVipRating")}</span>
+              <ShieldCheck size={16} className="text-success" />
+              <span className="text-xs font-black">{direction === "rtl" ? "تجربة تسوق موثوقة" : "A considered shopping experience"}</span>
             </div>
           </div>
         </div>
 
         {/* 3. Bottom Telemetry Footer */}
-        <div className="relative z-30 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.2em] text-muted">
+        <div className="relative z-30 flex items-center justify-between text-xs font-bold uppercase tracking-[0.2em] text-muted">
           <span>{t("authOfficialFlagship")}</span>
           <span>{t("authVerifiedAuthenticity")}</span>
         </div>
@@ -169,7 +197,7 @@ export default function SignInPageContent() {
         <div className="mb-6 flex items-center justify-between md:hidden">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1.5 text-[10px] font-black uppercase tracking-widest text-primary shadow-2xs"
+            className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface px-3.5 py-1.5 text-xs font-black uppercase tracking-widest text-primary shadow-2xs"
           >
             <ArrowLeft size={13} />
             <span>{t("catalogFlagship")}</span>
@@ -185,12 +213,12 @@ export default function SignInPageContent() {
         </div>
 
         {/* Form Card Container */}
-        <div className="mx-auto w-full max-w-[440px] rounded-[2.2rem] border border-border bg-surface p-6 shadow-[0_20px_60px_-15px_rgba(var(--shadow-rgb),0.07)] sm:p-9">
+        <div className="mx-auto w-full max-w-[440px] rounded-4xl border border-border bg-surface p-6 shadow-panel sm:p-9">
           {/* Top Pill & Headline */}
           <div className="mb-7 space-y-2">
             <div className="inline-flex items-center gap-2 rounded-full border border-border-subtle bg-surface-subtle px-3 py-1">
               <span className="h-1.5 w-1.5 rounded-full bg-success" />
-              <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
+              <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
                 {t("authLoginPanelLabel")}
               </span>
             </div>
@@ -212,7 +240,7 @@ export default function SignInPageContent() {
               <div className="w-full border-t border-border-subtle" />
             </div>
             <div className="relative flex justify-center">
-              <span className="bg-surface px-4 text-[9px] font-black uppercase tracking-[0.22em] text-muted">
+              <span className="bg-surface px-4 text-xs font-black uppercase tracking-[0.22em] text-muted">
                 {t("authSocialDivider")}
               </span>
             </div>

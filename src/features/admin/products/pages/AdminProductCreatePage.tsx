@@ -1,5 +1,7 @@
 "use client";
 
+import SizePicker from "@/features/admin/products/components/SizePicker";
+import ColorPicker from "@/features/admin/products/components/ColorPicker";
 import api from "@/lib/api";
 import { useState, useEffect } from "react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
@@ -37,12 +39,17 @@ export default function AdminProductCreatePage() {
 
   const [item, setItem] = useState({
     name: "",
+    nameAr: "",
     description: "",
+    descriptionAr: "",
     gender: "MEN",
+    genderAr: "رجالي",
     category: "CLOTHING",
+    categoryAr: "ملابس",
     section: "T-SHIRT",
-    // type: "T-SHIRT",
+    sectionAr: "تيشيرت",
     style: "Casual",
+    styleAr: "كاجوال",
     price: "",
     discount: "",
     isSale: "false",
@@ -65,7 +72,20 @@ export default function AdminProductCreatePage() {
     if (!e.target.files) return;
 
     const selectedFiles = Array.from(e.target.files);
-    const updatedFiles = [...images, ...selectedFiles].slice(0, 5);
+    const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+    const invalidFile = selectedFiles.find((file) => !allowedTypes.has(file.type) || file.size > 5 * 1024 * 1024);
+    if (invalidFile) {
+      setError(direction === "rtl" ? "استخدم صور JPG أو PNG أو WebP بحجم لا يتجاوز 5 ميجابايت." : "Use JPG, PNG or WebP images up to 5 MB each.");
+      e.target.value = "";
+      return;
+    }
+    const availableSlots = Math.max(0, 4 - images.length);
+    const updatedFiles = [...images, ...selectedFiles.slice(0, availableSlots)];
+    if (selectedFiles.length > availableSlots) {
+      setError(direction === "rtl" ? "الحد الأقصى 4 صور للمنتج." : "A product can have up to 4 images.");
+    } else {
+      setError("");
+    }
 
     previews.forEach((url) => URL.revokeObjectURL(url));
 
@@ -84,12 +104,17 @@ export default function AdminProductCreatePage() {
     previews.forEach((url) => URL.revokeObjectURL(url));
     setItem({
       name: "",
+      nameAr: "",
       description: "",
+      descriptionAr: "",
       gender: "MEN",
+      genderAr: "رجالي",
       category: "CLOTHING",
+      categoryAr: "ملابس",
       section: "T-SHIRT",
-      //   type: "T-SHIRT",
+      sectionAr: "تيشيرت",
       style: "Casual",
+      styleAr: "كاجوال",
       price: "",
       discount: "",
       isSale: "false",
@@ -173,7 +198,7 @@ export default function AdminProductCreatePage() {
               <p className="text-xs sm:text-sm font-bold">
                 {t("adminProductPublished")}
               </p>
-              <p className="text-[11px] text-success">
+              <p className="text-xs text-success">
                 {t("adminProductPublishedDescription")}
               </p>
             </div>
@@ -206,6 +231,10 @@ export default function AdminProductCreatePage() {
                 />
               </Field>
 
+              <Field label={direction === "rtl" ? "اسم المنتج بالعربية" : "Product name — Arabic"} icon={<Tag size={13} />}>
+                <input className="input-base" type="text" dir="rtl" placeholder="اسم المنتج بالعربية" value={item.nameAr} onChange={(e) => handleChange("nameAr", e.target.value)} />
+              </Field>
+
               <Field
                 label={t("adminProductDescriptionLabel")}
                 icon={<AlignLeft size={13} />}
@@ -216,6 +245,9 @@ export default function AdminProductCreatePage() {
                   value={item.description}
                   onChange={(e) => handleChange("description", e.target.value)}
                 />
+              </Field>
+              <Field label={direction === "rtl" ? "الوصف بالعربية" : "Description — Arabic"} icon={<AlignLeft size={13} />}>
+                <textarea className="input-base min-h-24 resize-none py-3 leading-relaxed" dir="rtl" placeholder="وصف المنتج بالعربية" value={item.descriptionAr} onChange={(e) => handleChange("descriptionAr", e.target.value)} />
               </Field>
             </div>
           </FormSection>
@@ -231,7 +263,12 @@ export default function AdminProductCreatePage() {
                 <select
                   className="input-base cursor-pointer"
                   value={item.gender}
-                  onChange={(e) => handleChange("gender", e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const arabic: Record<string, string> = { MEN: "رجالي", WOMEN: "نسائي", KIDS: "أطفال", UNISEX: "للجنسين" };
+                    handleChange("gender", value);
+                    handleChange("genderAr", arabic[value] || "للجنسين");
+                  }}
                 >
                   <option value="MEN">{t("adminProductGenderMen")}</option>
                   <option value="WOMEN">{t("adminProductGenderWomen")}</option>
@@ -252,6 +289,10 @@ export default function AdminProductCreatePage() {
                 />
               </Field>
 
+              <Field label={direction === "rtl" ? "التصنيف بالعربية" : "Category — Arabic"} icon={<Layers size={13} />}>
+                <input className="input-base" dir="rtl" type="text" placeholder="التصنيف بالعربية" value={item.categoryAr} onChange={(e) => handleChange("categoryAr", e.target.value)} />
+              </Field>
+
               <Field
                 label={t("adminProductSectionLabel")}
                 icon={<Tag size={13} />}
@@ -260,8 +301,10 @@ export default function AdminProductCreatePage() {
                   className="input-base cursor-pointer"
                   value={item.section}
                   onChange={(e) => {
-                    handleChange("section", e.target.value);
-                    handleChange("type", e.target.value);
+                    const value = e.target.value;
+                    const arabic: Record<string, string> = { "T-SHIRT": "تيشيرت", SHIRT: "قميص", PANTS: "بنطال", JEANS: "جينز" };
+                    handleChange("section", value);
+                    handleChange("sectionAr", arabic[value] || value);
                   }}
                 >
                   <option value="T-SHIRT">{t("adminSectionTShirt")}</option>
@@ -275,13 +318,21 @@ export default function AdminProductCreatePage() {
                 <select
                   className="input-base cursor-pointer"
                   value={item.style}
-                  onChange={(e) => handleChange("style", e.target.value)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const arabic: Record<string, string> = { Casual: "كاجوال", Formal: "رسمي", Party: "حفلات", Gym: "رياضي" };
+                    handleChange("style", value);
+                    handleChange("styleAr", arabic[value] || value);
+                  }}
                 >
                   <option value="Casual">{t("casual")}</option>
                   <option value="Formal">{t("formal")}</option>
                   <option value="Party">{t("party")}</option>
                   <option value="Gym">{t("gym")}</option>
                 </select>
+              </Field>
+              <Field label={direction === "rtl" ? "النمط بالعربية" : "Style — Arabic"} icon={<Sparkles size={13} />}>
+                <input className="input-base" dir="rtl" type="text" value={item.styleAr} onChange={(e) => handleChange("styleAr", e.target.value)} />
               </Field>
             </div>
           </FormSection>
@@ -354,32 +405,20 @@ export default function AdminProductCreatePage() {
           <FormSection label={t("adminProductVariants")} number="04">
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               <Field label={t("adminProductSizes")} icon={<Ruler size={13} />}>
-                <input
-                  className="input-base"
-                  type="text"
-                  placeholder={t("adminSizePlaceholder")}
+                <SizePicker
                   value={item.size}
-                  onChange={(e) => handleChange("size", e.target.value)}
+                  onChange={(v) => handleChange("size", v)}
                 />
-                <p className="text-[10px] text-muted">
-                  {t("adminSeparateWithCommas")}
-                </p>
               </Field>
 
               <Field
                 label={t("adminProductColors")}
                 icon={<Palette size={13} />}
               >
-                <input
-                  className="input-base"
-                  type="text"
-                  placeholder={t("adminColorsPlaceholder")}
+                <ColorPicker
                   value={item.colors}
-                  onChange={(e) => handleChange("colors", e.target.value)}
+                  onChange={(v) => handleChange("colors", v)}
                 />
-                <p className="text-[10px] text-muted">
-                  {t("adminSeparateColorsWithCommas")}
-                </p>
               </Field>
             </div>
           </FormSection>
@@ -388,7 +427,7 @@ export default function AdminProductCreatePage() {
           <FormSection
             label={t("adminMediaGallery")}
             number="05"
-            description={t("adminMaxFiveImages")}
+            description={direction === "rtl" ? "حتى 4 صور، 5 ميجابايت لكل صورة" : "Up to 4 images, 5 MB per image"}
           >
             <div className="space-y-4">
               <label className="group relative flex min-h-48 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-surface-subtle/50 p-6 text-center transition-all hover:border-border-strong hover:bg-surface-subtle">
@@ -409,7 +448,7 @@ export default function AdminProductCreatePage() {
                   <p className="text-xs font-black uppercase tracking-wider text-secondary">
                     {t("adminUploadImagesLabel")}
                   </p>
-                  <p className="text-[10px] text-muted mt-0.5">
+                  <p className="text-xs text-muted mt-0.5">
                     {t("adminImageFormatHint")}
                   </p>
                 </div>
@@ -422,7 +461,7 @@ export default function AdminProductCreatePage() {
                       key={src}
                       className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-surface-muted shadow-xs"
                     >
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={src}
                         alt={t("adminPreviewImageAlt")}
                         className="h-full w-full object-cover"
@@ -435,7 +474,7 @@ export default function AdminProductCreatePage() {
                         <X size={12} />
                       </button>
                       {index === 0 && (
-                        <span className="absolute bottom-2 start-2 rounded-md bg-action/85 px-2 py-0.5 text-[8px] font-black uppercase tracking-wider text-on-action backdrop-blur-xs">
+                        <span className="absolute bottom-2 start-2 rounded-md bg-action/85 px-2 py-0.5 text-xs font-black uppercase tracking-wider text-on-action backdrop-blur-xs">
                           {t("adminCoverImage")}
                         </span>
                       )}
@@ -451,7 +490,7 @@ export default function AdminProductCreatePage() {
             <button
               type="submit"
               disabled={loading}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-action px-5 py-4 text-xs font-black uppercase tracking-widest text-on-action shadow-[0_10px_28px_-8px_rgba(var(--shadow-rgb),0.1)] transition-all hover:bg-action-hover active:scale-[0.99] disabled:bg-surface-hover disabled:cursor-not-allowed cursor-pointer"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-action px-5 py-4 text-xs font-black uppercase tracking-widest text-on-action shadow-card transition-all hover:bg-action-hover active:scale-[0.99] disabled:bg-surface-hover disabled:cursor-not-allowed cursor-pointer"
             >
               <PackagePlus size={16} />
               <span>
@@ -482,7 +521,7 @@ function FormSection({
     <div className="overflow-hidden rounded-3xl border border-border/80 bg-surface shadow-xs">
       <div className="flex items-center justify-between border-b border-border-subtle bg-surface-subtle/70 px-5 py-4">
         <div className="flex items-center gap-3">
-          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-action text-[10px] font-black text-on-action">
+          <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-action text-xs font-black text-on-action">
             {number}
           </span>
           <p className="text-xs font-black uppercase tracking-wider text-secondary">
@@ -490,7 +529,7 @@ function FormSection({
           </p>
         </div>
         {description && (
-          <p className="text-[10px] text-muted font-bold">{description}</p>
+          <p className="text-xs text-muted font-bold">{description}</p>
         )}
       </div>
       <div className="p-5 sm:p-6">{children}</div>
@@ -511,7 +550,7 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5 min-w-0">
-      <label className="flex items-center gap-1.5 text-[11px] font-black uppercase tracking-wider text-muted">
+      <label className="flex items-center gap-1.5 text-xs font-black uppercase tracking-wider text-muted">
         {icon}
         <span className="truncate">{label}</span>
         {required && <span className="text-danger">*</span>}

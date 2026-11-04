@@ -19,7 +19,7 @@ export const CartOrderSummary = ({ product }: { product: Product[] }) => {
         subtotal: acc.subtotal + price * qty,
         total:
           acc.total +
-          calculateFinalPrice(price, Number(item.discount || 0), qty),
+          calculateFinalPrice(price, Number(item.discount || 0), qty, item.isSale),
       };
     },
     { total: 0, subtotal: 0 },
@@ -41,14 +41,14 @@ export const CartOrderSummary = ({ product }: { product: Product[] }) => {
             <h2 className="text-sm font-black uppercase tracking-tight text-primary">
               {t("orderSummary")}
             </h2>
-            <p className="text-[10px] font-semibold text-muted">
+            <p className="text-xs font-semibold text-muted">
               {t("liveBagValue")}
             </p>
           </div>
         </div>
 
         {discountAmount > 0 && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-2.5 py-1 font-mono text-[9px] font-black uppercase tracking-wider text-success">
+          <span className="inline-flex items-center gap-1 rounded-full bg-success-soft px-2.5 py-1 font-mono text-xs font-black uppercase tracking-wider text-success">
             <Sparkles size={10} /> {t("youSave")} {formatCurrency(discountAmount, locale)}
           </span>
         )}
@@ -79,7 +79,7 @@ export const CartOrderSummary = ({ product }: { product: Product[] }) => {
             {t("delivery")}
           </span>
           {delivery === 0 && total > 0 ? (
-            <span className="rounded bg-success-soft px-2 py-0.5 font-mono text-[10px] font-black uppercase text-success">
+            <span className="rounded bg-success-soft px-2 py-0.5 font-mono text-xs font-black uppercase text-success">
               {t("free")}
             </span>
           ) : (
@@ -93,7 +93,7 @@ export const CartOrderSummary = ({ product }: { product: Product[] }) => {
       {/* Grand Total Box */}
       <div className="flex items-end justify-between rounded-2xl bg-surface-subtle p-4">
         <div>
-          <span className="block text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+          <span className="block text-xs font-black uppercase tracking-[0.2em] text-muted">
             {t("estimatedTotal")}
           </span>
           <span className="text-xs font-extrabold uppercase text-primary">

@@ -24,7 +24,7 @@ export const CopyrightNotice = () => {
 
         <span className="hidden h-3.5 w-px bg-surface-hover sm:inline-block" />
 
-        <span className="inline-flex items-center gap-1 rounded-md border border-border-strong/70 bg-surface/80 px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-secondary shadow-2xs">
+        <span className="inline-flex items-center gap-1 rounded-md border border-border-strong/70 bg-surface/80 px-2 py-0.5 font-mono text-xs font-bold uppercase tracking-wider text-secondary shadow-2xs">
           <ShieldCheck size={12} className="text-success" />
           <span>{t("verifiedSecure")}</span>
         </span>
@@ -60,7 +60,7 @@ export const CopyrightNotice = () => {
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.92 }}
           title={t("backToTop")}
-          className="group flex h-8.5 cursor-pointer items-center gap-1.5 rounded-lg border border-border-strong/90 bg-surface px-3 font-mono text-[10px] font-black uppercase tracking-wider text-primary shadow-xs transition-colors hover:border-border-strong hover:bg-action hover:text-on-action"
+          className="group flex h-8.5 cursor-pointer items-center gap-1.5 rounded-lg border border-border-strong/90 bg-surface px-3 font-mono text-xs font-black uppercase tracking-wider text-primary shadow-xs transition-colors hover:border-border-strong hover:bg-action hover:text-on-action"
         >
           <span>{t("backToTop")}</span>
           <ArrowUp

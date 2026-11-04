@@ -8,6 +8,15 @@
 :root {
   color-scheme: light;
 
+  /* Responsive type scale: user preferences multiply the root scale. */
+  --root-font-size: 100%;
+  --type-display: clamp(2.5rem, 5vw, 4.5rem);
+  --type-h1: clamp(2rem, 3.3vw, 3.25rem);
+  --type-h2: clamp(1.625rem, 2.5vw, 2.25rem);
+  --type-h3: clamp(1.25rem, 1.8vw, 1.5rem);
+  --type-body: 1rem;
+  --type-small: 0.875rem;
+
   --app-bg: #f5f6fc;
   --surface: #ffffff;
   --surface-raised: #ffffff;
@@ -157,6 +166,10 @@ html.dark {
 }
 
 @theme inline {
+  --font-sans: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --shadow-card: var(--elev-card);
+  --shadow-panel: var(--elev-panel);
   --color-app: var(--app-bg);
   --color-surface: var(--surface);
   --color-surface-raised: var(--surface-raised);
@@ -204,6 +217,7 @@ html.dark {
 
 html {
   min-height: 100%;
+  font-size: var(--root-font-size, 100%);
   scroll-behavior: smooth;
   scrollbar-gutter: stable;
   background: var(--app-bg);
@@ -229,6 +243,23 @@ body {
   transition:
     background-color 220ms ease,
     color 220ms ease;
+}
+
+/* Keep form controls and interactive text on the same font system. */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: inherit;
 }
 
 ::selection {
@@ -273,11 +304,23 @@ html.theme-transition [class*="border-"] {
 }
 
 /* Shared responsive layout primitives. Sections own their own vertical rhythm. */
+/*
+ * One container for header, page content and footer so their edges line up.
+ * Gutter: 16px on phones -> 48px on large screens. Capped so ultra-wide
+ * monitors don't stretch the layout.
+ */
+:root {
+  --page-max: 1800px;
+  --page-gutter: clamp(1rem, 3vw, 3rem);
+  /* Vertical rhythm shared by every full page section. */
+  --page-pad-y: clamp(2rem, 1.25rem + 2.5vw, 4rem);
+}
+
 .Responsive {
   width: 100%;
-  /* max-width: 1600px; */
+  max-width: var(--page-max);
   margin-inline: auto;
-  padding-inline: clamp(1rem, 3vw, 3rem);
+  padding-inline: var(--page-gutter);
 }
 
 .page-shell {
@@ -289,10 +332,10 @@ html.theme-transition [class*="border-"] {
 
 .page-heading {
   color: var(--text-primary);
-  font-size: clamp(1.65rem, 3vw, 2.65rem);
+  font-size: var(--type-h1);
   font-weight: 850;
   letter-spacing: -0.045em;
-  line-height: 1.08;
+  line-height: 1.18;
 }
 
 .surface-panel {
@@ -318,11 +361,14 @@ html.theme-transition [class*="border-"] {
 }
 
 .h1-main {
-  @apply text-xl font-extrabold md:text-3xl lg:text-4xl 2xl:text-5xl;
+  font-size: var(--type-h1);
+  font-weight: 800;
+  line-height: 1.2;
   color: var(--text-primary);
 }
 .p-main {
-  @apply text-sm md:text-sm lg:text-lg;
+  font-size: var(--type-body);
+  line-height: 1.7;
   color: var(--text-muted);
 }
 
@@ -376,6 +422,15 @@ html.theme-transition [class*="border-"] {
 }
 
 /* MUI participates in the same theme. */
+.MuiTypography-root,
+.MuiButtonBase-root,
+.MuiButton-root,
+.MuiInputBase-root,
+.MuiFormLabel-root,
+.MuiFormHelperText-root {
+  font-family: inherit !important;
+}
+
 .MuiDrawer-paper,
 .MuiPopover-paper,
 .MuiMenu-paper,
@@ -430,10 +485,14 @@ html.theme-transition [class*="border-"] {
 }
 
 /* Locale-aware typography and logical-direction helpers. */
-html[lang="ar"] body {
+html[lang="ar"] body,
+html[lang="ar"] .font-sans {
   font-family:
-    "Noto Sans Arabic", Tahoma, Arial, var(--font-geist-sans), sans-serif;
+    var(--font-arabic), "Noto Sans Arabic", Tahoma, Arial,
+    var(--font-geist-sans), sans-serif;
   letter-spacing: normal;
+}
+html[lang="ar"] body {
   line-height: 1.65;
 }
 html[dir="rtl"] input:not([type="tel"]),
@@ -492,12 +551,6 @@ svg {
   max-width: 100%;
 }
 
-@media (max-width: 640px) {
-  .Responsive {
-    padding-inline: 1rem;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -511,6 +564,208 @@ svg {
     transition-duration: 0.01ms !important;
   }
 }
-section {
-  padding: 7rem 0px;
+/* Default rhythm only; inside a layer so utilities like py-8 override it. */
+@layer base {
+  section {
+    padding-block: 7rem;
+  }
+}
+
+/* ========================================================================== */
+/* Consistency & responsive typography                                         */
+/* ========================================================================== */
+
+/* Radius scale used everywhere: xl (controls) < 2xl (small cards)
+   < 3xl (cards) < 4xl (large panels) < full (pills). Shadow tiers below. */
+:root {
+  --elev-card: 0 10px 30px -14px rgba(var(--shadow-rgb), 0.1);
+  --elev-panel: 0 24px 60px -20px rgba(var(--shadow-rgb), 0.14);
+}
+
+@layer components {
+  .page-section {
+    padding-block: var(--page-pad-y);
+  }
+  .type-display {
+    font-size: var(--type-display);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.045em;
+  }
+  .type-heading-1 {
+    font-size: var(--type-h1);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .type-heading-2 {
+    font-size: var(--type-h2);
+    font-weight: 750;
+    line-height: 1.25;
+  }
+  .type-heading-3 {
+    font-size: var(--type-h3);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  .type-body {
+    font-size: var(--type-body);
+    line-height: 1.65;
+  }
+  .type-caption {
+    font-size: var(--type-small);
+    line-height: 1.5;
+  }
+}
+
+/* Scale rem-based sizes (text AND spacing) with the screen so large monitors
+   don't look tiny and very small phones don't overflow. 16px is the default. */
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+@media (max-width: 359px) {
+  html {
+    --root-font-size: 93.75%; /* 15px base on very small screens */
+  }
+}
+@media (min-width: 1920px) {
+  html {
+    --root-font-size: 112.5%; /* 18px base on large screens */
+  }
+}
+@media (min-width: 2560px) {
+  html {
+    --root-font-size: 125%; /* 20px base on ultra-wide screens */
+  }
+}
+
+@layer base {
+  /* Balanced, semantic defaults. Explicit Tailwind utilities can refine a page. */
+  h1 {
+    font-size: var(--type-h1);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  h2 {
+    font-size: var(--type-h2);
+    font-weight: 750;
+    line-height: 1.25;
+  }
+  h3 {
+    font-size: var(--type-h3);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  p {
+    font-size: var(--type-body);
+    line-height: 1.65;
+    text-wrap: pretty;
+  }
+  small {
+    font-size: var(--type-small);
+  }
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  /* Arabic needs more vertical room than Latin: tight Latin line-heights
+     clip the ascenders and dots. */
+  html[lang="ar"] body {
+    line-height: 1.7;
+  }
+  html[lang="ar"] h1,
+  html[lang="ar"] h2,
+  html[lang="ar"] h3,
+  html[lang="ar"] h4 {
+    line-height: 1.35;
+  }
+}
+
+/* Utilities such as leading-none are layered, so Arabic needs an override that
+   wins over them. Decorative watermark text (aria-hidden) keeps its tight look. */
+html[lang="ar"]:not([data-line-spacing="comfortable"])
+  :is(h1, h2, h3, h4, p, span, a, button, label, li):not(
+    [aria-hidden="true"]
+  )[class*="leading-none"],
+html[lang="ar"]:not([data-line-spacing="comfortable"])
+  :is(h1, h2, h3, h4, p, span, a, button, label, li):not(
+    [aria-hidden="true"]
+  )[class*="leading-["],
+html[lang="ar"]:not([data-line-spacing="comfortable"])
+  :is(h1, h2, h3, h4, p, span, a, button, label, li):not(
+    [aria-hidden="true"]
+  )[class*="leading-tight"],
+html[lang="ar"]:not([data-line-spacing="comfortable"])
+  :is(h1, h2, h3, h4, p, span, a, button, label, li):not(
+    [aria-hidden="true"]
+  )[class*="leading-snug"] {
+  line-height: 1.4 !important;
+}
+
+/* ========================================================================== */
+/* User display preferences — applied globally to storefront and admin.       */
+/* ========================================================================== */
+html[data-font-size="small"] {
+  font-size: calc(var(--root-font-size, 100%) * 0.9375);
+}
+html[data-font-size="standard"] {
+  font-size: var(--root-font-size, 100%);
+}
+html[data-font-size="large"] {
+  font-size: calc(var(--root-font-size, 100%) * 1.125);
+}
+
+html[data-line-spacing="comfortable"] body {
+  line-height: 1.85;
+}
+html[lang="ar"][data-line-spacing="comfortable"] body {
+  line-height: 1.95;
+}
+html[data-line-spacing="comfortable"] :where(p, li, dd, blockquote) {
+  line-height: 1.85;
+}
+html[lang="ar"][data-line-spacing="comfortable"] :where(p, li, dd, blockquote) {
+  line-height: 1.95;
+}
+
+html[data-high-contrast="true"]:not(.dark) {
+  --text-primary: #0b1220;
+  --text-secondary: #26334b;
+  --text-muted: #46536c;
+  --text-subtle: #596781;
+  --border: #aeb8ca;
+  --border-subtle: #d1d8e4;
+  --border-strong: #8794aa;
+  --focus: #3d369d;
+  --focus-ring: rgba(61, 54, 157, 0.3);
+}
+html.dark[data-high-contrast="true"] {
+  --text-primary: #ffffff;
+  --text-secondary: #f0f4ff;
+  --text-muted: #d4def3;
+  --text-subtle: #bdc9e3;
+  --border: #657594;
+  --border-subtle: #40506e;
+  --border-strong: #8c9cba;
+  --focus: #c5c1ff;
+  --focus-ring: rgba(197, 193, 255, 0.38);
+}
+html[data-high-contrast="true"] :focus-visible {
+  outline-style: solid;
+  outline-width: 2px;
+  outline-offset: 3px;
+}
+
+html[data-reduce-motion="true"] {
+  scroll-behavior: auto !important;
+}
+html[data-reduce-motion="true"] *,
+html[data-reduce-motion="true"] *::before,
+html[data-reduce-motion="true"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
 }

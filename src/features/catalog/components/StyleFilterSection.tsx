@@ -18,7 +18,7 @@ export const StyleFilterSection = () => {
         onClick={() => setActive((p) => !p)}
         className="flex w-full cursor-pointer items-center justify-between py-3.5"
       >
-        <span className="text-[11px] font-black uppercase tracking-[0.16em] text-secondary">
+        <span className="text-xs font-black uppercase tracking-[0.16em] text-secondary">
           {t("dressAesthetic")}
         </span>
         <ChevronDown

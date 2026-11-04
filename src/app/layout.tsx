@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, IBM_Plex_Sans_Arabic } from "next/font/google";
 import { cookies } from "next/headers";
 // @ts-ignore CSS side-effect imports are handled by Next.js.
 import "./globals.css";
@@ -11,6 +11,8 @@ import { ThemeProvider } from "@/shared/theme/ThemeProvider";
 import { LocaleProvider } from "@/shared/i18n/LocaleProvider";
 import type { Locale } from "@/shared/i18n/messages";
 import ToastSoundListener from "@/shared/components/feedback/ToastSoundListener";
+import { DisplayPreferencesProvider } from "@/shared/preferences/DisplayPreferencesProvider";
+import { NotificationPreferencesProvider } from "@/shared/preferences/NotificationPreferencesProvider";
 
 /* -------------------------------------------------------------------------- */
 /*                                FONTS SETUP                                 */
@@ -25,6 +27,13 @@ const geistSans = Geist({
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const plexArabic = IBM_Plex_Sans_Arabic({
+  variable: "--font-arabic",
+  subsets: ["arabic", "latin"],
+  weight: ["400", "500", "600", "700"],
   display: "swap",
 });
 
@@ -90,7 +99,6 @@ export const metadata: Metadata = {
     title: "SHOP.CO™ | Contemporary Fashion & Street Luxe",
     description:
       "Browse through our diverse range of meticulously crafted garments, designed to bring out your individuality.",
-    creator: "@shopco",
   },
 
   robots: {
@@ -131,9 +139,8 @@ export default async function RootLayout({
     name: "SHOP.CO",
     url: SITE_URL,
     description:
-      "Contemporary fashion destination featuring 200+ international brands and 2,000+ curated garments.",
+      "Contemporary fashion destination with curated garments from international brands.",
     priceRange: "$$",
-    sameAs: ["https://instagram.com", "https://twitter.com"],
   };
 
   return (
@@ -147,7 +154,27 @@ export default async function RootLayout({
       <head>
         <script
           dangerouslySetInnerHTML={{
-            __html: `var savedTheme = null; try { savedTheme = localStorage.getItem('shopco-theme'); } catch (_) {} var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches; var initialTheme = savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark) ? 'dark' : 'light'; document.documentElement.classList.toggle('dark', initialTheme === 'dark'); document.documentElement.dataset.theme = initialTheme; document.documentElement.style.colorScheme = initialTheme;`,
+            __html: `
+              (function () {
+                var root = document.documentElement;
+                var savedTheme = null;
+                try { savedTheme = localStorage.getItem('shopco-theme'); } catch (_) {}
+                var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var initialTheme = savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark) ? 'dark' : 'light';
+                root.classList.toggle('dark', initialTheme === 'dark');
+                root.dataset.theme = initialTheme;
+                root.style.colorScheme = initialTheme;
+
+                var preferences = {};
+                try {
+                  preferences = JSON.parse(localStorage.getItem('shopco-display-preferences') || '{}') || {};
+                } catch (_) {}
+                root.dataset.fontSize = ['small', 'standard', 'large'].indexOf(preferences.fontSize) >= 0 ? preferences.fontSize : 'standard';
+                root.dataset.lineSpacing = preferences.lineSpacing === 'comfortable' ? 'comfortable' : 'standard';
+                root.dataset.reduceMotion = String(preferences.reduceMotion === true);
+                root.dataset.highContrast = String(preferences.highContrast === true);
+              })();
+            `,
           }}
         />
 
@@ -166,70 +193,74 @@ export default async function RootLayout({
         />
       </head>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} relative min-h-screen overflow-x-clip font-sans antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} ${plexArabic.variable} relative min-h-screen overflow-x-clip font-sans antialiased`}
       >
         <ThemeProvider>
           <LocaleProvider initialLocale={initialLocale}>
-            <script
-              type="application/ld+json"
-              dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-            />
+            <DisplayPreferencesProvider>
+              <NotificationPreferencesProvider>
+                <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+              />
 
-            {/* Global App Listeners */}
-            <ToastSoundListener />
-            <NotificationListener />
-            <AuthWatcher />
+              {/* Global App Listeners */}
+              <ToastSoundListener />
+              <NotificationListener />
+              <AuthWatcher />
 
-            {/* Main Content */}
-            {children}
+              {/* Main Content */}
+              {children}
 
-            {/* Application toast notifications */}
-            <Toaster
-              position="top-center"
-              gutter={10}
-              containerStyle={{
-                top: 16,
-                left: 12,
-                right: 12,
-              }}
-              toastOptions={{
-                className: "shopco-toast",
-                duration: 3500,
-                style: {
-                  minWidth: "fit",
-                  maxWidth: "min(410px, calc(100vw - 15px))",
-                  background:
-                    "color-mix(in srgb, var(--surface) 50%, transparent)",
-                  color: "var(--text-primary)",
-                  backdropFilter: "blur(20px)",
-                  WebkitBackdropFilter: "blur(20px)",
-                  border: "1px solid var(--border)",
-                  borderRadius: "99999px",
-                  padding: "8px 16px",
-                  fontSize: "11.5px",
-                  fontWeight: 700,
-                  letterSpacing: "0.05em",
-                  textTransform: "uppercase",
-                  boxShadow: "var(--shadow-floating)",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  display: "flex",
-                  gap: " 10px",
-                },
-                success: {
-                  iconTheme: {
-                    primary: "var(--success)",
-                    secondary: "var(--surface)",
+              {/* Application toast notifications */}
+              <Toaster
+                position="top-center"
+                gutter={10}
+                containerStyle={{
+                  top: 16,
+                  left: 12,
+                  right: 12,
+                }}
+                toastOptions={{
+                  className: "shopco-toast",
+                  duration: 3500,
+                  style: {
+                    minWidth: "fit",
+                    maxWidth: "min(410px, calc(100vw - 15px))",
+                    background:
+                      "color-mix(in srgb, var(--surface) 50%, transparent)",
+                    color: "var(--text-primary)",
+                    backdropFilter: "blur(20px)",
+                    WebkitBackdropFilter: "blur(20px)",
+                    border: "1px solid var(--border)",
+                    borderRadius: "99999px",
+                    padding: "8px 16px",
+                    fontSize: "0.8125rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.05em",
+                    textTransform: "uppercase",
+                    boxShadow: "var(--shadow-floating)",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                    display: "flex",
+                    gap: " 10px",
                   },
-                },
-                error: {
-                  iconTheme: {
-                    primary: "var(--danger)",
-                    secondary: "var(--surface)",
+                  success: {
+                    iconTheme: {
+                      primary: "var(--success)",
+                      secondary: "var(--surface)",
+                    },
                   },
-                },
-              }}
-            />
+                  error: {
+                    iconTheme: {
+                      primary: "var(--danger)",
+                      secondary: "var(--surface)",
+                    },
+                  },
+                }}
+              />
+              </NotificationPreferencesProvider>
+            </DisplayPreferencesProvider>
           </LocaleProvider>
         </ThemeProvider>
       </body>

@@ -6,6 +6,7 @@ import { FooterBenefits } from "@/shared/components/layout/footer/FooterBenefits
 import { FooterSocialLinks } from "@/shared/components/layout/footer/FooterSocialLinks";
 import { CopyrightNotice } from "@/shared/components/layout/footer/CopyrightNotice";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import Link from "next/link";
 
 const footerGroups = [
   {
@@ -71,7 +72,7 @@ export default function StorefrontFooter() {
           className="pointer-events-none absolute  top-1/2 bottom-0 z-0 bg-surface-subtle"
         />
 
-        <div className="relative z-10 mx-auto w-full px-4 sm:px-6 lg:px-8">
+        <div className="Responsive relative z-10">
           <Newsletter />
         </div>
       </div>
@@ -86,7 +87,7 @@ export default function StorefrontFooter() {
           </span>
         </div>
 
-        <div className="relative z-10 mx-auto w-full  px-4 sm:px-6 lg:px-8">
+        <div className="Responsive relative z-10">
           <motion.div
             variants={containerVariants}
             initial="hidden"
@@ -115,6 +116,42 @@ export default function StorefrontFooter() {
             ))}
           </motion.div>
 
+          <div className="mb-7 flex flex-wrap items-center gap-x-5 gap-y-3 border-t border-border/70 pt-5 text-xs font-bold text-muted">
+            <span className="w-full text-[10px] font-black uppercase tracking-[.18em]">
+              {t("account")}
+            </span>
+            <Link href="/my-space" className="transition hover:text-primary">
+              {t("navProfile")}
+            </Link>
+            <Link href="/stylist" className="transition hover:text-primary">
+              {t("navFindStyle")}
+            </Link>
+            <Link
+              href="/saved-for-later"
+              className="transition hover:text-primary"
+            >
+              {t("language") === "العربية"
+                ? "محفوظ لوقت لاحق"
+                : "Saved for later"}
+            </Link>
+            <Link
+              href="/recently-viewed"
+              className="transition hover:text-primary"
+            >
+              {t("language") === "العربية" ? "شوهدت مؤخرًا" : "Recently viewed"}
+            </Link>
+            <Link href="/compare" className="transition hover:text-primary">
+              {t("language") === "العربية"
+                ? "مقارنة المنتجات"
+                : "Compare products"}
+            </Link>
+            <Link
+              href="/price-alerts"
+              className="transition hover:text-primary"
+            >
+              {t("language") === "العربية" ? "تنبيهات الأسعار" : "Price alerts"}
+            </Link>
+          </div>
           <CopyrightNotice />
         </div>
       </div>

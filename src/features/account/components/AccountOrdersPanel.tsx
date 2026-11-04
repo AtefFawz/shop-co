@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { Package } from "lucide-react";
 import { EmptyAccountState } from "@/features/account/components/EmptyAccountState";
 import { AccountSectionHeader } from "@/features/account/components/AccountSectionHeader";
@@ -12,21 +12,17 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 import type { CustomerOrderRecord } from "@/types/domain";
 export default function AccountOrdersPanel() {
   const { t } = useLocale();
-  const { data, loading, page, totalPages, goToPage, refetch } =
-    useData("profile/my-orders");
-
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const { data, loading, page, totalPages, goToPage, refetch } =
+    useData("profile/my-orders", {
+      params: {
+        status: statusFilter === "all" ? null : statusFilter[0].toUpperCase() + statusFilter.slice(1),
+      },
+    });
 
   const orders: CustomerOrderRecord[] = (data?.data?.orders ??
     []) as CustomerOrderRecord[];
   const total = data?.pagination?.total ?? orders.length;
-
-  const filteredOrders = useMemo(() => {
-    if (statusFilter === "all") return orders;
-    return orders.filter(
-      (o) => (o.status || "").toLowerCase() === statusFilter,
-    );
-  }, [orders, statusFilter]);
 
   if (loading && !data) {
     return (
@@ -52,7 +48,7 @@ export default function AccountOrdersPanel() {
         />
 
         {/* Live Status Filter Pills */}
-        {orders.length > 0 && (
+        {data && (
           <div className="inline-flex flex-wrap rounded-xl border border-border/80 bg-surface p-1 shadow-2xs">
             {[
               { id: "all", label: t("uiFilterAll") },
@@ -64,7 +60,7 @@ export default function AccountOrdersPanel() {
                 key={tab.id}
                 type="button"
                 onClick={() => setStatusFilter(tab.id)}
-                className={`cursor-pointer rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
+                className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                   statusFilter === tab.id
                     ? "bg-action text-on-action shadow-2xs"
                     : "text-muted hover:text-primary"
@@ -77,9 +73,9 @@ export default function AccountOrdersPanel() {
         )}
       </div>
 
-      {filteredOrders.length > 0 ? (
+      {orders.length > 0 ? (
         <div className="space-y-4">
-          {filteredOrders.map((order: CustomerOrderRecord) => (
+          {orders.map((order: CustomerOrderRecord) => (
             <OrderCard
               key={order._id}
               order={order}
@@ -90,16 +86,16 @@ export default function AccountOrdersPanel() {
       ) : (
         <EmptyAccountState
           message={
-            orders.length === 0
-              ? t("uiNoOrdersYet")
-              : t("uiNoStatusOrders").replace(
+            total === 0
+              ? (statusFilter === "all" ? t("uiNoOrdersYet") : t("uiNoStatusOrders").replace(
                   "{status}",
                   statusFilter === "pending"
                     ? t("uiFilterPending")
                     : statusFilter === "shipped"
                       ? t("uiFilterShipped")
                       : t("uiFilterDelivered"),
-                )
+                ))
+              : t("uiNoOrdersYet")
           }
         />
       )}

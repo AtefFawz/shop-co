@@ -51,7 +51,7 @@ export default function OrderStatusTracker({
           </div>
 
           <div>
-            <span className="inline-block rounded-full bg-danger-soft px-2.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-widest text-danger">
+            <span className="inline-block rounded-full bg-danger-soft px-2.5 py-0.5 font-mono text-xs font-black uppercase tracking-widest text-danger">
               {t("dispatchHalted")}
             </span>
             <p className="mt-1 text-base font-black uppercase tracking-tight text-danger">
@@ -151,7 +151,7 @@ export default function OrderStatusTracker({
                   isAdmin ? "cursor-pointer" : ""
                 } ${
                   isCurrent
-                    ? "border-border bg-surface-subtle shadow-[0_14px_32px_-12px_rgba(var(--shadow-rgb),0.12)]"
+                    ? "border-border bg-surface-subtle shadow-card"
                     : completed
                       ? "border-border/90 bg-surface hover:border-border-strong"
                       : "border-border/50 bg-surface-subtle/50 opacity-65 hover:opacity-100"
@@ -165,7 +165,7 @@ export default function OrderStatusTracker({
                   <div
                     className={`relative flex h-13 w-13 items-center justify-center rounded-2xl border-2 transition-all duration-300 ${
                       completed
-                        ? "border-border bg-action text-on-action shadow-[0_10px_24px_-6px_rgba(var(--shadow-rgb),0.4)]"
+                        ? "border-border bg-action text-on-action shadow-card"
                         : "border-border bg-surface text-muted group-hover:border-border-strong"
                     }`}
                   >
@@ -180,12 +180,12 @@ export default function OrderStatusTracker({
                 {/* Stage Metadata */}
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2 md:justify-center">
-                    <span className="font-mono text-[9px] font-black uppercase tracking-[0.2em] text-muted">
+                    <span className="font-mono text-xs font-black uppercase tracking-[0.2em] text-muted">
                       {step.code}
                     </span>
 
                     {isCurrent && (
-                      <span className="rounded-full bg-success-soft px-2 py-0.5 text-[8px] font-black tracking-wider text-success">
+                      <span className="rounded-full bg-success-soft px-2 py-0.5 text-xs font-black tracking-wider text-success">
                         {t("statusActive")}
                       </span>
                     )}
@@ -220,7 +220,7 @@ export default function OrderStatusTracker({
           </span>
         </div>
 
-        <span className="font-mono text-[10px] font-black uppercase tracking-widest text-primary">
+        <span className="font-mono text-xs font-black uppercase tracking-widest text-primary">
           {t("progress")} · {Math.round(((currentIndex + 1) / steps.length) * 100)}%
         </span>
       </div>

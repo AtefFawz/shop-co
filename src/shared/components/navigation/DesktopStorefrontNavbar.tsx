@@ -5,14 +5,17 @@ import { usePathname, useRouter } from "next/navigation";
 import SearchBar from "@/features/catalog/components/ProductSearchBar";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined";
-import { NAV_LINKS, getStorefrontNavLabel } from "@/shared/config/storefrontNavigation";
+import {
+  NAV_LINKS,
+  getStorefrontNavLabel,
+} from "@/shared/config/storefrontNavigation";
 import NavIcons from "@/shared/components/navigation/HeaderActionIcons";
 import api from "@/lib/api";
 import { useEffect, useState } from "react";
 import NotificationDropdown from "@/features/notifications/components/NotificationDropdown";
 import StrokeText from "@/shared/components/motion/StrokeText";
 import { motion, LayoutGroup } from "framer-motion";
-import { Heart } from "lucide-react";
+import { Heart, LayoutGrid } from "lucide-react";
 import { useWishlistStore } from "@/store/wishlistStore";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
@@ -21,9 +24,8 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 export default function DesktopStorefrontNavbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { t } = useLocale();
+  const { t, direction } = useLocale();
   const wishlistCount = useWishlistStore((state) => state.items.length);
-
 
   const [photo, setPhoto] = useState("");
 
@@ -85,7 +87,7 @@ export default function DesktopStorefrontNavbar() {
       // the action icons, so the compact navigation is used until xl.
       className="hidden xl:block w-full sticky top-0 z-50 "
     >
-      <header className="mx-auto flex w-full max-w-full items-center justify-between gap-2 lg:gap-5 xl:gap-8 px-2 py-3">
+      <header className="Responsive flex items-center justify-between gap-2 py-3 lg:gap-5 xl:gap-8">
         <div className="flex items-center gap-2.5 lg:gap-6 xl:gap-10 shrink-0">
           <motion.div
             initial={{ opacity: 0, filter: "blur(4px)" }}
@@ -130,7 +132,7 @@ export default function DesktopStorefrontNavbar() {
                     >
                       <Link
                         href={item.path}
-                        className={`relative px-2 py-1.5 2xl:px-3 2xl:py-2 text-[12px] xl:text-[13px] 2xl:text-[14px] font-semibold whitespace-nowrap transition-colors duration-200 rounded-lg ${
+                        className={`relative px-2 py-1.5 2xl:px-3 2xl:py-2 text-[0.75rem] xl:text-[0.8125rem] 2xl:text-[0.875rem] font-semibold whitespace-nowrap transition-colors duration-200 rounded-lg ${
                           isActive
                             ? "text-primary"
                             : "text-muted hover:text-primary hover:bg-surface-muted/60"
@@ -143,7 +145,7 @@ export default function DesktopStorefrontNavbar() {
                         {isActive && (
                           <motion.span
                             layoutId="desktopNavUnderline"
-                            className="absolute left-2 right-2 lg:left-3 lg:right-3 -bottom-px h-[2px] rounded-t-full bg-action shadow-[0_2px_6px_rgba(var(--shadow-rgb),0.25)]"
+                            className="absolute left-2 right-2 lg:left-3 lg:right-3 -bottom-px h-[2px] rounded-t-full bg-action shadow-card"
                             transition={{
                               type: "spring",
                               stiffness: 450,
@@ -175,6 +177,14 @@ export default function DesktopStorefrontNavbar() {
           transition={{ duration: 0.4, delay: 0.2 }}
           className="flex items-center gap-1 lg:gap-2.5 shrink-0"
         >
+          <Link
+            href="/my-space"
+            aria-label={direction === "rtl" ? "مساحتي" : "My space"}
+            title={direction === "rtl" ? "مساحتي" : "My space"}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-secondary transition hover:bg-surface-muted hover:text-primary"
+          >
+            <LayoutGrid size={19} />
+          </Link>
           <NavIcons
             items={desktopIcons}
             containerClass="flex items-center gap-0.5 lg:gap-1.5"

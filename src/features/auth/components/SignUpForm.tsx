@@ -89,11 +89,11 @@ const SignUpForm = () => {
         label={t("authPortrait")}
         rightBadge={
           user?.avatar ? (
-            <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-success">
+            <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-success">
               <CheckCircle2 size={11} /> {t("authPortraitReady")}
             </span>
           ) : (
-            <span className="text-[10px] font-bold uppercase tracking-wider text-muted">
+            <span className="text-xs font-bold uppercase tracking-wider text-muted">
               {t("authOptionalImage")}
             </span>
           )
@@ -106,7 +106,7 @@ const SignUpForm = () => {
             className="absolute inset-0 z-20 h-full w-full cursor-pointer opacity-0"
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               e.target.files?.[0] &&
-              handleChange("avatar", e.target.files[0] as unknown as string)
+              handleChange("avatar", e.target.files[0])
             }
           />
 
@@ -114,7 +114,7 @@ const SignUpForm = () => {
           <div className="relative flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-2 border-surface bg-surface shadow-sm transition-transform duration-300 group-hover:scale-105">
             {avatarPreviewUrl ? (
               <>
-                <img
+                <img loading="lazy" decoding="async"
                   src={avatarPreviewUrl}
                   alt={t("authPortrait")}
                   className="h-full w-full object-cover"
@@ -137,7 +137,7 @@ const SignUpForm = () => {
                 <p className="truncate text-xs font-black uppercase tracking-wider text-primary">
                   {user.avatar.name || t("authPortraitSelected")}
                 </p>
-                <p className="mt-0.5 text-[11px] font-semibold text-success">
+                <p className="mt-0.5 text-xs font-semibold text-success">
                   {user.avatar.size
                     ? `${(user.avatar.size / (1024 * 1024)).toFixed(2)} MB · ${t("authClickReplace")}`
                     : t("authClickChangePhoto")}
@@ -148,14 +148,14 @@ const SignUpForm = () => {
                 <p className="text-xs font-black uppercase tracking-wider text-primary">
                   {t("authUploadPortrait")}
                 </p>
-                <p className="mt-0.5 text-[11px] font-medium text-muted">
+                <p className="mt-0.5 text-xs font-medium text-muted">
                   {t("authDropBrowse")}
                 </p>
               </>
             )}
           </div>
 
-          <span className="rounded-xl border border-border bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary transition-colors group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action">
+          <span className="rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-black uppercase tracking-wider text-secondary transition-colors group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action">
             {user?.avatar ? t("authChange") : t("authBrowse")}
           </span>
         </label>
@@ -167,7 +167,7 @@ const SignUpForm = () => {
         active={focusedField === "fullName"}
         rightBadge={
           isNameValid ? (
-            <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-success">
+            <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-success">
               <CheckCircle2 size={11} /> {t("authLooksGood")}
             </span>
           ) : null
@@ -176,7 +176,7 @@ const SignUpForm = () => {
         <div
           className={`group relative flex items-center rounded-2xl border bg-surface-subtle transition-all duration-300 ${
             focusedField === "fullName"
-              ? "-translate-y-0.5 border-border bg-surface shadow-[0_12px_28px_-8px_rgba(var(--shadow-rgb),0.12)] ring-4 ring-focus/20"
+              ? "-translate-y-0.5 border-border bg-surface shadow-card ring-4 ring-focus/20"
               : "border-border/90 hover:border-border-strong hover:bg-surface"
           }`}
         >
@@ -198,7 +198,7 @@ const SignUpForm = () => {
             onFocus={() => setFocusedField("fullName")}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleChange("fullName", e.target.value)}
-            className="w-full bg-transparent py-3.5 ps-14 pe-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[0.8125rem]"
             required
           />
 
@@ -217,7 +217,7 @@ const SignUpForm = () => {
         active={focusedField === "email"}
         rightBadge={
           isEmailValid ? (
-            <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-success">
+            <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-success">
               <CheckCircle2 size={11} /> {t("authValidEmail")}
             </span>
           ) : null
@@ -226,7 +226,7 @@ const SignUpForm = () => {
         <div
           className={`group relative flex items-center rounded-2xl border bg-surface-subtle transition-all duration-300 ${
             focusedField === "email"
-              ? "-translate-y-0.5 border-border bg-surface shadow-[0_12px_28px_-8px_rgba(var(--shadow-rgb),0.12)] ring-4 ring-focus/20"
+              ? "-translate-y-0.5 border-border bg-surface shadow-card ring-4 ring-focus/20"
               : "border-border/90 hover:border-border-strong hover:bg-surface"
           }`}
         >
@@ -248,7 +248,7 @@ const SignUpForm = () => {
             onFocus={() => setFocusedField("email")}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleChange("email", e.target.value)}
-            className="w-full bg-transparent py-3.5 ps-14 pe-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-10 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[0.8125rem]"
             required
           />
 
@@ -267,7 +267,7 @@ const SignUpForm = () => {
         active={focusedField === "password"}
         rightBadge={
           <span
-            className={`font-mono text-[10px] font-black uppercase tracking-wider ${
+            className={`font-mono text-xs font-black uppercase tracking-wider ${
               pwdStrength.score >= 3
                 ? "text-success"
                 : pwdStrength.score >= 2
@@ -282,7 +282,7 @@ const SignUpForm = () => {
         <div
           className={`group relative flex items-center rounded-2xl border bg-surface-subtle transition-all duration-300 ${
             focusedField === "password"
-              ? "-translate-y-0.5 border-border bg-surface shadow-[0_12px_28px_-8px_rgba(var(--shadow-rgb),0.12)] ring-4 ring-focus/20"
+              ? "-translate-y-0.5 border-border bg-surface shadow-card ring-4 ring-focus/20"
               : "border-border/90 hover:border-border-strong hover:bg-surface"
           }`}
         >
@@ -304,7 +304,7 @@ const SignUpForm = () => {
             onFocus={() => setFocusedField("password")}
             onBlur={() => setFocusedField(null)}
             onChange={(e) => handleChange("password", e.target.value)}
-            className="w-full bg-transparent py-3.5 ps-14 pe-12 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[13px]"
+            className="w-full bg-transparent py-3.5 ps-14 pe-12 text-xs font-bold text-primary placeholder:font-medium placeholder:text-muted focus:outline-none sm:text-[0.8125rem]"
             required
           />
 
@@ -333,7 +333,7 @@ const SignUpForm = () => {
             ))}
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 text-[10px] font-bold text-muted">
+          <div className="flex flex-wrap items-center gap-3 text-xs font-bold text-muted">
             <span className={pwdStrength.hasLength ? "text-success" : ""}>
               ✓ {t("authEightChars")}
             </span>
@@ -352,7 +352,7 @@ const SignUpForm = () => {
         <button
           type="submit"
           disabled={loading}
-          className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-[0_16px_36px_-10px_rgba(var(--shadow-rgb),0.45)] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_22px_44px_-10px_rgba(var(--shadow-rgb),0.6)] active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-surface-hover disabled:shadow-none"
+          className="group relative flex w-full cursor-pointer items-center justify-center gap-3 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-panel active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-surface-hover disabled:shadow-none"
         >
           <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
 
@@ -390,7 +390,7 @@ function Field({
     <div className="flex flex-col gap-1.5">
       <div className="flex items-center justify-between px-1">
         <label
-          className={`text-[10px] font-black uppercase tracking-[0.18em] transition-colors ${
+          className={`text-xs font-black uppercase tracking-[0.18em] transition-colors ${
             active ? "text-primary" : "text-muted"
           }`}
         >

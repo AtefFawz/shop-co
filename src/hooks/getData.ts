@@ -1,7 +1,7 @@
 "use client";
 
 import api from "@/lib/api";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 
 import { getApiErrorDetails } from "@/lib/errorUtils";
 import type { ApiResponse } from "@/types/domain";
@@ -18,27 +18,34 @@ const useData = <T = ApiResponse, R = T>(
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<R | null>(null);
   const [page, setPage] = useState(1);
-  const [total, setTotal] = useState(1);
+  const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const { params, limit = 10, transform } = options || {};
 
   const serializedParams = JSON.stringify(params ?? {});
+  const previousParams = useRef(serializedParams);
+  // The first render after a filter change already requests page 1, rather than
+  // briefly requesting the previous page and then cancelling it in an effect.
+  const requestPage = previousParams.current === serializedParams ? page : 1;
 
   useEffect(() => {
-    setPage(1);
-  }, [serializedParams]);
+    if (previousParams.current !== serializedParams) {
+      previousParams.current = serializedParams;
+      if (page !== 1) setPage(1);
+    }
+  }, [serializedParams, page]);
 
   const fetchData = useCallback(
     async (signal?: AbortSignal) => {
       try {
         setLoading(true);
 
-        const response = await api.get(URL, {
+        const response = await api.get(URL.replace(/^\/+/, ""), {
           params: {
             ...JSON.parse(serializedParams),
-            page,
+            page: requestPage,
             limit,
           },
           signal,
@@ -47,8 +54,10 @@ const useData = <T = ApiResponse, R = T>(
         const finalData = transform ? transform(responseData) : responseData;
 
         setData(finalData);
-        setTotalPages(responseData?.pagination?.totalPages || 1);
-        setTotal(responseData?.pagination?.total || 1);
+        const nextTotal = Number(responseData?.pagination?.total) || 0;
+        const nextTotalPages = Math.max(1, Number(responseData?.pagination?.totalPages) || 1);
+        setTotalPages(nextTotalPages);
+        setTotal(nextTotal);
       } catch (error: unknown) {
         const details = getApiErrorDetails(error);
         const wasCancelled =
@@ -59,6 +68,9 @@ const useData = <T = ApiResponse, R = T>(
         // Navigation and rapid filter changes intentionally cancel stale requests.
         // They are not application errors and should not clutter the console.
         if (!wasCancelled) {
+          setData(null);
+          setTotal(0);
+          setTotalPages(1);
           console.error(
             "Fetch Error:",
             details.response?.data?.message || details.message || "Unknown error",
@@ -69,7 +81,7 @@ const useData = <T = ApiResponse, R = T>(
         if (!signal?.aborted) setLoading(false);
       }
     },
-    [URL, page, limit, serializedParams, refreshKey, transform],
+    [URL, requestPage, limit, serializedParams, refreshKey, transform],
   );
 
   useEffect(() => {

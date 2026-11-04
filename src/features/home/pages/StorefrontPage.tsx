@@ -5,7 +5,7 @@ export default function StorefrontPage() {
   return (
     <>
       <CinematicIntro />
-      <div className="pt-18 md:pt-20">
+      <div>
         <Index />
       </div>
     </>

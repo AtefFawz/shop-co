@@ -6,6 +6,7 @@ export const NAV_LINKS = [
   { name: "On Sale", path: "/selling" },
   { name: "Category", path: "/category" },
   { name: "Brands", path: "/brand" },
+  { name: "Find your style", path: "/stylist" },
 ];
 
 const NAV_LABEL_KEYS: Readonly<Record<string, MessageKey>> = {
@@ -13,6 +14,7 @@ const NAV_LABEL_KEYS: Readonly<Record<string, MessageKey>> = {
   "/selling": "navSale",
   "/category": "navCategory",
   "/brand": "navBrands",
+  "/stylist": "navFindStyle",
 };
 
 export function getStorefrontNavLabel(

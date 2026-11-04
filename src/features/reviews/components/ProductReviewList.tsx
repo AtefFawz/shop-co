@@ -36,16 +36,16 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
   );
 
   const reviewsList: Review[] = useMemo(() => {
-    return (
-      item?.reviews?.map((e: RawReview) => ({
-        fullName: e.user?.fullName || t("reviewVerifiedClient"),
-        rating: Number(e.rating) || 5,
-        comment:
-          e.comment ||
-          t("reviewSampleComment"),
-        avatar: e.user?.avatar || "",
-      })) || []
-    );
+    return (item?.reviews ?? []).flatMap((review: RawReview) => {
+      const rating = Number(review.rating);
+      if (!Number.isFinite(rating) || rating < 1 || rating > 5) return [];
+      return [{
+        fullName: review.user?.fullName || t("reviewVerifiedClient"),
+        rating,
+        comment: typeof review.comment === "string" ? review.comment.trim() : "",
+        avatar: review.user?.avatar || "",
+      }];
+    });
   }, [item?.reviews, t]);
 
   const filteredReviews = useMemo(() => {
@@ -59,7 +59,7 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
   }, [reviewsList, filterStars]);
 
   const avgScore = useMemo(() => {
-    if (reviewsList.length === 0) return "5.0";
+    if (reviewsList.length === 0) return "—";
     const sum = reviewsList.reduce((acc, r) => acc + r.rating, 0);
     return (sum / reviewsList.length).toFixed(1);
   }, [reviewsList]);
@@ -67,11 +67,11 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
   return (
     <div dir={direction} className="space-y-8">
       {/* ── Top Header & Sentiment Filter Bar ── */}
-      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface p-5 shadow-[0_12px_34px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-7 lg:flex-row lg:items-center">
+      <div className="flex flex-col justify-between gap-4 rounded-3xl border border-border bg-surface p-5 shadow-card sm:p-7 lg:flex-row lg:items-center">
         <div>
           <div className="mb-1.5 inline-flex items-center gap-2 rounded-full bg-surface-subtle px-3 py-1">
             <ShieldCheck size={12} className="text-success" />
-            <span className="text-[9px] font-black uppercase tracking-[0.22em] text-secondary">
+            <span className="text-xs font-black uppercase tracking-[0.22em] text-secondary">
               {t("reviewVerifiedPatronFeedback")}
             </span>
           </div>
@@ -80,15 +80,17 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
 
         {/* Right Aggregate Score & Filter Pills */}
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex items-center gap-2.5 rounded-2xl border border-border/80 bg-surface-subtle px-4 py-2">
-            <span className="font-mono text-lg font-black text-primary">
-              {avgScore}
-            </span>
-            <Star size={15} className="fill-rating text-rating" />
-            <span className="text-[11px] font-bold text-muted">
-              ({reviewsList.length} {t("reviewVerifiedCount")})
-            </span>
-          </div>
+          {reviewsList.length > 0 && (
+            <div className="flex items-center gap-2.5 rounded-2xl border border-border/80 bg-surface-subtle px-4 py-2">
+              <span className="font-mono text-lg font-black text-primary">
+                {avgScore}
+              </span>
+              <Star size={15} className="fill-rating text-rating" />
+              <span className="text-xs font-bold text-muted">
+                ({reviewsList.length} {t("reviewVerifiedCount")})
+              </span>
+            </div>
+          )}
 
           {reviewsList.length > 0 && (
             <div className="inline-flex rounded-xl border border-border/80 bg-surface-subtle p-1">
@@ -101,7 +103,7 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
                   key={tab.id}
                   type="button"
                   onClick={() => setFilterStars(tab.id as "all" | "5" | "4+")}
-                  className={`cursor-pointer rounded-lg px-3 py-1.5 text-[10px] font-black uppercase tracking-wider transition-all ${
+                  className={`cursor-pointer rounded-lg px-3 py-1.5 text-xs font-black uppercase tracking-wider transition-all ${
                     filterStars === tab.id
                       ? "bg-action text-on-action shadow-2xs"
                       : "text-muted hover:text-primary"
@@ -126,7 +128,7 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
                 key={id}
                 whileHover={{ y: -6 }}
                 transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-[0_12px_34px_-14px_rgba(var(--shadow-rgb),0.06)] transition-shadow hover:border-border-subtle hover:shadow-[0_24px_48px_-14px_rgba(var(--shadow-rgb),0.12)]"
+                className="group relative flex flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-6 shadow-card transition-shadow hover:border-border-subtle hover:shadow-panel"
               >
                 <div className="space-y-4">
                   {/* Top Row: Stars & Quote Watermark */}
@@ -144,16 +146,18 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
                   </div>
 
                   {/* Comment Body */}
-                  <p className="text-xs font-medium italic leading-relaxed text-secondary sm:text-sm">
-                    &ldquo;{e.comment}&rdquo;
-                  </p>
+                  {e.comment && (
+                    <p className="text-xs font-medium italic leading-relaxed text-secondary sm:text-sm">
+                      &ldquo;{e.comment}&rdquo;
+                    </p>
+                  )}
                 </div>
 
                 {/* Bottom Author Profile */}
                 <div className="mt-6 flex items-center justify-between border-t border-border-subtle pt-4">
                   <div className="flex items-center gap-3 min-w-0">
                     {hasAvatar ? (
-                      <img
+                      <img loading="lazy" decoding="async"
                         src={e.avatar}
                         alt={e.fullName}
                         onError={() =>
@@ -174,7 +178,7 @@ export const ProductReviewList = ({ item }: { item: Product }) => {
                         </span>
                         <VerifiedRoundedIcon className="!text-sm text-success" />
                       </div>
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-muted">
+                      <span className="block text-xs font-bold uppercase tracking-wider text-muted">
                         {t("reviewVerifiedClient")}
                       </span>
                     </div>

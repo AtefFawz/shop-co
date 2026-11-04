@@ -45,7 +45,7 @@ export default function NotFound() {
     <main
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative isolate flex min-h-screen w-full flex-col items-center justify-between overflow-hidden bg-surface-subtle px-4 py-8 text-center text-primary select-none sm:px-8"
+      className="page-section relative isolate flex min-h-screen w-full flex-col items-center justify-between overflow-hidden bg-surface-subtle px-4 text-center text-primary select-none sm:px-8"
     >
       {/* ================================================================== */}
       {/* GPU 3D ANIMATIONS                                                  */}
@@ -90,7 +90,7 @@ export default function NotFound() {
         <button
           type="button"
           onClick={() => router.back()}
-          className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-border-subtle bg-surface/90 px-4 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-primary shadow-2xs backdrop-blur-md transition-all hover:bg-action hover:text-on-action"
+          className="group inline-flex cursor-pointer items-center gap-2 rounded-full border border-border-subtle bg-surface/90 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-primary shadow-2xs backdrop-blur-md transition-all hover:bg-action hover:text-on-action"
         >
           <ArrowLeft
             size={13}
@@ -99,7 +99,7 @@ export default function NotFound() {
           <span>Previous Page</span>
         </button>
 
-        <span className="rounded-full border border-border-subtle bg-surface/90 px-3.5 py-1.5 font-mono text-[10px] font-extrabold tracking-[0.2em] text-secondary backdrop-blur-md">
+        <span className="rounded-full border border-border-subtle bg-surface/90 px-3.5 py-1.5 font-mono text-xs font-extrabold tracking-[0.2em] text-secondary backdrop-blur-md">
           STATUS // 404
         </span>
       </header>
@@ -117,15 +117,15 @@ export default function NotFound() {
             transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
             transformStyle: "preserve-3d",
           }}
-          className="relative rounded-[2.6rem] border-2 border-surface bg-surface/95 p-7 shadow-[0_35px_90px_-20px_rgba(var(--shadow-rgb),0.15)] backdrop-blur-xl transition-transform duration-200 ease-out sm:p-10"
+          className="relative rounded-[2.6rem] border-2 border-surface bg-surface/95 p-7 shadow-panel backdrop-blur-xl transition-transform duration-200 ease-out sm:p-10"
         >
           {/* 3D Floating Luxury Price Tag (translateZ +50px) */}
-          <div className="animate-tag-3d mx-auto mb-6 flex w-fit items-center gap-3 rounded-2xl border border-white/20 bg-action px-4 py-2.5 text-on-action shadow-[0_18px_36px_-6px_rgba(var(--shadow-rgb),0.45)]">
+          <div className="animate-tag-3d mx-auto mb-6 flex w-fit items-center gap-3 rounded-2xl border border-white/20 bg-action px-4 py-2.5 text-on-action shadow-card">
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-surface text-primary">
               <Tag size={15} />
             </span>
             <div className="pr-1 text-left">
-              <span className="block font-mono text-[8px] font-bold uppercase tracking-[0.22em] text-on-action/50">
+              <span className="block font-mono text-xs font-bold uppercase tracking-[0.22em] text-on-action/50">
                 ARCHIVE CODE // 404
               </span>
               <span className="block text-xs font-black uppercase tracking-wider text-rating">
@@ -169,7 +169,7 @@ export default function NotFound() {
             </div>
             <button
               type="submit"
-              className="shrink-0 cursor-pointer rounded-xl bg-action px-5 py-2.5 text-[10px] font-black uppercase tracking-widest text-on-action transition-all hover:bg-action-hover active:scale-95"
+              className="shrink-0 cursor-pointer rounded-xl bg-action px-5 py-2.5 text-xs font-black uppercase tracking-widest text-on-action transition-all hover:bg-action-hover active:scale-95"
             >
               Search
             </button>
@@ -182,7 +182,7 @@ export default function NotFound() {
           >
             <Link
               href="/"
-              className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-[0_14px_30px_-8px_rgba(var(--shadow-rgb),0.4)] transition-all hover:-translate-y-0.5 hover:bg-action-hover"
+              className="group inline-flex items-center justify-center gap-2 rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.18em] text-on-action shadow-card transition-all hover:-translate-y-0.5 hover:bg-action-hover"
             >
               <Compass size={15} />
               <span>Flagship Home</span>
@@ -203,7 +203,7 @@ export default function NotFound() {
 
           {/* Quick Destination Pills */}
           <div className="mt-6 border-t border-border-subtle pt-5">
-            <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-muted">
+            <span className="block text-xs font-black uppercase tracking-[0.22em] text-muted">
               Direct Showroom Shortcuts
             </span>
             <div className="mt-2.5 flex flex-wrap items-center justify-center gap-2">
@@ -211,7 +211,7 @@ export default function NotFound() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className="rounded-full border border-border/80 bg-surface-subtle px-3.5 py-1 text-[10px] font-bold text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
+                  className="rounded-full border border-border/80 bg-surface-subtle px-3.5 py-1 text-xs font-bold text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
                 >
                   {item.label}
                 </Link>
@@ -224,7 +224,7 @@ export default function NotFound() {
       {/* ================================================================== */}
       {/* 3. BOTTOM EDITORIAL FOOTER                                         */}
       {/* ================================================================== */}
-      <footer className="relative z-20 text-[10px] font-bold uppercase tracking-[0.24em] text-muted">
+      <footer className="relative z-20 text-xs font-bold uppercase tracking-[0.24em] text-muted">
         SHOP.CO™ OFFICIAL ONLINE FLAGSHIP · EDITION 2026
       </footer>
     </main>

@@ -2,59 +2,45 @@
 "use client";
 import { resolveImageUrl } from "@/lib/imageUrl";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { AlertTriangle, ArrowUpRight, Edit3, Search, CheckCircle2, Flame } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatCurrency } from "@/lib/formatCurrency";
+import useData from "@/hooks/getData";
+import { useDebounce } from "@/hooks/useDebounce";
+import { ClientPagination } from "@/shared/components/navigation/ClientPagination";
 
 import type { Product } from "@/types";
-export const LowStockProductList = ({
-  lowStockProducts = [],
-}: {
-  lowStockProducts: Product[];
-}) => {
+export const LowStockProductList = () => {
   const { t, locale, direction } = useLocale();
   const [filterMode, setFilterMode] = useState<"all" | "out" | "urgent">("all");
   const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
+  const stockStatus = filterMode === "all" ? "critical" : filterMode === "urgent" ? "low" : "out";
+  const { data, loading, page, totalPages, goToPage } = useData("product", {
+    params: {
+      stockStatus,
+      keyword: debouncedSearch.trim() || null,
+      sort: "stock-asc",
+      includeStats: true,
+    },
+    limit: 8,
+  });
 
-  const safeList = Array.isArray(lowStockProducts) ? lowStockProducts : [];
-
-  const depletedCount = useMemo(
-    () => safeList.filter((i) => (i.countInStock ?? 0) === 0).length,
-    [safeList],
-  );
-  const urgentCount = useMemo(
-    () =>
-      safeList.filter((i) => {
-        const s = i.countInStock ?? 0;
-        return s > 0 && s <= 5;
-      }).length,
-    [safeList],
-  );
-
-  const filteredProducts = useMemo(() => {
-    return safeList
-      .filter((item) => {
-        const stock = item.countInStock ?? 0;
-        if (filterMode === "out" && stock !== 0) return false;
-        if (filterMode === "urgent" && (stock === 0 || stock > 5)) return false;
-        if (searchQuery.trim()) {
-          const q = searchQuery.toLowerCase();
-          const matchName = (item.name || "").toLowerCase().includes(q);
-          const matchCat = (item.category || "").toLowerCase().includes(q);
-          return matchName || matchCat;
-        }
-        return true;
-      })
-      .slice(0, 8);
-  }, [safeList, filterMode, searchQuery]);
+  const safeList: Product[] = (data?.data?.Products ?? []) as Product[];
+  const globalStats = (data as { stats?: { lowStockCount?: number; outOfStockCount?: number } } | null)?.stats;
+  const depletedCount = Number(globalStats?.outOfStockCount ?? 0);
+  const criticalCount = Number(globalStats?.lowStockCount ?? 0);
+  const urgentCount = Math.max(0, criticalCount - depletedCount);
+  const filteredProducts = safeList;
+  const totalMatches = Number(data?.pagination?.total ?? safeList.length);
 
   return (
     <div
       dir={direction}
-      className="overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)]"
+      className="overflow-hidden rounded-3xl border border-border bg-surface shadow-card"
     >
       {/* ================================================================== */}
       {/* 1. WATCHLIST COMMAND HEADER & LIVE FILTER TABS                     */}
@@ -63,9 +49,9 @@ export const LowStockProductList = ({
         <div className="flex items-start gap-3.5">
           <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-action text-on-action shadow-md">
             <AlertTriangle size={18} className="text-rating" />
-            {safeList.length > 0 && (
-              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-danger font-mono text-[9px] font-black text-on-danger">
-                {safeList.length}
+            {criticalCount > 0 && (
+              <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-danger font-mono text-xs font-black text-on-danger">
+                {criticalCount}
               </span>
             )}
           </div>
@@ -75,7 +61,7 @@ export const LowStockProductList = ({
               <h3 className="text-sm font-black uppercase tracking-tight text-primary sm:text-base">
                 {t("dashboardCriticalInventoryWatchlist")}
               </h3>
-              <span className="hidden rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-warning sm:inline-block">
+              <span className="hidden rounded-full border border-warning-border bg-warning-soft px-2.5 py-0.5 text-xs font-black uppercase tracking-wider text-warning sm:inline-block">
                 {t("dashboardRestockPriority")}
               </span>
             </div>
@@ -107,18 +93,18 @@ export const LowStockProductList = ({
             <button
               type="button"
               onClick={() => setFilterMode("all")}
-              className={`rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+              className={`rounded-lg px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider transition-all ${
                 filterMode === "all"
                   ? "bg-action text-on-action"
                   : "text-muted hover:text-primary"
               }`}
             >
-              {t("dashboardFilterAll")} ({safeList.length})
+              {t("dashboardFilterAll")} ({criticalCount})
             </button>
             <button
               type="button"
               onClick={() => setFilterMode("urgent")}
-              className={`rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+              className={`rounded-lg px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider transition-all ${
                 filterMode === "urgent"
                   ? "bg-warning text-on-warning"
                   : "text-muted hover:text-warning"
@@ -129,7 +115,7 @@ export const LowStockProductList = ({
             <button
               type="button"
               onClick={() => setFilterMode("out")}
-              className={`rounded-lg px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wider transition-all ${
+              className={`rounded-lg px-2.5 py-1 text-xs font-extrabold uppercase tracking-wider transition-all ${
                 filterMode === "out"
                   ? "bg-danger text-on-danger"
                   : "text-muted hover:text-danger"
@@ -141,7 +127,7 @@ export const LowStockProductList = ({
 
           <Link
             href="/dashboard/products"
-            className="group inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
+            className="group inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3.5 py-2 text-xs font-black uppercase tracking-wider text-primary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
           >
             <span>{t("dashboardManageAll")}</span>
             <ArrowUpRight
@@ -155,18 +141,24 @@ export const LowStockProductList = ({
       {/* ================================================================== */}
       {/* 2. TABLE OR HEALTHY EMPTY STATE                                    */}
       {/* ================================================================== */}
-      {filteredProducts.length === 0 ? (
+      {loading && !data ? (
+        <div className="space-y-3 p-5" aria-label={t("dashboardLoadingInventory")}>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="h-14 animate-pulse rounded-xl bg-surface-subtle" />
+          ))}
+        </div>
+      ) : filteredProducts.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-14 text-center">
           <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-success-soft text-success">
             <CheckCircle2 size={22} />
           </div>
           <p className="text-sm font-black uppercase tracking-wider text-primary">
-            {safeList.length === 0
+            {criticalCount === 0 && filterMode === "all" && !debouncedSearch
               ? t("dashboardAllStockOptimal")
               : t("dashboardNoMatchingProducts")}
           </p>
           <p className="mt-1 text-xs text-muted">
-            {safeList.length === 0
+            {criticalCount === 0 && filterMode === "all" && !debouncedSearch
               ? t("dashboardAllStockOkayDescription")
               : t("dashboardTryOtherFilters")}
           </p>
@@ -175,7 +167,7 @@ export const LowStockProductList = ({
         <div className="overflow-x-auto">
           <table className="w-full border-collapse text-start">
             <thead>
-              <tr className="border-b border-border-subtle bg-surface-subtle/50 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+              <tr className="border-b border-border-subtle bg-surface-subtle/50 text-xs font-black uppercase tracking-[0.18em] text-muted">
                 <th className="px-5 py-3.5 sm:px-6">{t("dashboardProductSku")}</th>
                 <th className="px-4 py-3.5">{t("dashboardCategory")}</th>
                 <th className="px-4 py-3.5">{t("dashboardUnitPrice")}</th>
@@ -212,7 +204,7 @@ export const LowStockProductList = ({
                           >
                             {item.name}
                           </p>
-                          <span className="mt-0.5 block truncate font-mono text-[10px] font-semibold uppercase tracking-wider text-muted">
+                          <span className="mt-0.5 block truncate font-mono text-xs font-semibold uppercase tracking-wider text-muted">
                             {item.section || item.style || t("dashboardCatalogArchive")}
                           </span>
                         </div>
@@ -221,7 +213,7 @@ export const LowStockProductList = ({
 
                     {/* Category */}
                     <td className="py-3.5 px-4">
-                      <span className="inline-flex rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">
+                      <span className="inline-flex rounded-lg border border-border/80 bg-surface px-2.5 py-1 text-xs font-bold uppercase tracking-wider text-secondary">
                         {item.category || t("dashboardGeneralCategory")}
                       </span>
                     </td>
@@ -254,12 +246,12 @@ export const LowStockProductList = ({
                         </div>
 
                         {isOut ? (
-                          <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-border bg-danger-soft px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-danger">
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-danger-border bg-danger-soft px-2.5 py-1 text-xs font-black uppercase tracking-wider text-danger">
                             <span className="h-1.5 w-1.5 animate-ping rounded-full bg-danger" />
                             {t("dashboardDepletedAt")}
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1.5 rounded-full border border-warning-border bg-warning-soft px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-warning">
+                          <span className="inline-flex items-center gap-1.5 rounded-full border border-warning-border bg-warning-soft px-2.5 py-1 text-xs font-black uppercase tracking-wider text-warning">
                             <Flame size={11} className="text-warning" />
                             {t("dashboardUrgentUnits").replace("{count}", String(stockVal))}
                           </span>
@@ -271,7 +263,7 @@ export const LowStockProductList = ({
                     <td className="py-3.5 px-5 text-end sm:px-6">
                       <Link
                         href={`/dashboard/products/edit/${item._id}`}
-                        className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:bg-action hover:text-on-action"
+                        className="inline-flex items-center gap-1.5 rounded-xl border border-border bg-surface px-3 py-1.5 text-xs font-black uppercase tracking-wider text-secondary shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-border-strong hover:bg-action hover:text-on-action"
                       >
                         <Edit3 size={11} />
                         <span>{t("dashboardRestock")}</span>
@@ -282,6 +274,15 @@ export const LowStockProductList = ({
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className="flex flex-col items-center justify-between gap-2 border-t border-border-subtle px-5 py-3 sm:flex-row sm:px-6">
+          <span className="text-xs font-semibold text-muted">
+            {totalMatches.toLocaleString(locale === "ar" ? "ar-EG" : "en-EG")} {t("dashboardInventoryMatches")}
+          </span>
+          <ClientPagination page={page} totalPages={totalPages} goToPage={goToPage} />
         </div>
       )}
     </div>

@@ -57,7 +57,7 @@ export default function Error({
     <main
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
-      className="relative isolate flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-surface-subtle px-4 py-12 text-center text-primary select-none"
+      className="page-section relative isolate flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-surface-subtle px-4 text-center text-primary select-none"
     >
       {/* ================================================================== */}
       {/* GPU 3D ANIMATIONS                                                  */}
@@ -110,7 +110,7 @@ export default function Error({
             transform: `rotateX(${tilt.y}deg) rotateY(${tilt.x}deg)`,
             transformStyle: "preserve-3d",
           }}
-          className="relative rounded-[2.5rem] border-2 border-surface bg-surface/95 p-7 shadow-[0_30px_80px_-20px_rgba(var(--shadow-rgb),0.14)] backdrop-blur-xl transition-transform duration-200 ease-out sm:p-10"
+          className="relative rounded-4xl border-2 border-surface bg-surface/95 p-7 shadow-panel backdrop-blur-xl transition-transform duration-200 ease-out sm:p-10"
         >
           {/* Depth Layer -1: Decorative Dashed Halo */}
           <div
@@ -121,7 +121,7 @@ export default function Error({
           {/* Top Floating Status Badge (translateZ +30px) */}
           <div
             style={{ transform: "translateZ(30px)" }}
-            className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-danger-border bg-danger-soft px-3.5 py-1 text-[9px] font-black uppercase tracking-[0.22em] text-danger"
+            className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-danger-border bg-danger-soft px-3.5 py-1 text-xs font-black uppercase tracking-[0.22em] text-danger"
           >
             <span className="h-1.5 w-1.5 animate-ping rounded-full bg-danger" />
             <span>RUNTIME TELEMETRY INTERRUPTION</span>
@@ -130,10 +130,10 @@ export default function Error({
           {/* 3D Extruded Warning Cube (translateZ +45px) */}
           <div
             style={{ transform: "translateZ(45px)" }}
-            className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-action text-on-action shadow-[0_18px_36px_-8px_rgba(var(--shadow-rgb),0.4)]"
+            className="relative mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-action text-on-action shadow-card"
           >
             <AlertTriangle size={32} className="text-rating" />
-            <span className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-surface bg-danger font-mono text-[10px] font-black text-on-danger">
+            <span className="absolute -right-1.5 -top-1.5 flex h-6 w-6 items-center justify-center rounded-full border-2 border-surface bg-danger font-mono text-xs font-black text-on-danger">
               !
             </span>
           </div>
@@ -147,7 +147,7 @@ export default function Error({
               Studio View Interrupted
             </h1>
 
-            <p className="mx-auto max-w-sm text-xs font-medium leading-relaxed text-muted sm:text-[13px]">
+            <p className="mx-auto max-w-sm text-xs font-medium leading-relaxed text-muted sm:text-[0.8125rem]">
               We encountered a temporary rendering anomaly while loading this
               view. Rest assured, your{" "}
               <strong className="font-bold text-primary">
@@ -165,7 +165,7 @@ export default function Error({
               type="button"
               onClick={handleRecovery}
               disabled={isResetting}
-              className="group relative flex w-full cursor-pointer items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-[0_16px_36px_-10px_rgba(var(--shadow-rgb),0.45)] transition-all hover:-translate-y-0.5 hover:bg-action-hover active:scale-98 disabled:opacity-60"
+              className="group relative flex w-full cursor-pointer items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-action py-4 text-xs font-black uppercase tracking-[0.2em] text-on-action shadow-card transition-all hover:-translate-y-0.5 hover:bg-action-hover active:scale-98 disabled:opacity-60"
             >
               <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
               <RotateCcw
@@ -185,7 +185,7 @@ export default function Error({
               <button
                 type="button"
                 onClick={() => window.location.reload()}
-                className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-2xl border border-border/90 bg-surface-subtle py-3 text-[10px] font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-surface hover:text-primary"
+                className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-2xl border border-border/90 bg-surface-subtle py-3 text-xs font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-surface hover:text-primary"
               >
                 <RefreshCw size={12} />
                 <span>Hard Reload</span>
@@ -193,7 +193,7 @@ export default function Error({
 
               <Link
                 href="/"
-                className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-border/90 bg-surface-subtle py-3 text-[10px] font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-surface hover:text-primary"
+                className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-border/90 bg-surface-subtle py-3 text-xs font-black uppercase tracking-widest text-secondary transition-all hover:border-border-strong hover:bg-surface hover:text-primary"
               >
                 <Store size={12} />
                 <span>Flagship Home</span>
@@ -209,7 +209,7 @@ export default function Error({
             <button
               type="button"
               onClick={() => setShowLogs((prev) => !prev)}
-              className="flex w-full cursor-pointer items-center justify-between text-[10px] font-black uppercase tracking-widest text-muted hover:text-primary"
+              className="flex w-full cursor-pointer items-center justify-between text-xs font-black uppercase tracking-widest text-muted hover:text-primary"
             >
               <span className="inline-flex items-center gap-1.5">
                 <Terminal size={12} />
@@ -224,7 +224,7 @@ export default function Error({
             </button>
 
             {showLogs && (
-              <div className="mt-3 rounded-2xl border border-border/80 bg-surface-subtle p-3.5 font-mono text-[10px] text-secondary animate-in fade-in duration-200">
+              <div className="mt-3 rounded-2xl border border-border/80 bg-surface-subtle p-3.5 font-mono text-xs text-secondary animate-in fade-in duration-200">
                 <div className="flex items-center justify-between border-b border-border/70 pb-2">
                   <span className="font-bold text-primary">
                     DIGEST: {error?.digest || "LOCAL_RUNTIME_ERR"}
@@ -232,7 +232,7 @@ export default function Error({
                   <button
                     type="button"
                     onClick={handleCopyError}
-                    className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-surface px-2 py-0.5 text-[9px] font-black uppercase text-primary shadow-2xs hover:bg-action hover:text-on-action"
+                    className="inline-flex cursor-pointer items-center gap-1 rounded-md bg-surface px-2 py-0.5 text-xs font-black uppercase text-primary shadow-2xs hover:bg-action hover:text-on-action"
                   >
                     {copied ? (
                       <>
@@ -245,7 +245,7 @@ export default function Error({
                     )}
                   </button>
                 </div>
-                <p className="mt-2 line-clamp-3 break-all text-[10px] leading-relaxed text-danger">
+                <p className="mt-2 line-clamp-3 break-all text-xs leading-relaxed text-danger">
                   {error?.message ||
                     "Unexpected client-side exception occurred."}
                 </p>
@@ -254,7 +254,7 @@ export default function Error({
           </div>
 
           {/* Bag Protection Assurance */}
-          <div className="mt-4 flex items-center justify-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-muted">
+          <div className="mt-4 flex items-center justify-center gap-1.5 text-xs font-bold uppercase tracking-widest text-muted">
             <ShieldCheck size={13} className="text-success" />
             <span>Cart State Protected By Local Persistence</span>
           </div>

@@ -63,7 +63,7 @@ export default function AdminUsersTable({
             <div
               key={user._id}
               onClick={() => clickUser(user._id)}
-              className="user-3d-card group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-[0_12px_32px_-12px_rgba(var(--shadow-rgb),0.06)]"
+              className="user-3d-card group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-card"
             >
               {/* Top Lanyard Slot Aesthetic */}
               <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-surface-hover/80 transition-colors group-hover:bg-action" />
@@ -75,7 +75,7 @@ export default function AdminUsersTable({
                   onClick={(e) =>
                     handleCopy(e, user._id, `ID #${shortId}`, `id-${user._id}`)
                   }
-                  className="inline-flex items-center gap-1 rounded-lg bg-surface-muted px-2 py-1 font-mono text-[10px] font-black text-secondary transition-colors hover:bg-action hover:text-on-action"
+                  className="inline-flex items-center gap-1 rounded-lg bg-surface-muted px-2 py-1 font-mono text-xs font-black text-secondary transition-colors hover:bg-action hover:text-on-action"
                 >
                   <span>#{shortId}</span>
                   {copiedKey === `id-${user._id}` ? (
@@ -86,7 +86,7 @@ export default function AdminUsersTable({
                 </button>
 
                 <span
-                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-wider ${roleInfo.className}`}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-black uppercase tracking-wider ${roleInfo.className}`}
                 >
                   <RoleIcon size={11} />
                   {roleInfo.label}
@@ -97,7 +97,7 @@ export default function AdminUsersTable({
               <div className="my-5 flex flex-col items-center text-center">
                 <div className="relative mb-3">
                   {hasAvatar ? (
-                    <img
+                    <img loading="lazy" decoding="async"
                       src={user.avatar}
                       alt={user.fullName || t("usersUnnamed")}
                       onError={() =>
@@ -128,7 +128,7 @@ export default function AdminUsersTable({
                   onClick={(e) =>
                     handleCopy(e, user.email || "", t("usersCopyEmail"), `mail-${user._id}`)
                   }
-                  className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-[11px] font-medium text-muted hover:text-primary"
+                  className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-xs font-medium text-muted hover:text-primary"
                 >
                   <span className="truncate">{user.email}</span>
                   {copiedKey === `mail-${user._id}` && (
@@ -138,7 +138,7 @@ export default function AdminUsersTable({
               </div>
 
               {/* Footer: Joined Date & Inspect CTA */}
-              <div className="flex items-center justify-between border-t border-border-subtle pt-3.5 text-[10px] font-bold text-muted">
+              <div className="flex items-center justify-between border-t border-border-subtle pt-3.5 text-xs font-bold text-muted">
                 <span className="inline-flex items-center gap-1">
                   <Calendar size={11} />
                   {user.createdAt
@@ -169,11 +169,11 @@ export default function AdminUsersTable({
   /* MODE A: EDITORIAL DIRECTORY TABLE (DEFAULT DESKTOP VIEW)               */
   /* ====================================================================== */
   return (
-    <div dir={direction} className="hidden w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.07)] md:block">
+    <div dir={direction} className="hidden w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-card md:block">
       <div className="w-full overflow-x-auto">
         <table className="w-full border-collapse text-start">
           <thead>
-            <tr className="border-b border-border-subtle bg-surface-subtle/70 text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+            <tr className="border-b border-border-subtle bg-surface-subtle/70 text-xs font-black uppercase tracking-[0.18em] text-muted">
               <th className="py-4 px-5">{t("usersAccountId")}</th>
               <th className="py-4 px-4">{t("usersProfile")}</th>
               <th className="py-4 px-4">{t("adminUserRole")}</th>
@@ -224,7 +224,7 @@ export default function AdminUsersTable({
                     <div className="flex items-center gap-3.5">
                       <div className="relative shrink-0">
                         {hasAvatar ? (
-                          <img
+                          <img loading="lazy" decoding="async"
                             src={user.avatar}
                             alt={user.fullName || t("usersUnnamed")}
                             onError={() =>
@@ -261,7 +261,7 @@ export default function AdminUsersTable({
                             )
                           }
                           title={t("usersCopyEmail")}
-                          className="mt-0.5 inline-flex max-w-full cursor-pointer items-center gap-1.5 truncate text-[11px] font-medium text-muted transition-colors hover:text-primary"
+                          className="mt-0.5 inline-flex max-w-full cursor-pointer items-center gap-1.5 truncate text-xs font-medium text-muted transition-colors hover:text-primary"
                         >
                           <Mail size={10} className="shrink-0" />
                           <span className="truncate">{user.email}</span>
@@ -279,7 +279,7 @@ export default function AdminUsersTable({
                   {/* 3. Role Badge */}
                   <td className="py-4 px-4 align-middle">
                     <span
-                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${roleInfo.className}`}
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${roleInfo.className}`}
                     >
                       <RoleIcon size={11} />
                       <span>{roleInfo.label}</span>
@@ -302,7 +302,7 @@ export default function AdminUsersTable({
 
                   {/* 5. Action Indicator */}
                   <td className="py-4 px-5 text-end align-middle">
-                    <span className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface px-3 py-1.5 text-[10px] font-black uppercase tracking-wider text-secondary shadow-2xs transition-all duration-200 group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action">
+                    <span className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface px-3 py-1.5 text-xs font-black uppercase tracking-wider text-secondary shadow-2xs transition-all duration-200 group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action">
                       <span>{t("usersProfile")}</span>
                       <ChevronRight
                         size={13}

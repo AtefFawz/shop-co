@@ -12,9 +12,9 @@ export default function WishlistPage() {
   const clearWishlist = useWishlistStore((state) => state.clearWishlist);
 
   return (
-    <section className="relative min-h-[70vh] overflow-hidden bg-surface-subtle py-8 text-primary sm:py-12">
-      <div className="Responsive relative z-10 space-y-8 px-4 sm:px-6">
-        <header className="flex flex-wrap items-end justify-between gap-4 rounded-3xl border border-border bg-surface p-6 shadow-[0_12px_36px_-14px_rgba(var(--shadow-rgb),0.08)] sm:p-8">
+    <section className="page-section relative min-h-[70vh] overflow-hidden bg-surface-subtle text-primary">
+      <div className="Responsive relative z-10 space-y-8">
+        <header className="flex flex-wrap items-end justify-between gap-4 rounded-3xl border border-border bg-surface p-6 shadow-card sm:p-8">
           <div className="space-y-2">
             <span className="inline-flex items-center gap-2 rounded-full bg-danger-soft px-3 py-1 text-xs font-bold text-danger">
               <Heart size={14} fill="currentColor" />

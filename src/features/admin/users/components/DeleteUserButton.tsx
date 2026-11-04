@@ -120,7 +120,7 @@ export default function DeleteUserButton({
                     stiffness: 420,
                     damping: 30,
                   }}
-                  className="relative z-10 w-full max-w-[400px] overflow-hidden rounded-[2rem] border border-border bg-surface p-5 text-primary shadow-[0_32px_80px_-12px_rgba(0,0,0,0.45)] sm:p-7"
+                  className="relative z-10 w-full max-w-[400px] overflow-hidden rounded-4xl border border-border bg-surface p-5 text-primary shadow-[0_32px_80px_-12px_rgba(0,0,0,0.45)] sm:p-7"
                 >
                   {/* Top Ambient Danger Glow */}
                   <div
@@ -146,7 +146,7 @@ export default function DeleteUserButton({
 
                   {/* Text Content */}
                   <div className="relative text-center">
-                    <span className="inline-flex items-center gap-1 rounded-full border border-danger-border/60 bg-danger-soft px-3 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.18em] text-danger">
+                    <span className="inline-flex items-center gap-1 rounded-full border border-danger-border/60 bg-danger-soft px-3 py-0.5 font-mono text-xs font-black uppercase tracking-[0.18em] text-danger">
                       {t("usersDeleteIrreversible")}
                     </span>
 
@@ -174,7 +174,7 @@ export default function DeleteUserButton({
                           {userName || t("usersProfile")}
                         </span>
                       </div>
-                      <span className="shrink-0 rounded-lg border border-border bg-surface px-2 py-0.5 font-mono text-[10px] font-black text-muted">
+                      <span className="shrink-0 rounded-lg border border-border bg-surface px-2 py-0.5 font-mono text-xs font-black text-muted">
                         #{shortId}
                       </span>
                     </div>

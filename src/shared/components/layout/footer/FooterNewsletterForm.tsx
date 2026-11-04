@@ -48,7 +48,7 @@ export default function FooterNewsletterForm() {
       viewport={{ once: true, margin: "-40px" }}
       transition={{ type: "spring", stiffness: 300, damping: 26 }}
       onMouseMove={handleMouseMove}
-      className="group relative overflow-hidden rounded-[24px] bg-action p-6 text-on-action shadow-[0_28px_60px_-12px_rgba(var(--shadow-rgb),0.28)] ring-1 ring-white/10 sm:rounded-[28px] sm:px-10 sm:py-9 lg:px-14 lg:py-11"
+      className="group relative overflow-hidden rounded-3xl bg-action p-6 text-on-action shadow-panel ring-1 ring-white/10 sm:rounded-3xl sm:px-10 sm:py-9 lg:px-14 lg:py-11"
     >
       <motion.div
         aria-hidden="true"
@@ -80,13 +80,13 @@ export default function FooterNewsletterForm() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/6 px-3 py-1 text-[9.5px] font-black uppercase tracking-[0.2em] text-on-action-muted backdrop-blur-md"
+            className="mb-3 inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/6 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-on-action-muted backdrop-blur-md"
           >
             <Sparkles size={11} className="text-rating animate-pulse" />
             <span>{t("exclusiveDrops")}</span>
           </motion.div>
 
-          <h2 className="text-2xl font-black uppercase tracking-tight text-on-action sm:text-3xl lg:text-[38px] lg:leading-[1.12]">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-on-action sm:text-3xl lg:text-[2.375rem] lg:leading-[1.12]">
             {t("stayUpdated")}
           </h2>
         </div>

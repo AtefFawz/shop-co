@@ -64,9 +64,9 @@ const LINEAR = (t: number) => t;
 const EASE_OUT = (t: number) => 1 - Math.pow(1 - t, 3);
 
 const SIZES: Record<HoldToConfirmButtonSize, string> = {
-  sm: "h-9 px-4 text-[10px] w-full font-extrabold",
-  md: "h-11 px-[22px] text-[15px]",
-  lg: "h-[52px] px-7 text-[17px]",
+  sm: "h-9 px-4 text-xs w-full font-extrabold",
+  md: "h-11 px-[22px] text-[0.9375rem]",
+  lg: "h-[52px] px-7 text-[1.0625rem]",
 };
 
 const GLOW =
@@ -298,8 +298,8 @@ const HoldToConfirmButton: React.FC<HoldToConfirmButtonProps> = ({
       >
         {icon ? (
           <span
-            className="inline-flex 
-          
+            className="inline-flex
+
           flex-none [&>svg]:block"
           >
             {icon}

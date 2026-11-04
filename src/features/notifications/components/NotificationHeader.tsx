@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
+
+import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { CheckCheck, X, Search, Volume2, VolumeX } from "lucide-react";
 
 import type { FilterTab } from "./NotificationDropdown";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { formatNumber } from "@/lib/formatNumber";
+import { useNotificationPreferences } from "@/shared/preferences/NotificationPreferencesProvider";
 
 type NotificationHeaderProps = {
   unreadCount: number;
@@ -18,8 +21,6 @@ type NotificationHeaderProps = {
   onMarkAllAsRead: () => void;
   onClose?: () => void;
 };
-
-const soundStorageKey = "shopco_notif_sound";
 
 export default function NotificationHeader({
   unreadCount,
@@ -33,27 +34,12 @@ export default function NotificationHeader({
 }: NotificationHeaderProps) {
   const { locale, t } = useLocale();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [soundEnabled, setSoundEnabled] = useState(true);
-  const reduceMotion = useReducedMotion();
-
-  useEffect(() => {
-    try {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setSoundEnabled(localStorage.getItem(soundStorageKey) !== "muted");
-    } catch {
-      // Keep default enabled state when storage is unavailable.
-    }
-  }, []);
+  const { preferences, updatePreferences } = useNotificationPreferences();
+  const soundEnabled = preferences.soundEnabled;
+  const reduceMotion = useAppReducedMotion();
 
   const toggleSound = () => {
-    const nextValue = !soundEnabled;
-    setSoundEnabled(nextValue);
-
-    try {
-      localStorage.setItem(soundStorageKey, nextValue ? "on" : "muted");
-    } catch {
-      // Sound preference remains usable for the current session.
-    }
+    updatePreferences({ soundEnabled: !soundEnabled });
   };
 
   const toggleSearch = () => {
@@ -112,13 +98,13 @@ export default function NotificationHeader({
                 {t("notifTitle")}
               </h3>
               {unreadCount > 0 && (
-                <span className="inline-flex items-center rounded-full border border-border-strong/60 bg-brand-soft px-2 py-0.5 font-mono text-[9.5px] font-bold text-accent">
+                <span className="inline-flex items-center rounded-full border border-border-strong/60 bg-brand-soft px-2 py-0.5 font-mono text-xs font-bold text-accent">
                   {formattedUnreadCount}
                 </span>
               )}
             </div>
 
-            <p className="mt-0.5 truncate text-[10.5px] font-medium text-muted">
+            <p className="mt-0.5 truncate text-xs font-medium text-muted">
               {unreadCount > 0
                 ? `${formattedUnreadCount} ${t("notifUnreadLabel")}`
                 : t("notifCaughtUp")}
@@ -181,7 +167,7 @@ export default function NotificationHeader({
               className="
                 inline-flex min-h-8 cursor-pointer items-center gap-1.5
                 rounded-xl border border-border-strong/70 bg-brand-soft
-                px-2.5 text-[9.5px] font-bold uppercase tracking-wider
+                px-2.5 text-xs font-bold uppercase tracking-wider
                 text-accent transition-all duration-200
                 hover:border-action hover:bg-action hover:text-on-action
                 focus-visible:outline-none focus-visible:ring-2
@@ -283,7 +269,7 @@ export default function NotificationHeader({
                 className={`
                   relative flex min-h-8 flex-1 cursor-pointer
                   items-center justify-center gap-1.5 rounded-xl
-                  px-2 text-[10.5px] font-bold transition-colors
+                  px-2 text-xs font-bold transition-colors
                   focus-visible:outline-none focus-visible:ring-2
                   focus-visible:ring-focus
                   ${
@@ -311,7 +297,7 @@ export default function NotificationHeader({
                   <span
                     className={`
                       relative z-10 rounded-full px-1.5 py-0.5
-                      font-mono text-[9px] font-bold leading-none
+                      font-mono text-xs font-bold leading-none
                       ${
                         selected
                           ? "bg-white/20 text-on-action"
@@ -353,7 +339,7 @@ export default function NotificationHeader({
           />
         </div>
 
-        <span className="font-mono text-[9.5px] font-bold text-muted">
+        <span className="font-mono text-xs font-bold text-muted">
           {t("notifReadProgress").replace("{percent}", String(readPercentage))}
         </span>
       </div>

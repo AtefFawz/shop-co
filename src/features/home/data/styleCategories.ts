@@ -1,8 +1,8 @@
 import { StaticImageData } from "next/image";
-import Casual from "@/assets/browse/casual.png";
-import Formal from "@/assets/browse/formal.png";
-import Party from "@/assets/browse/party.png";
-import Gym from "@/assets/browse/gym.png";
+import Casual from "@/assets/browse/casual.webp";
+import Formal from "@/assets/browse/formal.webp";
+import Party from "@/assets/browse/party.webp";
+import Gym from "@/assets/browse/gym.webp";
 interface StyleCategory {
   image: StaticImageData;
   name: string;

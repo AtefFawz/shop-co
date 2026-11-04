@@ -39,7 +39,7 @@ export default function OrderItemsList({
   );
 
   return (
-    <div dir={direction} className="overflow-hidden rounded-[2.2rem] border border-border bg-surface p-5 shadow-[0_14px_40px_-14px_rgba(var(--shadow-rgb),0.06)] sm:p-7">
+    <div dir={direction} className="overflow-hidden rounded-4xl border border-border bg-surface p-5 shadow-card sm:p-7">
       {/* ── Top Manifest Header ── */}
       <div className="mb-6 flex items-center justify-between border-b border-border-subtle pb-4">
         <div className="flex items-center gap-3">
@@ -56,7 +56,7 @@ export default function OrderItemsList({
           </div>
         </div>
 
-        <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-[10px] font-black uppercase tracking-wider text-secondary">
+        <span className="rounded-full border border-border bg-surface-subtle px-3 py-1 font-mono text-xs font-black uppercase tracking-wider text-secondary">
           {t("verifiedItems")}
         </span>
       </div>
@@ -79,19 +79,19 @@ export default function OrderItemsList({
               <div className="flex items-center gap-4 min-w-0">
                 {/* 3D Thumbnail Frame */}
                 <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-2xl border-2 border-surface bg-surface shadow-sm sm:h-24 sm:w-24">
-                  <img
+                  <img loading="lazy" decoding="async"
                     src={resolveImageUrl(item.image, "https://placehold.co/120x150/111111/FFFFFF?text=SHOP.CO")}
                     alt={productName}
                     className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-108"
                   />
-                  <span className="absolute bottom-1.5 end-1.5 rounded-lg bg-action/90 px-2 py-0.5 font-mono text-[10px] font-black text-on-action backdrop-blur-md">
+                  <span className="absolute bottom-1.5 end-1.5 rounded-lg bg-action/90 px-2 py-0.5 font-mono text-xs font-black text-on-action backdrop-blur-md">
                     ×{qty}
                   </span>
                 </div>
 
                 {/* Item Title & Unit Breakdown */}
                 <div className="min-w-0 flex-1 space-y-1.5">
-                  <span className="inline-block font-mono text-[9px] font-black uppercase tracking-[0.18em] text-muted">
+                  <span className="inline-block font-mono text-xs font-black uppercase tracking-[0.18em] text-muted">
                     {t("itemLabel")} · 0{idx + 1}
                   </span>
 
@@ -110,7 +110,7 @@ export default function OrderItemsList({
               {/* Right Line Subtotal & Inspect Link */}
               <div className="flex items-center justify-between border-t border-border/60 pt-3 sm:flex-col sm:items-end sm:border-t-0 sm:pt-0">
                 <div className="text-start sm:text-end">
-                  <span className="block text-[9px] font-bold uppercase tracking-widest text-muted">
+                  <span className="block text-xs font-bold uppercase tracking-widest text-muted">
                     {t("subtotal")}
                   </span>
                   <span className="font-mono text-base font-black text-primary sm:text-lg">
@@ -121,7 +121,7 @@ export default function OrderItemsList({
                 {productId && (
                   <Link
                     href={`/shop/details/${productId}`}
-                    className="mt-2 inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-wider text-muted hover:text-primary"
+                    className="mt-2 inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-muted hover:text-primary"
                   >
                     <span>{t("viewSku")}</span>
                     <ArrowUpRight size={12} />
@@ -153,7 +153,7 @@ export default function OrderItemsList({
 
         <div className="mt-4 flex items-end justify-between">
           <div>
-            <span className="block text-[9px] font-black uppercase tracking-[0.22em] text-on-action/45">
+            <span className="block text-xs font-black uppercase tracking-[0.22em] text-on-action/45">
               {t("finalSettlement")}
             </span>
             <span className="mt-0.5 inline-flex items-center gap-1.5 text-xs font-bold text-success">
