@@ -124,14 +124,14 @@ export default function RevenueMetricCard({
               {formattedChange}%
             </span>
             <span className="truncate text-[9px] text-muted">
-              {t("dashboardVsPrevious")}
+              {t("dashboardVsPrevious" as any)}
             </span>
           </>
         ) : (
           <span className="text-[9px] font-medium text-muted">
             {unavailable
-              ? t("dashboardRequiresCostData")
-              : t("dashboardNoComparisonData")}
+              ? t("dashboardRequiresCostData" as any)
+              : t("dashboardNoComparisonData" as any)}
           </span>
         )}
       </div>

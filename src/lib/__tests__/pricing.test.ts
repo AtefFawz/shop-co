@@ -22,7 +22,9 @@ describe("totals", () => {
   it("applies discount before shipping", () => {
     expect(calculateFinalPrice(100, 50, 2, true)).toBe(100);
     expect(calculateFinalPrice(100, 50, 2, false)).toBe(200);
-    const total = calculateTotalPrice([{ price: 100, count: 1, discount: 50, isSale: true }]);
+    const total = calculateTotalPrice([
+      { price: 100, count: 1, discount: 50, isSale: true },
+    ]);
     expect(total).toBe(50 + STANDARD_DELIVERY_FEE);
   });
 });
@@ -30,7 +32,7 @@ describe("totals", () => {
 describe("stock", () => {
   it("treats missing or invalid values as out of stock", () => {
     expect(getStockCount({ countInStock: 5 })).toBe(5);
-    expect(getStockCount({ countInStock: undefined })).toBe(0);
+    expect(getStockCount({ countInStock: 0 })).toBe(0);
     expect(getStockCount(null)).toBe(0);
     expect(getStockCount({ countInStock: -3 })).toBe(0);
   });

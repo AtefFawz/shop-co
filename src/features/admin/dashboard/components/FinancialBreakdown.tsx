@@ -27,26 +27,30 @@ export default function FinancialBreakdown({
       : null;
 
   const rows = [
-    { label: t("dashboardGrossSales"), value: summary.grossSales },
-    { label: t("dashboardDiscounts"), value: -summary.discounts },
-    { label: t("dashboardRefunds"), value: -summary.refunds },
-    { label: t("dashboardShippingRevenue"), value: summary.shippingRevenue },
+    { label: t("dashboardGrossSales" as any), value: summary.grossSales },
+    { label: t("dashboardDiscounts" as any), value: -summary.discounts },
+    { label: t("dashboardRefunds" as any), value: -summary.refunds },
     {
-      label: t("dashboardCostOfGoods"),
+      label: t("dashboardShippingRevenue" as any),
+      value: summary.shippingRevenue,
+    },
+    {
+      label: t("dashboardCostOfGoods" as any),
       value: summary.costOfGoodsSold === null ? null : -summary.costOfGoodsSold,
     },
-    { label: t("dashboardGrossProfit"), value: summary.grossProfit },
+    { label: t("dashboardGrossProfit" as any), value: summary.grossProfit },
     {
-      label: t("dashboardPaymentFees"),
+      label: t("dashboardPaymentFees" as any),
       value: summary.paymentFees === null ? null : -summary.paymentFees,
     },
     {
-      label: t("dashboardShippingCosts"),
+      label: t("dashboardShippingCosts" as any),
       value: summary.shippingCosts === null ? null : -summary.shippingCosts,
     },
     {
-      label: t("dashboardOperatingExpenses"),
-      value: summary.operatingExpenses === null ? null : -summary.operatingExpenses,
+      label: t("dashboardOperatingExpenses" as any),
+      value:
+        summary.operatingExpenses === null ? null : -summary.operatingExpenses,
     },
   ];
 
@@ -55,10 +59,10 @@ export default function FinancialBreakdown({
       <div className="mb-3 flex items-center justify-between gap-2">
         <div>
           <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-muted">
-            {t("dashboardFinancialBreakdown")}
+            {t("dashboardFinancialBreakdown" as any)}
           </p>
           <h4 className="mt-1 text-sm font-extrabold text-primary">
-            {t("dashboardWhereMoneyGoes")}
+            {t("dashboardWhereMoneyGoes" as any)}
           </h4>
         </div>
         <Wallet size={17} className="text-muted" aria-hidden="true" />
@@ -83,7 +87,7 @@ export default function FinancialBreakdown({
       <div className="mt-3 border-t border-border pt-3">
         <div className="mb-2 flex items-center justify-between gap-3">
           <span className="text-[11px] font-semibold text-secondary">
-            {t("dashboardProfitMargin")}
+            {t("dashboardProfitMargin" as any)}
           </span>
           <span className="font-mono text-[11px] font-bold text-primary">
             {profitMargin !== null ? `${profitMargin}%` : "—"}
@@ -91,7 +95,7 @@ export default function FinancialBreakdown({
         </div>
         <div className="flex items-center justify-between gap-3">
           <span className="text-xs font-bold text-primary">
-            {t("dashboardNetProfit")}
+            {t("dashboardNetProfit" as any)}
           </span>
           <span
             className={`font-mono text-sm font-black ${
@@ -107,8 +111,12 @@ export default function FinancialBreakdown({
 
       {!profitIsAvailable && (
         <p className="mt-3 flex items-start gap-2 rounded-xl border border-warning-border bg-warning-soft p-2.5 text-[10px] leading-relaxed text-warning">
-          <CircleAlert size={13} className="mt-0.5 shrink-0" aria-hidden="true" />
-          {t("dashboardProfitSetupHint")}
+          <CircleAlert
+            size={13}
+            className="mt-0.5 shrink-0"
+            aria-hidden="true"
+          />
+          {t("dashboardProfitSetupHint" as any)}
         </p>
       )}
     </div>
