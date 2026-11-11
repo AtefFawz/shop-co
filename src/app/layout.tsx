@@ -13,6 +13,7 @@ import type { Locale } from "@/shared/i18n/messages";
 import ToastSoundListener from "@/shared/components/feedback/ToastSoundListener";
 import { DisplayPreferencesProvider } from "@/shared/preferences/DisplayPreferencesProvider";
 import { NotificationPreferencesProvider } from "@/shared/preferences/NotificationPreferencesProvider";
+import PWAInstallPrompt from "@/shared/components/pwa/PWAInstallPrompt";
 
 /* -------------------------------------------------------------------------- */
 /*                                FONTS SETUP                                 */
@@ -45,7 +46,10 @@ const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL || "https://shop-co-jfqp.vercel.app";
 
 export const viewport: Viewport = {
-  themeColor: "#f5f4ef",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f4ef" },
+    { media: "(prefers-color-scheme: dark)", color: "#111827" },
+  ],
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
@@ -79,6 +83,14 @@ export const metadata: Metadata = {
   creator: "SHOP.CO Studio",
   publisher: "SHOP.CO International",
   category: "fashion",
+  appleWebApp: {
+    capable: true,
+    title: "SHOP.CO",
+    statusBarStyle: "default",
+  },
+  other: {
+    "mobile-web-app-capable": "yes",
+  },
 
   alternates: {
     canonical: "/",
@@ -208,6 +220,7 @@ export default async function RootLayout({
               <ToastSoundListener />
               <NotificationListener />
               <AuthWatcher />
+              <PWAInstallPrompt />
 
               {/* Main Content */}
               {children}

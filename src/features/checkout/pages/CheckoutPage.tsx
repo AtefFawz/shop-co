@@ -15,6 +15,8 @@ import { ShippingAddressForm } from "@/features/checkout/components/ShippingAddr
 import { OrderSummary } from "@/features/checkout/components/OrderSummary";
 import { EmptyCartState } from "@/features/cart/components/EmptyCartState";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { useUserStore } from "@/store/userStore";
+import { hasSessionHint } from "@/lib/sessionHint";
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -46,10 +48,38 @@ export default function CheckoutPage() {
     );
   }
 
+  const redirectGuestToSignIn = () => {
+    const checkoutPath = "/shop/details/cart/checkout";
+    // Keep the intended destination across both password and Google sign-in.
+    try {
+      window.sessionStorage.setItem("shopco:authReturnTo", checkoutPath);
+    } catch {
+      // Navigation still works when browser storage is unavailable.
+    }
+    toast.error(t("checkoutSignInRequired"));
+    router.push(`/auth/signin?reason=checkout&next=${encodeURIComponent(checkoutPath)}`);
+  };
+
   const handlePlaceOrder = async (shippingData: CheckoutShippingData) => {
+    if (loading) return;
     setLoading(true);
 
     try {
+      // Do not rely only on client state: the session may still be hydrating,
+      // or its access token may have expired while the checkout page was open.
+      const profileResponse = await api.get("profile/me", {
+        // Match AuthWatcher: do not burn refresh requests for a known guest.
+        skipAuthRefresh: !hasSessionHint(),
+      });
+      const authenticatedUser = profileResponse.data?.data?.user;
+
+      if (!authenticatedUser) {
+        redirectGuestToSignIn();
+        return;
+      }
+
+      useUserStore.getState().setUser(authenticatedUser);
+
       const payload = {
         orderItems: cartItems.map((item: CartProduct) => {
           const size = Array.isArray(item.size) ? item.size[0] : item.size;
@@ -81,6 +111,12 @@ export default function CheckoutPage() {
       clearCart();
       router.push("/order-success");
     } catch (error: unknown) {
+      // A guest or an expired session must authenticate before an order can be placed.
+      if (isAxiosError(error) && error.response?.status === 401) {
+        redirectGuestToSignIn();
+        return;
+      }
+
       // The shared axios interceptor already toasts API errors; only toast here
       // for failures it does not cover (non-Axios errors), to avoid doubles.
       if (!isAxiosError(error)) toast.error(t("placeOrderError"));

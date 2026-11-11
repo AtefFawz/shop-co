@@ -14,6 +14,7 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 import LocaleSwitcher from "@/shared/i18n/LocaleSwitcher";
 import ThemeToggle from "@/shared/theme/ThemeToggle";
 import { startGoogleOAuth } from "@/lib/googleOAuth";
+import { getSafeInternalRedirect } from "@/lib/safeRedirect";
 
 export default function SignInPageContent() {
   const { t, direction } = useLocale();
@@ -25,8 +26,16 @@ export default function SignInPageContent() {
   // /dashboard later is bounced here by the proxy (it cannot see the refresh cookie,
   // which is scoped to /api/auth). Try a silent refresh once and send them back.
   useEffect(() => {
-    const next = new URLSearchParams(window.location.search).get("next");
-    if (!next || !next.startsWith("/dashboard") || next.startsWith("//")) return;
+    const next = getSafeInternalRedirect(new URLSearchParams(window.location.search).get("next"));
+    if (next) {
+      try {
+        window.sessionStorage.setItem("shopco:authReturnTo", next);
+      } catch {
+        // Password sign-in can still use the query-string destination.
+      }
+    }
+
+    if (!next || !next.startsWith("/dashboard")) return;
 
     let cancelled = false;
     axios

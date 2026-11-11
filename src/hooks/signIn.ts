@@ -8,6 +8,7 @@ import { useSocketStore } from "@/store/socketStore";
 import { useUserStore } from "@/store/userStore";
 import { getApiErrorDetails } from "@/lib/errorUtils";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
+import { getSafeInternalRedirect } from "@/lib/safeRedirect";
 
 const useLogin = () => {
   const router = useRouter();
@@ -45,7 +46,20 @@ const useLogin = () => {
       toast.success(locale === "ar" ? "تم تسجيل الدخول بنجاح." : "Login successful!");
 
       router.refresh();
-      router.replace(["ADMIN", "MANAGER"].includes(userData.role.toUpperCase()) ? "/dashboard" : "/");
+      const requestedDestination = getSafeInternalRedirect(
+        typeof window !== "undefined"
+          ? new URLSearchParams(window.location.search).get("next")
+          : null,
+      );
+      const defaultDestination = ["ADMIN", "MANAGER"].includes(userData.role.toUpperCase())
+        ? "/dashboard"
+        : "/";
+      try {
+        window.sessionStorage.removeItem("shopco:authReturnTo");
+      } catch {
+        // Ignore unavailable browser storage.
+      }
+      router.replace(requestedDestination || defaultDestination);
     } catch (caught: unknown) {
       const details = getApiErrorDetails(caught);
       const status = details.response?.status;

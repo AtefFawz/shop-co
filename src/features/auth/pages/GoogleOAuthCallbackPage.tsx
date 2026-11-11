@@ -10,6 +10,7 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { useSocketStore } from "@/store/socketStore";
 import { useUserStore } from "@/store/userStore";
 import api from "@/lib/api";
+import { getSafeInternalRedirect } from "@/lib/safeRedirect";
 
 function OAuthContent() {
   const { t, direction, locale } = useLocale();
@@ -92,9 +93,21 @@ function OAuthContent() {
         useUserStore.getState().setUser(user);
         useSocketStore.getState().setSocketReady(true);
         toast.success(welcomeText);
+        let requestedDestination: string | null = null;
+        try {
+          requestedDestination = getSafeInternalRedirect(
+            window.sessionStorage.getItem("shopco:authReturnTo"),
+          );
+          window.sessionStorage.removeItem("shopco:authReturnTo");
+        } catch {
+          // Fall back to the storefront when session storage is unavailable.
+        }
         timer = setTimeout(() => {
           restoreOverflow();
-          router.replace(role === "ADMIN" || role === "MANAGER" ? "/dashboard" : "/");
+          const destination = role === "ADMIN" || role === "MANAGER"
+            ? "/dashboard"
+            : requestedDestination || "/";
+          router.replace(destination);
         }, 900);
       } catch (error) {
         console.error("Google OAuth exchange failed:", error);
