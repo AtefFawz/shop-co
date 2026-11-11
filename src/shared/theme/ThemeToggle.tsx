@@ -1,7 +1,6 @@
 "use client";
 
 import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
-
 import { motion, AnimatePresence } from "framer-motion";
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "@/shared/theme/ThemeProvider";
@@ -21,6 +20,17 @@ export default function ThemeToggle({
   const reduceMotion = useAppReducedMotion();
   const isDark = theme === "dark";
 
+  if (!mounted) {
+    return (
+      <button
+        type="button"
+        className={`group relative inline-flex shrink-0 items-center justify-center overflow-hidden rounded-full border border-border/80 bg-surface text-secondary shadow-sm outline-none ${compact ? "h-9 w-9" : "h-10 w-10"} ${className}`}
+      >
+        <span style={{ width: compact ? 16 : 18, height: compact ? 16 : 18 }} />
+      </button>
+    );
+  }
+
   return (
     <motion.button
       type="button"
@@ -37,10 +47,14 @@ export default function ThemeToggle({
       />
       <AnimatePresence mode="wait" initial={false}>
         <motion.span
-          key={mounted ? theme : "initial"}
-          initial={reduceMotion ? false : { opacity: 0, rotate: -40, scale: 0.7 }}
+          key={theme}
+          initial={
+            reduceMotion ? false : { opacity: 0, rotate: -40, scale: 0.7 }
+          }
           animate={{ opacity: 1, rotate: 0, scale: 1 }}
-          exit={reduceMotion ? undefined : { opacity: 0, rotate: 40, scale: 0.7 }}
+          exit={
+            reduceMotion ? undefined : { opacity: 0, rotate: 40, scale: 0.7 }
+          }
           transition={{ duration: 0.18 }}
           className="relative z-10 flex items-center justify-center"
         >

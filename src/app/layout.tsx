@@ -14,6 +14,7 @@ import ToastSoundListener from "@/shared/components/feedback/ToastSoundListener"
 import { DisplayPreferencesProvider } from "@/shared/preferences/DisplayPreferencesProvider";
 import { NotificationPreferencesProvider } from "@/shared/preferences/NotificationPreferencesProvider";
 import PWAInstallPrompt from "@/shared/components/pwa/PWAInstallPrompt";
+import PWAAppLaunchScreen from "@/shared/components/pwa/PWAAppLaunchScreen";
 
 /* -------------------------------------------------------------------------- */
 /*                                FONTS SETUP                                 */
@@ -47,12 +48,13 @@ const SITE_URL =
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f5f4ef" },
-    { media: "(prefers-color-scheme: dark)", color: "#111827" },
+    { media: "(prefers-color-scheme: light)", color: "#f5f6fc" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1020" },
   ],
   width: "device-width",
   initialScale: 1,
   maximumScale: 5,
+  viewportFit: "cover",
 };
 
 /* -------------------------------------------------------------------------- */
@@ -86,7 +88,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     title: "SHOP.CO",
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
   },
   other: {
     "mobile-web-app-capable": "yes",
@@ -185,6 +187,17 @@ export default async function RootLayout({
                 root.dataset.lineSpacing = preferences.lineSpacing === 'comfortable' ? 'comfortable' : 'standard';
                 root.dataset.reduceMotion = String(preferences.reduceMotion === true);
                 root.dataset.highContrast = String(preferences.highContrast === true);
+
+                var isStandalone = window.matchMedia('(display-mode: standalone)').matches ||
+                  window.matchMedia('(display-mode: fullscreen)').matches ||
+                  navigator.standalone === true;
+                try {
+                  if (isStandalone && sessionStorage.getItem('shopco-pwa-launch-v2') !== 'seen') {
+                    root.dataset.pwaLaunch = 'true';
+                  }
+                } catch (_) {
+                  if (isStandalone) root.dataset.pwaLaunch = 'true';
+                }
               })();
             `,
           }}
@@ -221,6 +234,7 @@ export default async function RootLayout({
               <NotificationListener />
               <AuthWatcher />
               <PWAInstallPrompt />
+              <PWAAppLaunchScreen />
 
               {/* Main Content */}
               {children}

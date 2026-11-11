@@ -19,6 +19,12 @@ export default function CinematicIntro() {
   const isArabic = locale === "ar";
 
   useEffect(() => {
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      ("standalone" in navigator &&
+        Boolean((navigator as Navigator & { standalone?: boolean }).standalone));
+    if (isStandalone) return;
+
     // Wait until the preference has been resolved before consuming the session key.
     if (reduceMotion === null || reduceMotion) return;
 

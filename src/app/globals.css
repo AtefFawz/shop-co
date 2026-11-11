@@ -215,6 +215,15 @@ html.dark {
   --color-rating: var(--rating);
 }
 
+html[data-pwa-launch="true"],
+html[data-pwa-launch="true"] body {
+  background: #0b1020 !important;
+}
+
+html[data-pwa-launch="true"] body > :not([data-pwa-launch-screen]) {
+  visibility: hidden;
+}
+
 html {
   min-height: 100%;
   font-size: var(--root-font-size, 100%);

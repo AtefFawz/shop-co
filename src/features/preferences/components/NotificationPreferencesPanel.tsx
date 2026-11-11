@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 import { useNotificationPreferences } from "@/shared/preferences/NotificationPreferencesProvider";
+import PWANotificationAccess from "@/shared/components/pwa/PWANotificationAccess";
 
 type SwitchRowProps = {
   title: string;
@@ -120,6 +121,10 @@ export function NotificationPreferencesPanel() {
             {t("notificationPreferencesDescription")}
           </p>
         </div>
+      </div>
+
+      <div className="mt-4">
+        <PWANotificationAccess />
       </div>
 
       <div className="mt-4 space-y-2.5">

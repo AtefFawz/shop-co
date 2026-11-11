@@ -145,12 +145,40 @@ export default function NotificationListener() {
       const currentPreferences = preferencesRef.current;
       const orderNotification = isOrderStatusNotification(notification);
       if (
-        !currentPreferences.inAppBanners ||
         (orderNotification && !currentPreferences.orderUpdates) ||
         isQuietHoursActive(currentPreferences)
       ) {
         return;
       }
+
+      // When the app is in the background but its live socket is still connected,
+      // surface the update through the operating system notification center.
+      // Delivery while the app is fully closed requires a server Web Push integration.
+      if (
+        document.visibilityState === "hidden" &&
+        "Notification" in window &&
+        window.Notification.permission === "granted" &&
+        "serviceWorker" in navigator
+      ) {
+        const destination = notification.order
+          ? `/shop/orders/${encodeURIComponent(String(notification.order))}`
+          : "/";
+        void navigator.serviceWorker.ready
+          .then((registration) =>
+            registration.showNotification(notification.title || t("notifNew"), {
+              body: notification.message || "",
+              icon: "/icons/shopco-192.png",
+              badge: "/icons/shopco-192.png",
+              tag: notificationId || `shopco-${Date.now()}`,
+              data: { url: destination },
+            }),
+          )
+          .catch((error: unknown) => {
+            console.warn("SHOP.CO device notification could not be displayed:", error);
+          });
+      }
+
+      if (!currentPreferences.inAppBanners) return;
 
       const { Icon, label, iconStyle } = getToastVisuals(
         notification.title,
