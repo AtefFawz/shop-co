@@ -40,4 +40,3 @@ export function AnimatedStatValue({ rawValue }: { rawValue: string }) {
     </>
   );
 }
-

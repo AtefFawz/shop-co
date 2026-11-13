@@ -1,59 +1,86 @@
-# SHOP.CO Frontend Architecture
+# Architecture
 
-## Directory boundaries
+SHOP.CO uses the Next.js App Router for routing and application composition. Route files under `src/app/` define URLs and metadata, while feature modules contain the page-specific interface and behavior.
 
-- `src/app/` contains Next.js App Router route files, layouts, error/loading boundaries, and route-level metadata/configuration. A route file remains named `page.tsx` because that is a Next.js convention; its implementation lives in a semantically named feature page.
-- `src/features/` owns business-facing UI by domain: `admin`, `auth`, `account`, `cart`, `catalog`, `checkout`, `home`, `notifications`, `orders`, `reviews`, and `seller`. Each feature owns its pages, components, and data. Complex UI areas use nested component folders instead of keeping every helper inside a single page file.
-- `src/shared/` contains cross-feature UI primitives, navigation, layout shell/footer, motion primitives, feedback UI, and theme state.
-- `src/features/*/data/` contains feature-owned content, while `src/shared/data/` and `src/shared/config/` hold cross-feature assets and navigation configuration.
-- `src/assets/` contains imported visual assets.
-- Unused legacy `src/components/` and `src/data/` trees were removed after checking that current route adapters, features, shared UI, and app entry points do not import from them; this prevents parallel, stale implementations from being mistaken for active code.
-- `src/hooks/`, `src/lib/`, `src/store/`, `src/types/`, and `src/utils/` retain the existing data/API integration boundary and utilities. API clients and API-specific hooks were intentionally not rewritten or renamed.
+## Source boundaries
 
-## Naming rules
-
-- React component files use PascalCase and describe what they render or do (`ProductCard.tsx`, `AccountProfilePanel.tsx`, `AdminDesktopOrdersTable.tsx`).
-- Page implementations are named by user intent (`ProductDetailsPage.tsx`, `OrderConfirmationPage.tsx`, `AdminProductCreatePage.tsx`). Route adapters import these explicit names while the required App Router filename remains `page.tsx`.
-- Shared controls are named by their behavior or role (`ClientPagination.tsx`, `ThemeToggle.tsx`, `RouteTransition.tsx`). Components exported by named export should match the component file name where practical.
-- New imports should use the `@/` alias instead of deep relative paths. Component file names and exported component identifiers should describe the same concept; API and hook files are kept in their original integration boundary.
-- Public URLs remain unchanged; route groups such as `(shop)` and `(admin)` are organizational and do not appear in the URL.
-
-## Current route ownership
-
-| URL | Page implementation |
+| Directory | Responsibility |
 | --- | --- |
-| `/` | `features/home/pages/StorefrontPage.tsx` |
-| `/brand` | `features/catalog/pages/BrandDirectoryPage.tsx` |
-| `/category` | `features/catalog/pages/CategoryLandingPage.tsx` |
-| `/selling` | `features/catalog/pages/BestSellingProductsPage.tsx` |
-| `/shop` | `features/catalog/pages/ShopCatalogPage.tsx` |
-| `/shop/details/[id]` | `features/catalog/pages/ProductDetailsPage.tsx` |
-| `/shop/details/cart` | `features/cart/pages/ShoppingCartPage.tsx` |
-| `/shop/details/cart/checkout` | `features/checkout/pages/CheckoutPage.tsx` |
-| `/shop/orders/[id]` | `features/orders/pages/OrderDetailsPage.tsx` |
-| `/my-orders` | `features/orders/pages/CustomerOrderHistoryPage.tsx` |
-| `/order-success` | `features/orders/pages/OrderConfirmationPage.tsx` |
-| `/user/profile` | `features/account/pages/AccountProfilePage.tsx` |
-| `/auth/forgot-password` | `features/auth/pages/PasswordRecoveryPage.tsx` |
-| `/auth/success` | `features/auth/pages/GoogleOAuthCallbackPage.tsx` |
-| `/post` | `features/seller/pages/ProductSubmissionPage.tsx` |
-| `/dashboard` | `features/admin/dashboard/pages/AdminDashboardPage.tsx` |
-| `/dashboard/products` | `features/admin/products/pages/AdminProductCatalogPage.tsx` |
-| `/dashboard/products/add` | `features/admin/products/pages/AdminProductCreatePage.tsx` |
-| `/dashboard/products/edit/[id]` | `features/admin/products/pages/AdminProductEditPage.tsx` |
-| `/dashboard/admin/orders` | `features/admin/orders/pages/AdminOrdersPage.tsx` |
-| `/dashboard/admin/users` | `features/admin/users/pages/AdminUsersPage.tsx` |
-| `/dashboard/admin/users/about/[id]` | `features/admin/users/pages/AdminUserDetailsPage.tsx` (route wrapper retains dynamic metadata) |
+| `src/app/` | App Router route adapters, root and route-group layouts, metadata, error/loading boundaries, and small route handlers. |
+| `src/features/` | Storefront and business domains. Each feature owns its pages, components, and feature-specific data. |
+| `src/shared/` | Components and providers shared across features, including navigation, layout, localization, theme, motion, and preferences. |
+| `src/lib/` | API clients, authentication/session helpers, Socket.IO setup, formatting, and domain utilities. |
+| `src/hooks/` | Reusable React hooks. |
+| `src/store/` | Client-side state stores, including the cart store. |
+| `src/types/` | Shared TypeScript domain and API types. |
+| `src/utils/` | General-purpose helpers. |
+| `public/` | Static assets, PWA icons, the service worker, and the offline page. |
 
-## API boundary
+Route groups `(shop)` and `(admin)` organize layouts and code. Their names do not appear in public URLs.
 
-Existing `src/lib/**`, `src/hooks/**`, `src/proxy.ts`, and `next.config.ts` were kept byte-for-byte identical to the uploaded project. This preserves request behavior, endpoint names, token refresh logic, authentication semantics, backend rewrite configuration, and server-client transport. Feature pages may import these modules, but should not duplicate or bypass their behavior.
+## Route ownership
 
+| URL | Feature area |
+| --- | --- |
+| `/` | Home / storefront |
+| `/shop` | Product catalog |
+| `/shop/details/[id]` | Product details |
+| `/brand` | Brand directory |
+| `/category` | Category landing page |
+| `/selling` | Best-selling products |
+| `/shop/details/cart` | Shopping cart |
+| `/shop/details/cart/checkout` | Checkout |
+| `/compare` | Product comparison |
+| `/wishlist` | Wishlist |
+| `/saved-for-later` | Saved items |
+| `/recently-viewed` | Recently viewed products |
+| `/price-alerts` | Price alerts |
+| `/auth/signin` | Sign-in |
+| `/auth/signup` | Account registration |
+| `/auth/verify-email` | Email verification |
+| `/auth/forgot-password` | Password recovery |
+| `/auth/success` | Google OAuth callback |
+| `/my-space` | Customer space |
+| `/user/profile` | Account profile and settings |
+| `/my-orders` | Customer order history |
+| `/shop/orders/[id]` | Order details |
+| `/shop/orders/[id]/invoice` | Order invoice |
+| `/order-success` | Order confirmation |
+| `/stylist` | Personal stylist experience |
+| `/post` | Product submission |
+| `/dashboard` | Admin dashboard |
+| `/dashboard/products` | Admin product catalog |
+| `/dashboard/products/add` | Product creation |
+| `/dashboard/products/edit/[id]` | Product editing |
+| `/dashboard/admin/orders` | Admin order management |
+| `/dashboard/admin/users` | Admin user management |
+| `/dashboard/admin/users/about/[id]` | Admin user details |
 
-## Store responsibilities
+## Application data flow
 
-- `src/store/cartStore.ts` is the canonical Zustand cart store. `useCartStore` is the preferred name for new feature code; `useProduct` remains as a compatibility export for older feature imports.
-- Cart quantity mutations respect known inventory limits, persist through the existing `product` storage key, and migrate persisted data to version 3.
-- `summarizeCart()` is a pure selector/helper for all-line and checkout-selected counts/totals, preventing UI components from implementing subtly different subtotal rules.
-- The cart UI supports line selection, select/deselect all, bulk removal, and checkout restricted to selected lines. API order placement and endpoint names were not changed.
-- `features/home/components/intro/CinematicIntro.tsx` owns the landing-page brand reveal; it is session-scoped, skippable, keyboard dismissible, and disabled for reduced-motion preferences.
+1. Feature pages call shared API functions from `src/lib/` rather than defining separate transport behavior.
+2. Browser requests use the same-origin `/api/backend/*` and `/api/auth/*` paths configured in `next.config.ts`.
+3. The browser client sends credentials and the selected locale. Session cookies are HttpOnly; browser code should not read or manually attach access tokens.
+4. Server-rendered requests that require a session use the server API client and read session cookies on the server.
+5. The backend is authoritative for authorization, inventory, prices, discounts, shipping, and order creation.
+6. Zustand stores client-side shopping state such as the cart. Server-owned account, product, and order data must still be validated by the backend.
+
+## Cart behavior
+
+`src/store/cartStore.ts` is the shared cart store. Cart entries are variant-aware, and quantity changes respect known stock limits. Cart calculations are centralized in shared selectors/helpers so the cart and checkout use the same totals and selection rules. The browser's persisted cart is a convenience for the customer; it is not an authoritative source for price or stock.
+
+## Theme, locale, and preferences
+
+- `src/shared/theme/` owns the theme provider and theme utilities.
+- `src/shared/i18n/` owns locale state and translation messages.
+- `src/shared/preferences/` owns display and notification preference state.
+- `src/app/globals.css` defines the semantic theme tokens consumed by shared and feature components.
+
+## Conventions
+
+- Keep App Router `page.tsx` files as route adapters; place substantial page UI in the owning feature.
+- Prefer the `@/` import alias.
+- Keep cross-feature components in `src/shared/`; keep domain-specific UI in its feature module.
+- Use semantic theme classes rather than introducing one-off colors for common surfaces and text.
+- Keep API transport and session behavior in `src/lib/`; do not duplicate it in components.
+- Treat the backend as the source of truth for all business-critical values and permissions.

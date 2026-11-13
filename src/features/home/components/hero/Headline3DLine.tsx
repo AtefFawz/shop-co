@@ -33,4 +33,3 @@ export function Headline3DLine({
     </span>
   );
 }
-

@@ -3,7 +3,11 @@
 import { featuredBrandNames } from "@/features/home/data/storefrontContent";
 import { useLocale } from "@/shared/i18n/LocaleProvider";
 
-export function FeaturedBrandTicker({ reduceMotion }: { reduceMotion: boolean | null }) {
+export function FeaturedBrandTicker({
+  reduceMotion,
+}: {
+  reduceMotion: boolean | null;
+}) {
   const { t, direction } = useLocale();
   const list = featuredBrandNames.filter(Boolean);
   if (!list.length) return null;
@@ -85,4 +89,3 @@ export function FeaturedBrandTicker({ reduceMotion }: { reduceMotion: boolean | 
     </div>
   );
 }
-

@@ -225,67 +225,69 @@ export default async function RootLayout({
             <DisplayPreferencesProvider>
               <NotificationPreferencesProvider>
                 <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
-              />
+                  type="application/ld+json"
+                  dangerouslySetInnerHTML={{
+                    __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+                  }}
+                />
 
-              {/* Global App Listeners */}
-              <ToastSoundListener />
-              <NotificationListener />
-              <AuthWatcher />
-              <PWAInstallPrompt />
-              <PWAAppLaunchScreen />
+                {/* Global App Listeners */}
+                <ToastSoundListener />
+                <NotificationListener />
+                <AuthWatcher />
+                <PWAInstallPrompt />
+                <PWAAppLaunchScreen />
 
-              {/* Main Content */}
-              {children}
+                {/* Main Content */}
+                {children}
 
-              {/* Application toast notifications */}
-              <Toaster
-                position="top-center"
-                gutter={10}
-                containerStyle={{
-                  top: 16,
-                  left: 12,
-                  right: 12,
-                }}
-                toastOptions={{
-                  className: "shopco-toast",
-                  duration: 3500,
-                  style: {
-                    minWidth: "fit",
-                    maxWidth: "min(410px, calc(100vw - 15px))",
-                    background:
-                      "color-mix(in srgb, var(--surface) 50%, transparent)",
-                    color: "var(--text-primary)",
-                    backdropFilter: "blur(20px)",
-                    WebkitBackdropFilter: "blur(20px)",
-                    border: "1px solid var(--border)",
-                    borderRadius: "99999px",
-                    padding: "8px 16px",
-                    fontSize: "0.8125rem",
-                    fontWeight: 700,
-                    letterSpacing: "0.05em",
-                    textTransform: "uppercase",
-                    boxShadow: "var(--shadow-floating)",
-                    whiteSpace: "nowrap",
-                    overflow: "hidden",
-                    display: "flex",
-                    gap: " 10px",
-                  },
-                  success: {
-                    iconTheme: {
-                      primary: "var(--success)",
-                      secondary: "var(--surface)",
+                {/* Application toast notifications */}
+                <Toaster
+                  position="top-center"
+                  gutter={10}
+                  containerStyle={{
+                    top: 16,
+                    left: 12,
+                    right: 12,
+                  }}
+                  toastOptions={{
+                    className: "shopco-toast",
+                    duration: 3500,
+                    style: {
+                      minWidth: "fit",
+                      maxWidth: "min(410px, calc(100vw - 15px))",
+                      background:
+                        "color-mix(in srgb, var(--surface) 50%, transparent)",
+                      color: "var(--text-primary)",
+                      backdropFilter: "blur(20px)",
+                      WebkitBackdropFilter: "blur(20px)",
+                      border: "1px solid var(--border)",
+                      borderRadius: "99999px",
+                      padding: "8px 16px",
+                      fontSize: "0.8125rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.05em",
+                      textTransform: "uppercase",
+                      boxShadow: "var(--shadow-floating)",
+                      whiteSpace: "nowrap",
+                      overflow: "hidden",
+                      display: "flex",
+                      gap: " 10px",
                     },
-                  },
-                  error: {
-                    iconTheme: {
-                      primary: "var(--danger)",
-                      secondary: "var(--surface)",
+                    success: {
+                      iconTheme: {
+                        primary: "var(--success)",
+                        secondary: "var(--surface)",
+                      },
                     },
-                  },
-                }}
-              />
+                    error: {
+                      iconTheme: {
+                        primary: "var(--danger)",
+                        secondary: "var(--surface)",
+                      },
+                    },
+                  }}
+                />
               </NotificationPreferencesProvider>
             </DisplayPreferencesProvider>
           </LocaleProvider>

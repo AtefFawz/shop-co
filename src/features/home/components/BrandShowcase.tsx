@@ -1,6 +1,5 @@
 "use client";
 
-
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { motion } from "motion/react";
@@ -17,7 +16,10 @@ export const BrandShowcase = () => {
   };
 
   return (
-    <section dir={direction} className="page-section relative isolate overflow-hidden bg-surface-subtle text-primary">
+    <section
+      dir={direction}
+      className="page-section relative isolate overflow-hidden bg-surface-subtle text-primary"
+    >
       {/* Architectural Studio Grid */}
       <div
         aria-hidden="true"

@@ -37,9 +37,8 @@ export const DEFAULT_DISPLAY_PREFERENCES: DisplayPreferences = {
   highContrast: false,
 };
 
-const DisplayPreferencesContext = createContext<DisplayPreferencesContextValue | null>(
-  null,
-);
+const DisplayPreferencesContext =
+  createContext<DisplayPreferencesContextValue | null>(null);
 const ReducedMotionPreferenceContext = createContext(false);
 
 function normalizePreferences(value: unknown): DisplayPreferences {
@@ -152,7 +151,9 @@ export function DisplayPreferencesProvider({
   return (
     <MotionConfig reducedMotion={preferences.reduceMotion ? "always" : "user"}>
       <DisplayPreferencesContext.Provider value={value}>
-        <ReducedMotionPreferenceContext.Provider value={preferences.reduceMotion}>
+        <ReducedMotionPreferenceContext.Provider
+          value={preferences.reduceMotion}
+        >
           {children}
         </ReducedMotionPreferenceContext.Provider>
       </DisplayPreferencesContext.Provider>

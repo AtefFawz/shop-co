@@ -5,8 +5,25 @@ import { useAppReducedMotion } from "@/shared/preferences/useAppReducedMotion";
 import Image from "next/image";
 import Link from "next/link";
 import React, { useEffect, useState, useRef } from "react";
-import { AnimatePresence, motion, useMotionValue, useSpring, useTransform, useMotionTemplate } from "framer-motion";
-import { ArrowUpRight, MoveUpRight, Sparkles, Star, ShieldCheck, Flame, Plus, ShoppingBag, CheckCircle2 } from "lucide-react";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+  useMotionTemplate,
+} from "framer-motion";
+import {
+  ArrowUpRight,
+  MoveUpRight,
+  Sparkles,
+  Star,
+  ShieldCheck,
+  Flame,
+  Plus,
+  ShoppingBag,
+  CheckCircle2,
+} from "lucide-react";
 
 import { storefrontStats } from "@/features/home/data/storefrontContent";
 import {
@@ -30,20 +47,41 @@ import { useLocale } from "@/shared/i18n/LocaleProvider";
 export default function StorefrontHero() {
   const { t, locale } = useLocale();
   const dynamicWords = [t("heroWord1"), t("heroWord2"), t("heroWord3")];
-  const quickTags = locale === "ar"
-    ? [t("newArrivals"), t("tagStreetwear"), t("tagMinimalist"), t("tagWinter")]
-    : QUICK_TAGS;
+  const quickTags =
+    locale === "ar"
+      ? [
+          t("newArrivals"),
+          t("tagStreetwear"),
+          t("tagMinimalist"),
+          t("tagWinter"),
+        ]
+      : QUICK_TAGS;
   const statLabels = [t("statBrands"), t("statProducts"), t("statCustomers")];
-  const localizedLookbook = locale === "ar"
-    ? LOOKBOOK_EDITS.map((edit, index) => ({
-        ...edit,
-        tag: ["مختارات ستريت لوكس", "استوديو البساطة", "أساسيات الموسم"][index],
-        title: ["إطلالة أحادية واسعة", "معطف حضري بتصميم متقن", "طبقات يومية عصرية"][index],
-        subtitle: ["قطن ثقيل · قصة كتف منسدلة", "نسيج مقاوم للعوامل · تصميم انسيابي", "خامة فاخرة تسمح بالتهوية · قصة مريحة"][index],
-        badge: ["الأكثر رواجًا", "اختيار المحررين", "كمية محدودة"][index],
-        fabric: ["تيري عضوي 480 GSM", "نسيج تقني ياباني", "مزيج سوبيما ممشّط"][index],
-      }))
-    : LOOKBOOK_EDITS;
+  const localizedLookbook =
+    locale === "ar"
+      ? LOOKBOOK_EDITS.map((edit, index) => ({
+          ...edit,
+          tag: ["مختارات ستريت لوكس", "استوديو البساطة", "أساسيات الموسم"][
+            index
+          ],
+          title: [
+            "إطلالة أحادية واسعة",
+            "معطف حضري بتصميم متقن",
+            "طبقات يومية عصرية",
+          ][index],
+          subtitle: [
+            "قطن ثقيل · قصة كتف منسدلة",
+            "نسيج مقاوم للعوامل · تصميم انسيابي",
+            "خامة فاخرة تسمح بالتهوية · قصة مريحة",
+          ][index],
+          badge: ["الأكثر رواجًا", "اختيار المحررين", "كمية محدودة"][index],
+          fabric: [
+            "تيري عضوي 480 GSM",
+            "نسيج تقني ياباني",
+            "مزيج سوبيما ممشّط",
+          ][index],
+        }))
+      : LOOKBOOK_EDITS;
   const reduceMotion = useAppReducedMotion();
   const [activeSlide, setActiveSlide] = useState(0);
   const [wordIndex, setWordIndex] = useState(0);
@@ -292,9 +330,7 @@ export default function StorefrontHero() {
                   >
                     {/* Animated light sweep */}
                     <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 ease-out group-hover:translate-x-full" />
-                    <span className="relative z-10">
-                      {t("shopNow")}
-                    </span>
+                    <span className="relative z-10">{t("shopNow")}</span>
                     <span className="relative z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/15 transition-all duration-300 group-hover:rotate-45 group-hover:scale-110 group-hover:bg-surface group-hover:text-primary">
                       <ArrowUpRight size={15} />
                     </span>
@@ -458,7 +494,9 @@ export default function StorefrontHero() {
                       SHOP.CO
                     </span>
                     <span className="mt-1 text-xs font-extrabold uppercase tracking-[0.45em] text-primary/20">
-                      {locale === "ar" ? "مختارات الموسم · ٢٠٢٦" : "ARCHIVE // 2026"}
+                      {locale === "ar"
+                        ? "مختارات الموسم · ٢٠٢٦"
+                        : "ARCHIVE // 2026"}
                     </span>
                   </motion.div>
 

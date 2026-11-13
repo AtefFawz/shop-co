@@ -4,7 +4,11 @@ interface SecondaryButtonProps {
   func?: () => void;
   style?: string;
 }
-export default function SecondaryButton({ textBtn, func, style }: SecondaryButtonProps) {
+export default function SecondaryButton({
+  textBtn,
+  func,
+  style,
+}: SecondaryButtonProps) {
   return (
     <div className="w-full flex justify-center">
       <Button
@@ -18,9 +22,16 @@ export default function SecondaryButton({ textBtn, func, style }: SecondaryButto
           backgroundColor: "var(--surface)",
           color: "var(--text-primary)",
           border: "1px solid var(--border-strong)",
-          transition: "background-color 180ms ease, border-color 180ms ease, color 180ms ease",
-          "&:hover": { backgroundColor: "var(--surface-muted)", borderColor: "var(--focus)" },
-          "&:focus-visible": { outline: "2px solid var(--focus)", outlineOffset: 3 },
+          transition:
+            "background-color 180ms ease, border-color 180ms ease, color 180ms ease",
+          "&:hover": {
+            backgroundColor: "var(--surface-muted)",
+            borderColor: "var(--focus)",
+          },
+          "&:focus-visible": {
+            outline: "2px solid var(--focus)",
+            outlineOffset: 3,
+          },
         }}
       >
         {textBtn}
