@@ -1,0 +1,58 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowLeft, ArrowUp } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+
+export const CatalogNavigationTrail = () => {
+  const router = useRouter();
+  const { t, direction } = useLocale();
+  const [showTop, setShowTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowTop(window.scrollY > 400);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <div dir={direction} className="fixed bottom-6 start-4 z-40 flex items-center gap-2 lg:start-8">
+      <motion.button
+        type="button"
+        whileHover={{ scale: 1.04, y: -2 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => router.back()}
+        className="flex cursor-pointer items-center gap-2 rounded-full border border-white/15 bg-action/95 px-4 py-3 text-xs font-black uppercase tracking-widest text-on-action shadow-card backdrop-blur-md transition-colors hover:bg-action"
+      >
+        <ArrowLeft size={14} className={direction === "rtl" ? "rotate-180" : undefined} />
+        <span className="hidden sm:inline">{t("back")}</span>
+      </motion.button>
+
+      <AnimatePresence>
+        {showTop && (
+          <motion.button
+            type="button"
+            initial={{ opacity: 0, scale: 0.8, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.8, y: 10 }}
+            whileHover={{ scale: 1.06, y: -2 }}
+            whileTap={{ scale: 0.94 }}
+            onClick={scrollToTop}
+            title={t("catalogScrollToTop")}
+            className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-border-subtle bg-surface/95 text-primary shadow-card backdrop-blur-md hover:bg-action hover:text-on-action"
+          >
+            <ArrowUp size={15} />
+          </motion.button>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};

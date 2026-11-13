@@ -1,0 +1,321 @@
+"use client";
+import { getInitials } from "@/lib/initials";
+import { getUserRoleBadge } from "@/features/admin/users/utils/roleBadge";
+
+
+import React, { useState } from "react";
+import { User } from "@/types/user";
+import { useRouter } from "next/navigation";
+import { ChevronRight, Copy, Check, Mail, Calendar, ArrowUpRight } from "lucide-react";
+import toast from "react-hot-toast";
+import { useLocale } from "@/shared/i18n/LocaleProvider";
+
+interface UsersTableProps {
+  users: User[];
+  viewMode?: "table" | "grid";
+}
+
+export default function AdminUsersTable({
+  users,
+  viewMode = "table",
+}: UsersTableProps) {
+  const router = useRouter();
+  const { t, locale, direction } = useLocale();
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
+  const [brokenAvatars, setBrokenAvatars] = useState<Record<string, boolean>>(
+    {},
+  );
+
+  const clickUser = (id: string) => {
+    router.push(`/dashboard/admin/users/about/${id}`);
+  };
+
+  const handleCopy = (
+    e: React.MouseEvent,
+    text: string,
+    label: string,
+    key: string,
+  ) => {
+    e.stopPropagation();
+    navigator.clipboard?.writeText(text);
+    setCopiedKey(key);
+    toast.success(`${label}: ${t("usersCopied")}`);
+    setTimeout(() => setCopiedKey(null), 1800);
+  };
+
+  if (viewMode === "grid") {
+    /* ==================================================================== */
+    /* MODE B: 3D VIP IDENTITY BADGE CARDS (DESKTOP GRID)                   */
+    /* ==================================================================== */
+    return (
+      <div
+        style={{ perspective: "1200px" }}
+        dir={direction}
+        className="hidden grid-cols-1 gap-4 md:grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+      >
+        {users.map((user: User) => {
+          const shortId = (user._id || "").slice(-6).toUpperCase();
+          const roleInfo = getUserRoleBadge(user.role, t);
+          const RoleIcon = roleInfo.icon;
+          const hasAvatar = user.avatar && !brokenAvatars[user._id];
+
+          return (
+            <div
+              key={user._id}
+              onClick={() => clickUser(user._id)}
+              className="user-3d-card group relative flex cursor-pointer flex-col justify-between overflow-hidden rounded-3xl border border-border bg-surface p-5 shadow-card"
+            >
+              {/* Top Lanyard Slot Aesthetic */}
+              <div className="mx-auto mb-4 h-1.5 w-12 rounded-full bg-surface-hover/80 transition-colors group-hover:bg-action" />
+
+              {/* Header: ID + Role Pill */}
+              <div className="flex items-center justify-between gap-2">
+                <button
+                  type="button"
+                  onClick={(e) =>
+                    handleCopy(e, user._id, `ID #${shortId}`, `id-${user._id}`)
+                  }
+                  className="inline-flex items-center gap-1 rounded-lg bg-surface-muted px-2 py-1 font-mono text-xs font-black text-secondary transition-colors hover:bg-action hover:text-on-action"
+                >
+                  <span>#{shortId}</span>
+                  {copiedKey === `id-${user._id}` ? (
+                    <Check size={10} className="text-success" />
+                  ) : (
+                    <Copy size={10} className="opacity-60" />
+                  )}
+                </button>
+
+                <span
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-black uppercase tracking-wider ${roleInfo.className}`}
+                >
+                  <RoleIcon size={11} />
+                  {roleInfo.label}
+                </span>
+              </div>
+
+              {/* Center Avatar & Profile */}
+              <div className="my-5 flex flex-col items-center text-center">
+                <div className="relative mb-3">
+                  {hasAvatar ? (
+                    <img loading="lazy" decoding="async"
+                      src={user.avatar}
+                      alt={user.fullName || t("usersUnnamed")}
+                      onError={() =>
+                        setBrokenAvatars((prev) => ({
+                          ...prev,
+                          [user._id]: true,
+                        }))
+                      }
+                      className="h-16 w-16 rounded-2xl border-2 border-surface object-cover shadow-md transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-surface bg-action font-mono text-lg font-black text-on-action shadow-md transition-transform duration-300 group-hover:scale-105">
+                      {getInitials(user.fullName)}
+                    </div>
+                  )}
+
+                  <span
+                    className={`absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-surface ${roleInfo.dotClass}`}
+                  />
+                </div>
+
+                <h3 className="max-w-full truncate text-sm font-black uppercase tracking-tight text-primary">
+                  {user.fullName || t("usersUnnamed")}
+                </h3>
+
+                <button
+                  type="button"
+                  onClick={(e) =>
+                    handleCopy(e, user.email || "", t("usersCopyEmail"), `mail-${user._id}`)
+                  }
+                  className="mt-1 inline-flex max-w-full items-center gap-1 truncate text-xs font-medium text-muted hover:text-primary"
+                >
+                  <span className="truncate">{user.email}</span>
+                  {copiedKey === `mail-${user._id}` && (
+                    <Check size={11} className="shrink-0 text-success" />
+                  )}
+                </button>
+              </div>
+
+              {/* Footer: Joined Date & Inspect CTA */}
+              <div className="flex items-center justify-between border-t border-border-subtle pt-3.5 text-xs font-bold text-muted">
+                <span className="inline-flex items-center gap-1">
+                  <Calendar size={11} />
+                  {user.createdAt
+                    ? new Date(user.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "—"}
+                </span>
+
+                <span className="inline-flex items-center gap-1 font-black uppercase tracking-wider text-primary group-hover:underline">
+                  {t("usersInspect")}
+                  <ArrowUpRight
+                    size={12}
+                    className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                  />
+                </span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }
+
+  /* ====================================================================== */
+  /* MODE A: EDITORIAL DIRECTORY TABLE (DEFAULT DESKTOP VIEW)               */
+  /* ====================================================================== */
+  return (
+    <div dir={direction} className="hidden w-full overflow-hidden rounded-3xl border border-border bg-surface shadow-card md:block">
+      <div className="w-full overflow-x-auto">
+        <table className="w-full border-collapse text-start">
+          <thead>
+            <tr className="border-b border-border-subtle bg-surface-subtle/70 text-xs font-black uppercase tracking-[0.18em] text-muted">
+              <th className="py-4 px-5">{t("usersAccountId")}</th>
+              <th className="py-4 px-4">{t("usersProfile")}</th>
+              <th className="py-4 px-4">{t("adminUserRole")}</th>
+              <th className="py-4 px-4">{t("usersJoinedDate")}</th>
+              <th className="py-4 px-5 text-end">{t("usersProfile")}</th>
+            </tr>
+          </thead>
+
+          <tbody className="divide-y divide-border-subtle text-xs">
+            {users.map((user: User) => {
+              const shortId = (user._id || "").slice(-6).toUpperCase();
+              const roleInfo = getUserRoleBadge(user.role, t);
+              const RoleIcon = roleInfo.icon;
+              const hasAvatar = user.avatar && !brokenAvatars[user._id];
+
+              return (
+                <tr
+                  key={user._id}
+                  onClick={() => clickUser(user._id)}
+                  className="group cursor-pointer transition-colors duration-150 hover:bg-surface-subtle"
+                >
+                  {/* 1. User ID with One-Click Copy */}
+                  <td className="py-4 px-5 align-middle">
+                    <button
+                      type="button"
+                      onClick={(e) =>
+                        handleCopy(
+                          e,
+                          user._id,
+                          `${t("usersCopyId")} #${shortId}`,
+                          `id-${user._id}`,
+                        )
+                      }
+                      title={t("usersCopyId")}
+                      className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-border/80 bg-surface-muted px-2.5 py-1 font-mono text-xs font-black text-secondary transition-all hover:border-border-strong hover:bg-action hover:text-on-action"
+                    >
+                      <span>#{shortId}</span>
+                      {copiedKey === `id-${user._id}` ? (
+                        <Check size={11} className="text-success" />
+                      ) : (
+                        <Copy size={11} className="opacity-50" />
+                      )}
+                    </button>
+                  </td>
+
+                  {/* 2. Customer Avatar, Name & Copyable Email */}
+                  <td className="py-4 px-4 align-middle">
+                    <div className="flex items-center gap-3.5">
+                      <div className="relative shrink-0">
+                        {hasAvatar ? (
+                          <img loading="lazy" decoding="async"
+                            src={user.avatar}
+                            alt={user.fullName || t("usersUnnamed")}
+                            onError={() =>
+                              setBrokenAvatars((prev) => ({
+                                ...prev,
+                                [user._id]: true,
+                              }))
+                            }
+                            className="h-11 w-11 rounded-2xl border-2 border-surface object-cover shadow-xs transition-transform duration-300 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-11 w-11 items-center justify-center rounded-2xl border-2 border-surface bg-action font-mono text-xs font-black text-on-action shadow-xs transition-transform duration-300 group-hover:scale-105">
+                            {getInitials(user.fullName)}
+                          </div>
+                        )}
+                        <span
+                          className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-surface ${roleInfo.dotClass}`}
+                        />
+                      </div>
+
+                      <div className="min-w-0 max-w-[220px] xl:max-w-[280px]">
+                        <p className="truncate text-xs font-black text-primary sm:text-sm">
+                          {user.fullName || t("usersUnnamed")}
+                        </p>
+
+                        <button
+                          type="button"
+                          onClick={(e) =>
+                            handleCopy(
+                              e,
+                              user.email || "",
+                              t("usersCopyEmail"),
+                              `mail-${user._id}`,
+                            )
+                          }
+                          title={t("usersCopyEmail")}
+                          className="mt-0.5 inline-flex max-w-full cursor-pointer items-center gap-1.5 truncate text-xs font-medium text-muted transition-colors hover:text-primary"
+                        >
+                          <Mail size={10} className="shrink-0" />
+                          <span className="truncate">{user.email}</span>
+                          {copiedKey === `mail-${user._id}` && (
+                            <Check
+                              size={11}
+                              className="shrink-0 text-success"
+                            />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+
+                  {/* 3. Role Badge */}
+                  <td className="py-4 px-4 align-middle">
+                    <span
+                      className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-black uppercase tracking-[0.12em] ${roleInfo.className}`}
+                    >
+                      <RoleIcon size={11} />
+                      <span>{roleInfo.label}</span>
+                    </span>
+                  </td>
+
+                  {/* 4. Joined Date */}
+                  <td className="py-4 px-4 align-middle">
+                    <span className="inline-flex items-center gap-1.5 text-xs font-bold text-secondary">
+                      <Calendar size={12} className="text-muted" />
+                      {user.createdAt
+                        ? new Date(user.createdAt).toLocaleDateString(locale === "ar" ? "ar-EG" : "en-GB", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : "—"}
+                    </span>
+                  </td>
+
+                  {/* 5. Action Indicator */}
+                  <td className="py-4 px-5 text-end align-middle">
+                    <span className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-border/80 bg-surface px-3 py-1.5 text-xs font-black uppercase tracking-wider text-secondary shadow-2xs transition-all duration-200 group-hover:border-border-strong group-hover:bg-action group-hover:text-on-action">
+                      <span>{t("usersProfile")}</span>
+                      <ChevronRight
+                        size={13}
+                        className="transition-transform duration-200 group-hover:translate-x-0.5"
+                      />
+                    </span>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
